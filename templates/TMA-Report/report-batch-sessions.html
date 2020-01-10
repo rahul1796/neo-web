@@ -1,0 +1,561 @@
+      
+<!-- third party css -->
+<link href="static/assets/libs/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+<!-- third party css end -->
+
+<!-- App css -->
+<!-- <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" /> -->
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
+<!-- <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" /> -->
+<style>
+     #tblTrAct th{
+         padding: 0.85rem .10rem;
+     }
+</style>
+
+<script type="text/javascript">
+    var Candidates = {};
+    var varGroupAttendanceData = {};
+    var varAttendanceImagePath='';
+    var varGroupImageindex = 0;
+        $(document).ready(function(){       
+            $("#tbl_list").dataTable().fnDestroy();                
+            $('.dropdown-search-filter').select2();
+            $(".date-picker").flatpickr({
+                dateFormat:'d-M-Y'
+            });
+            LoadBatchDetails('{{data[0]}}','{{data[1]}}');
+            LoadTable();
+    
+        });
+    function LoadTableBasedOnSearch(){
+        $("#tbl_list").dataTable().fnDestroy();
+        LoadTable();
+    }
+    function LoadTable(){
+        vartable = $("#tbl_list").DataTable({
+        "serverSide": true,
+        "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
+        "paging": true,
+        "pageLength": 10,
+        "sPaginationType": "full_numbers",
+        "scrollX": false,
+        "destroy": true,
+        "processing": true,
+        "language": { "processing": 'Loading..!' },
+        "ajax": {
+            "url": $('#hdn_web_url').val()+ "/report_batch_session",
+            "type": "POST",
+            "dataType": "json",
+            "data": function (d) {
+                d.batch_id = '{{data[0]}}';
+                d.course_id ='{{data[1]}}';
+                
+            },
+            error: function (e) {
+                $("#tbl_list tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
+            }
+
+        },
+        "columns": [
+            { "data": "S_No"},
+            { "data": "Session_Plan_Name"},
+            { "data": "Module_Name"},
+            { "data": "Session_Name"},
+            //{ "data": "Session_Name"}
+            {
+            "data": function (row, type, val, meta) {
+                var varButtons = ""; 
+                varButtons += '<a onclick="GetCandidateAttendance(\'' + row.Session_Id +'\',\'' + row.Attendance_Type +'\',\'' + row.Stage_Count +'\')" class="btn" style="cursor:pointer" ><i title="Candidate Attendance" class="fas fa-users" ></i></a>';
+                varButtons += '<a onclick="GetTrainierActivity(\'' + row.Session_Id +'\')" class="btn" style="cursor:pointer" ><i title="Trainer Activity" class="far fa-user" ></i></a>';
+                
+                return varButtons;
+                }
+            }
+            ]
+        });
+    }
+    function GetCandidateAttendance(SessionId,AttendanceType,StageCount){
+        if(StageCount==0)
+        {
+            alert("Tainer did not start this session.");
+            return false;
+        }
+        else
+        {
+            BatchId='{{data[0]}}';
+            var URL=$('#hdn_web_url').val()+ "/GetCandidateSessionAttendance?batch_id="+BatchId+"&session_id="+SessionId+"&attendance_type="+AttendanceType;
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                overflow:true,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    varHtml='';
+                    $("#tblCandAtt tbody").empty();
+                    $("#tblCandGrpAtt tbody").empty();
+                    if(!jQuery.isEmptyObject(data.CandidateAttendance))
+                    {   if (data.CandidateAttendance != null){
+                            if (data.CandidateAttendance.length > 0){                             
+                                for(var i=0;i<data.CandidateAttendance.length;i++)   {
+                                    varHtml+='<tr>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.CandidateAttendance[i].S_No +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.CandidateAttendance[i].Candidate_Name +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.CandidateAttendance[i].Enrollment_Id +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.CandidateAttendance[i].Attendance +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.CandidateAttendance[i].Attendance_Date +'</td>';
+                                    if(AttendanceType!=1){
+                                        if (data.CandidateAttendance[i].Image_File_Name=='NA')
+                                            varHtml+='  <td style="text-align:center;">NA</td>';
+                                        else
+                                            varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.TMACandidateImagePath + data.CandidateAttendance[i].Image_File_Name+ ' target="_blank" title="Open image in new tab"><img src='+ data.TMACandidateImagePath + data.CandidateAttendance[i].Image_File_Name +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                                    }
+                                    varHtml+='</tr>';
+                                } 
+                                if(AttendanceType==1){
+                                    $("#tblCandGrpAtt tbody").append(varHtml);
+                                    $('#cand_grp_att').modal('show');
+                                    if(!jQuery.isEmptyObject(data.GroupAttendance)){
+                                        if(data.GroupAttendance.length>0){
+                                            varGroupAttendanceData = data.GroupAttendance;
+                                            $("#imgInfo").text('Showing image 1 of ' + varGroupAttendanceData.length);
+                                            $("#imgGroupImages").show();
+                                            $("#imgGroupImages").attr('src', (data.TMACandidateImagePath + varGroupAttendanceData[varGroupImageindex].Image_File_Name));
+                                            varAttendanceImagePath=data.TMACandidateImagePath;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    $("#tblCandAtt tbody").append(varHtml);
+                                    $('#cand_att').modal('show');
+                                }
+                                
+                                
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(AttendanceType==1){
+                            varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                            $("#tblCandGrpAtt tbody").append(varHtml);
+                            $('#cand_grp_att').modal('show');
+                        }
+                        else{
+                            varHtml='<tr><td colspan="6" style="text-align:center;">No records found</td></tr>'
+                            $("#tblCandAtt tbody").append(varHtml);
+                            $('#cand_att').modal('show');
+                        }
+                        
+                    }   
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+        
+    }
+    function GetTrainierActivity(SessionId){
+        BatchId='{{data[0]}}';
+        var URL=$('#hdn_web_url').val()+ "/GetSessionTrainerActivity?batch_id="+BatchId+"&session_id="+SessionId;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            overflow:true,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                varHtml='';
+                $("#tblTrAct tbody").empty();
+                if(!jQuery.isEmptyObject(data.TrainerActivity))
+                {   if (data.TrainerActivity != null){
+                        
+                        td_open= '  <td style="text-align:center;">' ;
+                        td_close=   '</td>';       
+                        varHtml+='<tr>';
+                        varHtml+='  <td style="text-align:center;">'+ data.TrainerActivity.Batch_Code +'</td>';
+                        varHtml+='  <td style="text-align:center;">'+ data.TrainerActivity.Trainer_Email +'</td>';
+                        varHtml+='  <td style="text-align:center;">'+ data.TrainerActivity.Stage1_Log_Time +'</td>';
+                        if (data.TrainerActivity.Stage1_Image=='NA')
+                            varHtml+='  <td style="text-align:center;">NA</td>';
+                        else
+                            varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.TMAStageLogImagePath + data.TrainerActivity.Stage1_Image+ ' target="_blank" title="Open image in new tab"><img src='+ data.TMAStageLogImagePath + data.TrainerActivity.Stage1_Image +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                        if (data.TrainerActivity.Stage1_Latitide!='NA' & data.TrainerActivity.Stage1_Longitude!='NA')
+                            varHtml +='  <td style="text-align:center;"><a href="https://www.google.com/maps/search/?api=1&query=' + data.TrainerActivity.Stage1_Latitide + ','  + data.TrainerActivity.Stage1_Longitude +  ' target="_blank" title="View location map"><img src="static/images/location.png" style="height:20px;"/></a>';
+                        else
+                            varHtml +='  <td style="text-align:center;">NA</td>';
+                        
+                        varHtml+='  <td style="text-align:center;">'+ data.TrainerActivity.Stage2_Log_Time +'</td>';
+                        if (data.TrainerActivity.Stage2_Image=='NA')
+                            varHtml+='  <td style="text-align:center;">NA</td>';
+                        else
+                            varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.TMAStageLogImagePath + data.TrainerActivity.Stage2_Image+ ' target="_blank" title="Open image in new tab"><img src='+ data.TMAStageLogImagePath + data.TrainerActivity.Stage2_Image +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                        if (data.TrainerActivity.Stage2_Latitide!='NA' & data.TrainerActivity.Stage2_Longitude!='NA')
+                            varHtml +='  <td style="text-align:center;"><a href="https://www.google.com/maps/search/?api=1&query=' + data.TrainerActivity.Stage2_Latitide + ','  + data.TrainerActivity.Stage2_Longitude +  ' target="_blank" title="View location map"><img src="static/images/location.png" style="height:20px;"/></a>';
+                        else
+                            varHtml +='  <td style="text-align:center;">NA</td>';
+                        
+                        varHtml+='  <td style="text-align:center;">'+ data.TrainerActivity.Stage3_Log_Time +'</td>';
+                        if (data.TrainerActivity.Stage3_Image=='NA')
+                            varHtml+='  <td style="text-align:center;">NA</td>';
+                        else
+                            varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.TMAStageLogImagePath + data.TrainerActivity.Stage3_Image+ ' target="_blank" title="Open image in new tab"><img src='+ data.TMAStageLogImagePath + data.TrainerActivity.Stage3_Image +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                        if (data.TrainerActivity.Stage3_Latitide!='NA' & data.TrainerActivity.Stage3_Longitude!='NA')
+                            varHtml +='  <td style="text-align:center;"><a href="https://www.google.com/maps/search/?api=1&query=' + data.TrainerActivity.Stage3_Latitide + ','  + data.TrainerActivity.Stage3_Longitude +  ' target="_blank" title="View location map"><img src="static/images/location.png" style="height:20px;"/></a>';
+                        else
+                            varHtml +='  <td style="text-align:center;">NA</td>';
+                        
+                        
+                        varHtml+='  <td style="text-align:center;">'+ data.TrainerActivity.Stage4_Log_Time +'</td>';
+                        if (data.TrainerActivity.Stage4_Image=='NA')
+                            varHtml+='  <td style="text-align:center;">NA</td>';
+                        else
+                            varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.TMAStageLogImagePath + data.TrainerActivity.Stage4_Image+ ' target="_blank" title="Open image in new tab"><img src='+ data.TMAStageLogImagePath + data.TrainerActivity.Stage4_Image +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                        if (data.TrainerActivity.Stage4_Latitide!='NA' & data.TrainerActivity.Stage4_Longitude!='NA')
+                            varHtml +='  <td style="text-align:center;"><a href="https://www.google.com/maps/search/?api=1&query=' + data.TrainerActivity.Stage4_Latitide + ','  + data.TrainerActivity.Stage4_Longitude +  ' target="_blank" title="View location map"><img src="static/images/location.png" style="height:20px;"/></a>';
+                        else
+                            varHtml +='  <td style="text-align:center;">NA</td>';                   
+                        varHtml+='</tr>';
+                        $("#tblTrAct tbody").append(varHtml);
+                        $('#tr_sess_act').modal('show');
+                    }
+                }
+                else
+                {
+                    varHtml='<tr><td colspan="14" style="text-align:center;">No records found</td></tr>'
+                    $("#tblTrAct tbody").append(varHtml);
+                    $('#tr_sess_act').modal('show');
+                }   
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+        
+    } 
+    function LoadBatchDetails(BatchId,CourseId){
+        var URL=$('#hdn_web_url').val()+ "/get_batch_details_for_att_report?batch_id="+BatchId;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                if(data.BatchDetails != null)
+                {
+                    
+                    {
+                        $('#txtQpCode').val(data.BatchDetails.Qp_Code);
+                        $('#txtQpName').val(data.BatchDetails.Qp_Name);
+                        $('#txtCourseCode').val(data.BatchDetails.Course_Code);
+                        $('#txtCourseName').val(data.BatchDetails.Course_Name);
+                        $('#txtBatchCode').val(data.BatchDetails.Batch_Code);
+                        $('#txtBatchPeriod').val(data.BatchDetails.Batch_Period);
+                    }
+                    
+                }
+                else
+                    {
+                        alert('No data found');
+                    }   
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    
+    function ShowImage(imgPosition)
+    {
+        if (varGroupAttendanceData.length > 0)
+        {
+            switch(imgPosition)
+            {
+                case "FIRST":
+                    if (varGroupAttendanceData.length > 0) varGroupImageindex = 0;
+                    break;
+
+                case "PREVIOUS":
+                    if (varGroupImageindex > 0) varGroupImageindex--;
+                    break;
+
+                case "NEXT":
+                    if (varGroupImageindex < (varGroupAttendanceData.length - 1)) varGroupImageindex++;
+                    break;
+
+                case "LAST":
+                    if (varGroupAttendanceData.length > 0) varGroupImageindex = (varGroupAttendanceData.length - 1);
+                    break;
+            }
+
+            $("#imgInfo").text('Showing image ' + (varGroupImageindex + 1) + ' of ' + varGroupAttendanceData.length);
+            $("#imgGroupImages").attr('src', (varAttendanceImagePath + varGroupAttendanceData[varGroupImageindex].Image_File_Name));
+        }
+    }
+    function OpenGroupImageInNewTab(imgSrc)
+    {
+        if (imgSrc != '')
+        {
+            var win = window.open(imgSrc, '_blank');
+            win.focus();
+        }
+    }
+</script>
+   
+</br>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- <div class="page-title-box"  style="margin-top:20px;"> -->
+                <!-- <h4 class="page-title" >Sessions</h4> -->
+            <!-- </div> -->
+            <div class="card">
+                <div class="card-body"> 
+                    <div class="col-md-12">                                
+                        <div class="col-md-4 form-group">
+                            <h5>Qp Code</h5>                                           
+                        </div>
+                        <div class="col-md-4" style="margin-top: -38px; margin-left: 10%;">
+                            <div class="form-group" style="margin-bottom: 20px;">        
+                                <input type="text" class="form-control" id="txtQpCode"  disabled/>                               
+                            </div>
+                        </div>
+                        <div class="col-md-2 form-group" style="margin-top: -45px; margin-left: 45%;">
+                            <h5>Qp Name</h5>                                           
+                        </div>
+                        <div class="col-md-4" style="margin-top: -42px; margin-left: 55%;">
+                            <div class="form-group" style="margin-bottom: 20px;">        
+                                <input type="text" class="form-control" id="txtQpName"  disabled/>                               
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">                                
+                        <div class="col-md-4 form-group">
+                            <h5>Course Code</h5>                                           
+                        </div>
+                        <div class="col-md-4" style="margin-top: -38px; margin-left: 10%;">
+                            <div class="form-group" style="margin-bottom: 20px;">        
+                                <input type="text" class="form-control" id="txtCourseCode"  disabled/>                               
+                            </div>
+                        </div>
+                        <div class="col-md-2 form-group" style="margin-top: -45px; margin-left: 45%;">
+                            <h5>Course Name </h5>                                           
+                        </div>
+                        <div class="col-md-4" style="margin-top: -42px; margin-left: 55%;">
+                            <div class="form-group" style="margin-bottom: 20px;">        
+                                <input type="text" class="form-control" id="txtCourseName"  disabled/>                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">                                
+                        <div class="col-md-4 form-group">
+                            <h5>batch Code</h5>                                           
+                        </div>
+                        <div class="col-md-4" style="margin-top: -38px; margin-left: 10%;">
+                            <div class="form-group" style="margin-bottom: 20px;">        
+                                <input type="text" class="form-control" id="txtBatchCode" disabled />                               
+                            </div>
+                        </div>
+                        <div class="col-md-2 form-group" style="margin-top: -45px; margin-left: 45%;">
+                            <h5>Batch Period</h5>                                           
+                        </div>
+                        <div class="col-md-4" style="margin-top: -42px; margin-left: 55%;">
+                            <div class="form-group" style="margin-bottom: 20px;">        
+                                <input type="text" class="form-control" id="txtBatchPeriod"  disabled/>                                
+                            </div>
+                        </div>
+                    </div>
+                </div> <!--end card-body-->
+            </div> <!-- end card-->
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <h4 class="header-title">Session List</h4>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="col-lg-12">
+                        <table id="tbl_list" class="table dt-responsive nowrap" >
+                            <thead>
+                                <tr>
+                                    <th>S No</th>
+                                    <th>Session Plan</th>
+                                    <th>Module</th>
+                                    <th>Session</th>  
+                                    <th>Actions</th> 
+                                </tr>
+                            </thead>
+                        
+                        <tbody></tbody>
+                        </table>
+                    </div>
+                </div> <!-- end card body-->                
+            </div> <!-- end card -->
+        </div><!-- end col-->
+    </div>
+</div>
+
+
+<!-- third party js -->
+<script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
+<script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>  
+<!-- third party js ends -->
+
+<div id="tr_sess_act" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title">Trainer Activity</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <table id="tblTrAct" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                    <thead>
+                        <tr style="background-color: #f5f6f8;">
+                            <th rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch Code</th>
+                            <th rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Trainer Email</th>
+                            <th colspan="3" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Session Start</th>
+                            <th colspan="3" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Ongoing Session</th>
+                            <th colspan="3" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Mark Attendance</th>
+                            <th colspan="3" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Session Complete</th>
+                        </tr>
+                        <tr style="background-color: #f5f6f8;">
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Log Date Time</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Stage Image</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Location</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Log Date Time</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Stage Image</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Location</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Log Date Time</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Stage Image</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Location</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Log Date Time</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Stage Image</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div><!--/.modal-->
+<div id="cand_att" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Candidate Attendance</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <table id="tblCandAtt" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                    <thead>
+                        <tr style="background-color: #f5f6f8;">
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S No</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Candidate Name</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Enrollment No</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Attendance</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Attendance Date</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Image</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div><!--/.modal-->
+<div id="cand_grp_att" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Candidate Attendance</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8" style="overflow-y: auto; display: inline-block; ">
+                        <table id="tblCandGrpAtt" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                            <thead>
+                                <tr style="background-color: #f5f6f8;">
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S No</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Candidate Name</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Enrollment No</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Attendance</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Attendance Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-4" style="border:solid 1px black; display: inline-block; padding: 10px;">
+                        <center>
+                            <h5 id="imgInfo">No images found for this session!</h5>
+                            <a title="Open image in new tab"><img id="imgGroupImages" src="" style="height: 180px; width: 360px; border: solid 1px black; cursor:pointer;" onclick="OpenGroupImageInNewTab(this.src)"/></a>
+                            
+                        </center>
+                        <div style="width: 100%;">
+                                <button class="btn btn-primary" title="Show first image" onclick="ShowImage('FIRST')">First</button>
+                                <button class="btn btn-success" title="Show previous image" onclick="ShowImage('PREVIOUS')">Previous</button>
+                                <button class="btn btn-success" title="Show next image" onclick="ShowImage('NEXT')">Next</button>
+                                <button class="btn btn-primary" title="Show last image" onclick="ShowImage('LAST')">Last</button>
+                                <button class="btn btn-danger" data-dismiss="modal" title="Exit Gallery"><i class="fas fa-sign-out-alt" aria-hidden="true"></i></button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div><!--/.modal-->

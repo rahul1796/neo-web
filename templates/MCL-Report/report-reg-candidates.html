@@ -1,0 +1,287 @@
+      
+
+<link href="static/assets/libs/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
+
+
+<script type="text/javascript">
+    var Candidates = {};
+        $(document).ready(function(){       
+            $("#tbl_list").dataTable().fnDestroy();                
+            $('.dropdown-search-filter').select2();
+            $(".date-picker").flatpickr({
+                dateFormat:'d-M-Y'
+            });
+            LoadTable();
+    
+        });
+    
+    function LoadTable(){
+        vartable = $("#tbl_list").DataTable({
+        "serverSide": true,
+        "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
+        "paging": true,
+        "pageLength": 10,
+        "sPaginationType": "full_numbers",
+        "scrollX": false,
+        "destroy": true,
+        "processing": true,
+        "language": { "processing": 'Loading..!' },
+        "ajax": {
+            "url": $('#hdn_web_url').val()+ "/GetRegisteredCandidatesList",
+            "type": "POST",
+            "dataType": "json",
+            "data": function (d) {
+                d.center_id = '{{data[0]}}';
+                d.course_id ='{{data[1]}}';
+                d.mobilizer_id ='{{data[2]}}';
+                
+            },
+            error: function (e) {
+                $("#tbl_list tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
+            }
+
+        },
+        "columns": [
+            { "data": "S_No"},
+            { "data": "Candidate_Id"},
+            { "data": "Salutation"},
+            //{ "data": "Name"},
+            {
+            "data": function (row, type, val, meta) {
+                var varButtons = ""; 
+                varButtons += '<a  onclick="GetCandidatebasicDetails(\'' + row.Candidate_Id + '\',\'' + row.Name + '\')"  style="color:blue;cursor:pointer" >' + row.Name + '</a>';
+                return varButtons;
+                }
+            },
+            { "data": "Registration_Id"},
+            { "data": "Enrollment_Id"}
+            ]
+        });
+    }
+    function GetCandidatebasicDetails(CandidateId,Name)
+    {
+        var URL=$('#hdn_web_url').val()+ "/GetCandidateBasicDetails?candidate_id="+CandidateId;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            overflow:true,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                if(data.CandidateDetails!=null)
+                {
+                    $('#lblCandidateName').text(Name);
+                    $('#lblGender').text(data.CandidateDetails.Gender);
+                    $('#lblDob').text(data.CandidateDetails.Date_of_birth);
+                    $('#lblEmailId').text(data.CandidateDetails.Email_Id);
+                    $('#lblFather').text(data.CandidateDetails.Father_Name);
+                    $('#lblMother').text(data.CandidateDetails.Mother_Name);
+                    $('#con_close_modal').modal('show');
+                }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+</script>
+   
+</br>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">           
+            <div class="card">
+                <div class="card-body"> 
+                    <div class="col-md-12">                                
+                        <div class="col-md-4 form-group">
+                            <h5>Center Name</h5>                                           
+                        </div>
+                        <div class="col-md-4" style="margin-top: -38px; margin-left: 10%;">
+                            <div class="form-group" style="margin-bottom: 20px;">        
+                                <input type="text" class="form-control" id="txtCenterName" value="{{data[3]}}"  disabled/>                               
+                            </div>
+                        </div>
+                        <div class="col-md-2 form-group" style="margin-top: -45px; margin-left: 45%;">
+                            <h5>Course Name</h5>                                           
+                        </div>
+                        <div class="col-md-4" style="margin-top: -42px; margin-left: 55%;">
+                            <div class="form-group" style="margin-bottom: 20px;">        
+                                <input type="text" class="form-control" id="txtCourseName" value="{{data[4]}}" disabled/>                               
+                            </div>
+                        </div>
+                    </div>
+                </div> <!--end card-body-->
+            </div> <!-- end card-->
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <h4 class="header-title">Candidate List</h4>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="col-lg-12">
+                        <table id="tbl_list" class="table dt-responsive nowrap" >
+                            <thead>
+                                <tr>
+                                    <th>S No</th>
+                                    <th>Candidate Id</th>
+                                    <th>Salutation</th>
+                                    <th>Candidate Name</th>
+                                    <th>Registration Id</th>  
+                                    <th>Enrollment Id</th> 
+                                </tr>
+                            </thead>
+                        
+                        <tbody></tbody>
+                        </table>
+                    </div>
+                </div> <!-- end card body-->                
+            </div> <!-- end card -->
+        </div><!-- end col-->
+    </div>
+</div>
+
+
+<!-- third party js -->
+<script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
+<script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>  
+<!-- third party js ends -->
+
+<div id="con_close_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Candidate Basic Details</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="lblCandidateName" class="control-label">Candidate Name :</label>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                            <div class="form-group">
+                                <label for="lblMother" class="control-label"> :</label>
+                            </div>
+                        </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label id="lblCandidateName" class="control-label"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="lblGender" class="control-label">Gender :</label>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                            <div class="form-group">
+                                <label for="lblMother" class="control-label"> :</label>
+                            </div>
+                        </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label id="lblGender" class="control-label"></label>                            
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="lblDob" class="control-label">Date Of Birth :</label>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                            <div class="form-group">
+                                <label for="lblMother" class="control-label"> :</label>
+                            </div>
+                        </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label id="lblDob" class="control-label"></label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="lblEmailId" class="control-label">Email Id :</label>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                                <div class="form-group">
+                                    <label for="lblMother" class="control-label"> :</label>
+                                </div>
+                            </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label id="lblEmailId" class="control-label"></label>
+                            </div>
+                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="lblFather" class="control-label">Father Name :</label>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                            <div class="form-group">
+                                <label for="lblMother" class="control-label"> :</label>
+                            </div>
+                        </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label id="lblFather" class="control-label"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="lblMother" class="control-label">Mother Name :</label>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                            <div class="form-group">
+                                <label for="lblMother" class="control-label"> :</label>
+                            </div>
+                        </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label id="lblMother" class="control-label"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>                
+            </div>
+        </div>
+    </div>
+</div><!--/.modal-->

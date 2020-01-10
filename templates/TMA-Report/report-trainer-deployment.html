@@ -1,0 +1,518 @@
+<link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+        
+<!-- third party css -->
+<link href="static/assets/libs/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+<!-- third party css end -->
+
+<!-- Custom box css -->
+<!-- <link href="static/assets/libs/custombox/custombox.min.css" rel="stylesheet"> -->
+
+<!-- App css -->
+<!-- <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" /> -->
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
+<!-- <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" /> -->
+
+
+<script type="text/javascript">
+    var Candidates = {};
+        $(document).ready(function(){       
+            $("#tbl_list").dataTable().fnDestroy();                
+            $('.dropdown-search-filter').select2();
+            $(".date-picker").flatpickr({
+                dateFormat:'d-M-Y'
+            });
+            LoadRegionddl(); 
+            //LoadTable();
+    
+        });
+    function LoadRegionddl(){
+    var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+                "user_id": $('#hdn_home_user_id').val(),
+                "user_role_id" : $('#hdn_home_user_role_id').val()
+        },
+        success: function (data){
+            if(data.Regions != null)
+            {
+                $('#ddlRegion').empty();
+                var count=data.Regions.length;
+                if( count> 0)
+                {
+                    $('#ddlRegion').append(new Option('ALL','0'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlRegion').append(new Option(data.Regions[i].Region_Name,data.Regions[i].Region_Id));
+                    $('#ddlRegion').val('');
+                }
+                else
+                {
+                    $('#ddlRegion').append(new Option('ALL','0'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+    function LoadCenter(region_id){
+        var URL=$('#hdn_web_url').val()+ "/GetAllCentersBasedOnRegion_User"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id" : $('#hdn_home_user_role_id').val(),
+                    "region_id":region_id
+            },
+            success: function (data){
+                if(data.Centers != null)
+                {
+                    $('#ddlCenter').empty();
+                    var count=data.Centers.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlCenter').append(new Option('ALL','0'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlCenter').append(new Option(data.Centers[i].Center_Name,data.Centers[i].Center_Id));
+						$('#ddlCenter').val('');
+                    }
+                    else
+                    {
+                        $('#ddlCenter').append(new Option('ALL','0'));
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function LoadCourse_users(center_id){
+        LoadCourses(center_id);
+        LoadTrainers(center_id);
+    }
+    function LoadCourses(center_id){
+        var URL=$('#hdn_web_url').val()+ "/GetAllCoursesBasedOnCenter_User"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id" : $('#hdn_home_user_role_id').val(),
+                    "center_id":center_id
+            },
+            success: function (data){
+                if(data.Courses != null)
+                {
+                    $('#ddlCourse').empty();
+                    var count=data.Courses.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlCourse').append(new Option('ALL','0'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
+                    }
+                    else
+                    {
+                        $('#ddlCourse').append(new Option('ALL','0'));
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function LoadTrainers(center_id){
+        var URL=$('#hdn_web_url').val()+ "/GetAllTrainersBasedOnCenter_User"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id" : $('#hdn_home_user_role_id').val(),
+                    "center_id":center_id
+            },
+            success: function (data){
+                if(data.Trainers != null)
+                {
+                    $('#ddlTrainer').empty();
+                    var count=data.Trainers.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlTrainer').append(new Option('ALL','0'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlTrainer').append(new Option(data.Trainers[i].User_Name,data.Trainers[i].User_Id));
+                    }
+                    else
+                    {
+                        $('#ddlTrainer').append(new Option('ALL','0'));
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function LoadTableBasedOnSearch(){
+        if($('#ddlRegion').val()==''|| $('#ddlRegion').val()==null){
+            alert("Please select a region.");
+        }
+        else{
+            $("#tbl_list").dataTable().fnDestroy();
+            LoadTable();
+        }
+        
+    }
+    function LoadTable(){
+        vartable = $("#tbl_list").DataTable({
+        "serverSide": true,
+        "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
+        "paging": true,
+        "pageLength": 10,
+        "sPaginationType": "full_numbers",
+        "scrollX": false,
+        "destroy": true,
+        "processing": true,
+        "language": { "processing": 'Loading..!' },
+        "ajax": {
+            "url": $('#hdn_web_url').val()+ "/trainer_deployment_batches",
+            "type": "POST",
+            "dataType": "json",
+            "data": function (d) {
+                d.region_id = $('#ddlRegion').val();
+                d.center_id =$('#ddlCenter').val();
+                d.course_ids = $('#ddlCourse').val().toString();  
+                d.trainer_ids = $('#ddlTrainer').val().toString();             
+                d.from_date =$('#FromDate').val();
+                d.to_date = $('#ToDate').val();
+                d.batch_stage_id = $('#ddlBatchStage').val();
+                
+            },
+            error: function (e) {
+                $("#tbl_list tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
+            }
+
+        },
+        "columns": [
+            { "data": "S_No"},
+            { "data": "Center_Name"},
+            { "data": "Course_Name"},
+            { "data": "Trainer_Name"},
+            {
+            "data": function (row, type, val, meta) {
+                var varButtons = ""; 
+                varButtons += '<a  onclick="BatchModal(\'' + row.Qp_Code + '\',\'' + row.Qp_Name + '\',\'' + row.Course_Code + '\',\'' + row.Course_Name + '\',\'' + row.Batch_Code + '\',\'' + row.Start_Date + '\',\'' + row.End_Date + '\',\'' + row.Actual_Start_Date + '\',\'' + row.Actual_End_Date + '\',\'' + row.Batch_Active_Status + '\')"  style="color:blue;cursor:pointer" >' + row.Batch_Code + '</a>';
+                return varButtons;
+                }
+            },
+            //{ "data": "Batch_Code"},
+            { "data": "Batch_Stage_Name"},
+            { "data": "Candidate_Count"}
+            
+            ]
+        });
+    }
+    function BatchModal(QpCode,QpName,CourseCode,CourseName,BatchCode,StartDate,EndDate,ActualStartDate,ActualEndDate,BatchActiveStatus){
+        $('#txtQPCode').val(QpCode);
+        $('#txtQPName').val(QpName);
+        $('#txtCourseCode').val(CourseCode);
+        $('#txtCourseName').val(CourseName);
+        $('#txtBatchCode').val(BatchCode);
+        $('#txtPlannedStartDate').val(StartDate);
+        $('#txtPlannedEndDate').val(EndDate);
+        $('#txtActualStartDate').val(ActualStartDate);
+        $('#txtActualEndDate').val(ActualEndDate);
+        $('#txtBatchActiveStatus').val(BatchActiveStatus);
+        $('#con_close_modal').modal('show');
+    }
+</script>
+   
+</br>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card-box">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label for="ddlRegion " class="mr-2">Region</label>
+                        <select class="form-control dropdown-search-filter" onchange="LoadCenter(this.value);" id="ddlRegion" >
+                            <option selected="" value="0">All</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="ddlCenter " class="mr-2">Center</label>
+                        <select class="form-control dropdown-search-filter" id="ddlCenter" onchange="LoadCourse_users(this.value);" >
+                            <option selected="" value="0">All</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="ddlCourse" class="mr-2">Course</label>
+                        <select class="form-control dropdown-search-filter" id="ddlCourse" multiple >
+                            <option value="0">All</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3" style="display:none">
+                        <label for="ddlMobilizer" class="mr-2">Mobilizer</label>
+                        <select class="form-control dropdown-search-filter" id="ddlMobilizer" >
+                            <option  value="0">All</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3" >
+                        <label for="ddlTrainer" class="mr-2">Trainer</label>
+                        <select class="form-control dropdown-search-filter" id="ddlTrainer" multiple>
+                            <option value="0">All</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">                    
+                    
+                    <div class="col-lg-3">
+                        <label for="FromDate" class="mr-2">From Date</label>
+                        <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
+                        ClientIdMode="static" placeholder="From Date">
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="ToDate" class="mr-2">To Date</label>
+                        <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
+                        ClientIdMode="static" placeholder="To Date">
+                    </div>
+                    <div class="col-lg-3" >
+                        <label for="ddlBatchStage" class="mr-2">Batch Stage</label>
+                        <select class="form-control dropdown-search-filter" id="ddlBatchStage" >
+                            <option selected="" value="0">All</option>
+                            <option  value="1">Completed</option>
+                            <option  value="2">Ongoing</option>
+                            <option  value="3">Scheduled</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3" >
+                        <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <h4 class="header-title">Batch List</h4>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="col-lg-12">
+                        <table id="tbl_list" class="table dt-responsive nowrap" >
+                            <thead>
+                                <tr>
+                                    <th>S No</th>
+                                    <th>Center</th>
+                                    <th>Course</th>
+                                    <th>Trainer</th>
+                                    <th>Batch Code</th>
+                                    <th>Stage</th>
+                                    <th>Enrolled Count</th>    
+                                </tr>
+                            </thead>
+                        
+                        <tbody></tbody>
+                        </table>
+                    </div>
+                </div> <!-- end card body-->                
+            </div> <!-- end card -->
+        </div><!-- end col-->
+    </div>
+</div>
+
+
+
+
+<!-- third party js -->
+<script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
+<script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>  
+<!-- third party js ends -->
+<!--<script src="static/assets/js/pages/trainer-deployment-report.js"></script>-->
+<!-- <script src="static/assets/libs/custombox/custombox.min.js"></script> -->
+
+<div id="con_close_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Batch Details</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtQPCode" class="control-label">QP Code</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtQPCode" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtQPName" class="control-label">QP Name</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtQPName" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtCourseCode" class="control-label">Course Code</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtCourseCode" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtCourseName" class="control-label">Course Name</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtCourseName" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtBatchCode" class="control-label">Batch Code</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtBatchCode" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtPlannedStartDate" class="control-label">Planned Start Date</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtPlannedStartDate" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtPlannedEndDate" class="control-label">Planned End Date</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtPlannedEndDate"disabled >
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtActualStartDate" class="control-label">Actual Start Date</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtActualStartDate" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtActualEndDate" class="control-label">Actual End Date</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtActualEndDate" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtBatchActiveStatus" class="control-label">Batch Active Status</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtBatchActiveStatus" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div><!--/.modal-->
+
+
+
+
+ 

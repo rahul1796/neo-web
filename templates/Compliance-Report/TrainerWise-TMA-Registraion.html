@@ -1,0 +1,534 @@
+<link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+  
+<link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
+
+
+
+<script type="text/javascript">
+    var Candidates = {};
+        $(document).ready(function(){       
+            $("#tbl_list").dataTable().fnDestroy();                
+            $('.dropdown-search-filter').select2({
+                placeholder:'select an option'
+            });
+            $(".date-picker").flatpickr({
+                dateFormat:'d-M-Y'
+            });
+            LoadRegionddl(); 
+            LoadCenterType();
+    
+        });
+    function LoadRegionddl(){
+    var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+                "user_id": $('#hdn_home_user_id').val(),
+                "user_role_id" : $('#hdn_home_user_role_id').val()
+        },
+        success: function (data){
+            if(data.Regions != null)
+            {
+                $('#ddlRegion').empty();
+                var count=data.Regions.length;
+                if( count> 0)
+                {
+                    //$('#ddlRegion').append(new Option('Select Region','0'));
+                    
+                    for(var i=0;i<count;i++)
+                        $('#ddlRegion').append(new Option(data.Regions[i].Region_Name,data.Regions[i].Region_Id));
+                    //$('#ddlRegion').val('');
+                }
+                else
+                {
+                    $('#ddlRegion').append(new Option('ALL','0'));
+                }
+                $("#ddlRegion option[value='0']").attr('disabled','disabled');
+            }
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+    function LoadCenterType()
+    {
+        
+        var URL=$('#hdn_web_url').val()+ "/AllCenterTypes"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id" : $('#hdn_home_user_role_id').val()
+            },
+            success: function (data){
+                if(data.Center_Types != null)
+                {
+                    $('#ddlCenterType').empty();
+                    var count=data.Center_Types.length;
+                    if( count> 0)
+                    {
+                        for(var i=0;i<count;i++)
+                            $('#ddlCenterType').append(new Option(data.Center_Types[i].Center_Type_Name,data.Center_Types[i].Center_Type_Id));
+                        //$('#ddlCenterType').val('');
+                    }
+                    else
+                    {
+                        $('#ddlCenterType').append(new Option('ALL','0'));
+                    }
+                    $("#ddlCenterType option[value='0']").attr('disabled','disabled');
+                }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function LoadCooCluster(){
+        LoadCluster();
+        LoadCoo();
+    }
+    function LoadCluster()
+    {
+        var URL=$('#hdn_web_url').val()+ "/GetAllClustersBasedOnMultipleRegion_User"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+                "user_id": $('#hdn_home_user_id').val(),
+                "user_role_id" : $('#hdn_home_user_role_id').val(),
+                "region_id":$('#ddlRegion').val().toString()
+        },
+        success: function (data){
+            if(data.Clusters != null)
+            {
+                $('#ddlCluster').empty();
+                var count=data.Clusters.length;
+                if( count> 0)
+                {
+                    $('#ddlCluster').append(new Option('ALL','0'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlCluster').append(new Option(data.Clusters[i].Cluster_Name,data.Clusters[i].Cluster_Id));
+                    //$('#ddlCenter').val('');
+                }
+                else
+                {
+                    $('#ddlCluster').append(new Option('ALL','0'));
+                }
+                $("#ddlCluster option[value='0']").attr('disabled','disabled');
+            }
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+    }
+    function LoadCoo()
+    {
+        var URL=$('#hdn_web_url').val()+ "/GetAllCooBasedOnMultipleRegions_User"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id" : $('#hdn_home_user_role_id').val(),
+                    "region_id":$('#ddlRegion').val().toString()
+            },
+            success: function (data){
+                if(data.Coo != null)
+                {
+                    $('#ddlCoo').empty();
+                    var count=data.Coo.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlTrainer').append(new Option('ALL','0'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlCoo').append(new Option(data.Coo[i].User_Name,data.Coo[i].User_Id));
+                    }
+                    else
+                    {
+                        $('#ddlCoo').append(new Option('ALL','0'));
+                    }
+                    $("#ddlCoo option[value='0']").attr('disabled','disabled');
+                }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function LoadTmCenter()
+    {
+        LoadCenter();
+        LoadTm();
+    }
+    function LoadCenter(){
+        
+        var URL=$('#hdn_web_url').val()+ "/GetAllCentersBasedOnMultipleClusters_User"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id" : $('#hdn_home_user_role_id').val(),
+                    "cluster_id":$('#ddlCluster').val().toString()
+            },
+            success: function (data){
+                if(data.Centers != null)
+                {
+                    $('#ddlCenter').empty();
+                    var count=data.Centers.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlCenter').append(new Option('ALL','0'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlCenter').append(new Option(data.Centers[i].Center_Name,data.Centers[i].Center_Id));
+						$('#ddlCenter').val('');
+                    }
+                    else
+                    {
+                        $('#ddlCenter').append(new Option('ALL','0'));
+                    }
+                    $("#ddlCenter option[value='0']").attr('disabled','disabled');
+                }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function LoadTm()
+    {
+        var URL=$('#hdn_web_url').val()+ "/GetAllTmBasedOnMultipleClusters_User"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id" : $('#hdn_home_user_role_id').val(),
+                    "cluster_id":$('#ddlCluster').val().toString()
+            },
+            success: function (data){
+                if(data.TM != null)
+                {
+                    $('#ddlTm').empty();
+                    var count=data.TM.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlTrainer').append(new Option('ALL','0'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlTm').append(new Option(data.TM[i].User_Name,data.TM[i].User_Id));
+                    }
+                    else
+                    {
+                        $('#ddlTm').append(new Option('ALL','0'));
+                    }
+                    $("#ddlTm option[value='0']").attr('disabled','disabled');
+                }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function LoadCourses(){
+        
+        var URL=$('#hdn_web_url').val()+ "/GetAllCoursesBasedOnMultipleCenters_User"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id" : $('#hdn_home_user_role_id').val(),
+                    "center_id":$('#ddlCenter').val().toString()
+            },
+            success: function (data){
+                if(data.Courses != null)
+                {
+                    $('#ddlCourse').empty();
+                    var count=data.Courses.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlCourse').append(new Option('ALL','0'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
+                    }
+                    else
+                    {
+                        $('#ddlCourse').append(new Option('ALL','0'));
+                    }
+                    $("#ddlCourse option[value='0']").attr('disabled','disabled');
+                }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function LoadTableBasedOnSearch(){
+        if($('#ddlRegion').val().toString()==''|| $('#ddlRegion').val().toString()==null){
+            alert("Please select a region.");
+        }
+        else{
+            LoadTable();
+        }
+        
+    }
+    function LoadTable()
+    {
+            vartable1 = $("#tbl_list").DataTable({
+            "serverSide": true,
+            "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
+            "paging": true,
+            "pageLength": 10,
+            "sPaginationType": "full_numbers",
+            "scrollX": false,
+            "destroy": true,
+            "processing": true,
+            "language": { "processing": 'Loading..!' },
+            "ajax": {
+                "url": $('#hdn_web_url').val()+ "/trainerwise_tma_registration_compliance_report",
+                "type": "POST",
+                "dataType": "json",
+                "data": function (d) {
+                    d.region_id=$('#ddlRegion').val().toString();
+                    d.center_type_id=$('#ddlCenterType').val().toString();
+                    d.cluster_id=$('#ddlCluster').val().toString();
+                    d.center_id=$('#ddlCenter').val().toString();
+                    d.course_id=$('#ddlCourse').val().toString();
+                    d.coo=$('#ddlCoo').val().toString();
+                    d.tm=$('#ddlTm').val().toString();
+                },
+                error: function (e) {
+                    $("#tbl_list tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
+                }
+
+            },
+
+            "columns": [
+                { "data": "S_No"},
+                { "data": "Trainer_Name" },
+                { "data": "Region_Name" },
+                { "data": "Cluster_Name" },
+                { "data": "Center_Type_Name" },
+                { "data": "Center_Name" },
+                { "data": "Course_Name" },
+                { "data": "Batch_Count" },
+                { "data": "Tm" },
+                { "data": "Coo" }
+            ],
+            drawCallback: function(){
+                $('#tbl_list_paginate ul.pagination').addClass("pagination-rounded");
+            }
+        });
+    }
+    function DownloadReport()
+    {
+        if($('#ddlRegion').val().toString()==''|| $('#ddlRegion').val().toString()==null){
+            alert("Please select a region.");
+        }
+        else
+        {   
+            var URL=$('#hdn_web_url').val()+ "/download_trainerwise_tma_registration_compliance_report";            
+            $.ajax({
+                type:"POST",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{         
+                    "region_id":$('#ddlRegion').val().toString(),                    
+                    "center_type_id":$('#ddlCenterType').val().toString(),
+                    "cluster_id":$('#ddlCluster').val().toString(),
+                    "center_id":$('#ddlCenter').val().toString(),
+                    "course_id":$('#ddlCourse').val().toString(),
+                    "coo":$('#ddlCoo').val().toString(),
+                    "tm":$('#ddlTm').val().toString()
+                },
+                success:function(data){
+                    if(data!=null)
+                    {
+                        //alert(data.FilePath+data.FileName);
+                        window.location=data.FilePath+data.FileName+'.xlsx';
+                    }                    
+                },
+                error:function(x){
+                    alert('Error while downloading Report. ');
+                }
+            });
+        }
+    }
+</script>
+   
+</br>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card-box">
+                <form id="DownloadReport" action="javascript:DownloadReport();" name="DownloadReport" method="POST">
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <label for="ddlRegion " class="mr-2">Region</label>
+                            <select class="form-control dropdown-search-filter" onchange="LoadCooCluster();" id="ddlRegion" multiple>
+                                <!-- <option value="" disabled selected>Select Region</option> -->
+                            </select>
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="ddlCluster" class="mr-2">Cluster</label>
+                            <select class="form-control dropdown-search-filter" id="ddlCluster" onchange="LoadTmCenter();" multiple>
+                                <!-- <option selected="" value="0">All</option> -->
+                            </select>
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="ddlCenterType" class="mr-2">Center Type</label>
+                            <select class="form-control dropdown-search-filter" id="ddlCenterType" multiple >
+                                <!-- <option value="0">All</option> -->
+                            </select>
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="ddlCenter " class="mr-2">Center</label>
+                            <select class="form-control dropdown-search-filter" id="ddlCenter" onchange="LoadCourses();" multiple>
+                                <!-- <option selected="" value="0">All</option> -->
+                            </select>
+                        </div>
+                        
+                        
+                    </div>
+                </br>
+                    <div class="row"> 
+                        <div class="col-lg-3">
+                            <label for="ddlCourse" class="mr-2">Course</label>
+                            <select class="form-control dropdown-search-filter" id="ddlCourse" multiple >
+                                <!-- <option value="0">All</option> -->
+                            </select>
+                        </div>                   
+                        <div class="col-lg-3">
+                            <label for="ddlCoo" class="mr-2">Coo</label>
+                            <select class="form-control dropdown-search-filter" id="ddlCoo" multiple>
+                                <!-- <option  value="0">All</option> -->
+                            </select>
+                        </div>
+                        <div class="col-lg-3" >
+                            <label for="ddlTm" class="mr-2">Territory Manager</label>
+                            <select class="form-control dropdown-search-filter" id="ddlTm" multiple>
+                                <!-- <option value="0">All</option> -->
+                            </select>
+                        </div>
+                        <div class="col-lg-1" >
+                            <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+                        </div>
+                        <div class="col-lg-1" >
+                            <!-- <button class="btn btn-primary" type="submit" >Download Report</button> -->
+                            <button style="margin-top: 30px" type="submit" class="btn btn-primary waves-effect waves-light" >Download</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <h4 class="header-title">TMA Registration</h4>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="col-lg-12">
+                        <table id="tbl_list" class="table dt-responsive nowrap" >
+                            <thead>
+                                <tr>
+                                    <th>S No</th>
+                                    <th>Trainer Name</th>
+                                    <th>Region</th>
+                                    <th>Cluster</th>
+                                    <th>Center Type</th>
+                                    <th>Center</th>
+                                    <th>Course</th>
+                                    <th>Batch Count</th>
+                                    <th>TM</th>
+                                    <th>COO</th>   
+                                </tr>
+                            </thead>
+                        
+                        <tbody></tbody>
+                        </table>
+                    </div>
+                </div> <!-- end card body-->                
+            </div> <!-- end card -->
+        </div><!-- end col-->
+    </div>
+</div>
+
+
+
+
+<!-- third party js -->
+<script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
+<script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>  
+<!-- third party js ends -->
+<!--<script src="static/assets/js/pages/trainer-deployment-report.js"></script>-->
+<!-- <script src="static/assets/libs/custombox/custombox.min.js"></script> -->
+
+
+
+
+ 

@@ -1,0 +1,7 @@
+__pycache__
+data
+report file
+wfastcgi.py
+Database/config.py
+Database/__pycache__
+Models/__pycache__

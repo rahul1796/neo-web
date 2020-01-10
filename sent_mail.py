@@ -1,0 +1,33 @@
+import smtplib
+import json 
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from Database import config
+
+def forget_password(email, password, name):
+    try:
+        server = smtplib.SMTP('smtp.office365.com','587')
+        #server = smtplib.SMTP(host='smtp.office365.com')
+        #server.connect('smtp.office365.com','587')
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login("do-not-reply@labournet.in","Donotreply@123")
+
+        msg = MIMEMultipart()
+
+        msg['From'] = "do-not-reply@labournet.in"
+        msg['To'] = email
+        msg['Subject'] = "[NEO] Reg: Your Request For Forgot Password"
+
+        html_msg= config.html_email_msg
+        html_msg = html_msg.format(name,password)
+
+        msg.attach(MIMEText(html_msg, 'html'))
+
+        res = server.sendmail(msg['From'], msg['To'], msg.as_string())
+        server.quit()
+
+        return {'status':True,'description':'Email sent'}
+    except:
+        return {'status':False,'description':'Unable to sent email'}
