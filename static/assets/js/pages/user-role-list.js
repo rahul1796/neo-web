@@ -53,7 +53,9 @@ function LoadTable()
                 }
             }
         ],
-
+        drawCallback: function(){
+            $('#tbl_user_role_paginate ul.pagination').addClass("pagination-rounded");
+        }
 
     });
 }

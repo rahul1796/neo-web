@@ -1,5 +1,5 @@
 
-<link href="static/assets/libs/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
 
 
@@ -236,7 +236,10 @@
                 return varButtons;
                 }
             }
-            ]
+            ],
+            drawCallback: function(){
+                $('#tbl_list_paginate ul.pagination').addClass("pagination-rounded");
+            }
         });
     }
     function GetCandidateList(CenterName,CourseName,CenterId,CourseId,MobilizerId)

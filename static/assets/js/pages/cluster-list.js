@@ -55,7 +55,9 @@ function LoadTable()
                 }
             }
         ],
-
+        drawCallback: function(){
+            $('#tbl_cluster_paginate ul.pagination').addClass("pagination-rounded");
+        }
 
     });
 }
