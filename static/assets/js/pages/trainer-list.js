@@ -60,7 +60,9 @@ function LoadTable()
            
             
         ],
-
+        drawCallback: function(){
+            $('#tbl_users_paginate ul.pagination').addClass("pagination-rounded");
+        }
 
     });
 }

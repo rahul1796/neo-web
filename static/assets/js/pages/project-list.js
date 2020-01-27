@@ -49,7 +49,9 @@ function LoadTable()
             }
             }
         ],
-
+        drawCallback: function(){
+            $('#alternative-page-datatable_paginate ul.pagination').addClass("pagination-rounded");
+        }
 
     });
 }

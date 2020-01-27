@@ -54,7 +54,9 @@ function LoadTable()
                 }
             }
         ],
-
+        drawCallback: function(){
+            $('#tbl_region_paginate ul.pagination').addClass("pagination-rounded");
+        }
 
     });
 }

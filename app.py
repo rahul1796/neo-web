@@ -43,7 +43,10 @@ def report_log_out():
         return render_template("login.html",error="Already logged out")
     
 @app.before_request
-def before_request():     
+def before_request():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=5)
+
     g.user = None
     g.course_id = None
     g.center_category_id = None
@@ -71,10 +74,13 @@ def before_request():
         g.user = session['user_name']
         g.user_id = session['user_id']
         g.user_role = session['user_role_id']
+        g.base_url = session['base_url']
         # print(g.user,g.user_id,g.user_role)
         g.User_detail_with_ids.append(g.user)
         g.User_detail_with_ids.append(g.user_id)
         g.User_detail_with_ids.append(g.user_role)
+        g.User_detail_with_ids.append(g.base_url)
+        
     if 'course_id' in session.keys():
         g.course_id = session['course_id']
     if 'center_category_id' in session.keys():
@@ -163,7 +169,8 @@ def login():
             if tr[0]['Is_Active'] == 1:
                 session['user_name'] = tr[0]['User_Name']            
                 session['user_id'] = tr[0]['User_Id']
-                session['user_role_id'] = tr[0]['User_Role_Id']            
+                session['user_role_id'] = tr[0]['User_Role_Id']  
+                session['base_url'] = config.Base_URL         
                 config.displaymsg=""
                 return redirect(url_for('home'))
                 #assign_sessions()
