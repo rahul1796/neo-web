@@ -41,7 +41,9 @@ function LoadTable()
             { "data": "Client_Name" },
             { "data": "Client_Code" }
         ],
-
+        drawCallback: function(){
+            $('#tbl_clients_paginate ul.pagination').addClass("pagination-rounded");
+        }
 
     });
 }

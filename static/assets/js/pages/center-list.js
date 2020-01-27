@@ -67,7 +67,10 @@ function LoadTable()
                 orderable:false,
                 targets:[1]
             }
-        ]
+        ],
+        drawCallback: function(){
+            $('#tbl_centers_paginate ul.pagination').addClass("pagination-rounded");
+        }
 
     });
 }

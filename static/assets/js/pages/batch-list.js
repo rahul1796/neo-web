@@ -64,7 +64,9 @@ function LoadTable()
             { "data": "Actual_Start_Date"},
             { "data": "Actual_End_Date"}
         ],
-
+        drawCallback: function(){
+            $('#tbl_batchs_paginate ul.pagination').addClass("pagination-rounded");
+        }
 
     });
 }
