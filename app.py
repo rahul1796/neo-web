@@ -23,6 +23,8 @@ from datetime import datetime, timedelta
 import pandas as pd
 import re
 
+print('hi')
+
 app = Flask(__name__)
 
 api = Api(app)
