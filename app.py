@@ -23,8 +23,6 @@ from datetime import datetime, timedelta
 import pandas as pd
 import re
 
-print('hi')
-
 app = Flask(__name__)
 
 api = Api(app)
@@ -3169,6 +3167,104 @@ class download_trainerwise_tma_registration_compliance_report(Resource):
                 print(str(e))
                 return {"exceptione":str(e)}
 api.add_resource(download_trainerwise_tma_registration_compliance_report,'/download_trainerwise_tma_registration_compliance_report')
+
+#######################  GIGS API
+class authentication(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                username = request.form['username']
+                password = request.form['password']
+                token_id = request.form['token_id']
+                
+                tr = Database.Login(username,password)
+                if tr != []:
+                    if tr[0]['Is_Active'] == 1:
+                        res = {'success':True, 'description':'Authentication Successful', 'user_name': tr[0]['User_Name'], 'user_id':int(tr[0]['User_Id']), 'user_role_id':int(tr[0]['User_Role_Id'])}
+
+                    elif tr[0]['Is_Active'] == 0:
+                        res = {'success':False, 'description':'Inactive User Credential'}
+                    
+                    else:
+                        res = {'success':False, 'description':'Authentication failed'}
+                else:
+                    res = {'success':False, 'description':'Invalid Username Password'}
+
+                return jsonify(res)
+
+            except Exception as e:
+
+                res = {'success':False, 'description':'error: '+str(e)}
+                return jsonify(res)
+               
+
+api.add_resource(authentication,'/authentication')
+
+class get_password(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            email = request.args['email']
+            token_id = request.args['token_id']
+            
+            data = Database.recover_pass_db(email)
+            if len(data)>0:
+                res = sent_mail.forget_password(email,data[0][1],data[0][3] + ' ' + data[0][4])
+                if res['status']:
+                    res = {'success':True, 'description':res['description']}
+                    #msg = {"message":, "title":'Sucess',"UserId":data[0][0]}
+                else:
+                    res = {'success':False, 'description':res['description']}
+                   
+            else:
+                res = {'success':False, 'description':'Invalid Email'}
+
+            
+            return jsonify(res)
+
+api.add_resource(get_password,'/get_password')
+
+class get_all_me(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            token_id = request.args['token_id']
+
+            data = Database.get_all_me()
+            if len(data)>0:
+                res = {'success':True, 'description':'data found', 'me_array':data}
+                return jsonify(res)
+                                   
+            else:
+                res = {'success':False, 'description':'No data found'}
+                return jsonify(res)
+            
+            
+
+api.add_resource(get_all_me,'/get_all_me')
+
+class get_me_category(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            token_id = request.args['token_id']
+            
+            if token_id!='398722':
+                res = {'success':False, 'description':'Invalid Token Id'}
+                return jsonify(res)
+            
+            data = Database.get_me_category_db()
+            #data = Database.get_all_me()
+            if len(data)>0:
+                res = {'success':True, 'description':'data found', 'me_category':data}
+                return jsonify(res)
+                                   
+            else:
+                res = {'success':False, 'description':'No data found'}
+                return jsonify(res)
+
+api.add_resource(get_me_category,'/get_me_category')
 
 
 if __name__ == '__main__':    
