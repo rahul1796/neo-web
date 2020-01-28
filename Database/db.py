@@ -2591,4 +2591,32 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return df
+
+    def get_all_me():
+        bu = []
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'select * from masters.[tbl_map_ME_category] where is_active=1;'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[1]+"":row[1],""+columns[2]+"":row[2], ""+columns[3]+"":row[3], ""+columns[4]+"":row[4]}
+            bu.append(h)
+        cur.close()
+        con.close()
+        return bu
+
+    def get_me_category_db():
+        bu = []
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'select * from [masters].[tbl_mecategory] where is_active=1;'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[1]+"":row[1],""+columns[2]+"":row[2]}
+            bu.append(h)
+        cur.close()
+        con.close()
+        return bu
     
