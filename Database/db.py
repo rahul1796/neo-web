@@ -2672,3 +2672,134 @@ SELECT					cb.name as candidate_name,
         con.close()
         #print(df)
         return df
+
+
+    def get_all_me():
+        bu = []
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'select * from masters.[tbl_map_ME_category] where is_active=1;'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[1]+"":row[1],""+columns[2]+"":row[2], ""+columns[3]+"":row[3], ""+columns[4]+"":row[4]}
+            bu.append(h)
+        cur.close()
+        con.close()
+        return bu
+
+    def get_me_category_db():
+        bu = []
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'select * from [masters].[tbl_mecategory] where is_active=1;'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[1]+"":row[1],""+columns[2]+"":row[2]}
+            bu.append(h)
+        cur.close()
+        con.close()
+        return bu
+
+    def client_basedon_user(user_id, user_role_id):
+        client = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+
+        sql = 'exec masters.sp_client_based_on_user ?, ?'
+        values = (user_id, user_role_id)
+        cur2.execute(sql,(values))
+
+        columns = [column[0].title() for column in cur2.description]
+        for r in cur2:
+            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            client.append(h)
+        cur2.close()
+        con.close()
+        return client
+
+    @classmethod
+    def AllCustomer_report_db(cls):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = '''
+        SELECT      distinct
+		            [customer_name]
+		FROM        [tma].[tbl_batches]
+        order by    customer_name asc
+        '''
+        cur.execute(sql)
+        for row in cur:
+            h = {"customer_name":row[0]}
+            response.append(h)
+        cur.close()
+        con.close()       
+        return response
+
+    @classmethod
+    def AllCenter_customer_db(cls, customer_id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_center_basedon_course] ?'
+        values = (customer_id,)
+        cur.execute(sql,(values))
+
+        for row in cur:
+            h = {"Center_Name":row[0]}
+            response.append(h)
+        cur.close()
+        con.close()       
+        return response
+
+    @classmethod
+    def AllCourse_customercenter_db(cls, customer_id, center_id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_course_basedon_coursecenter] ?, ?'
+        values = (customer_id, center_id)
+        cur.execute(sql,(values))
+        
+        for row in cur:
+            h = {"Course_Name":row[0]}
+            response.append(h)
+        cur.close()
+        con.close()       
+        return response
+
+    @classmethod
+    def download_trainer_filter(user_id, user_role_id, centers, status, path):
+        
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [users].[sp_get_trainer_list_download] ?, ?, ?, ?'
+        values = (user_id, user_role_id, centers, status)
+        cur.execute(sql,(values))
+
+        columns = [column[0].title() for column in cur.description]
+        data=cur.fetchall()
+
+        writer = pd.ExcelWriter(path, engine='xlsxwriter')
+        workbook  = writer.book
+
+        header_format = workbook.add_format({
+            'bold': True,
+            'text_wrap': True,
+            'valign': 'center',
+            'fg_color': '#D7E4BC',
+            'border': 1})
+
+        df = pd.DataFrame(data)
+        df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Trainer List')
+        worksheet = writer.sheets['Trainer List']
+        for col_num, value in enumerate(columns):
+            worksheet.write(0, col_num, value, header_format)
+        writer.save()
+        cur.close()
+        con.close()
+        return True
+
+    
