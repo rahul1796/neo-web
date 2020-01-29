@@ -1,18 +1,169 @@
         <link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
         
          <!-- third party css -->
-         <link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-         <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
+         <link href="static/assets/libs/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
          <!-- third party css end -->
 
         <!-- App css -->
-        <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />        
+        <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
         <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
-       <form id='form1' method="POST" action="/assign_trainer_add_edit_to_home">
+        
+		<script type="text/javascript">
+        $(document).ready(function(){       
+            $("#tbl_users").dataTable().fnDestroy();                
             
-                <input type="hidden" id="hdn_user_id" name="hdn_user_id" value="0">
-                <div class="container-fluid">
+			$('.dropdown-search-filter').select2({
+                placeholder:''
+            });
+			
+            LoadCenter();
+			LoadTable("0","-1");
+			
+			$('#ddlStatus').append(new Option('ALL','-1'));
+			$('#ddlStatus').append(new Option('Active','1'));
+			$('#ddlStatus').append(new Option('InActive','0'));
+        });
+	
+    function LoadCenter()
+    {
+        
+        var URL=$('#hdn_web_url').val()+ "/AllCenterList";
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                if(data.Centers != null)
+                {
+                    $('#ddlCenter').empty();
+                    var count=data.Centers.length;
+                    if( count> 0)
+                    {
+                        $('#ddlCenter').append(new Option('ALL','0'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlCenter').append(new Option(data.Centers[i].Center_Name,data.Centers[i].Center_Id));
+                        //$('#ddlCenterType').val('');
+                    }
+                    else
+                    {
+                        $('#ddlCenter').append(new Option('ALL','0'));
+                    }
+                    //$("#ddlCenter option[value='0']").attr('disabled','disabled');
+                }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    
+	
+	function LoadTable(Centers, Status)
+{
+	vartable1 = $("#tbl_users").DataTable({
+        "serverSide": true,
+        "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
+        "paging": true,
+        "pageLength": 10,
+        "sPaginationType": "full_numbers",
+        "scrollX": false,
+        "destroy": true,
+        "processing": true,
+        "language": { "processing": 'Loading..!' },
+        "ajax": {
+            "url": $('#hdn_web_url').val()+ "/trainer_list",
+            "type": "POST",
+            "dataType": "json",
+            "data": function (d) {
+                d.user_id = $('#hdn_home_user_id').val();
+				d.user_role_id = $('#hdn_home_user_role_id').val();
+				d.centers = Centers;
+				d.status = Status;
+            },
+            error: function (e) {
+                $("#tbl_users tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
+            }
+
+        },
+
+        "columns": [
+            { "data": "S_No"},
+            { "data": "User_Name" },
+            { "data": "Email" },
+            
+			{ "data": function (row, type, val, meta) {
+                var varStatus = ""; 
+                if(row.Is_Active)
+                    varStatus="Active";
+                else
+                    varStatus="In Active";
+                return varStatus;
+                }
+            },
+			{ "visible":false, "data": "Center_Name" },
+            { "data": "Mobile_Number"}
+       ],
+
+
+    });
+}
+
+	
+    function LoadTableBasedOnSearch(){
+        if($('#ddlCenter').val().toString()==''|| $('#ddlCenter').val().toString()==null){
+            alert("Please select a Center.");
+        }
+        else{
+            
+            LoadTable($('#ddlCenter').val().toString(), $('#ddlStatus').val());
+        }
+        
+    }
+    
+	
+	function DownloadReport()
+    {
+        if($('#ddlCenter').val().toString()==''|| $('#ddlCenter').val().toString()==null){
+            alert("Please select a Center.");
+        }
+        else
+        {   
+            var URL=$('#hdn_web_url').val()+ "/download_trainer_filter";            
+            $.ajax({
+                type:"POST",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{ 
+					'user_id': $('#hdn_home_user_id').val(),
+					'user_role_id' : $('#hdn_home_user_role_id').val(),
+					'centers' : $('#ddlCenter').val().toString(),
+					'status' : $('#ddlStatus').val()
+                },
+                success:function(data){
+                    if(data!=null)
+                    {
+						//alert(data.FilePath+data.FileName+'.xlsx');
+                        window.location=data.FilePath+data.FileName+'.xlsx';
+                    }                    
+                },
+                error:function(x){
+                    alert('Error while downloading Report. ');
+                }
+            });
+        }
+    }
+    
+</script>
+	<div class="container-fluid">
     
                     <!-- start page title -->
                     <div class="row">
@@ -30,7 +181,44 @@
                     </div>     
                     <!-- end page title -->
                     
-                    <div class="row">
+	<div class="row">
+        <div class="col-12">
+            <div class="card-box">
+                <form id="DownloadReport" action="javascript:DownloadReport();" name="DownloadReport" method="POST">
+                    
+					<div class="row"> 
+                        <div class="col-lg-3">
+                            <label for="ddlCenter" class="mr-2">Center</label>
+                            <select class="form-control dropdown-search-filter" id="ddlCenter" multiple >
+                                <!-- <option value="0">All</option> -->
+                            </select>
+                        </div>   
+						
+                        <div class="col-lg-3">
+                            <label for="ddlStatus" class="mr-2">Status</label>
+                            <select class="form-control dropdown-search-filter" id="ddlStatus">
+                                <!-- <option  value="0">All</option> -->
+                            </select>
+                        </div>
+                        
+                        <div class="col-lg-1" >
+                            <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+                        </div>
+                        <div class="col-lg-1" >
+                            <!-- <button class="btn btn-primary" type="submit" >Download Report</button> -->
+                            <button style="margin-top: 30px" type="submit" class="btn btn-primary waves-effect waves-light" >Download</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+	
+	
+	
+	
+	
+				<div class="row">
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
@@ -38,9 +226,9 @@
                                         <div class="col-lg-6">
                                             <h4 class="header-title">Trainers List</h4>
                                         </div>
-                                        <div class="col-lg-6" >                                        
-                                                <button style="float: right; display : none;" type="submit" id="btn_create" class="btn btn-primary">Create Trainers</a>
-                                        </div>
+                                        <!--div class="col-lg-6" >                                        
+                                                <button style="float: right" type="submit" id="btn_create" class="btn btn-primary">Create Trainers</a>
+                                        </div-->
                                     </div>
                                     <br/>
                                     <div class="col-lg-12">
@@ -48,14 +236,11 @@
                                             <thead>
                                                 <tr>
                                                     <th>S No</th>
-                                                    <th>Actions</th>
                                                     <th>Trainers Name</th>
                                                     <th>Email</th>
 													<th>Status</th>
 													<th>Center(s)</th>
                                                     <th>Mobile Number</th>
-                                                    
-                                                    
                                                 </tr>
                                             </thead>
                                         
@@ -67,10 +252,9 @@
                         </div><!-- end col-->
                     </div>
                     <!-- end row-->    
-                </div> <!-- end container -->
+        </div> <!-- end container -->
             
             <!-- end wrapper -->
-        </form>
         <!-- ============================================================== -->
         <!-- End Page content -->
         <!-- ============================================================== -->
@@ -94,4 +278,7 @@
         <!-- third party js ends -->
 
         <!-- datatables init js-->
-        <script src="static/assets/js/pages/trainer-list.js"></script>
+        <!--script src="static/assets/js/pages/trainer-list.js"></script--
+		
+		
+		>
