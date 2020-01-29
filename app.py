@@ -45,7 +45,7 @@ def report_log_out():
 @app.before_request
 def before_request():
     session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=60)
+    app.permanent_session_lifetime = timedelta(minutes=5)
 
     g.user = None
     g.course_id = None
