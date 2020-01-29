@@ -40,8 +40,8 @@ class Master:
 
 
     ##Center##
-    def center_list(center_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        center_l = Database.center_list(center_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        center_l = Database.center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
         return center_l
     def add_center(center_name,user_id,is_active,center_id,center_type_id,center_category_id,bu_id,region_id,cluster_id,country_id,satet_id,district_id,location_name):
         popupMessage = {"PopupMessage": Database.add_center_details(center_name,user_id,is_active,center_id,center_type_id,center_category_id,bu_id,region_id,cluster_id,country_id,satet_id,district_id,location_name)}
@@ -113,3 +113,12 @@ class Master:
     def get_sub_center(glob_sub_center_id):
         indi_sub_center={"SubCenterDetail":Database.get_sub_center_detail(glob_sub_center_id)}
         return indi_sub_center
+
+    def sector_list(sector_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        sector_l = Database.sector_list(sector_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+        return sector_l
+    def contract_list(contract_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        contract_l = Database.contract_list(contract_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+        return contract_l
+    def GetAllBusBasedOn_User(UserId,UserRoleId):
+        return Database.GetAllBusBasedOn_User(UserId,UserRoleId)
