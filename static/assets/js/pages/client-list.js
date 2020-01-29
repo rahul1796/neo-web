@@ -31,8 +31,8 @@ function LoadTable()
 
         "columns": [
             { "data": "S_No"},  
-            {
-            "data": function (row, type, val, meta) {
+            {"visible": false,
+             "data": function (row, type, val, meta) {
                 var varButtons = ""; 
                 varButtons += '<a onclick="EditClientDetail(\'' + row.Client_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Client" class="fas fa-edit" ></i></a>';
                 return varButtons;
@@ -40,8 +40,19 @@ function LoadTable()
             },
             { "data": "Client_Name" },
             { "data": "Client_Code" }
+          
         ],
-
+        // "ColumnDefs"  :[
+        //     {
+        //         "visible": false,
+        //         "targets": [ 1 ],                
+        //         "searchable": false,
+        //         "ordering":false
+        //     }
+        // ],
+        drawCallback: function(){
+            $('#tbl_clients_paginate ul.pagination').addClass("pagination-rounded");
+        }
 
     });
 }

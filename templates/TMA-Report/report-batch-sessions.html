@@ -1,13 +1,9 @@
       
 <!-- third party css -->
-<link href="static/assets/libs/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
 <!-- third party css end -->
 
-<!-- App css -->
-<!-- <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" /> -->
-<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
-<!-- <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-<link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" /> -->
 <style>
      #tblTrAct th{
          padding: 0.85rem .10rem;
@@ -73,7 +69,10 @@
                 return varButtons;
                 }
             }
-            ]
+            ],
+            drawCallback: function(){
+                $('#tbl_list_paginate ul.pagination').addClass("pagination-rounded");
+            }
         });
     }
     function GetCandidateAttendance(SessionId,AttendanceType,StageCount){

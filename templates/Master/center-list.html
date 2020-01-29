@@ -1,14 +1,17 @@
         <link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
         
          <!-- third party css -->
-         <link href="static/assets/libs/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+         <!-- <link href="static/assets/libs/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" /> -->
          <!-- third party css end -->
 
         <!-- App css -->
-        <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-        <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />        
         <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+        <link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
+        
         <form id='form1' method="POST" action="/assign_center_add_edit_to_home">
             
                 <input type="hidden" id="hdn_center_id" name="hdn_center_id" value="0">
@@ -29,7 +32,41 @@
                         </div>
                     </div>     
                     <!-- end page title -->
-    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card-box">                                
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label for="ddlCenterType " class="mr-2">Center Type</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlCenterType" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddlBu " class="mr-2">Business Unit</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlBu" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddlStatus" class="mr-2">Status</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlStatus" >
+                                            <option selected="" value="-1">All</option>
+                                            <option  value="1">Active</option>
+                                            <option  value="0">In Active</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3" >
+                                        <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
+                                        onclick="LoadTableBasedOnSearch()">Search</button>
+                                        &nbsp
+                                        <button style="margin-top: 30px" type="button" class="btn btn-primary waves-effect waves-light submit" 
+                                        onclick="Download()">Download</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
@@ -39,7 +76,7 @@
                                             <h4 class="header-title">Center List</h4>
                                         </div>
                                         <div class="col-lg-6" >                                        
-                                                <button style="float: right" type="submit" id="btn_create" class="btn btn-primary">Create center</a>
+                                                <button style="float: right; display: none;" type="submit" id="btn_create" class="btn btn-primary">Create center</a>
                                         </div>
                                     </div>
                                     <br/>
@@ -54,14 +91,14 @@
 													<!--
                                                     <th>Center Category</th>
                                                     -->
-													<th>Business Unit</th>
+													<th>Business Unit</th>  
+                                                    <th>Status</th>
                                                     <th>Region</th>
                                                     <th>Cluster</th>
                                                     <th>Country</th>
                                                     <th>State</th>
                                                     <th>District</th>
                                                     <th>Location</th>   
-                                                    <th>Status</th>  
                                                 </tr>
                                             </thead>
                                         

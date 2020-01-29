@@ -19,7 +19,7 @@ import MCL_updated_report
 import os
 from flask import jsonify
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import pandas as pd
 import re
 
@@ -43,7 +43,10 @@ def report_log_out():
         return render_template("login.html",error="Already logged out")
     
 @app.before_request
-def before_request():     
+def before_request():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=5)
+
     g.user = None
     g.course_id = None
     g.center_category_id = None
@@ -66,15 +69,20 @@ def before_request():
     g.project_id= None
     g.user_role = None
     g.Batch_Sessions=None
+    g.sector_id=None
+    g.contract_id=None
     g.RegisteredCandidatesList=None
     if 'user_name' in session.keys():
         g.user = session['user_name']
         g.user_id = session['user_id']
         g.user_role = session['user_role_id']
+        g.base_url = session['base_url']
         # print(g.user,g.user_id,g.user_role)
         g.User_detail_with_ids.append(g.user)
         g.User_detail_with_ids.append(g.user_id)
         g.User_detail_with_ids.append(g.user_role)
+        g.User_detail_with_ids.append(g.base_url)
+        
     if 'course_id' in session.keys():
         g.course_id = session['course_id']
     if 'center_category_id' in session.keys():
@@ -122,7 +130,10 @@ def before_request():
         g.Batch_Sessions=session['Batch_Sessions']
     if 'RegisteredCandidatesList' in session.keys():
         g.RegisteredCandidatesList=session['RegisteredCandidatesList']
-
+    if 'sector_id' in session.keys():
+        g.sector_id = session['sector_id']
+    if 'contract_id' in session.keys():
+        g.contract_id = session['contract_id']
 
 #home_API's
 @app.route("/")
@@ -163,7 +174,8 @@ def login():
             if tr[0]['Is_Active'] == 1:
                 session['user_name'] = tr[0]['User_Name']            
                 session['user_id'] = tr[0]['User_Id']
-                session['user_role_id'] = tr[0]['User_Role_Id']            
+                session['user_role_id'] = tr[0]['User_Role_Id']  
+                session['base_url'] = config.Base_URL         
                 config.displaymsg=""
                 return redirect(url_for('home'))
                 #assign_sessions()
@@ -258,6 +270,33 @@ class get_all_Cluster_Based_On_Region(Resource):
         if request.method == 'POST':
             region_id=request.form['region_id']
             return  Master.get_all_Cluster_Based_On_Region(region_id)
+
+class download_centers_list(Resource):
+    DownloadPath=config.DownloadPathLocal
+    report_name = "Center_List_"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                center_type_ids = request.form['center_type_ids']
+                bu_ids = request.form['bu_ids']
+                status = request.form['status']
+                r=re.compile("Center_List_.*")
+                lst=os.listdir(download_centers_list.DownloadPath)
+                newlist = list(filter(r.match, lst))
+                for i in newlist:
+                    os.remove( download_centers_list.DownloadPath + i)
+                path = '{}{}.xlsx'.format(download_centers_list.DownloadPath,download_centers_list.report_name)
+                res=center_api.DownloadCenterList.download_centers_list(center_type_ids,bu_ids,status,path)
+                print(download_centers_list.report_name)
+                print(path)
+                ImagePath=config.DownloadPathWeb
+                return {'FileName':download_centers_list.report_name,'FilePath':ImagePath}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+
+api.add_resource(download_centers_list,'/download_centers_list')
 
 api.add_resource(get_all_BU,'/Get_all_BU')
 api.add_resource(get_all_Cluster_Based_On_Region,'/Get_all_Cluster_Based_On_Region')
@@ -1069,6 +1108,7 @@ class client_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
+            print(order_by_column_position,order_by_column_direction)
             return Master.client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 
 class add_client_details(Resource):
@@ -3161,10 +3201,410 @@ class download_trainerwise_tma_registration_compliance_report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(download_trainerwise_tma_registration_compliance_report,'/download_trainerwise_tma_registration_compliance_report')
 
+######################################################################################################
+
+#Sector_API's
+@app.route("/sector_list_page")
+def sector_list_page():
+    if g.user:
+        return render_template("Master/sector-list.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
+@app.route("/sector")
+def sector():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="sector_list_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/sector_add_edit")
+def sector_add_edit():
+    if g.user:
+        return render_template("Master/sector-add-edit.html",sector_id=g.sector_id)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/assign_sector_add_edit_to_home", methods=['GET','POST'])
+def assign_sector_add_edit_to_home():
+    session['sector_id']=request.form['hdn_sector_id']
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="sector_add_edit")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/after_popup_sector")
+def after_popup_sector():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="sector")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class sector_list(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            sector_id = request.form['sector_id'] 
+            start_index = request.form['start']
+            page_length = request.form['length']
+            search_value = request.form['search[value]']
+            order_by_column_position = request.form['order[0][column]']
+            order_by_column_direction = request.form['order[0][dir]']
+            draw=request.form['draw']
+            print(order_by_column_position,order_by_column_direction)
+            return Master.sector_list(sector_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+
+class add_sector_details(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            sector_name=request.form['SectorName']
+            sector_code=request.form['SectorCode']
+            user_id=g.user_id
+            is_active=request.form['isactive']
+            sector_id=g.sector_id
+            return Master.add_sector(sector_name,sector_code,user_id,is_active,sector_id)
+
+class get_sector_details(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            return Master.get_sector(g.sector_id)
+
+api.add_resource(sector_list,'/sector_list')
+api.add_resource(add_sector_details,'/add_sector_details')
+api.add_resource(get_sector_details,'/GetSectorDetails')
+
+
+####################################################################################################
+
+
+#Contract_API's
+@app.route("/contract_list_page")
+def contract_list_page():
+    if g.user:
+        return render_template("Master/contract-list.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
+@app.route("/contract")
+def contract():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="contract_list_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/contract_add_edit")
+def contract_add_edit():
+    if g.user:
+        return render_template("Master/contract-add-edit.html",sector_id=g.sector_id)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/assign_contract_add_edit_to_home", methods=['GET','POST'])
+def assign_contract_add_edit_to_home():
+    session['contract_id']=request.form['hdn_contract_id']
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="contract_add_edit")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/after_popup_contract")
+def after_popup_contract():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="contract")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class contract_list(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            contract_id = request.form['contract_id'] 
+            start_index = request.form['start']
+            page_length = request.form['length']
+            search_value = request.form['search[value]']
+            order_by_column_position = request.form['order[0][column]']
+            order_by_column_direction = request.form['order[0][dir]']
+            draw=request.form['draw']
+            print(order_by_column_position,order_by_column_direction)
+            return Master.contract_list(contract_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+
+class add_contract_details(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            sector_name=request.form['SectorName']
+            sector_code=request.form['SectorCode']
+            user_id=g.user_id
+            is_active=request.form['isactive']
+            sector_id=g.sector_id
+            return Master.add_sector(sector_name,sector_code,user_id,is_active,sector_id)
+
+class get_contract_details(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            return Master.get_sector(g.sector_id)
+
+api.add_resource(contract_list,'/contract_list')
+api.add_resource(add_contract_details,'/add_contract_details')
+api.add_resource(get_contract_details,'/GetContractDetails')
+
+
+####################################################################################################
+
+class GetAllBusBasedOn_User(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=[]
+            try:
+                UserId=request.args.get('user_id',0,type=int)
+                UserRoleId=request.args.get('user_role_id',0,type=int)
+                response=Master.GetAllBusBasedOn_User(UserId,UserRoleId)
+                return {'Bu':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(GetAllBusBasedOn_User,'/GetAllBusBasedOn_User')
+
+@app.route("/Downloads/<path:path>")
+def get_download_file(path):
+    """Download a file."""
+    filename = r"{}{}".format(config.DownloadPathLocal,path)
+    print(filename)
+    if not(os.path.exists(filename)):
+        filename = r"{}No-image-found.jpg".format(config.DownloadPathWeb)
+    return send_file(filename)
+
+
+#######################  GIGS API
+class authentication(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                username = request.form['username']
+                password = request.form['password']
+                token_id = request.form['token_id']
+                
+                tr = Database.Login(username,password)
+                if tr != []:
+                    if tr[0]['Is_Active'] == 1:
+                        res = {'success':True, 'description':'Authentication Successful', 'user_name': tr[0]['User_Name'], 'user_id':int(tr[0]['User_Id']), 'user_role_id':int(tr[0]['User_Role_Id'])}
+
+                    elif tr[0]['Is_Active'] == 0:
+                        res = {'success':False, 'description':'Inactive User Credential'}
+                    
+                    else:
+                        res = {'success':False, 'description':'Authentication failed'}
+                else:
+                    res = {'success':False, 'description':'Invalid Username Password'}
+
+                return jsonify(res)
+
+            except Exception as e:
+
+                res = {'success':False, 'description':'error: '+str(e)}
+                return jsonify(res)
+               
+
+api.add_resource(authentication,'/authentication')
+
+class get_password(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            email = request.args['email']
+            token_id = request.args['token_id']
+            
+            data = Database.recover_pass_db(email)
+            if len(data)>0:
+                res = sent_mail.forget_password(email,data[0][1],data[0][3] + ' ' + data[0][4])
+                if res['status']:
+                    res = {'success':True, 'description':res['description']}
+                    #msg = {"message":, "title":'Sucess',"UserId":data[0][0]}
+                else:
+                    res = {'success':False, 'description':res['description']}
+                   
+            else:
+                res = {'success':False, 'description':'Invalid Email'}
+
+            
+            return jsonify(res)
+
+api.add_resource(get_password,'/get_password')
+
+class get_all_me(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            token_id = request.args['token_id']
+
+            data = Database.get_all_me()
+            if len(data)>0:
+                res = {'success':True, 'description':'data found', 'me_array':data}
+                return jsonify(res)
+                                   
+            else:
+                res = {'success':False, 'description':'No data found'}
+                return jsonify(res)
+            
+            
+
+api.add_resource(get_all_me,'/get_all_me')
+
+class client_basedon_user(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            user_id = request.args['user_id']
+            user_role_id = request.args['user_role_id']
+            return Master.client_basedon_user(user_id, user_role_id)
+
+api.add_resource(client_basedon_user, '/client_basedon_user')
+
+
+class get_me_category(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            token_id = request.args['token_id']
+            
+            if token_id!='398722':
+                res = {'success':False, 'description':'Invalid Token Id'}
+                return jsonify(res)
+            
+            data = Database.get_me_category_db()
+            #data = Database.get_all_me()
+            if len(data)>0:
+                res = {'success':True, 'description':'data found', 'me_category':data}
+                return jsonify(res)
+                                   
+            else:
+                res = {'success':False, 'description':'No data found'}
+                return jsonify(res)
+
+api.add_resource(get_me_category,'/get_me_category')
+
+    
+#tma-filter-report
+
+@app.route("/report file/<path:path>")
+def get_tma_file(path):
+    """Download a file."""
+    filename = r"{}{}".format(config.neo_report_file_path,path)
+    if not(os.path.exists(filename)):
+        filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathWeb)
+    return send_file(filename)
+
+
+class download_trainer_filter(Resource):
+    DownloadPath=config.neo_report_file_path
+    file_name = "Trainer_Filtered"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id']
+                user_role_id=request.form['user_role_id']
+                centers=request.form['centers']
+                status=request.form['status']
+                
+                path = download_trainer_filter.DownloadPath + download_trainer_filter.file_name +'.xlsx'
+                Database.download_trainer_filter(user_id, user_role_id, centers, status, path)
+                
+                #send_file(config.ReportDownloadPathLocal+download_tma_registration_compliance_report.report_name+'.xlsx')
+                return {'FileName':download_trainer_filter.file_name,'FilePath':config.neo_report_file_path_web}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(download_trainer_filter,'/download_trainer_filter')
+
+
+@app.route("/tma_report_filter_page")
+def tma_report_filter_page():
+    if g.user:
+        return render_template("TMA-Report/tma-filter-report.html")
+    else:
+        return redirect("/")
+
+@app.route("/tma_report_filter")
+def tma_report_filter():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="tma_report_filter_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class AllCustomer_report(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.AllCustomer_report_db()
+                return {'Customer':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(AllCustomer_report,'/AllCustomer_report')
+
+class All_Center_based_on_customer(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                customer_id=request.args['Customer_id']
+                response = Database.AllCenter_customer_db(customer_id)
+                return {'Centers':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(All_Center_based_on_customer,'/All_Center_based_on_customer')
+
+class All_Course_basedon_customer_center(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                customer_id=request.args['Customer_id']
+                center_id=request.args['Center_id']
+                response = Database.AllCourse_customercenter_db(customer_id, center_id)
+                return {'Courses':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(All_Course_basedon_customer_center,'/All_Course_basedon_customer_center')
+
+class updated_tma_report(Resource):
+    report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                
+                from_date = request.form["from_date"]
+                to_date = request.form["to_date"]
+                Customers = request.form["Customers"]
+                Centers =request.form["Centers"]
+                Courses = request.form["Courses"]
+
+                file_name='tma_report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+
+                resp = filter_tma_report.create_report(from_date, to_date, Customers, Centers, Courses, file_name)
+                
+                return resp
+                return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(updated_tma_report,'/updated_tma_report')
+
+
 
 if __name__ == '__main__':    
-    #session.permanent = True
-    #app.permanent_session_lifetime = timedelta(minutes=5)
     app.run(debug=True)
 
 #app.run(debug=True)
