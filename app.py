@@ -3380,6 +3380,230 @@ def get_download_file(path):
         filename = r"{}No-image-found.jpg".format(config.DownloadPathWeb)
     return send_file(filename)
 
+
+#######################  GIGS API
+class authentication(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                username = request.form['username']
+                password = request.form['password']
+                token_id = request.form['token_id']
+                
+                tr = Database.Login(username,password)
+                if tr != []:
+                    if tr[0]['Is_Active'] == 1:
+                        res = {'success':True, 'description':'Authentication Successful', 'user_name': tr[0]['User_Name'], 'user_id':int(tr[0]['User_Id']), 'user_role_id':int(tr[0]['User_Role_Id'])}
+
+                    elif tr[0]['Is_Active'] == 0:
+                        res = {'success':False, 'description':'Inactive User Credential'}
+                    
+                    else:
+                        res = {'success':False, 'description':'Authentication failed'}
+                else:
+                    res = {'success':False, 'description':'Invalid Username Password'}
+
+                return jsonify(res)
+
+            except Exception as e:
+
+                res = {'success':False, 'description':'error: '+str(e)}
+                return jsonify(res)
+               
+
+api.add_resource(authentication,'/authentication')
+
+class get_password(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            email = request.args['email']
+            token_id = request.args['token_id']
+            
+            data = Database.recover_pass_db(email)
+            if len(data)>0:
+                res = sent_mail.forget_password(email,data[0][1],data[0][3] + ' ' + data[0][4])
+                if res['status']:
+                    res = {'success':True, 'description':res['description']}
+                    #msg = {"message":, "title":'Sucess',"UserId":data[0][0]}
+                else:
+                    res = {'success':False, 'description':res['description']}
+                   
+            else:
+                res = {'success':False, 'description':'Invalid Email'}
+
+            
+            return jsonify(res)
+
+api.add_resource(get_password,'/get_password')
+
+class get_all_me(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            token_id = request.args['token_id']
+
+            data = Database.get_all_me()
+            if len(data)>0:
+                res = {'success':True, 'description':'data found', 'me_array':data}
+                return jsonify(res)
+                                   
+            else:
+                res = {'success':False, 'description':'No data found'}
+                return jsonify(res)
+            
+            
+
+api.add_resource(get_all_me,'/get_all_me')
+
+class client_basedon_user(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            user_id = request.args['user_id']
+            user_role_id = request.args['user_role_id']
+            return Master.client_basedon_user(user_id, user_role_id)
+
+api.add_resource(client_basedon_user, '/client_basedon_user')
+
+
+class get_me_category(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            token_id = request.args['token_id']
+            
+            if token_id!='398722':
+                res = {'success':False, 'description':'Invalid Token Id'}
+                return jsonify(res)
+            
+            data = Database.get_me_category_db()
+            #data = Database.get_all_me()
+            if len(data)>0:
+                res = {'success':True, 'description':'data found', 'me_category':data}
+                return jsonify(res)
+                                   
+            else:
+                res = {'success':False, 'description':'No data found'}
+                return jsonify(res)
+
+api.add_resource(get_me_category,'/get_me_category')
+
+    
+#tma-filter-report
+
+@app.route("/report file/<path:path>")
+def get_tma_file(path):
+    """Download a file."""
+    filename = r"{}{}".format(config.neo_report_file_path,path)
+    if not(os.path.exists(filename)):
+        filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathWeb)
+    return send_file(filename)
+
+
+class download_trainer_filter(Resource):
+    DownloadPath=config.neo_report_file_path
+    file_name = "Trainer_Filtered"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id']
+                user_role_id=request.form['user_role_id']
+                centers=request.form['centers']
+                status=request.form['status']
+                
+                path = download_trainer_filter.DownloadPath + download_trainer_filter.file_name +'.xlsx'
+                Database.download_trainer_filter(user_id, user_role_id, centers, status, path)
+                
+                #send_file(config.ReportDownloadPathLocal+download_tma_registration_compliance_report.report_name+'.xlsx')
+                return {'FileName':download_trainer_filter.file_name,'FilePath':config.neo_report_file_path_web}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(download_trainer_filter,'/download_trainer_filter')
+
+
+@app.route("/tma_report_filter_page")
+def tma_report_filter_page():
+    if g.user:
+        return render_template("TMA-Report/tma-filter-report.html")
+    else:
+        return redirect("/")
+
+@app.route("/tma_report_filter")
+def tma_report_filter():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="tma_report_filter_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class AllCustomer_report(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.AllCustomer_report_db()
+                return {'Customer':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(AllCustomer_report,'/AllCustomer_report')
+
+class All_Center_based_on_customer(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                customer_id=request.args['Customer_id']
+                response = Database.AllCenter_customer_db(customer_id)
+                return {'Centers':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(All_Center_based_on_customer,'/All_Center_based_on_customer')
+
+class All_Course_basedon_customer_center(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                customer_id=request.args['Customer_id']
+                center_id=request.args['Center_id']
+                response = Database.AllCourse_customercenter_db(customer_id, center_id)
+                return {'Courses':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(All_Course_basedon_customer_center,'/All_Course_basedon_customer_center')
+
+class updated_tma_report(Resource):
+    report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                
+                from_date = request.form["from_date"]
+                to_date = request.form["to_date"]
+                Customers = request.form["Customers"]
+                Centers =request.form["Centers"]
+                Courses = request.form["Courses"]
+
+                file_name='tma_report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+
+                resp = filter_tma_report.create_report(from_date, to_date, Customers, Centers, Courses, file_name)
+                
+                return resp
+                return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(updated_tma_report,'/updated_tma_report')
+
+
+
 if __name__ == '__main__':    
     app.run(debug=True)
 
