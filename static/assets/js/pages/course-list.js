@@ -4,8 +4,8 @@ $(document).ready(function () {
     LoadTable(); 
     LoadPracticeddl();
     role_id=parseInt($('#hdn_home_user_role_id').val());
-    if(role_id == 3 || role_id == 8)
-        $('#btn_create').hide();
+    // if(role_id == 3 || role_id == 8)
+    //     $('#btn_create').hide();
 });
 
 function LoadTable()
@@ -37,11 +37,12 @@ function LoadTable()
 
         "columns": [
             { "data": "S_No"},
-            {
+            {//"visible": false,
+            //<a onclick="EditCourseDetail(\'' + row.Course_Id + '\',\'' + row.Practice_Id + '\',\'' + row.Project_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Course" class="fas fa-edit" ></i></a>
             "data": function (row, type, val, meta) {
                 var varButtons = ""; 
                 if(role_id != 3 && role_id != 8)
-                    varButtons += '<a onclick="EditCourseDetail(\'' + row.Course_Id + '\',\'' + row.Practice_Id + '\',\'' + row.Project_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Course" class="fas fa-edit" ></i></a><a onclick="AddSessionCourseDetail('+row.Course_Id+' )" class="btn" style="cursor:pointer" ><i title="Add Session" class="fas fa-plus" ></i></a>';
+                    varButtons += '<a onclick="AddSessionCourseDetail('+row.Course_Id+' )" class="btn" style="cursor:pointer" ><i title="Add Session" class="fas fa-plus" ></i></a>';
                 return varButtons;
                 }
             },

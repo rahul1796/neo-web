@@ -34,7 +34,7 @@ function LoadTable()
 
         "columns": [
             { "data": "S_No"},
-            {
+            {"visible": false,
             "data": function (row, type, val, meta) {
                 var varButtons = ""; 
                 if(role_id != 3 && role_id != 8)
@@ -53,7 +53,9 @@ function LoadTable()
                 }
             }
         ],
-
+        drawCallback: function(){
+            $('#tbl_user_role_paginate ul.pagination').addClass("pagination-rounded");
+        }
 
     });
 }

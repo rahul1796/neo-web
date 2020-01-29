@@ -46,6 +46,7 @@
                 $('#hdn_home_user_id').val('{{values[1]}}');
                 $('#hdn_home_user_role_id').val('{{values[2]}}');
                 $('#hdn_home_user_name').val('{{values[0]}}');
+                $('#hdn_web_url').val('{{values[3]}}');
             }
             if(parseInt($('#hdn_home_user_role_id').val())>0)
             {
@@ -582,15 +583,8 @@
             <input type="hidden" id="hdn_home_user_id" name="hdn_home_user_id" value="0">
             <input type="hidden" id="hdn_home_user_role_id" name="hdn_home_user_role_id" value="0">
             <input type="hidden" id="hdn_home_user_name" name="hdn_home_user_name" value="0">
-            <input type="hidden" id="hdn_web_url" name="hdn_web_url" value="http://neolive.southindia.cloudapp.azure.com:29092">
+            <input type="hidden" id="hdn_web_url" name="hdn_web_url" value="">
 			
-			<!--   http://neolive.southindia.cloudapp.azure.com:29092 -->
-            <!-- http://neodevqa01.southindia.cloudapp.azure.com:27076 -->
-			<!--   value="http://neodevqa01.southindia.cloudapp.azure.com:27070"   Demo   -->   
-			<!--   value="http://10.0.0.5:27070"   Local   -->
-			<!--value="http://localhost:27071" -->
-			<!--  http://127.0.0.1:5000 -->
-        <!-- Navigation Bar-->
         <header id="topnav" style="background-color:#1C2A43;min-height: 10%; font-size: 15px;" >
 
             <!-- Topbar Start -->
@@ -668,6 +662,9 @@
 							<li class="has-submenu active" id="Content_Menu">
                                 <a href="#" class="active"> <i class="fe-briefcase"></i>Content <div class="arrow-down"></div></a>
                                 <ul class="submenu">
+                                    <li id="Sector_Menu">
+                                        <a id="AnchorSectors"  href="/sector" >Sectors</a>
+                                    </li>
                                     <li id="Course_Menu">
                                         <a id="AnchorCourses" href="/course">Courses</a>
                                     </li>
@@ -739,6 +736,9 @@
                                     <li id="Client_Menu">
                                         <a id="AnchorClients"  href="/client" >Customers</a>
                                     </li>
+                                    <li id="Contract_Menu">
+                                        <a id="AnchorContracts"  href="/contract" >Contracts</a>
+                                    </li>                                    
                                     <li id="Practicce_Menu">
                                         <a id="AnchorPractices" hidden href="/practice">Practices</a>
                                     </li>
@@ -746,21 +746,21 @@
                                         <a id="AnchorProjects"  href="/project">Projects</a>
                                     </li>
                                     <li id="Center_Type_Menu">
-                                        <a id="AnchorCenterType" href="/center_type">Center Type</a>
+                                        <a id="AnchorCenterType" hidden href="/center_type">Center Type</a>
                                     </li>
 									<!--
                                     <li id="Center_Category_Menu">
                                         <a id="AnchorCenterCategory" href="/center_category">Center Category</a>
                                     </li>
-									-->
-                                    <li id="Center_Menu">
-                                        <a id="AnchorCenters" href="/center">Centers</a>
-                                    </li>
+									-->                                    
                                     <li id="Region_Menu">
                                         <a id="AnchorRegion" href="/region">Region</a>
                                     </li>
                                     <li id="Cluster_Menu">
                                         <a id="AnchorCluster" href="/cluster">Cluster</a>
+                                    </li>
+                                    <li id="Center_Menu">
+                                        <a id="AnchorCenters" href="/center">Centers</a>
                                     </li>
 									<li class="has-submenu "  id="Org_menu">
 									<a href="#" class="active">

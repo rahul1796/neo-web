@@ -1,17 +1,9 @@
 <link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
         
 <!-- third party css -->
-<link href="static/assets/libs/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
 <!-- third party css end -->
-
-<!-- Custom box css -->
-<!-- <link href="static/assets/libs/custombox/custombox.min.css" rel="stylesheet"> -->
-
-<!-- App css -->
-<!-- <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" /> -->
-<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
-<!-- <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-<link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" /> -->
 
 
 <script type="text/javascript">
@@ -239,7 +231,10 @@
             { "data": "Batch_Stage_Name"},
             { "data": "Candidate_Count"}
             
-            ]
+            ],
+            drawCallback: function(){
+                $('#tbl_list_paginate ul.pagination').addClass("pagination-rounded");
+            }
         });
     }
     function BatchModal(QpCode,QpName,CourseCode,CourseName,BatchCode,StartDate,EndDate,ActualStartDate,ActualEndDate,BatchActiveStatus){
