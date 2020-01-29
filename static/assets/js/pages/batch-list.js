@@ -43,9 +43,10 @@ function LoadTable()
 
         "columns": [
             { "data": "S_No"},
-            {
+            { 
             "data": function (row, type, val, meta) {
                 var varButtons = ""; 
+                
                 if(role_id == 1 || role_id == 15)//|| role_id == 7 || role_id == 5 || role_id == 4
                     varButtons += '<a onclick="EditBatchDetail(\'' + row.Batch_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit User" class="fas fa-edit" ></i></a><a onclick="MapCandidateBatch('+row.Course_Id+','+row.Center_Id+','+row.Batch_Id+')" class="btn" style="cursor:pointer" ><i title="Map Candidate" class="fas fa-plus" ></i></a><a onclick="DropCandidateBatch('+row.Course_Id+','+row.Center_Id+','+row.Batch_Id+')" class="btn" style="cursor:pointer" ><i title="Drop Candidate" class="fas fa-minus" ></i></a>';
                 return varButtons;
@@ -73,7 +74,6 @@ function LoadTable()
 function EditBatchDetail(BatchId)
 {
     $('#hdn_batch_id').val(BatchId);
-    //alert('Hi');
     $('#form1').submit();
     
 }

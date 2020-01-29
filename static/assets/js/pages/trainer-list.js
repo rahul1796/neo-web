@@ -3,8 +3,8 @@ $(document).ready(function () {
     $("#tbl_users").dataTable().fnDestroy();
     LoadTable(); 
     role_id=parseInt($('#hdn_home_user_role_id').val());
-    if(role_id == 5 || role_id == 1)
-        $('#btn_create').show();
+    // if(role_id == 5 || role_id == 1)
+    //     $('#btn_create').show();
 });
 
 function LoadTable()
@@ -35,7 +35,7 @@ function LoadTable()
 
         "columns": [
             { "data": "S_No"},
-            {
+            {"visible": false,
             "data": function (row, type, val, meta) {
                 var varButtons = ""; 
                 if(role_id == 5 || role_id==1 || role_id==15)
