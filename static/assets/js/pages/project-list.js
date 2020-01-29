@@ -39,9 +39,10 @@ function LoadTable()
         "columns": [
             { "data": "S_No"},
             { "data": "Project_Name" },
+            { "data": "Contract_Name" },
             { "data": "Client_Name" },            
             { "data": "Practice_Name"},
-            {
+            {"visible": false,
             "data": function (row, type, val, meta) {
             var varButtons = ""; 
             varButtons += '<a onclick="EditProjectDetail(\'' + row.Project_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Project" class="fas fa-edit" ></i></a>';
