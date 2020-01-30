@@ -688,13 +688,13 @@ class Database:
         cur.close()
         con.close()
         return content
-    def trainer_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id):
+    def trainer_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [users].[sp_get_trainer_list] ?, ?, ?, ?, ?, ?, ?'
-        values = (user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_role_id)
+        sql = 'exec [users].[sp_get_trainer_list] ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_role_id,centers, status)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -708,7 +708,6 @@ class Database:
         cur.close()
         con.close()
         return content
-    
     def add_user_details(user_role_id,first_name,last_name,email,mobile,created_id,is_active,user_id,Id,is_reporting_manager):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -2771,7 +2770,7 @@ SELECT					cb.name as candidate_name,
         return response
 
     @classmethod
-    def download_trainer_filter(user_id, user_role_id, centers, status, path):
+    def download_trainer_filter(cls, user_id, user_role_id, centers, status, path):
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()

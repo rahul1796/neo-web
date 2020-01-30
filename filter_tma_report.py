@@ -148,9 +148,9 @@ def create_report(start_date, end_date, customername, centername, coursename, na
                         
         writer.save()
         
-        return({'Description':'created exccel', 'Status':True, 'filename':name})
+        return({'Description':'created excel', 'Status':True, 'filename':name})
         
     except Exception as e:
-        return({'Description':'Error creating exccel', 'Status':False, 'Error':str(e)})
+        return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
     ##########################################
     

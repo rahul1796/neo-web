@@ -22,6 +22,7 @@ import json
 from datetime import datetime, timedelta
 import pandas as pd
 import re
+import filter_tma_report
 
 app = Flask(__name__)
 
@@ -1917,12 +1918,12 @@ def mcl_user_download():
         #print(user_id, practice, course, date_from, date_to,csv_excel)
         #return (date_from + '   ' + date_to + '   ' + csv_excel + str(user_id))
         
-        f=open('C:/Sites/Neo_Skills_UAT/report file/audit_report.txt','a', encoding='utf-8')
+        f=open(config.neo_report_file_path+'audit_report.txt','a', encoding='utf-8')
         f.write('{}|{}|{}|{}|{}|\n'.format('Download',str(user_id),practice,course,str(datetime.now())))
         f.close()
         #return(str(datetime.now()))
-        for i in os.listdir(r'C:\Sites\Neo_Skills_UAT\report file')[1:]:
-            os.remove('C:/Sites/Neo_Skills_UAT/report file/' + i)
+        for i in os.listdir(config.neo_report_file_path)[1:]:
+            os.remove(config.neo_report_file_path + i)
 
 	
         #return str(user_id) + practice + course + date_from + date_to + csv_excel
@@ -1935,7 +1936,7 @@ def mcl_user_download():
         
         try:
 
-            tma_path = 'C:/Sites/Neo_Skills_UAT/report file/'
+            tma_path = config.neo_report_file_path
 
             if csv_excel == 'csv':
                 path = tma_path + '{}.csv'.format(report_name)
@@ -2511,10 +2512,14 @@ class trainer_list(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             user_role_id=request.form['user_role_id']
+            centers=request.form['centers']
+            status=request.form['status']
+
             
-            return UsersM.trainer_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id)
+            return UsersM.trainer_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id, centers, status)
 
 api.add_resource(trainer_list, '/trainer_list')
+
 
 api.add_resource(course_api.AllClusterList, '/AllClusterList')
 api.add_resource(course_api.AllRegionList, '/AllRegionList')
