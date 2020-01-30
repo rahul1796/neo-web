@@ -1,0 +1,27 @@
+
+
+ERROR
+tbl_batch  is changed in live and demo thats why error
+
+home-: home_batch
+batch:-				batch_list_page
+assign_batch_add_edit_to_home:- batch_add_edit
+
+candidate:- candidate_list_page
+
+trainer :- trainer_list_page
+assign_trainer_add_edit_to_home:- trainer_add_edit
+
+mcl_report:- mcl_report_page
+
+tma_batch:- tma_batch_page
+tma_report:-  tma_report_download_page
+
+
+stored Procedure to update
+
+
+app.py
+// batch apis  and db
+
+// candidate	candidate_list  and db
