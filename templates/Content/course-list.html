@@ -4,11 +4,22 @@
         <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
         <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
         
-        <form id='form1' method="POST" action="/assign_course_add_edit_to_home">
+		<style>
+            .center {
+                margin: auto;
+                width: 90%;
+                padding: 20px;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            }
             
-                <input type="hidden" id="hdn_course_id" name="hdn_course_id" value="-1">
-                
-                <div class="container-fluid">
+            .hidedialog {
+                display: none;
+            }
+		</style>
+		<form id='form1' method="POST" action="/assign_course_add_edit_to_home">
+            <input type="hidden" id="hdn_course_id" name="hdn_course_id" value="-1">
+			
+				<div class="container-fluid">
                     
                     <!-- start page title -->
                     <div class="row">
@@ -29,7 +40,7 @@
                             <div class="col-12">
                                 <div class="card-box">
                                     <div class="row">
-                                        <div class="col-lg-3">
+                                        <!--div class="col-lg-3">
                                             <label for="ddlPractice" class="mr-2">Practice</label>
                                             <select class="form-control" id="ddlPractice" onchange="LoadProjectddl(this.value)">
                                                 <option selected="" value="0">All</option>
@@ -39,6 +50,18 @@
                                             <label for="ddlProject" class="mr-2">Project</label>
                                             <select class="form-control" id="ddlProject">
                                                 <option selected="" value="0">All</option>
+                                            </select>
+                                        </div-->
+										<div class="col-lg-3">
+                                            <label for="ddlSector" class="mr-2">Sector</label>
+                                            <select class="form-control dropdown-search-filter" id="ddlSector" onchange="LoadQPddl()" multiple>
+                                                <!--option selected="" value="0">All</option-->
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <label for="ddlQP" class="mr-2">QP</label>
+                                            <select class="form-control dropdown-search-filter" id="ddlQP" multiple>
+                                                <!--option selected="" value="0">All</option-->
                                             </select>
                                         </div>
                                         <div class="col-lg-4">

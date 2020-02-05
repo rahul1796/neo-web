@@ -484,13 +484,13 @@ class Database:
         con.close()
         return districts
 
-    def course_list(course_id,project_id,practice_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def course_list(course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec [content].[sp_get_course_list] ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (course_id,project_id,practice_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        values = (course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -945,13 +945,13 @@ class Database:
             msg={"message":"Error fetching batch data for Droping"}
         return msg
 
-    def qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_qp_list] ?, ?, ?, ?, ?, ?'
-        values = (qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [masters].[sp_get_qp_list] ?, ?, ?, ?, ?, ?, ?'
+        values = (qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, sectors)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -2800,5 +2800,37 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return True
+
+    def AllSector_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        cur.execute("select	sector_id, sector_name  from		masters.tbl_sector  where		is_active=1  and			is_deleted=0")
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    def AllQPBasedOnSector_db(sector_id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        
+        sql = 'exec [masters].[sp_get_qp_list_bysector] ?'
+        values = (sector_id,)
+        cur.execute(sql,(values))
+        
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
 
     

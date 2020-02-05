@@ -23,10 +23,7 @@
         <!-- ============================================================== -->
         <!-- Start Page Content here -->
         <!-- ============================================================== -->
-        <form id='form1' method="POST" action="/assign_qp_add_edit_to_home">
-            
-                <input type="hidden" id="hdn_qp_id" name="hdn_qp_id" value="0">
-                <div class="container-fluid">
+				<div class="container-fluid">
     
                     <!-- start page title -->
                     <div class="row">
@@ -43,7 +40,30 @@
                         </div>
                     </div>     
                     <!-- end page title -->
-    
+					
+					<div class="row">
+						<div class="col-12">
+							<div class="card-box">
+								<form id="DownloadReport" action="javascript:DownloadReport();" name="DownloadReport" method="POST">
+									
+									<div class="row"> 
+										<div class="col-lg-3">
+											<label for="ddlsector" class="mr-2">Sector</label>
+											<select class="form-control dropdown-search-filter" id="ddlsector" multiple >
+												<!-- <option value="0">All</option> -->
+											</select>
+										</div>   
+										
+										<div class="col-lg-1" >
+											<button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+										</div>
+										
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					
                     <div id="get" class="row">
                         <div class="col-12">
                             <div class="card">
