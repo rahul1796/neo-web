@@ -46,7 +46,7 @@ def report_log_out():
 @app.before_request
 def before_request():
     session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=5)
+    app.permanent_session_lifetime = timedelta(minutes=config.SessionTimeOut)
 
     g.user = None
     g.course_id = None
@@ -3328,6 +3328,10 @@ class contract_list(Resource):
     def post():
         if request.method == 'POST':
             contract_id = request.form['contract_id'] 
+            customer_ids = request.form['customer_ids'] 
+            stage_ids = request.form['stage_ids'] 
+            from_date = request.form['from_date'] 
+            to_date = request.form['to_date'] 
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
@@ -3335,7 +3339,7 @@ class contract_list(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             print(order_by_column_position,order_by_column_direction)
-            return Master.contract_list(contract_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Master.contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 
 class add_contract_details(Resource):
     @staticmethod
@@ -3607,7 +3611,16 @@ class updated_tma_report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(updated_tma_report,'/updated_tma_report')
 
+class GetAllContractStages(Resource):
+    @staticmethod
+    def get():
+        try:
+            if request.method=='GET':
+                return {"Stages":Master.GetAllContractStages()}
+        except Exception as e:
+            return {"exception":str(e)}
 
+api.add_resource(GetAllContractStages,'/GetAllContractStages')
 
 if __name__ == '__main__':    
     app.run(debug=True)

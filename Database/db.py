@@ -2613,13 +2613,13 @@ SELECT					cb.name as candidate_name,
         con.close()
         return content
 
-    def contract_list(contract_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_contract_list] ?, ?, ?, ?, ?, ?'
-        values = (contract_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [masters].[sp_get_contract_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (contract_id,customer_ids,stage_ids,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -2800,5 +2800,21 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return True
+    def GetAllContractStages():
+        client = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+
+        sql = 'exec masters.sp_get_contract_stages '
+        #values = (,)
+        cur2.execute(sql)
+        columns = [column[0].title() for column in cur2.description]
+        for r in cur2:
+            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            client.append(h)
+        cur2.close()
+        con.close()
+        return client
+
 
     
