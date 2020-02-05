@@ -958,7 +958,10 @@ class qp_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            return Content.qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+
+            sectors = request.form['sectors']
+            
+            return Content.qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors)
 
 class add_qp_details(Resource):
     @staticmethod
@@ -3606,6 +3609,32 @@ class updated_tma_report(Resource):
                 print(str(e))
                 return {"exceptione":str(e)}
 api.add_resource(updated_tma_report,'/updated_tma_report')
+
+class All_Sector(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                
+                response = Database.AllSector_db()
+                return {'Sectors':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(All_Sector,'/All_Sector')
+
+class AllQPBasedOnSector(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                sector_id =request.args["sector_id"]
+                response = Database.AllQPBasedOnSector_db(sector_id)
+                return {'QP':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(AllQPBasedOnSector,'/AllQPBasedOnSector')
 
 
 
