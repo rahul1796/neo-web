@@ -3,13 +3,15 @@ $(document).ready(function () {
     $("#tbl_centers").dataTable().fnDestroy();
     
     $('.dropdown-search-filter').select2({
-        placeholder:'select an option'
+        placeholder:''
     });
     role_id=parseInt($('#hdn_home_user_role_id').val());
     if(role_id == 5)
         $('#btn_create').hide();
     LoadCenterType();
     LoadBuddl();
+	LoadCourseddl();
+	LoadRegionddl();
     LoadTable(); 
 });
 
@@ -91,6 +93,118 @@ function LoadBuddl(){
     return false;
 }
 
+
+function LoadCourseddl(){
+    var URL=$('#hdn_web_url').val()+ "/Get_All_Courses"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Courses != null)
+            {
+                $('#ddlCourse').empty();
+                var count=data.Courses.length;
+                if( count> 0)
+                {
+                    $('#ddlCourse').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
+                    //$('#ddlCourse').val('-1');
+                }
+                else
+                {
+                    $('#ddlCourse').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
+
+function LoadRegionddl(){
+    var URL=$('#hdn_web_url').val()+ "/Get_all_Region"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Region != null)
+            {
+                $('#ddlRegion').empty();
+                var count=data.Region.length;
+                if( count> 0)
+                {
+                    $('#ddlRegion').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlRegion').append(new Option(data.Region[i].Region_Name,data.Region[i].Region_Id));
+                    //$('#ddlCourse').val('-1');
+                }
+                else
+                {
+                    $('#ddlRegion').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
+
+//LoadClusterddl
+function LoadClusterddl(){
+    var URL=$('#hdn_web_url').val()+ "/Get_all_Cluster_Based_On_Region"
+        $.ajax({
+        type:"POST",
+        url:URL,
+        async:false,       
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json", 
+        data:{
+            "region_id" : $('#ddlRegion').val().toString()//$('#ddlProject option:selected').val()
+        },
+		success: function (data){
+            if(data.ClusterOnRegion != null)
+            {
+                $('#ddlCluster').empty();
+                var count=data.ClusterOnRegion.length;
+                if( count> 0)
+                {
+                    $('#ddlCluster').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlCluster').append(new Option(data.ClusterOnRegion[i].Cluster_Name,data.ClusterOnRegion[i].Cluster_Id));
+                    //$('#ddlCourse').val('-1');
+                }
+                else
+                {
+                    $('#ddlCluster').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading Cluster! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
 function LoadTable()
 {
     vartable1 = $("#tbl_centers").DataTable({
@@ -111,7 +225,10 @@ function LoadTable()
                 d.center_id = 0,
                 d.center_type_ids=$('#ddlCenterType').val().toString(),
                 d.bu_ids=$('#ddlBu').val().toString(),
-                d.status=$('#ddlStatus').val().toString()
+                d.status=$('#ddlStatus').val().toString(),
+				d.regions=$('#ddlRegion').val().toString(),
+				d.clusters=$('#ddlCluster').val().toString(),
+				d.courses=$('#ddlCourse').val().toString()
             },
             error: function (e) {
                 $("#tbl_centers tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');

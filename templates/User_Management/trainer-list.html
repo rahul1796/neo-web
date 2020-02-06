@@ -17,14 +17,129 @@
 			$('.dropdown-search-filter').select2({
                 placeholder:''
             });
-			
-            LoadCenter();
+			LoadBuddl();
+			LoadRegionddl();
+            
 			LoadTable("0","-1");
 			
 			$('#ddlStatus').append(new Option('ALL','-1'));
 			$('#ddlStatus').append(new Option('Active','1'));
 			$('#ddlStatus').append(new Option('InActive','0'));
         });
+	function LoadBuddl(){
+    var URL=$('#hdn_web_url').val()+ "/GetAllBusBasedOn_User"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+                "user_id": $('#hdn_home_user_id').val(),
+                "user_role_id" : $('#hdn_home_user_role_id').val()
+        },
+        success: function (data){
+            if(data.Bu != null)
+            {
+                $('#ddlBu').empty();
+                var count=data.Bu.length;
+                if( count> 0)
+                {
+                    //$('#ddlCenter').append(new Option('ALL',''));
+                    for(var i=0;i<count;i++)
+                        $('#ddlBu').append(new Option(data.Bu[i].Bu_Name,data.Bu[i].Bu_Id));
+                    $('#ddlBu').val('');
+                }
+                else
+                {
+                    $('#ddlBu').append(new Option('ALL',''));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
+function LoadRegionddl(){
+    var URL=$('#hdn_web_url').val()+ "/Get_all_Region"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Region != null)
+            {
+                $('#ddlRegion').empty();
+                var count=data.Region.length;
+                if( count> 0)
+                {
+                    $('#ddlRegion').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlRegion').append(new Option(data.Region[i].Region_Name,data.Region[i].Region_Id));
+                    //$('#ddlCourse').val('-1');
+                }
+                else
+                {
+                    $('#ddlRegion').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
+
+//LoadClusterddl
+function LoadClusterddl(){
+    var URL=$('#hdn_web_url').val()+ "/Get_all_Cluster_Based_On_Region"
+        $.ajax({
+        type:"POST",
+        url:URL,
+        async:false,       
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json", 
+        data:{
+            "region_id" : $('#ddlRegion').val().toString()//$('#ddlProject option:selected').val()
+        },
+		success: function (data){
+            if(data.ClusterOnRegion != null)
+            {
+                $('#ddlCluster').empty();
+                var count=data.ClusterOnRegion.length;
+                if( count> 0)
+                {
+                    $('#ddlCluster').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlCluster').append(new Option(data.ClusterOnRegion[i].Cluster_Name,data.ClusterOnRegion[i].Cluster_Id));
+                    //$('#ddlCourse').val('-1');
+                }
+                else
+                {
+                    $('#ddlCluster').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading Cluster! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
 	
     function LoadCenter()
     {
@@ -36,6 +151,7 @@
             async:false,        
             beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
             datatype:"json",
+			"data": {cluster_id : $('#ddlCluster').val().toString()},
             success: function (data){
                 if(data.Centers != null)
                 {
@@ -86,6 +202,9 @@
                 d.user_id = $('#hdn_home_user_id').val();
 				d.user_role_id = $('#hdn_home_user_role_id').val();
 				d.centers = Centers;
+				d.BU = $('#ddlBu').val().toString();
+				d.Region_id = $('#ddlRegion').val().toString();
+				d.Cluster_id = $('#ddlCluster').val().toString();
 				d.status = Status;
             },
             error: function (e) {
@@ -118,13 +237,15 @@
 
 	
     function LoadTableBasedOnSearch(){
+		LoadTable($('#ddlCenter').val().toString(), $('#ddlStatus').val());
+		/*
         if($('#ddlCenter').val().toString()==''|| $('#ddlCenter').val().toString()==null){
             alert("Please select a Center.");
         }
         else{
             
             LoadTable($('#ddlCenter').val().toString(), $('#ddlStatus').val());
-        }
+        }*/
         
     }
     
@@ -189,11 +310,35 @@
                     
 					<div class="row"> 
                         <div class="col-lg-3">
+							<label for="ddlBu" class="mr-2">Business Unit</label>
+							<select class="form-control dropdown-search-filter" id="ddlBu" multiple>
+								<option selected="" value="">All</option>
+							</select>
+                        </div>
+
+						<div class="col-lg-3">
+							<label for="ddlRegion" class="mr-2">Region</label>
+							<select class="form-control dropdown-search-filter" id="ddlRegion" onchange="LoadClusterddl()" multiple>
+								<option selected="" value="">All</option>
+								
+							</select>
+						</div>
+						
+						<div class="col-lg-3">
+							<label for="ddlCluster" class="mr-2">Cluster</label>
+							<select class="form-control dropdown-search-filter" id="ddlCluster" onchange="LoadCenter()" multiple>
+								<option selected="" value="">All</option>
+							</select>
+						</div>
+						
+						<div class="col-lg-3">
                             <label for="ddlCenter" class="mr-2">Center</label>
                             <select class="form-control dropdown-search-filter" id="ddlCenter" multiple >
                                 <!-- <option value="0">All</option> -->
                             </select>
-                        </div>   
+                        </div>
+					</div>
+					<div class="row"> 
 						
                         <div class="col-lg-3">
                             <label for="ddlStatus" class="mr-2">Status</label>

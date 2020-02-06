@@ -19,6 +19,6 @@ class UsersM:
     def get_user(glob_user_id):
         indi_user={"UserDetail":Database.get_user_details(glob_user_id)}
         return indi_user
-    def trainer_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status):
-        return Database.trainer_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status)
+    def trainer_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status, Region_id, Cluster_id, BU):
+        return Database.trainer_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status, Region_id, Cluster_id, BU)
     

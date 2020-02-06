@@ -34,17 +34,39 @@
                     <!-- end page title -->
                     <div class="row">
                         <div class="col-12">
-                            <div class="card-box">                                
-                                <div class="row">
+                            <div class="card-box">
+								<div class="row">
                                     <div class="col-lg-3">
-                                        <label for="ddlCenterType " class="mr-2">Center Type</label>
+                                        <label for="ddlCenterType" class="mr-2">Center Type</label>
                                         <select class="form-control dropdown-search-filter" id="ddlCenterType" multiple>
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
                                     <div class="col-lg-3">
-                                        <label for="ddlBu " class="mr-2">Business Unit</label>
+                                        <label for="ddlBu" class="mr-2">Business Unit</label>
                                         <select class="form-control dropdown-search-filter" id="ddlBu" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddlRegion" class="mr-2">Region</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlRegion" onchange="LoadClusterddl()" multiple>
+                                            <option selected="" value="">All</option>
+                                            
+                                        </select>
+                                    </div>
+                                    
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label for="ddlCluster" class="mr-2">Cluster</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlCluster" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddlCourse" class="mr-2">Course</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlCourse" multiple>
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>

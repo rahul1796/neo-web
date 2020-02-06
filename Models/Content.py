@@ -9,8 +9,8 @@ class Content:
     def AllProjectOnPractice(project_id,practice_id):
         project_list={"Projects":Database.GetProjectBasedOnPractice(project_id,practice_id)}
         return project_list
-    def AllCenter():
-        center_list={"Centers":Database.GetAllCenter()}
+    def AllCenter(cluster_id):
+        center_list={"Centers":Database.GetAllCenter(cluster_id)}
         return center_list
     def AllCluster():
         center_list={"Cluster":Database.GetAllCluster()}

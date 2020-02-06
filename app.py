@@ -2387,7 +2387,12 @@ class project_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            return Master.project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            region_ids=request.form['region_ids']
+            cluster_id=request.form['cluster_id']
+            center_id=request.form['center_id']
+            qp=request.form['qp']
+            
+            return Master.project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp)
 
 
 class add_project_details(Resource):
@@ -2517,9 +2522,11 @@ class trainer_list(Resource):
             user_role_id=request.form['user_role_id']
             centers=request.form['centers']
             status=request.form['status']
-
+            Region_id = request.form['Region_id']
+            Cluster_id = request.form['Cluster_id']
+            BU = request.form['BU']
             
-            return UsersM.trainer_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id, centers, status)
+            return UsersM.trainer_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id, centers, status, Region_id, Cluster_id, BU)
 
 api.add_resource(trainer_list, '/trainer_list')
 
@@ -3623,6 +3630,8 @@ class GetAllContractStages(Resource):
                 return {"Stages":Master.GetAllContractStages()}
         except Exception as e:
             return {"exception":str(e)}
+
+api.add_resource(GetAllContractStages,'/GetAllContractStages')
           
 class All_Sector(Resource):
     @staticmethod
@@ -3651,8 +3660,19 @@ class AllQPBasedOnSector(Resource):
 api.add_resource(AllQPBasedOnSector,'/AllQPBasedOnSector')
 
 
+class Get_All_Courses(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                
+                response = Database.AllCourse_db()
+                return {'Courses':response}
+            except Exception as e:
+                return {'exception':str(e)}
 
-api.add_resource(GetAllContractStages,'/GetAllContractStages')
+api.add_resource(Get_All_Courses,'/Get_All_Courses')
+
 
 if __name__ == '__main__':    
     app.run(debug=True)
