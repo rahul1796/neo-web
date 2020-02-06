@@ -26,8 +26,8 @@ class Master:
 
     
     #Project
-    def project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        project_l= Database.project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp):
+        project_l= Database.project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp)
         return project_l
     def all_client():
         all_client={"Clients":Database.GetALLClient()}
@@ -42,8 +42,8 @@ class Master:
 
 
     ##Center##
-    def center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        center_l = Database.center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses):
+        center_l = Database.center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses)
         return center_l
     def add_center(center_name,user_id,is_active,center_id,center_type_id,center_category_id,bu_id,region_id,cluster_id,country_id,satet_id,district_id,location_name):
         popupMessage = {"PopupMessage": Database.add_center_details(center_name,user_id,is_active,center_id,center_type_id,center_category_id,bu_id,region_id,cluster_id,country_id,satet_id,district_id,location_name)}

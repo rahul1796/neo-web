@@ -18,11 +18,12 @@ class course_list(Resource):
             draw=request.form['draw']
             return Content.course_list(course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 
-class AllCenterList(Resource):
+class AllCenterList(Resource,):
     @staticmethod
     def get():
         if request.method == 'GET':
-            return Content.AllCenter()
+            cluster_id = request.args['cluster_id']
+            return Content.AllCenter(cluster_id)
         
 class AllClusterList(Resource):
     @staticmethod
