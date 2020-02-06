@@ -46,7 +46,7 @@ def report_log_out():
 @app.before_request
 def before_request():
     session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=5)
+    app.permanent_session_lifetime = timedelta(minutes=config.SessionTimeOut)
 
     g.user = None
     g.course_id = None
@@ -958,7 +958,10 @@ class qp_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            return Content.qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+
+            sectors = request.form['sectors']
+            
+            return Content.qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors)
 
 class add_qp_details(Resource):
     @staticmethod
@@ -2384,7 +2387,12 @@ class project_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            return Master.project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            region_ids=request.form['region_ids']
+            cluster_id=request.form['cluster_id']
+            center_id=request.form['center_id']
+            qp=request.form['qp']
+            
+            return Master.project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp)
 
 
 class add_project_details(Resource):
@@ -2514,9 +2522,11 @@ class trainer_list(Resource):
             user_role_id=request.form['user_role_id']
             centers=request.form['centers']
             status=request.form['status']
-
+            Region_id = request.form['Region_id']
+            Cluster_id = request.form['Cluster_id']
+            BU = request.form['BU']
             
-            return UsersM.trainer_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id, centers, status)
+            return UsersM.trainer_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id, centers, status, Region_id, Cluster_id, BU)
 
 api.add_resource(trainer_list, '/trainer_list')
 
@@ -3328,6 +3338,10 @@ class contract_list(Resource):
     def post():
         if request.method == 'POST':
             contract_id = request.form['contract_id'] 
+            customer_ids = request.form['customer_ids'] 
+            stage_ids = request.form['stage_ids'] 
+            from_date = request.form['from_date'] 
+            to_date = request.form['to_date'] 
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
@@ -3335,7 +3349,7 @@ class contract_list(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             print(order_by_column_position,order_by_column_direction)
-            return Master.contract_list(contract_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Master.contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 
 class add_contract_details(Resource):
     @staticmethod
@@ -3607,6 +3621,57 @@ class updated_tma_report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(updated_tma_report,'/updated_tma_report')
 
+
+class GetAllContractStages(Resource):
+    @staticmethod
+    def get():
+        try:
+            if request.method=='GET':
+                return {"Stages":Master.GetAllContractStages()}
+        except Exception as e:
+            return {"exception":str(e)}
+
+api.add_resource(GetAllContractStages,'/GetAllContractStages')
+          
+class All_Sector(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                
+                response = Database.AllSector_db()
+                return {'Sectors':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(All_Sector,'/All_Sector')
+
+class AllQPBasedOnSector(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                sector_id =request.args["sector_id"]
+                response = Database.AllQPBasedOnSector_db(sector_id)
+                return {'QP':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(AllQPBasedOnSector,'/AllQPBasedOnSector')
+
+
+class Get_All_Courses(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                
+                response = Database.AllCourse_db()
+                return {'Courses':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(Get_All_Courses,'/Get_All_Courses')
 
 
 if __name__ == '__main__':    

@@ -1,7 +1,7 @@
 from Database import Database
 class Content:
-    def course_list(course_id,project_id,practice_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        course_l = Database.course_list(course_id,project_id,practice_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def course_list(course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        course_l = Database.course_list(course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
         return course_l
     def AllPractice():
         practice_list={"Pratices":Database.GetPractice()}
@@ -9,8 +9,8 @@ class Content:
     def AllProjectOnPractice(project_id,practice_id):
         project_list={"Projects":Database.GetProjectBasedOnPractice(project_id,practice_id)}
         return project_list
-    def AllCenter():
-        center_list={"Centers":Database.GetAllCenter()}
+    def AllCenter(cluster_id):
+        center_list={"Centers":Database.GetAllCenter(cluster_id)}
         return center_list
     def AllCluster():
         center_list={"Cluster":Database.GetAllCluster()}
@@ -37,8 +37,8 @@ class Content:
         qp_t={"Qp":Database.get_qp_course()}
         return qp_t
 
-    def qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        qp_l=Database.qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors):
+        qp_l=Database.qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors)
         return qp_l
     def add_qp(qp_name,qp_code,user_id,is_active,qp_id):
         popupMessage = {"PopupMessage": Database.add_qp_details(qp_name,qp_code,user_id,is_active,qp_id)}    

@@ -1,5 +1,4 @@
-<link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
-        
+      
 <!-- third party css -->
 <link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
@@ -15,10 +14,81 @@
     var varTable;
     $(document).ready(function () {
         $("#tbl_contract").dataTable().fnDestroy();
+        $('.dropdown-search-filter').select2({
+            placeholder:'select an option'
+        });
+        $(".date-picker").flatpickr({
+            dateFormat:'d-M-Y'
+        });
+        LoadCustomers();
+        LoadStages();
         LoadTable(); 
         role_id=parseInt($('#hdn_home_user_role_id').val());        
     });
-
+    function LoadCustomers(){
+        var URL=$('#hdn_web_url').val()+ "/GetALLClient"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                if(data.Clients != null)
+                {
+                    $('#ddlCustomer').empty();
+                    var count=data.Clients.length;
+                    if( count> 0)
+                    {
+                        for(var i=0;i<count;i++)
+                            $('#ddlCustomer').append(new Option(data.Clients[i].Client_Name,data.Clients[i].Client_Id));
+                    }
+                    else
+                    {
+                        $('#ddlCustomer').append(new Option('Choose Customer',''));
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error loading customers! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function LoadStages(){
+        var URL=$('#hdn_web_url').val()+ "/GetAllContractStages"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                if(data.Stages != null)
+                {
+                    $('#ddlStage').empty();
+                    var count=data.Stages.length;
+                    if( count> 0)
+                    {
+                        for(var i=0;i<count;i++)
+                            $('#ddlStage').append(new Option(data.Stages[i].Stage_Name,data.Stages[i].Stage_Id));
+                    }
+                    else
+                    {
+                        $('#ddlStage').append(new Option('Choose Stage',''));
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error loading stages! Please try again');
+                return false;
+            }
+        });
+        return false;        
+    }
     function LoadTable()
     {
         vartable1 = $("#tbl_contract").DataTable({
@@ -37,6 +107,10 @@
                 "dataType": "json",
                 "data": function (d) {
                     d.contract_id = 0;
+                    d.customer_ids= $('#ddlCustomer').val().toString();
+                    d.stage_ids= $('#ddlStage').val().toString();
+                    d.from_date= $('#FromDate').val().toString();
+                    d.to_date= $('#ToDate').val().toString();
                 },
                 error: function (e) {
                     $("#tbl_contract tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -68,6 +142,9 @@
 
         });
     }
+    function LoadTableBasedOnSearch(){
+        LoadTable();
+    }
 </script>
 
 
@@ -91,7 +168,49 @@
                </div>
            </div>     
            <!-- end page title -->
-
+           <div class="row">
+            <div class="col-12">
+                <div class="card-box">
+                    <form id="DownloadReport" action="javascript:DownloadReport();" name="DownloadReport" method="POST">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <label for="ddlCustomer" class="mr-2">Customer</label>
+                                <select class="form-control dropdown-search-filter" id="ddlCustomer" multiple>
+                                    <!-- <option value="" disabled selected>Select Region</option> -->
+                                </select>
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="ddlStage" class="mr-2">Stage</label>
+                                <select class="form-control dropdown-search-filter" id="ddlStage" multiple >
+                                    <!-- <option value="0">All</option> -->
+                                </select>
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="FromDate" class="mr-2">From Date</label>
+                                <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
+                                ClientIdMode="static" placeholder="From Date">
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="ToDate" class="mr-2">To Date</label>
+                                <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
+                                ClientIdMode="static" placeholder="To Date">
+                            </div>
+                            
+                        </br>
+                        </div>
+                        <div class="row">                             
+                            <div class="col-lg-1" >
+                                <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+                            </div>
+                            <!-- <div class="col-lg-1" >
+                                <!-- <button class="btn btn-primary" type="submit" >Download Report</button> -->
+                                <button style="margin-top: 30px" type="submit" class="btn btn-primary waves-effect waves-light" >Download</button>
+                            </div> -->
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
            <div class="row">
                <div class="col-12">
                    <div class="card">
@@ -142,6 +261,7 @@
 <script src="static/assets/libs/datatables/buttons.print.min.js"></script>
 <script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
 <script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
+  
 <!-- third party js ends -->
 
 
