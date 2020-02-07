@@ -18,7 +18,11 @@ class center_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            Center_lt = Master.center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            regions=request.form['regions']
+            clusters=request.form['clusters']
+            courses=request.form['courses']
+            
+            Center_lt = Master.center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses)
             return Center_lt
 
 

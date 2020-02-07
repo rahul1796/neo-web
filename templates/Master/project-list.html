@@ -31,7 +31,58 @@
                         </div>
                     </div>     
                     <!-- end page title -->
-    
+					
+					<div class="row">
+                        <div class="col-12">
+                            <div class="card-box">
+								<div class="row">
+                                    <div class="col-lg-3">
+										<label for="ddlRegion" class="mr-2">Region</label>
+										<select class="form-control dropdown-search-filter" id="ddlRegion" onchange="LoadClusterddl()" multiple>
+											<option selected="" value="">All</option>
+											
+										</select>
+									</div>
+									
+									<div class="col-lg-3">
+										<label for="ddlCluster" class="mr-2">Cluster</label>
+										<select class="form-control dropdown-search-filter" id="ddlCluster" onchange="LoadCenter()" multiple>
+											<option selected="" value="">All</option>
+										</select>
+									</div>
+									
+									<div class="col-lg-3">
+										<label for="ddlCenter" class="mr-2">Center</label>
+										<select class="form-control dropdown-search-filter" id="ddlCenter" multiple >
+											<!-- <option value="0">All</option> -->
+										</select>
+									</div>
+									<div class="col-lg-3">
+                                            <label for="ddlQP" class="mr-2">QP</label>
+                                            <select class="form-control dropdown-search-filter" id="ddlQP" multiple>
+                                                <!--option selected="" value="0">All</option-->
+                                            </select>
+                                        </div>
+									
+                                    
+                                    
+                                </div>
+                                <div class="row">
+                                    
+                                    <div class="col-lg-3" >
+										
+                                        <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
+                                        onclick="LoadTable()">Search</button>
+                                        &nbsp
+                                        <!--button style="margin-top: 30px" type="button" class="btn btn-primary waves-effect waves-light submit" 
+                                        onclick="Download()">Download</button-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+					
+					
                     <div class="row">
                         <div class="col-12">
                             <div class="card">

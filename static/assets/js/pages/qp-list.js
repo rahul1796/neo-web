@@ -1,13 +1,68 @@
 var varTable;
 $(document).ready(function () {
     $("#tbl_qp").dataTable().fnDestroy();
-    LoadTable(); 
+	$('.dropdown-search-filter').select2({
+                placeholder:''
+            });
+	
+	
+	LoadSector()		
+    LoadTable(""); 
     role_id=parseInt($('#hdn_home_user_role_id').val());
     if(role_id == 5)
         $('#btn_create').hide();
 });
 
-function LoadTable()
+function LoadSector()
+{
+	var URL=$('#hdn_web_url').val()+ "/All_Sector";
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                if(data.Sectors != null)
+                {
+                    $('#ddlsector').empty();
+                    var count=data.Sectors.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlsector').append(new Option('ALL',''));
+                        for(var i=0;i<count;i++)
+                            $('#ddlsector').append(new Option(data.Sectors[i].Sector_Name,data.Sectors[i].Sector_Id));
+                        //$('#ddlCenterType').val('');
+                    }
+                    else
+                    {
+                        $('#ddlsector').append(new Option('ALL',''));
+                    }
+                    //$("#ddlCenter option[value='0']").attr('disabled','disabled');
+                }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+}
+
+function LoadTableBasedOnSearch(){
+        if($('#ddlsector').val().toString()==''|| $('#ddlsector').val().toString()==null){
+            alert("Please select a Sector.");
+        }
+        else{
+            
+            LoadTable($('#ddlsector').val().toString());
+        }
+        
+    }
+	
+	
+function LoadTable(sectors)
 {
     vartable1 = $("#tbl_qp").DataTable({
         "serverSide": true,
@@ -25,6 +80,7 @@ function LoadTable()
             "dataType": "json",
             "data": function (d) {
                 d.qp_id = 0;
+				d.sectors = sectors;
             },
             error: function (e) {
                 $("#tbl_qp tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
