@@ -188,12 +188,15 @@
                                     <!-- <option value="0">All</option> -->
                                 </select>
                             </div>
-                            <div class="col-lg-3">
-                                <label for="FromDate" class="mr-2">From Date</label>
+                            <div class="col-lg-1" >
+                                <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+                            </div>
+                            <div class="col-lg-3" style="display: none;">
+                                <label for="FromDate" class="mr-2" >From Date</label>
                                 <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
                                 ClientIdMode="static" placeholder="From Date">
                             </div>
-                            <div class="col-lg-3">
+                            <div class="col-lg-3" style="display: none;">
                                 <label for="ToDate" class="mr-2">To Date</label>
                                 <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
                                 ClientIdMode="static" placeholder="To Date">
@@ -202,9 +205,7 @@
                         </br>
                         </div>
                         <div class="row">                             
-                            <div class="col-lg-1" >
-                                <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
-                            </div>
+                            
                              <!-- <div class="col-lg-1" >
                                  <button class="btn btn-primary" type="submit" >Download Report</button> 
                                 <button style="margin-top: 30px" type="submit" class="btn btn-primary waves-effect waves-light" >Download</button>
