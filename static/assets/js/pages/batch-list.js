@@ -22,7 +22,7 @@ function LoadTable()
         "paging": true,
         "pageLength": 10,
         "sPaginationType": "full_numbers",
-        "scrollX": false,
+        "scrollX": true,
         "destroy": true,
         "processing": true,
         "language": { "processing": 'Loading..!' },
