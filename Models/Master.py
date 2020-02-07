@@ -1,4 +1,6 @@
 from Database import Database
+from flask_restful import Resource
+
 class Master:
     ##Center_type##
     def center_type_list(center_type_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
@@ -24,8 +26,8 @@ class Master:
 
     
     #Project
-    def project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        project_l= Database.project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp):
+        project_l= Database.project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp)
         return project_l
     def all_client():
         all_client={"Clients":Database.GetALLClient()}
@@ -40,8 +42,8 @@ class Master:
 
 
     ##Center##
-    def center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        center_l = Database.center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses):
+        center_l = Database.center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses)
         return center_l
     def add_center(center_name,user_id,is_active,center_id,center_type_id,center_category_id,bu_id,region_id,cluster_id,country_id,satet_id,district_id,location_name):
         popupMessage = {"PopupMessage": Database.add_center_details(center_name,user_id,is_active,center_id,center_type_id,center_category_id,bu_id,region_id,cluster_id,country_id,satet_id,district_id,location_name)}
@@ -117,8 +119,12 @@ class Master:
     def sector_list(sector_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         sector_l = Database.sector_list(sector_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
         return sector_l
-    def contract_list(contract_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        contract_l = Database.contract_list(contract_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        contract_l = Database.contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
         return contract_l
     def GetAllBusBasedOn_User(UserId,UserRoleId):
         return Database.GetAllBusBasedOn_User(UserId,UserRoleId)
+
+    def GetAllContractStages():
+        return Database.GetAllContractStages()
+
