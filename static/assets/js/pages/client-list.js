@@ -39,7 +39,8 @@ function LoadTable()
                 }
             },
             { "data": "Client_Name" },
-            { "data": "Client_Code" }
+            { "data": "Client_Code" },
+            { "data": "Funding_Source_Name" }
           
         ],
         // "ColumnDefs"  :[
