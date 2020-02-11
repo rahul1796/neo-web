@@ -23,6 +23,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import re
 import filter_tma_report
+from Models import DownloadDump
 
 app = Flask(__name__)
 
@@ -3673,6 +3674,25 @@ class Get_All_Courses(Resource):
 
 api.add_resource(Get_All_Courses,'/Get_All_Courses')
 
+api.add_resource(DownloadDump,'/DownloadDump')
+
+####################################################################################################
+#Center_Type_API's
+@app.route("/download_master_data_page")
+def download_master_data_page():
+    if g.user:
+        return render_template("download-master-data.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
+@app.route("/download_master_data")
+def download_master_data():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="download_master_data_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!") 
+####################################################################################################
 
 if __name__ == '__main__':    
     app.run(debug=True)

@@ -4,3 +4,4 @@ from .User_Management import UsersM
 from .Batch import Batch
 from .Candidate import Candidate
 from .Report import Report
+from .DownloadDump import DownloadDump
