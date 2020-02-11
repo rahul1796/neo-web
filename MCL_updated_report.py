@@ -35,7 +35,7 @@ print(le,len(a))
 def create_report(data,report_name):
     try:
         import xlsxwriter
-        image_url = 'http://neodevqa01.southindia.cloudapp.azure.com:27072/data/'
+        image_url = 'http://mcl.labournet.in/data/'
     except:
         return {'Description':'Module Error','Status':False}
     try:
