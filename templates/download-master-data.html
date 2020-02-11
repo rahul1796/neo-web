@@ -1,0 +1,86 @@
+<link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+        
+
+<link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />        
+<link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+<link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+    
+    function Download()
+    {         
+        $('#divLoader').show();        
+        var URL=$('#hdn_web_url').val()+ "/DownloadDump";            
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{       
+            },
+            success:function(data){
+                if(data!=null)
+                {                       
+                    window.location=data.FilePath+data.FileName;
+                    $('#divLoader').hide();
+                }                    
+            },
+            error:function(x){
+                alert('Error while downloading Report. ');
+            }
+        });        
+    }
+</script>
+<form id='form1' method="POST" action="/assign_center_add_edit_to_home">   
+    <div class="container-fluid">  
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box">
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">Neo</a></li>
+                            <li class="breadcrumb-item active">Download Master Data</li>
+                        </ol>
+                    </div>
+                    <h4 class="page-title">Download</h4>
+                </div>
+            </div>
+        </div>          
+        <div class="row">
+            <div class="col-12">
+                <div class="card-box">                       
+                    <div class="row">
+                        <div class="col-lg-1" >                               
+                            <button style="margin-top: 10px" type="button" class="btn btn-primary waves-effect waves-light submit" 
+                            onclick="Download()">Download</button>
+                        </div>
+                    
+                        <div class="col-lg-1" id="divLoader" style="display: none;">
+                            <div class="spinner-border m-2" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                            <!-- <img src='/static/images/spinner1.gif' alt=”animated” /> -->
+                        </div>  
+                    </div>                 
+                </div>
+            </div>
+        </div>
+    </div> <!-- end container -->
+</form>
+<script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<!-- third party js ends -->
+
