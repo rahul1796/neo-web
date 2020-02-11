@@ -307,7 +307,7 @@ class Database:
         client = []
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        cur2.execute("SELECT * FROM [masters].[tbl_client] where is_active=1")
+        cur2.execute("SELECT * FROM [masters].[tbl_client] where is_active=1 and is_deleted=0")
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
             h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
