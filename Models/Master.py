@@ -73,8 +73,8 @@ class Master:
         Cluster={"ClusterOnRegion":Database.get_all_Cluster_Based_On_Region(region_id)}
         return Cluster
 
-    def client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        client_l = Database.client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources):
+        client_l = Database.client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources)
         return client_l
     def add_client(client_name,client_code,user_id,is_active,client_id):
         popupMessage = {"PopupMessage": Database.add_client_details(client_name,client_code,user_id,is_active,client_id)}
