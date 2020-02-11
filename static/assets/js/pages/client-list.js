@@ -1,8 +1,46 @@
 var varTable;
 $(document).ready(function () {
     $("#tbl_clients").dataTable().fnDestroy();
+    $('.dropdown-search-filter').select2({
+        placeholder:''
+    });
+    LoadFunding_Resourcesdl();
     LoadTable(); 
 });
+function LoadFunding_Resourcesdl(){
+    var URL=$('#hdn_web_url').val()+ "/Get_all_Funding_resources"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Funding_Resources != null)
+            {
+                $('#ddlFundingSource').empty();
+                var count=data.Funding_Resources.length;
+                if( count> 0)
+                {
+                    $('#ddlFundingSource').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlFundingSource').append(new Option(data.Funding_Resources[i].Funding_Source_Name,data.Funding_Resources[i].Funding_Source_Id));
+                    //$('#ddlCourse').val('-1');
+                }
+                else
+                {
+                    $('#ddlFundingSource').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
 
 function LoadTable()
 {
@@ -22,6 +60,7 @@ function LoadTable()
             "dataType": "json",
             "data": function (d) {
                 d.client_id = 0;
+                d.funding_resources=$('#ddlFundingSource').val().toString();
             },
             error: function (e) {
                 $("#tbl_clients tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');

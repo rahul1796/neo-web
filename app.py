@@ -673,9 +673,14 @@ class user_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            return UsersM.user_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-
-
+            dept_ids=request.form['dept_ids']
+            role_ids=request.form['role_ids']
+            entity_ids=request.form['entity_ids']
+            region_ids=request.form['region_ids']
+            RM_Role_ids=request.form['RM_Role_ids']
+            R_mangager_ids=request.form['R_mangager_ids']
+            return UsersM.user_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids)
+            
 
 class add_user_details(Resource):
     @staticmethod
@@ -1113,8 +1118,9 @@ class client_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            print(order_by_column_position,order_by_column_direction)
-            return Master.client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            funding_resources = request.form['funding_resources']
+            #print(order_by_column_position,order_by_column_direction)
+            return Master.client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources)
 
 class add_client_details(Resource):
     @staticmethod
@@ -3660,6 +3666,64 @@ class AllQPBasedOnSector(Resource):
 
 api.add_resource(AllQPBasedOnSector,'/AllQPBasedOnSector')
 
+class All_RM_role(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                
+                response = Database.All_RM_role_db()
+                return {'RM_ROLE':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(All_RM_role,'/All_RM_role')
+
+class All_Reporting_manager_basedon_role_id(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                rm_role_id =request.args["rm_role_id"]
+                response = Database.All_RM_basedon_role_db(rm_role_id)
+                return {'Users':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(All_Reporting_manager_basedon_role_id,'/All_Reporting_manager_basedon_role_id')
+
+class All_entity(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.All_entity_db()
+                return {'Entity':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(All_entity,'/All_entity')
+
+class All_role(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.All_role_db()
+                return {'Role':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(All_role,'/All_role')
+
+class All_dept(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.All_dept_db()
+                return {'Dept':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(All_dept,'/All_dept')
+
 
 class Get_All_Courses(Resource):
     @staticmethod
@@ -3673,6 +3737,7 @@ class Get_All_Courses(Resource):
                 return {'exception':str(e)}
 
 api.add_resource(Get_All_Courses,'/Get_All_Courses')
+
 
 api.add_resource(DownloadDump,'/DownloadDump')
 
@@ -3693,6 +3758,18 @@ def download_master_data():
     else:
         return render_template("login.html",error="Session Time Out!!") 
 ####################################################################################################
+
+class Get_all_Funding_resources(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.All_Funding_resources_db()
+                return {'Funding_Resources':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(Get_all_Funding_resources,'/Get_all_Funding_resources')
+
 
 if __name__ == '__main__':    
     app.run(debug=True)

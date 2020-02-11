@@ -669,13 +669,13 @@ class Database:
         cur.close()
         con.close()
         return h    
-    def user_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def user_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [users].[sp_get_users_list] ?, ?, ?, ?, ?, ?'
-        values = (user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [users].[sp_get_users_list] ?, ?, ?, ?, ?, ?,? ,? ,? ,? ,? ,?'
+        values = (user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -1068,13 +1068,13 @@ class Database:
         con.close()
         return section
 
-    def client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_client_list] ?, ?, ?, ?, ?, ?'
-        values = (client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [masters].[sp_get_client_list] ?, ?, ?, ?, ?, ?, ?'
+        values = (client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, funding_resources)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -2832,6 +2832,83 @@ SELECT					cb.name as candidate_name,
         con.close()       
         return response
 
+    def All_RM_role_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec users.sp_get_all_RM_role'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    def All_RM_basedon_role_db(rm_role_id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec users.sp_get_all_RM_basedon_role ?'
+        values = (rm_role_id,)
+        cur.execute(sql,(values))
+        
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    def All_entity_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        
+        cur.execute("SELECT entity_id,entity_name  FROM [masters].[tbl_entity] where is_active=1 and is_deleted=0")
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    def All_role_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        
+        cur.execute("SELECT employee_role_id, employee_role_name  FROM [users].[tbl_employee_role] where is_active=1 and is_deleted=0")
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    def All_dept_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        
+        cur.execute("SELECT employee_department_id, employee_department_name  FROM [users].[tbl_employee_department] where is_active=1 and is_deleted=0")
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
     def AllQPBasedOnSector_db(sector_id):
         response=[]
         con = pyodbc.connect(conn_str)
@@ -2864,6 +2941,7 @@ SELECT					cb.name as candidate_name,
         con.close()       
         return response
 
+
     def GetDataForExcel(sp_name):
         try:
             col=[]
@@ -2884,4 +2962,20 @@ SELECT					cb.name as candidate_name,
             return response
         except Exception as e:
             print(str(e))
+
+
+    def All_Funding_resources_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        
+        cur.execute("select funding_source_id, funding_source_name from [masters].[tbl_funding_source] where is_active=1 and is_deleted=0")
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
 
