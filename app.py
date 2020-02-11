@@ -1117,8 +1117,9 @@ class client_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            print(order_by_column_position,order_by_column_direction)
-            return Master.client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            funding_resources = request.form['funding_resources']
+            #print(order_by_column_position,order_by_column_direction)
+            return Master.client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources)
 
 class add_client_details(Resource):
     @staticmethod
@@ -3736,6 +3737,16 @@ class Get_All_Courses(Resource):
 
 api.add_resource(Get_All_Courses,'/Get_All_Courses')
 
+class Get_all_Funding_resources(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.All_Funding_resources_db()
+                return {'Funding_Resources':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(Get_all_Funding_resources,'/Get_all_Funding_resources')
 
 if __name__ == '__main__':    
     app.run(debug=True)
