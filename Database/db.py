@@ -1068,13 +1068,13 @@ class Database:
         con.close()
         return section
 
-    def client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_client_list] ?, ?, ?, ?, ?, ?'
-        values = (client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [masters].[sp_get_client_list] ?, ?, ?, ?, ?, ?, ?'
+        values = (client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, funding_resources)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -2912,8 +2912,7 @@ SELECT					cb.name as candidate_name,
     def AllQPBasedOnSector_db(sector_id):
         response=[]
         con = pyodbc.connect(conn_str)
-        cur = con.cursor()
-        
+        cur = con.cursor()        
         sql = 'exec [masters].[sp_get_qp_list_bysector] ?'
         values = (sector_id,)
         cur.execute(sql,(values))
@@ -2941,3 +2940,42 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return response
+
+
+    def GetDataForExcel(sp_name):
+        try:
+            col=[]
+            response={}
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            sql = 'exec '+ sp_name            
+            cur.execute(sql)
+            col = [column[0].title() for column in cur.description]
+            data=cur.fetchall()   
+            out = []
+            for i in data:
+                out.append(list(i))        
+            df=pd.DataFrame(out)       
+            cur.close()
+            con.close()
+            response= {"columns":col,"data":df}
+            return response
+        except Exception as e:
+            print(str(e))
+
+
+    def All_Funding_resources_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        
+        cur.execute("select funding_source_id, funding_source_name from [masters].[tbl_funding_source] where is_active=1 and is_deleted=0")
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+

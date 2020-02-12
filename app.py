@@ -23,6 +23,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import re
 import filter_tma_report
+from Models import DownloadDump
 
 app = Flask(__name__)
 
@@ -1117,8 +1118,9 @@ class client_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            print(order_by_column_position,order_by_column_direction)
-            return Master.client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            funding_resources = request.form['funding_resources']
+            #print(order_by_column_position,order_by_column_direction)
+            return Master.client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources)
 
 class add_client_details(Resource):
     @staticmethod
@@ -3735,6 +3737,38 @@ class Get_All_Courses(Resource):
                 return {'exception':str(e)}
 
 api.add_resource(Get_All_Courses,'/Get_All_Courses')
+
+
+api.add_resource(DownloadDump,'/DownloadDump')
+
+####################################################################################################
+#Center_Type_API's
+@app.route("/download_master_data_page")
+def download_master_data_page():
+    if g.user:
+        return render_template("download-master-data.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
+@app.route("/download_master_data")
+def download_master_data():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="download_master_data_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!") 
+####################################################################################################
+
+class Get_all_Funding_resources(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.All_Funding_resources_db()
+                return {'Funding_Resources':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(Get_all_Funding_resources,'/Get_all_Funding_resources')
 
 
 if __name__ == '__main__':    
