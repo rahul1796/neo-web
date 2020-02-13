@@ -127,7 +127,7 @@ function LoadRegionddl(){
 }
 
 function Loadentityddl(){
-    var URL=$('#hdn_web_url').val()+ "/Get_all_Region"
+    var URL=$('#hdn_web_url').val()+ "/All_entity"
         $.ajax({
         type:"GET",
         url:URL,
@@ -135,15 +135,15 @@ function Loadentityddl(){
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
         success: function (data){
-            if(data.Region != null)
+            if(data.Entity != null)
             {
                 $('#ddlentity').empty();
-                var count=data.Region.length;
+                var count=data.Entity.length;
                 if( count> 0)
                 {
                     $('#ddlentity').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
-                        $('#ddlentity').append(new Option(data.Region[i].Region_Name,data.Region[i].Region_Id));
+                        $('#ddlentity').append(new Option(data.Entity[i].Entity_Name,data.Entity[i].Entity_Id));
                     //$('#ddlCourse').val('-1');
                 }
                 else
