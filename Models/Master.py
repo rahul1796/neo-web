@@ -127,4 +127,10 @@ class Master:
 
     def GetAllContractStages():
         return Database.GetAllContractStages()
+    
+    def GetDashboardCount(UserId,UserRoleId):
+        return Database.GetDashboardCount(UserId,UserRoleId)
+
+    def GetDepartmentUsers(UserId,UserRoleId):
+        return Database.GetDepartmentUsers(UserId,UserRoleId)
 
