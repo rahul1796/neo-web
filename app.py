@@ -138,17 +138,18 @@ def before_request():
         g.contract_id = session['contract_id']
 
 #home_API's
+#home_batch -> for batchlist in home page
 @app.route("/")
 def index():
     if g.user:        
-        return render_template("home.html",values=g.User_detail_with_ids,html="home_batch")
+        return render_template("home.html",values=g.User_detail_with_ids,html="dashboard")
     else:
         return render_template("login.html",error=config.displaymsg)
 
-@app.route("/home_batch")
-def home_batch():
+@app.route("/dashboard")
+def dashboard():
     if g.user:
-        return render_template("Batch/home-batch-list.html")
+        return render_template("Dashboard/dashboard.html")
     else:
         return redirect("/")
         
@@ -160,7 +161,7 @@ def EraseDisplayMsg():
 @app.route("/home")
 def home():
     if g.user:
-        return render_template("home.html",values=g.User_detail_with_ids,html="home_batch")
+        return render_template("home.html",values=g.User_detail_with_ids,html="dashboard")
     else:        
         return redirect(url_for('index'))
 
@@ -3770,6 +3771,33 @@ class Get_all_Funding_resources(Resource):
                 return {'exception':str(e)}
 api.add_resource(Get_all_Funding_resources,'/Get_all_Funding_resources')
 
+class GetDashboardCount(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                UserId=request.args.get('user_id',0,type=int)
+                UserRoleId=request.args.get('user_role_id',0,type=int)
+                response=Master.GetDashboardCount(UserId,UserRoleId)
+                return { "Dashboard" : response}
+            except Exception as e:
+                print(str(e))
+                return {} 
+api.add_resource(GetDashboardCount,'/GetDashboardCount')
+
+class GetDepartmentUsers(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                UserId=request.args.get('user_id',0,type=int)
+                UserRoleId=request.args.get('user_role_id',0,type=int)
+                response=Master.GetDepartmentUsers(UserId,UserRoleId)
+                return { "Departments" : response}
+            except Exception as e:
+                print(str(e))
+                return {} 
+api.add_resource(GetDepartmentUsers,'/GetDepartmentUsers')
 
 if __name__ == '__main__':    
     app.run(debug=True)
