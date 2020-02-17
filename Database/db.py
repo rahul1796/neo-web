@@ -2999,14 +2999,14 @@ SELECT					cb.name as candidate_name,
         response={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()        
-        sql = 'exec [masters].[sp_get_department_users_count]  ?,?'
+        sql = 'exec [masters].[sp_get_department_trainers]  ?,?'
         values = (UserId,UserRoleId)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
             for i in range(len(columns)):
-                response[columns[i]]=row[i]
-            res.append(response)
+                response[columns[i]]=row[i]            
+            res.append(response.copy())
         cur.close()
         con.close()
         return res
