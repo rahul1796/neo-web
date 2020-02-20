@@ -2,7 +2,7 @@ var varTable;
 $(document).ready(function () {
     $("#alternative-page-datatable").dataTable().fnDestroy();
 	$('.dropdown-search-filter').select2({
-                placeholder:''
+                placeholder:'Select Option'
             });
 	LoadRegionddl();
 	LoadQPddl();
@@ -16,28 +16,33 @@ $(document).ready(function () {
     })*/
 });
 function LoadRegionddl(){
-    var URL=$('#hdn_web_url').val()+ "/Get_all_Region"
+    var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
         $.ajax({
         type:"GET",
         url:URL,
         async:false,        
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
+        data:{
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id" : $('#hdn_home_user_role_id').val(),
+            "user_region_id" : $('#hdn_user_region_id').val()
+        },
         success: function (data){
-            if(data.Region != null)
+            if(data.Regions != null)
             {
                 $('#ddlRegion').empty();
-                var count=data.Region.length;
+                var count=data.Regions.length;
                 if( count> 0)
                 {
-                    $('#ddlRegion').append(new Option('ALL','-1'));
+                    //$('#ddlRegion').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
-                        $('#ddlRegion').append(new Option(data.Region[i].Region_Name,data.Region[i].Region_Id));
+                        $('#ddlRegion').append(new Option(data.Regions[i].Region_Name,data.Regions[i].Region_Id));
                     //$('#ddlCourse').val('-1');
                 }
                 else
                 {
-                    $('#ddlRegion').append(new Option('ALL','-1'));
+                    //$('#ddlRegion').append(new Option('No Regions','-1'));
                 }
             }
         },
@@ -190,7 +195,10 @@ function LoadTable()
 				d.region_ids = $('#ddlRegion').val().toString();
 				d.cluster_id = $('#ddlCluster').val().toString();
 				d.center_id = $('#ddlCenter').val().toString();
-				d.qp = $('#ddlQP').val().toString();
+                d.qp = $('#ddlQP').val().toString();
+                d.user_id =$('#hdn_home_user_id').val();
+                d.user_role_id = $('#hdn_home_user_role_id').val();
+                d.user_region_id=$('#hdn_user_region_id').val();
             },
             error: function (e) {
                 $("#alternative-page-datatable tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');

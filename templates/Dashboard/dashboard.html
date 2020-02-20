@@ -82,7 +82,8 @@
             datatype:"json",
             data:{
                 "user_id": $('#hdn_home_user_id').val(),
-                "user_role_id" : $('#hdn_home_user_role_id').val()
+                "user_role_id" : $('#hdn_home_user_role_id').val(),
+                "user_region_id" : $('#hdn_user_region_id').val()
             },
             success: function (data)
             {
@@ -127,7 +128,8 @@
             datatype:"json",
             data:{
                 "user_id": $('#hdn_home_user_id').val(),
-                "user_role_id" : $('#hdn_home_user_role_id').val()
+                "user_role_id" : $('#hdn_home_user_role_id').val(),
+                "user_region_id" : $('#hdn_user_region_id').val()
             },
             success: function (data)
             {
@@ -141,9 +143,6 @@
                             jsn={ name : data.Departments[i].Employee_Department_Name, y: data.Departments[i].User_Count};
                             chartData.push(jsn);
                         }
-                        //chartData=chartData.substring(0,chartData.length-1);
-                        console.log(chartData);
-                        //chartData=[{name:'abc',y:20},{name:'wefwef',y:30}];
                         Highcharts.chart('container', {
                             chart: {
                                 type: 'column'
@@ -228,7 +227,7 @@
                         </div>                      
                         <div class="col-6">
                             <div class="text-right">
-                                <h3 class="text-dark mt-1"><span id="span_customer" data-plugin="counterup"></span></h3>
+                                <h3 class="text-dark mt-1"><a href="/client"><span id="span_customer" data-plugin="counterup"></span></a></h3>
                                 <p class="text-muted mb-1 text-truncate">Customers</p>
                             </div>
                         </div>
@@ -247,7 +246,7 @@
                         </div>                    
                         <div class="col-6">
                             <div class="text-right">
-                                <h3 class="text-dark mt-1"><span id="span_contract" data-plugin="counterup"></span></h3>
+                                <h3 class="text-dark mt-1"><a href="/contract"><span id="span_contract" data-plugin="counterup"></span></a></h3>
                                 <p class="text-muted mb-1 text-truncate">Contracts</p>
                             </div>
                         </div>
@@ -266,8 +265,8 @@
                         </div>                     
                         <div class="col-6">
                             <div class="text-right">
-                                <h3 class="text-dark mt-1"><span id="span_projects" data-plugin="counterup"></span></h3>
-                                <p class="text-muted mb-1 text-truncate">Projetcs</p>
+                                <h3 class="text-dark mt-1"><a href="/project"><span id="span_projects" data-plugin="counterup"></span></a></h3>
+                                <p class="text-muted mb-1 text-truncate">Projects</p>
                             </div>
                         </div>
                         <div class="col-1"></div>
@@ -285,7 +284,7 @@
                         </div>                    
                         <div class="col-6">
                             <div class="text-right">
-                                <h3 class="text-dark mt-1"><span id="span_centers" data-plugin="counterup"></span></h3>
+                                <h3 class="text-dark mt-1"><a href="/center"><span id="span_centers" data-plugin="counterup"></span></a></h3>
                                 <p class="text-muted mb-1 text-truncate">Centers</p>
                             </div>
                         </div>
@@ -306,7 +305,7 @@
                         </div>                      
                         <div class="col-6">
                             <div class="text-right">
-                                <h3 class="text-dark mt-1"><span id="span_course" data-plugin="counterup"></span></h3>
+                                <h3 class="text-dark mt-1"><a href="/course"><span id="span_course" data-plugin="counterup"></span></a></h3>
                                 <p class="text-muted mb-1 text-truncate">Courses</p>
                             </div>
                         </div>
@@ -325,7 +324,7 @@
                         </div>                    
                         <div class="col-6">
                             <div class="text-right">
-                                <h3 class="text-dark mt-1"><span id="span_trainer" data-plugin="counterup"></span></h3>
+                                <h3 class="text-dark mt-1"><a href="/trainer"><span id="span_trainer" data-plugin="counterup"></span></a></h3>
                                 <p class="text-muted mb-1 text-truncate">Trainers</p>
                             </div>
                         </div>
@@ -344,7 +343,7 @@
                         </div>                     
                         <div class="col-6">
                             <div class="text-right">
-                                <h3 class="text-dark mt-1"><span id="span_mobilizer" data-plugin="counterup"></span></h3>
+                                <h3 class="text-dark mt-1"><a href="/user?role_id=2"><span id="span_mobilizer" data-plugin="counterup"></span></a></h3>
                                 <p class="text-muted mb-1 text-truncate">Mobilizers</p>
                             </div>
                         </div>

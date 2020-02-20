@@ -26,8 +26,8 @@ class Master:
 
     
     #Project
-    def project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp):
-        project_l= Database.project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp)
+    def project_list(project_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp):
+        project_l= Database.project_list(project_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp)
         return project_l
     def all_client():
         all_client={"Clients":Database.GetALLClient()}
@@ -42,8 +42,8 @@ class Master:
 
 
     ##Center##
-    def center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses):
-        center_l = Database.center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses)
+    def center_list(center_id,user_id,user_role_id,user_region_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses):
+        center_l = Database.center_list(center_id,user_id,user_role_id,user_region_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses)
         return center_l
     def add_center(center_name,user_id,is_active,center_id,center_type_id,center_category_id,bu_id,region_id,cluster_id,country_id,satet_id,district_id,location_name):
         popupMessage = {"PopupMessage": Database.add_center_details(center_name,user_id,is_active,center_id,center_type_id,center_category_id,bu_id,region_id,cluster_id,country_id,satet_id,district_id,location_name)}
@@ -73,8 +73,8 @@ class Master:
         Cluster={"ClusterOnRegion":Database.get_all_Cluster_Based_On_Region(region_id)}
         return Cluster
 
-    def client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources):
-        client_l = Database.client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources)
+    def client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources):
+        client_l = Database.client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources)
         return client_l
     def add_client(client_name,client_code,user_id,is_active,client_id):
         popupMessage = {"PopupMessage": Database.add_client_details(client_name,client_code,user_id,is_active,client_id)}
@@ -83,8 +83,8 @@ class Master:
         indi_client={"ClientDetail":Database.get_client_detail(glob_client_id)}
         return indi_client
 
-    def region_list(region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        region_l = Database.region_list(region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def region_list(region_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        region_l = Database.region_list(region_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
         return region_l
     def add_region(region_name,region_code,user_id,is_active,region_id):
         popupMessage = {"PopupMessage": Database.add_region_details(region_name,region_code,user_id,is_active,region_id)}
@@ -94,8 +94,8 @@ class Master:
         return indi_region
 
     
-    def cluster_list(cluster_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        cluster_l = Database.cluster_list(cluster_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def cluster_list(cluster_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        cluster_l = Database.cluster_list(cluster_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
         return cluster_l
     def add_cluster(cluster_name,cluster_code,region_id,user_id,is_active,cluster_id):
         popupMessage = {"PopupMessage": Database.add_cluster_details(cluster_name,cluster_code,region_id,user_id,is_active,cluster_id)}
@@ -128,9 +128,9 @@ class Master:
     def GetAllContractStages():
         return Database.GetAllContractStages()
     
-    def GetDashboardCount(UserId,UserRoleId):
-        return Database.GetDashboardCount(UserId,UserRoleId)
+    def GetDashboardCount(UserId,UserRoleId,UserRegionId):
+        return Database.GetDashboardCount(UserId,UserRoleId,UserRegionId)
 
-    def GetDepartmentUsers(UserId,UserRoleId):
-        return Database.GetDepartmentUsers(UserId,UserRoleId)
+    def GetDepartmentUsers(UserId,UserRoleId,UserRegionId):
+        return Database.GetDepartmentUsers(UserId,UserRoleId,UserRegionId)
 
