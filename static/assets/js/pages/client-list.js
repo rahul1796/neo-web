@@ -1,12 +1,21 @@
 var varTable;
+var IsActive;
 $(document).ready(function () {
+    //IsActive='{{active}}';
+    // if ('{{active}}'!="")
+    //     IsActive=0;
+    console.log(IsActive);
     $("#tbl_clients").dataTable().fnDestroy();
     $('.dropdown-search-filter').select2({
         placeholder:''
     });
     LoadFunding_Resourcesdl();
     LoadTable(); 
+
+
 });
+
+
 function LoadFunding_Resourcesdl(){
     var URL=$('#hdn_web_url').val()+ "/Get_all_Funding_resources"
         $.ajax({
@@ -61,6 +70,7 @@ function LoadTable()
             "data": function (d) {
                 d.client_id = 0;
                 d.funding_resources=$('#ddlFundingSource').val().toString();
+                d.is_active=-1;
             },
             error: function (e) {
                 $("#tbl_clients tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');

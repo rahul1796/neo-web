@@ -47,10 +47,38 @@
                 $('#hdn_home_user_role_id').val('{{values[2]}}');
                 $('#hdn_home_user_name').val('{{values[0]}}');
                 $('#hdn_web_url').val('{{values[3]}}');
+                $('#hdn_user_region_id').val('{{values[4]}}');
             }
             if(parseInt($('#hdn_home_user_role_id').val())>0)
             {
                 var role_id=parseInt($('#hdn_home_user_role_id').val());
+                $('#Home').show();
+                $('#Master_Menu').show();
+                $('#AnchorCenters').show();
+                $('#AnchorCenterType').show();
+                $('#AnchorCenterCategory').show();
+                $('#Org_menu').show();
+                $('#AnchorRoles').show();
+                $('#AnchorUsers').show();
+                $('#Content_Menu').show();
+                $('#AnchorCourses').show();
+                $('#Batch_Menu').show();
+                $('#Candidate_Menu').show();
+
+                $('#TMA_content').show();
+                $('#TMA_batch_Menu').show();
+                $('#TMA_report_Menu').show();
+                $('#MCL_report_Menu').show();
+                $('#Mobilization_report_Menu').show();
+                $('#Report_Menu').show();
+                $('#CoomplianceReport').show();
+                //TMA_registraion_Menu, TrainerwiseTMARegistration
+                
+                $('#Trainer_Menu').show()
+                
+                if(goto !="")
+                    $("#box").load(goto);
+                /*
                 switch(role_id)
 				{
                     case 1:         //Tech Admin
@@ -286,9 +314,9 @@
                         break;
                         case 11:         //COO
                         $('#Home').show();
-                        $('#Master_Menu').hide();
-                        $('#AnchorCenters').hide();
-                        $('#AnchorCenterType').hide();
+                        $('#Master_Menu').show();
+                        $('#AnchorCenters').show();
+                        $('#AnchorCenterType').show();
                         $('#AnchorCenterCategory').hide();
                         $('#Org_menu').hide();
                         $('#AnchorRoles').hide();
@@ -310,9 +338,10 @@
 						
                         if(goto != ""){
 							// home, batch_list_page, batch_add_edit, candidate_list_page, trainer_list_page, trainer_add_edit, mcl_report_page, tma_batch_page, tma_report_download_page
-                            if(goto == "home" || goto == "batch_list_page" || goto == "batch_add_edit" || goto == "candidate_list_page" || goto == "trainer_list_page" || goto == "trainer_add_edit" || goto == "mcl_report_page" || goto == "tma_batch_page" || goto == "tma_report_download_page" || goto == "mcl_report_page" || goto == "mobilization_report" || goto == "attendance_report" || goto=="trainer_deployment" || goto == "change_password_page" || goto == "trainer_deployment" || goto == "attendance_report" || goto == "batch_sessions" || goto == "mobilization_report" || goto == "registered_candidates_list"){
-                                $("#box").load(goto);
-                            }
+                            // if(goto == "home" || goto == "batch_list_page" || goto == "batch_add_edit" || goto == "candidate_list_page" || goto == "trainer_list_page" || goto == "trainer_add_edit" || goto == "mcl_report_page" || goto == "tma_batch_page" || goto == "tma_report_download_page" || goto == "mcl_report_page" || goto == "mobilization_report" || goto == "attendance_report" || goto=="trainer_deployment" || goto == "change_password_page" || goto == "trainer_deployment" || goto == "attendance_report" || goto == "batch_sessions" || goto == "mobilization_report" || goto == "registered_candidates_list"){
+                            //     $("#box").load(goto);
+                            // }
+                            $("#box").load(goto);
                         }
                         break;
                         case 12:         //P-ops
@@ -573,6 +602,7 @@
                         }
                         break;
                 }
+                */
             }
         });
         
@@ -584,6 +614,7 @@
             <input type="hidden" id="hdn_home_user_role_id" name="hdn_home_user_role_id" value="0">
             <input type="hidden" id="hdn_home_user_name" name="hdn_home_user_name" value="0">
             <input type="hidden" id="hdn_web_url" name="hdn_web_url" value="">
+            <input type="hidden" id="hdn_user_region_id" name="hdn_user_region_id" value="">
 			
         <header id="topnav" style="background-color:#1C2A43;min-height: 10%; font-size: 15px;" >
 
@@ -779,14 +810,7 @@
 									</li>
 
                                 </ul>
-                            </li>
-
-                            
-
-                            
-
-                            
-                            
+                            </li>                            
                         </ul>
                         <!-- End navigation menu -->
                     <!-- </ul> -->
