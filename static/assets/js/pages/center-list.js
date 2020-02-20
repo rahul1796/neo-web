@@ -272,7 +272,8 @@ function LoadTable()
             { "data": "Country_Name"},
             { "data": "State_Name" },
             { "data": "District_Name"},
-            { "data": "Location" }
+            { "data": "Location" },
+            { "data": "Sub_Center_Names" }
             
         ],
         "ColumnDefs":[

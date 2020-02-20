@@ -218,7 +218,8 @@ function LoadTable()
             varButtons += '<a onclick="EditProjectDetail(\'' + row.Project_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Project" class="fas fa-edit" ></i></a>';
             return varButtons;
             }
-            }
+            },
+            { "data": "Sub_Project_Names"},
         ],
         drawCallback: function(){
             $('#alternative-page-datatable_paginate ul.pagination').addClass("pagination-rounded");
