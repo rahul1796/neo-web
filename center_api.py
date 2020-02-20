@@ -9,6 +9,9 @@ class center_list(Resource):
     def post():
         if request.method == 'POST':
             center_id = request.form['center_id']
+            user_id = request.form['user_id']
+            user_role_id = request.form['user_role_id'] 
+            user_region_id = request.form['user_region_id'] 
             center_type_ids = request.form['center_type_ids']
             bu_ids = request.form['bu_ids']
             status = request.form['status'] 
@@ -22,7 +25,7 @@ class center_list(Resource):
             clusters=request.form['clusters']
             courses=request.form['courses']
             
-            Center_lt = Master.center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses)
+            Center_lt = Master.center_list(center_id,user_id,user_role_id,user_region_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses)
             return Center_lt
 
 

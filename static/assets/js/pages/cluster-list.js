@@ -25,6 +25,9 @@ function LoadTable()
             "dataType": "json",
             "data": function (d) {
                 d.cluster_id = 0;
+                d.user_id=$('#hdn_home_user_id').val();
+                d.user_role_id=$('#hdn_home_user_role_id').val();
+                d.user_region_id=$('#hdn_user_region_id').val();
             },
             error: function (e) {
                 $("#tbl_cluster tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');

@@ -1,6 +1,7 @@
 var varTable;
 var varTable1;
 var flag = "";
+var role_id;
 
 $(document).ready(function () {
     var Course=0,Batch=0;
@@ -8,10 +9,12 @@ $(document).ready(function () {
 
     LoadTable(); 
     role_id=parseInt($('#hdn_home_user_role_id').val());
-    if(role_id == 1)
+    if(role_id == 1 || role_id ==5 || role_id ==15)
         $('#btn_create').show();
-	if(role_id == 7 || role_id==5 || role_id == 4)
-		$('#btn_create').hide();
+    else 
+        $('#btn_create').hide();
+	// if(role_id == 7 || role_id==5 || role_id == 4)
+	// 	$('#btn_create').hide();
 });
 
 function LoadTable()
@@ -43,11 +46,11 @@ function LoadTable()
 
         "columns": [
             { "data": "S_No"},
-            { 
+            { "visible":(($('#hdn_home_user_role_id').val() =='1') || ($('#hdn_home_user_role_id').val() =='5')||($('#hdn_home_user_role_id').val() =='15')) ?true: false,
             "data": function (row, type, val, meta) {
                 var varButtons = ""; 
                 
-                if(role_id == 1 || role_id == 15)//|| role_id == 7 || role_id == 5 || role_id == 4
+                if(role_id == 1 || role_id == 15 || role_id ==5)//|| role_id == 7 || role_id == 5 || role_id == 4
                     varButtons += '<a onclick="EditBatchDetail(\'' + row.Batch_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit User" class="fas fa-edit" ></i></a><a onclick="MapCandidateBatch('+row.Course_Id+','+row.Center_Id+','+row.Batch_Id+')" class="btn" style="cursor:pointer" ><i title="Map Candidate" class="fas fa-plus" ></i></a><a onclick="DropCandidateBatch('+row.Course_Id+','+row.Center_Id+','+row.Batch_Id+')" class="btn" style="cursor:pointer" ><i title="Drop Candidate" class="fas fa-minus" ></i></a>';
                 return varButtons;
                 }

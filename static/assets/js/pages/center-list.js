@@ -131,23 +131,28 @@ function LoadCourseddl(){
 
 
 function LoadRegionddl(){
-    var URL=$('#hdn_web_url').val()+ "/Get_all_Region"
+    var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
         $.ajax({
         type:"GET",
         url:URL,
         async:false,        
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
+        data:{
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id" : $('#hdn_home_user_role_id').val(),
+            "user_region_id" : $('#hdn_user_region_id').val()
+        },
         success: function (data){
-            if(data.Region != null)
+            if(data.Regions != null)
             {
                 $('#ddlRegion').empty();
-                var count=data.Region.length;
+                var count=data.Regions.length;
                 if( count> 0)
                 {
                     $('#ddlRegion').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
-                        $('#ddlRegion').append(new Option(data.Region[i].Region_Name,data.Region[i].Region_Id));
+                        $('#ddlRegion').append(new Option(data.Regions[i].Region_Name,data.Regions[i].Region_Id));
                     //$('#ddlCourse').val('-1');
                 }
                 else
@@ -223,6 +228,9 @@ function LoadTable()
             "dataType": "json",
             "data": function (d) {
                 d.center_id = 0,
+                d.user_id= $('#hdn_home_user_id').val(),
+                d.user_role_id = $('#hdn_home_user_role_id').val(),
+                d.user_region_id = $('#hdn_user_region_id').val(),
                 d.center_type_ids=$('#ddlCenterType').val().toString(),
                 d.bu_ids=$('#ddlBu').val().toString(),
                 d.status=$('#ddlStatus').val().toString(),

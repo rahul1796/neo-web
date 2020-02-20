@@ -1,20 +1,7 @@
 
 var varTable;
-$(document).ready(function () {
-    $("#tbl_users").dataTable().fnDestroy();
-    $('.dropdown-search-filter').select2({
-        placeholder:''
-    });
-    LoadRM_Role_ddl();
-    LoadRegionddl();
-    LoadDEPTddl();
-    Loadentityddl();
-    LoadRoleddl();
-    LoadTable(); 
-    role_id=parseInt($('#hdn_home_user_role_id').val());
-    if(role_id == 5)
-        $('#btn_create').hide();
-});
+var filter_role_id;
+
 
 function LoadRM_Role_ddl(){
     var URL=$('#hdn_web_url').val()+ "/All_RM_role"
@@ -232,8 +219,9 @@ function LoadDEPTddl(){
 }
 
 
-function LoadTable()
+function LoadTable(FilterRoleId)
 {       //alert($('#ddlDEPT').val().toString() +'\n'+$('#ddlRole').val().toString()+'\n'+$('#ddlentity').val().toString() +'\n'+$('#ddlRegion').val().toString()+'\n'+$('#ddlRM_role').val().toString()+'\n'+$('#ddl_R_Manager').val().toString())
+    filter_role_id=FilterRoleId;
         vartable1 = $("#tbl_users").DataTable({
         "serverSide": true,
         "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
@@ -256,6 +244,9 @@ function LoadTable()
                 d.region_ids = $('#ddlRegion').val().toString();
                 d.RM_Role_ids = $('#ddlRM_role').val().toString();
                 d.R_mangager_ids = $('#ddl_R_Manager').val().toString();
+                d.filter_role_id=filter_role_id;
+                d.user_region_id = $('#hdn_user_region_id').val();
+                d.user_role_id = $('#hdn_home_user_role_id').val();
             },
             error: function (e) {
                 $("#tbl_users tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
