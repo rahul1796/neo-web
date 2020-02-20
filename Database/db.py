@@ -6,6 +6,7 @@ import pandas as pd
 class Database:
     def Login(email,passw):
         tr =[]
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec [users].[sp_user_login] ?, ?'
@@ -15,7 +16,9 @@ class Database:
         columns = [column[0].title() for column in cur.description]
         #cur.execute("SELECT u.user_id,u.user_name,u.user_role_id FROM users.tbl_users AS u LEFT JOIN users.tbl_user_details AS ud ON ud.user_id=u.user_id where ud.email='"+email+"' AND u.password='"+passw+"';")
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3]}
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3]}
             tr.append(h)
         cur.commit()
         cur.close()
@@ -283,13 +286,13 @@ class Database:
         con.close()
         return h
     
-    def project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp):
+    def project_list(project_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, region_ids, cluster_id, center_id, qp)
+        sql = 'exec [masters].[sp_get_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (project_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, region_ids, cluster_id, center_id, qp)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -345,13 +348,13 @@ class Database:
         con.close()
         return h
     
-    def center_list(center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses):
+    def center_list(center_id,user_id,user_role_id,user_region_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_centers_list] ?,?,?,?, ?, ?, ?, ?, ?,?,?,?'        
-        values = (center_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,regions,clusters,courses)
+        sql = 'exec [masters].[sp_get_centers_list] ?,?,?,?, ?, ?, ?, ?, ?,?,?,?,?,?,?'        
+        values = (center_id,user_id,user_role_id,user_region_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,regions,clusters,courses)
         print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
@@ -669,13 +672,13 @@ class Database:
         cur.close()
         con.close()
         return h    
-    def user_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids):
+    def user_list(user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [users].[sp_get_users_list] ?, ?, ?, ?, ?, ?,? ,? ,? ,? ,? ,?'
-        values = (user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids)
+        sql = 'exec [users].[sp_get_users_list] ?, ?, ?, ?, ?, ?,? ,? ,? ,? ,? ,?, ?, ?, ?'
+        values = (user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -689,13 +692,13 @@ class Database:
         cur.close()
         con.close()
         return content
-    def trainer_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status, Region_id, Cluster_id, BU):
+    def trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status, Region_id, Cluster_id, BU):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [users].[sp_get_trainer_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_role_id,centers, status, Region_id, Cluster_id, BU)
+        sql = 'exec [users].[sp_get_trainer_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_role_id,centers, status, Region_id, Cluster_id, BU)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -1068,13 +1071,13 @@ class Database:
         con.close()
         return section
 
-    def client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources):
+    def client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_client_list] ?, ?, ?, ?, ?, ?, ?'
-        values = (client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, funding_resources)
+        sql = 'exec [masters].[sp_get_client_list] ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, funding_resources)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -1121,13 +1124,13 @@ class Database:
         con.close()
         return h
 
-    def region_list(region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def region_list(region_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_region_list] ?, ?, ?, ?, ?, ?'
-        values = (region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [masters].[sp_get_region_list] ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (region_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -1174,13 +1177,13 @@ class Database:
         con.close()
         return h
         
-    def cluster_list(cluster_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def cluster_list(cluster_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_cluster_list] ?, ?, ?, ?, ?, ?'
-        values = (cluster_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [masters].[sp_get_cluster_list] ?, ?, ?, ?, ?, ?, ?, ? ,?'
+        values = (cluster_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -2137,21 +2140,24 @@ SELECT					cb.name as candidate_name,
         con.close()
         return data
        
-    @classmethod
-    def AllRegionsBasedOnUser(cls,UserId,UserRoleId):
+    
+    def AllRegionsBasedOnUser(UserId,UserRoleId,UserRegionId):
         response=[]
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_get_regions_based_on_user] ?, ?'
-        values = (UserId,UserRoleId)
+        sql = 'exec	[masters].[sp_get_regions_based_on_user] ?, ?, ?'
+        values = (UserId,UserRoleId,UserRegionId)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
-            response.append(h)
+            for i in range(len(columns)):
+                h[columns[i]]=row[i] 
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h.copy())
         cur.commit()
         cur.close()
-        con.close()       
+        con.close()
         return response
     
     def GetAllCentersBasedOnRegion_User(UserId,UserRoleId,RegionId):
@@ -2979,12 +2985,12 @@ SELECT					cb.name as candidate_name,
         con.close()       
         return response
     
-    def GetDashboardCount(UserId,UserRoleId):
+    def GetDashboardCount(UserId,UserRoleId,UserRegionId):
         response={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()        
-        sql = 'exec [masters].[sp_get_dashboard_count]  ?,?'
-        values = (UserId,UserRoleId)
+        sql = 'exec [masters].[sp_get_dashboard_count]  ?,?,?'
+        values = (UserId,UserRoleId,UserRegionId)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -2994,13 +3000,13 @@ SELECT					cb.name as candidate_name,
         con.close()
         return response
     
-    def GetDepartmentUsers(UserId,UserRoleId):
+    def GetDepartmentUsers(UserId,UserRoleId,UserRegionId):
         res=[]
         response={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()        
-        sql = 'exec [masters].[sp_get_department_trainers]  ?,?'
-        values = (UserId,UserRoleId)
+        sql = 'exec [masters].[sp_get_department_trainers]  ?,?,?'
+        values = (UserId,UserRoleId,UserRegionId)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:

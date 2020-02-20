@@ -34,7 +34,8 @@
         datatype:"json",
         data:{
                 "user_id": $('#hdn_home_user_id').val(),
-                "user_role_id" : $('#hdn_home_user_role_id').val()
+                "user_role_id" : $('#hdn_home_user_role_id').val(),
+                "user_region_id" : $('#hdn_user_region_id').val()
         },
         success: function (data){
             if(data.Regions != null)
