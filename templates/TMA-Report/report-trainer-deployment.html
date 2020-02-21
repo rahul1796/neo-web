@@ -28,7 +28,8 @@
         datatype:"json",
         data:{
                 "user_id": $('#hdn_home_user_id').val(),
-                "user_role_id" : $('#hdn_home_user_role_id').val()
+                "user_role_id" : $('#hdn_home_user_role_id').val(),
+                    "user_region_id" : $('#hdn_user_region_id').val()
         },
         success: function (data){
             if(data.Regions != null)
@@ -37,7 +38,7 @@
                 var count=data.Regions.length;
                 if( count> 0)
                 {
-                    $('#ddlRegion').append(new Option('ALL','0'));
+                    //$('#ddlRegion').append(new Option('ALL','0'));
                     for(var i=0;i<count;i++)
                         $('#ddlRegion').append(new Option(data.Regions[i].Region_Name,data.Regions[i].Region_Id));
                     $('#ddlRegion').val('');

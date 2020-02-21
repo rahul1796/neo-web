@@ -78,13 +78,14 @@ def before_request():
         g.user = session['user_name']
         g.user_id = session['user_id']
         g.user_role = session['user_role_id']
+        g.user_region_id=session['user_region_id']
         g.base_url = session['base_url']
         # print(g.user,g.user_id,g.user_role)
         g.User_detail_with_ids.append(g.user)
         g.User_detail_with_ids.append(g.user_id)
         g.User_detail_with_ids.append(g.user_role)
         g.User_detail_with_ids.append(g.base_url)
-        
+        g.User_detail_with_ids.append(g.user_region_id)
     if 'course_id' in session.keys():
         g.course_id = session['course_id']
     if 'center_category_id' in session.keys():
@@ -177,7 +178,8 @@ def login():
             if tr[0]['Is_Active'] == 1:
                 session['user_name'] = tr[0]['User_Name']            
                 session['user_id'] = tr[0]['User_Id']
-                session['user_role_id'] = tr[0]['User_Role_Id']  
+                session['user_role_id'] = tr[0]['User_Role_Id']
+                session['user_region_id'] = tr[0]['Region_Id']  
                 session['base_url'] = config.Base_URL         
                 config.displaymsg=""
                 return redirect(url_for('home'))
@@ -629,14 +631,17 @@ api.add_resource(user_role_list, '/user_role_list')
 @app.route("/user_list_page")
 def user_list_page():
     if g.user:
-        return render_template("User_Management/user-list.html")
+        role_id=request.args.get('role_id',-1,type=int)
+        return render_template("User_Management/user-list.html",role=role_id)
     else:
         return render_template("login.html",error="Session Time Out!!")
 
-@app.route("/user")
+@app.route("/user",methods=['GET','POST'])
 def user():
     if g.user:
-        return render_template("home.html",values=g.User_detail_with_ids,html="user_list_page")
+        role_id=request.args.get('role_id',-1,type=int) 
+        html_str="user_list_page?role_id=" + str(role_id)       
+        return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
     else:
         return render_template("login.html",error="Session Time Out!!")
 
@@ -680,7 +685,10 @@ class user_list(Resource):
             region_ids=request.form['region_ids']
             RM_Role_ids=request.form['RM_Role_ids']
             R_mangager_ids=request.form['R_mangager_ids']
-            return UsersM.user_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids)
+            filter_role_id=request.form['filter_role_id']
+            user_region_id=request.form['user_region_id']
+            user_role_id=request.form['user_role_id']
+            return UsersM.user_list(user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids)
             
 
 class add_user_details(Resource):
@@ -1071,15 +1079,16 @@ api.add_resource(get_section_for_cand,'/GetSectionCand')
 
 
 #Client_API's
-@app.route("/client_list_page")
+@app.route("/client_list_page",methods=['GET','POST'])
 def client_list_page():
     if g.user:
-        return render_template("Master/client-list.html")
+        print(request.args.get('client',100,type=int))
+        return render_template("Master/client-list.html",active=1)
     else:
         return render_template("login.html",error="Session Time Out!!")
 
 
-@app.route("/client")
+@app.route("/client",methods=['GET','POST'])
 def client():
     if g.user:
         return render_template("home.html",values=g.User_detail_with_ids,html="client_list_page")
@@ -1113,6 +1122,10 @@ class client_list(Resource):
     def post():
         if request.method == 'POST':
             client_id = request.form['client_id'] 
+            if 'is_active' in request.form:
+                Is_Active=request.form['is_active']
+            else:
+                Is_Active=-1
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
@@ -1121,7 +1134,7 @@ class client_list(Resource):
             draw=request.form['draw']
             funding_resources = request.form['funding_resources']
             #print(order_by_column_position,order_by_column_direction)
-            return Master.client_list(client_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources)
+            return Master.client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources)
 
 class add_client_details(Resource):
     @staticmethod
@@ -1189,14 +1202,17 @@ class region_list(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
-            region_id = request.form['region_id'] 
+            region_id = request.form['region_id']
+            user_id = request.form['user_id']
+            user_role_id = request.form['user_role_id'] 
+            user_region_id = request.form['user_region_id'] 
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            return Master.region_list(region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Master.region_list(region_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 
 class add_region_details(Resource):
     @staticmethod
@@ -1265,13 +1281,16 @@ class cluster_list(Resource):
     def post():
         if request.method == 'POST':
             cluster_id = request.form['cluster_id'] 
+            user_id = request.form['user_id']
+            user_role_id = request.form['user_role_id'] 
+            user_region_id = request.form['user_region_id']
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            return Master.cluster_list(cluster_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Master.cluster_list(cluster_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 
 class add_cluster_details(Resource):
     @staticmethod
@@ -2389,6 +2408,9 @@ class project_list(Resource):
     def post():
         if request.method == 'POST':
             project_id = request.form['project_id']
+            user_id = request.form['user_id']
+            user_role_id = request.form['user_role_id'] 
+            user_region_id = request.form['user_region_id']
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
@@ -2400,7 +2422,7 @@ class project_list(Resource):
             center_id=request.form['center_id']
             qp=request.form['qp']
             
-            return Master.project_list(project_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp)
+            return Master.project_list(project_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp)
 
 
 class add_project_details(Resource):
@@ -2521,6 +2543,10 @@ class trainer_list(Resource):
     def post():
         if request.method == 'POST':
             user_id = request.form['user_id']
+            user_region_id=0
+        
+            if 'user_region_id' in request.form:
+                user_region_id = request.form['user_region_id']
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
@@ -2533,8 +2559,7 @@ class trainer_list(Resource):
             Region_id = request.form['Region_id']
             Cluster_id = request.form['Cluster_id']
             BU = request.form['BU']
-            
-            return UsersM.trainer_list(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id, centers, status, Region_id, Cluster_id, BU)
+            return UsersM.trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id, centers, status, Region_id, Cluster_id, BU)
 
 api.add_resource(trainer_list, '/trainer_list')
 
@@ -2640,7 +2665,8 @@ class AllRegionsBasedOnUser(Resource):
             try:
                 UserId=request.args.get('user_id',0,type=int)
                 UserRoleId=request.args.get('user_role_id',0,type=int)
-                response=Report.AllRegionsBasedOnUser(UserId,UserRoleId)
+                UserRegionId=request.args.get('user_region_id',0,type=int)
+                response=Report.AllRegionsBasedOnUser(UserId,UserRoleId,UserRegionId)
                 return {'Regions':response}
             except Exception as e:
                 return {'exception':str(e)}
@@ -3778,7 +3804,8 @@ class GetDashboardCount(Resource):
             try:
                 UserId=request.args.get('user_id',0,type=int)
                 UserRoleId=request.args.get('user_role_id',0,type=int)
-                response=Master.GetDashboardCount(UserId,UserRoleId)
+                UserRegionId=request.args.get('user_region_id',0,type=int)
+                response=Master.GetDashboardCount(UserId,UserRoleId,UserRegionId)
                 return { "Dashboard" : response}
             except Exception as e:
                 print(str(e))
@@ -3792,7 +3819,8 @@ class GetDepartmentUsers(Resource):
             try:
                 UserId=request.args.get('user_id',0,type=int)
                 UserRoleId=request.args.get('user_role_id',0,type=int)
-                response=Master.GetDepartmentUsers(UserId,UserRoleId)
+                UserRegionId=request.args.get('user_region_id',0,type=int)
+                response=Master.GetDepartmentUsers(UserId,UserRoleId,UserRegionId)
                 return { "Departments" : response}
             except Exception as e:
                 print(str(e))

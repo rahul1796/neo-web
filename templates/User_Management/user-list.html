@@ -8,6 +8,23 @@
         <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />        
         <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript">
+            $(document).ready(function () {
+            $("#tbl_users").dataTable().fnDestroy();
+            $('.dropdown-search-filter').select2({
+                placeholder:''
+            });
+            LoadRM_Role_ddl();
+            LoadRegionddl();
+            LoadDEPTddl();
+            Loadentityddl();
+            LoadRoleddl();
+            LoadTable('{{role}}'); 
+            role_id=parseInt($('#hdn_home_user_role_id').val());
+            if(role_id == 5)
+                $('#btn_create').hide();
+        });
+        </script>
        <form id='form1' method="POST" action="/assign_user_add_edit_to_home">
             
                 <input type="hidden" id="hdn_user_id" name="hdn_user_id" value="0">
