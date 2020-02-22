@@ -692,13 +692,13 @@ class Database:
         cur.close()
         con.close()
         return content
-    def trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status, Region_id, Cluster_id, BU):
+    def trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status, Region_id, Cluster_id, Dept):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec [users].[sp_get_trainer_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_role_id,centers, status, Region_id, Cluster_id, BU)
+        values = (user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_role_id,centers, status, Region_id, Cluster_id, Dept)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -1038,6 +1038,7 @@ class Database:
         courses = []
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
+        
         cur2.execute("SELECT * FROM masters.tbl_courses WHERE project_id="+project_id)
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
@@ -1046,6 +1047,21 @@ class Database:
         cur2.close()
         con.close()
         return courses
+        
+    def get_cand_course_basedon_proj_multiple(project_id):
+        courses = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = """SELECT * FROM masters.tbl_courses WHERE is_active=1 and is_deleted=0 and ('{}'='-1' or project_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(project_id, project_id)  #'{}'='' or 
+        cur2.execute(sql)
+        columns = [column[0].title() for column in cur2.description]
+        for r in cur2:
+            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            courses.append(h)
+        cur2.close()
+        con.close()
+        return courses
+
     def get_cand_center_basedon_course(course_id):
         center = []
         con = pyodbc.connect(conn_str)
@@ -3016,4 +3032,32 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return res
+    def get_project_basedon_client_multiple(client_id):
+        project = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        print(client_id)
+        sql = """SELECT * FROM masters.tbl_projects WHERE is_active=1 and is_deleted=0 and ('{}'='-1' or client_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(client_id, client_id)  #'{}'='' or 
+        cur2.execute(sql)
+        columns = [column[0].title() for column in cur2.description]
+        for r in cur2:
+            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            project.append(h)
+        cur2.close()
+        con.close()
+        return project
 
+    def All_Department_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        
+        cur.execute("SELECT distinct [employee_department_id],[employee_department_name] FROM [users].[tbl_employee_department] where is_active=1 and is_deleted=0 and is_oprt=1")
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response

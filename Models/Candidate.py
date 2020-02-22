@@ -9,6 +9,10 @@ class Candidate:
     def get_cand_course_basedon_proj(project_id):
         courses = {"Courses": Database.get_cand_course_basedon_proj(project_id)}
         return courses
+    def get_cand_course_basedon_proj_multiple(project_id):
+        courses = {"Courses": Database.get_cand_course_basedon_proj_multiple(project_id)}
+        return courses
+    
     def get_cand_center_basedon_course(course_id):
         centers = {"Centers": Database.get_cand_center_basedon_course(course_id)}
         print(centers)
@@ -16,3 +20,6 @@ class Candidate:
     def get_section_for_cand():
         section = {"Sections":Database.get_section_for_cand()}
         return section
+    def get_project_basedon_client_multiple(client_id):
+        projects ={"Projects": Database.get_project_basedon_client_multiple(client_id)}
+        return projects
