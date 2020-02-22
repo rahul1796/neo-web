@@ -71,9 +71,8 @@ def create_report(data,report_name):
         #worksheet = workbook.add_worksheet('Stage Log')
 
         for i in set(map(lambda x:(x[12],x[13]), data)):
-            
             if i[1]=='-Basic Profile':
-                print(i[1])
+                #print(i[1])
                 row=1
                 worksheet = workbook.add_worksheet(str(i[1]))
                 section = list(filter(lambda x:x[12]==i[0], data))
@@ -190,10 +189,10 @@ def create_report(data,report_name):
                     
                     row+=max_l
                 
-                #worksheet.set_column('F:F', None, None, {'hidden': True})
-                worksheet.getCells().deleteColumns(5,5,True)
-                worksheet.getCells().deleteColumns(7,7,True)
-                #worksheet.set_column('H:H', None, None, {'hidden': True})
+                worksheet.set_column('F:F', None, None, {'hidden': True})
+                #worksheet.getCells().deleteColumns(5,5,True)
+                #worksheet.getCells().deleteColumns(7,7,True)
+                worksheet.set_column('H:H', None, None, {'hidden': True})
             else:
                 print(i[1])
                 row=1

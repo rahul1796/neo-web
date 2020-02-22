@@ -17,15 +17,52 @@
 			$('.dropdown-search-filter').select2({
                 placeholder:''
             });
-			LoadBuddl();
+
+            LoadBuddl();
+            LoadDeptdl();
 			LoadRegionddl();
-            
-			LoadTable("0","-1");
+            LoadTable("0","-1");
 			
 			$('#ddlStatus').append(new Option('ALL','-1'));
 			$('#ddlStatus').append(new Option('Active','1'));
 			$('#ddlStatus').append(new Option('InActive','0'));
         });
+
+function LoadDeptdl(){
+    var URL=$('#hdn_web_url').val()+ "/GetAllDept"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Departments != null)
+            {
+                $('#ddlDept').empty();
+                var count=data.Departments.length;
+                if( count> 0)
+                {
+                    $('#ddlDept').append(new Option('ALL',''));
+                    for(var i=0;i<count;i++)
+                        $('#ddlDept').append(new Option(data.Departments[i].Employee_Department_Name,data.Departments[i].Employee_Department_Id));
+                    //$('#ddlDept').val('');
+                }
+                else
+                {
+                    $('#ddlDept').append(new Option('ALL',''));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
 	function LoadBuddl(){
     var URL=$('#hdn_web_url').val()+ "/GetAllBusBasedOn_User"
         $.ajax({
@@ -207,7 +244,7 @@ function LoadClusterddl(){
                 d.user_id = $('#hdn_home_user_id').val();
 				d.user_role_id = $('#hdn_home_user_role_id').val();
 				d.centers = Centers;
-				d.BU = $('#ddlBu').val().toString();
+				d.Dept = $('#ddlDept').val().toString();        // ddlbu
 				d.Region_id = $('#ddlRegion').val().toString();
 				d.Cluster_id = $('#ddlCluster').val().toString();
                 d.status = Status;
@@ -240,7 +277,6 @@ function LoadClusterddl(){
 
     });
 }
-
 	
     function LoadTableBasedOnSearch(){
 		LoadTable($('#ddlCenter').val().toString(), $('#ddlStatus').val());
@@ -316,11 +352,17 @@ function LoadClusterddl(){
                     
 					<div class="row"> 
                         <div class="col-lg-3">
+							<label for="ddlDept" class="mr-2">Department Name</label>
+							<select class="form-control dropdown-search-filter" id="ddlDept" multiple>
+								<option selected="" value="">All</option>
+							</select>
+                        </div>
+                        <!--div class="col-lg-3">
 							<label for="ddlBu" class="mr-2">Business Unit</label>
 							<select class="form-control dropdown-search-filter" id="ddlBu" multiple>
 								<option selected="" value="">All</option>
 							</select>
-                        </div>
+                        </div-->
 
 						<div class="col-lg-3">
 							<label for="ddlRegion" class="mr-2">Region</label>
@@ -428,9 +470,6 @@ function LoadClusterddl(){
         <script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
         <script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
         <!-- third party js ends -->
-
         <!-- datatables init js-->
         <!--script src="static/assets/js/pages/trainer-list.js"></script--
-		
-		
 		>
