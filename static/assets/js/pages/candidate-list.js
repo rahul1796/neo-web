@@ -10,6 +10,7 @@ $(document).ready(function () {
     if(role_id == 5)
         $('#btn_create').hide();
 });
+
 function loadSection(){
     var URL=$('#hdn_web_url').val()+ "/GetSectionCand"
     $.ajax({
