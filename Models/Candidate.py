@@ -15,7 +15,9 @@ class Candidate:
     
     def get_cand_center_basedon_course(course_id):
         centers = {"Centers": Database.get_cand_center_basedon_course(course_id)}
-        print(centers)
+        return centers
+    def get_cand_center_basedon_course_multiple(course_id, RegionId):
+        centers = {"Centers": Database.get_cand_center_basedon_course_multiple(course_id, RegionId)}
         return centers
     def get_section_for_cand():
         section = {"Sections":Database.get_section_for_cand()}

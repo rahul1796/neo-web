@@ -139,7 +139,7 @@ function LoadProject(){
     });
     return false;
 }
-function LoadCourse(Project_Id){
+function LoadCourse(){
     var URL=$('#hdn_web_url').val()+ "/get_cand_course_basedon_proj_multiple"
     $.ajax({
         type:"POST",
@@ -175,8 +175,9 @@ function LoadCourse(Project_Id){
     });
     return false;
 }
-function LoadCenter(Course_Id){
-    var URL=$('#hdn_web_url').val()+ "/get_cand_center_basedon_course"
+
+function LoadCenter(){
+    var URL=$('#hdn_web_url').val()+ "/get_cand_center_basedon_course_multiple"
     $.ajax({
         type:"POST",
         url:URL,
@@ -184,7 +185,8 @@ function LoadCenter(Course_Id){
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
         data:{
-            "CourseId":Course_Id
+            "CourseId":$('#ddlCourse').val().toString(),
+            "RegionId":$('#ddlRegion').val().toString()
         },
         success: function (data){
             if(data.Centers != null)
@@ -204,7 +206,8 @@ function LoadCenter(Course_Id){
             }
         },
         error:function(err)
-        {
+        {   
+            
             alert('Error! Please try again');
             return false;
         }
@@ -224,13 +227,19 @@ function LoadTable()
         "processing": true,
         "language": { "processing": 'Loading..!' },
         "ajax": {
-            "url": $('#hdn_web_url').val()+ "/batch_list",
+            "url": $('#hdn_web_url').val()+ "/batch_list_updated",
             "type": "POST",
             "dataType": "json",
             "data": function (d) {
                 d.batch_id = 0;
 		        d.user_id = $('#hdn_home_user_id').val();
-		        d.user_role_id  = $('#hdn_home_user_role_id').val();
+                d.user_role_id  = $('#hdn_home_user_role_id').val();
+                d.status = $('#ddlStatus').val();
+                d.customer = $('#ddlClient').val().toString();
+                d.project = $('#ddlProject').val().toString();
+                d.course = $('#ddlCourse').val().toString();
+                d.region = $('#ddlRegion').val().toString();
+                d.center = $('#ddlCenter').val().toString();
             },
             error: function (e) {
                 $("#tbl_batchs tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');

@@ -780,6 +780,27 @@ class Database:
         cur.close()
         con.close()
         return content
+    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, course, region, center):
+        #print(status, customer, project, course, region, center)
+        content = {}
+        d = []
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, course, region, center)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[19]
+            fil=row[18]
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16],""+columns[17]+"":row[17]}
+            d.append(h)
+        content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        return content
     def add_batch_details(batch_id,batch_name,course_id,batch_code,center_id,trainer_id,center_manager_id,start_date,end_date,start_time,end_time,user_id,is_active,actual_start_date,actual_end_date):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -1047,12 +1068,13 @@ class Database:
         cur2.close()
         con.close()
         return courses
-        
+
     def get_cand_course_basedon_proj_multiple(project_id):
         courses = []
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = """SELECT * FROM masters.tbl_courses WHERE is_active=1 and is_deleted=0 and ('{}'='-1' or project_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(project_id, project_id)  #'{}'='' or 
+
+        sql = """SELECT distinct * FROM masters.tbl_courses WHERE is_active=1 and is_deleted=0 and ('{}'='-1' or project_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(project_id, project_id)  #'{}'='' or 
         cur2.execute(sql)
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
@@ -1067,6 +1089,19 @@ class Database:
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
         cur2.execute("SELECT cen.center_id,cen.center_name FROM masters.tbl_center As cen LEFT JOIN masters.tbl_map_course_center As map on map.center_id=cen.center_id WHERE map.course_id="+course_id)
+        columns = [column[0].title() for column in cur2.description]
+        for r in cur2:
+            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            center.append(h)
+        cur2.close()
+        con.close()
+        return center
+    def get_cand_center_basedon_course_multiple(course_id, RegionId):
+        center = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = """SELECT distinct cen.center_id,cen.center_name FROM masters.tbl_center As cen LEFT JOIN masters.tbl_map_course_center As map on map.center_id=cen.center_id where cen.is_active=1 and cen.is_deleted=0 and ('{}'='-1' or '{}'='' or cen.region_id in (select value from string_split('{}',',') where trim(value)!='')) and ('{}'='-1' or map.course_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(RegionId, RegionId, RegionId, course_id, course_id)
+        cur2.execute(sql)
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
             h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
@@ -3036,7 +3071,7 @@ SELECT					cb.name as candidate_name,
         project = []
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        print(client_id)
+        #print(client_id)
         sql = """SELECT * FROM masters.tbl_projects WHERE is_active=1 and is_deleted=0 and ('{}'='-1' or client_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(client_id, client_id)  #'{}'='' or 
         cur2.execute(sql)
         columns = [column[0].title() for column in cur2.description]

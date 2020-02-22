@@ -795,6 +795,28 @@ class batch_list(Resource):
             
             return Batch.batch_list(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id)
 
+class batch_list_updated(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            batch_id = request.form['batch_id'] 
+            start_index = request.form['start']
+            page_length = request.form['length']
+            search_value = request.form['search[value]']
+            order_by_column_position = request.form['order[0][column]']
+            order_by_column_direction = request.form['order[0][dir]']
+            draw=request.form['draw']
+            user_role_id  = request.form['user_role_id']
+            user_id = request.form['user_id']
+            status = request.form['status']
+            customer = request.form['customer']
+            project = request.form['project']
+            course = request.form['course']
+            region = request.form['region']
+            center = request.form['center']
+            
+            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, course, region, center)
+
 class add_batch_details(Resource):
     @staticmethod
     def post():
@@ -912,6 +934,7 @@ class drop_edit_map_candidate_batch(Resource):
 
 
 api.add_resource(batch_list, '/batch_list')
+api.add_resource(batch_list_updated, '/batch_list_updated')
 api.add_resource(add_batch_details, '/add_batch_details')
 api.add_resource(get_batch_details, '/GetBatchDetails')
 api.add_resource(all_course_list, '/AllCourseList')
@@ -1048,7 +1071,6 @@ class get_cand_course_basedon_proj_multiple(Resource):
             project_id=request.form['ProjectId']
             return Candidate.get_cand_course_basedon_proj_multiple(project_id)
 
-
 class get_cand_center_basedon_course(Resource):
     @staticmethod
     def post():
@@ -1056,6 +1078,13 @@ class get_cand_center_basedon_course(Resource):
             course_id = request.form['CourseId']
             return Candidate.get_cand_center_basedon_course(course_id)
 
+class get_cand_center_basedon_course_multiple(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            course_id = request.form['CourseId']
+            RegionId = request.form['RegionId']
+            return Candidate.get_cand_center_basedon_course_multiple(course_id, RegionId)
 
 class get_section_for_cand(Resource):
     @staticmethod
@@ -1090,8 +1119,8 @@ api.add_resource(get_project_basedon_client_multiple,'/GetALLProject_multiple')
 api.add_resource(get_project_basedon_client,'/GetALLProject')
 api.add_resource(get_cand_course_basedon_proj, '/get_cand_course_basedon_proj')
 api.add_resource(get_cand_course_basedon_proj_multiple, '/get_cand_course_basedon_proj_multiple')
-
 api.add_resource(get_cand_center_basedon_course, '/get_cand_center_basedon_course')
+api.add_resource(get_cand_center_basedon_course_multiple, '/get_cand_center_basedon_course_multiple')
 api.add_resource(get_section_for_cand,'/GetSectionCand')
 
 ####################################################################################################

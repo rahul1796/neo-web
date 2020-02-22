@@ -53,19 +53,19 @@
                                     </div>
                                     <div class="col-lg-3">
                                         <label for="ddlProject" class="mr-2">Project</label>
-                                        <select class="form-control dropdown-search-filter" onchange="LoadCourse(this.value);" id="ddlProject" multiple>
+                                        <select class="form-control dropdown-search-filter" onchange="LoadCourse();" id="ddlProject" multiple>
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
                                     <div class="col-lg-3">
                                         <label for="ddlCourse" class="mr-2">Course</label>
-                                        <select class="form-control dropdown-search-filter" onchange="LoadCenter(this.value);" id="ddlCourse" multiple>
+                                        <select class="form-control dropdown-search-filter" onchange="LoadCenter();" id="ddlCourse" multiple>
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
                                     <div class="col-lg-3">
                                         <label for="ddlRegion" class="mr-2">Region</label>
-                                        <select class="form-control dropdown-search-filter" id="ddlRegion" multiple>
+                                        <select class="form-control dropdown-search-filter" onchange="LoadCenter();" id="ddlRegion" multiple>
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
@@ -86,7 +86,7 @@
                                     <!-- end col-->
 									
                                     <div class="col-lg-1" style="float: center; margin-top: 30px">
-                                        <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+                                        <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTable()">Search</button>
                                     </div>
                                 </div>    
                                  <!-- end row -->
@@ -94,7 +94,7 @@
                         </div><!-- end col-->
                     </div>
 
-                    <div class="row"> <!-- id="get"  -->>
+                    <div class="row"> <!-- id="get"  -->
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
