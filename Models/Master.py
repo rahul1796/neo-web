@@ -72,7 +72,6 @@ class Master:
     def get_all_Cluster_Based_On_Region(region_id):
         Cluster={"ClusterOnRegion":Database.get_all_Cluster_Based_On_Region(region_id)}
         return Cluster
-
     def client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources):
         client_l = Database.client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources)
         return client_l
@@ -133,4 +132,4 @@ class Master:
 
     def GetDepartmentUsers(UserId,UserRoleId,UserRegionId):
         return Database.GetDepartmentUsers(UserId,UserRoleId,UserRegionId)
-
+     

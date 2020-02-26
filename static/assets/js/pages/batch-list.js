@@ -7,6 +7,16 @@ $(document).ready(function () {
     var Course=0,Batch=0;
     $("#tbl_batchs").dataTable().fnDestroy();
 
+    $('.dropdown-search-filter').select2({
+        placeholder:''
+    });
+
+    $('#ddlStatus').append(new Option('ALL','-1'));
+	$('#ddlStatus').append(new Option('Active','1'));
+    $('#ddlStatus').append(new Option('InActive','0'));
+
+    LoadRegionddl();       
+    loadClient();
     LoadTable(); 
     role_id=parseInt($('#hdn_home_user_role_id').val());
     if(role_id == 1 || role_id ==5 || role_id ==15)
@@ -17,6 +27,193 @@ $(document).ready(function () {
 	// 	$('#btn_create').hide();
 });
 
+function LoadRegionddl(){
+    var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id" : $('#hdn_home_user_role_id').val(),
+            "user_region_id" : $('#hdn_user_region_id').val()
+        },
+
+        success: function (data){
+            if(data.Regions != null)
+            {
+                $('#ddlRegion').empty();
+                var count=data.Regions.length;
+                if( count> 0)
+                {
+                    $('#ddlRegion').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlRegion').append(new Option(data.Regions[i].Region_Name,data.Regions[i].Region_Id));
+                    //$('#ddlCourse').val('-1');
+                }
+                else
+                {
+                    $('#ddlRegion').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
+
+function loadClient(){
+    var URL=$('#hdn_web_url').val()+ "/GetALLClient"
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Clients != null)
+            {
+                $('#ddlClient').empty();
+                var count=data.Clients.length;
+                if( count> 0)
+                {
+                    $('#ddlClient').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlClient').append(new Option(data.Clients[i].Client_Name,data.Clients[i].Client_Id));
+                }
+                else
+                {
+                    $('#ddlClient').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            //alert($('#ddlClient').val().toString())
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+}
+
+function LoadProject(){
+    var URL=$('#hdn_web_url').val()+ "/GetALLProject_multiple"  //"/GetALLProject_multiple"
+    $.ajax({
+        type:"POST",
+        url:URL,
+        async:false,
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "ClientId":$('#ddlClient').val().toString()
+        },
+        success: function (data){
+            if(data.Projects != null)
+            {
+                $('#ddlProject').empty();
+                var count=data.Projects.length;
+                if( count> 0)
+                {
+                    $('#ddlProject').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlProject').append(new Option(data.Projects[i].Project_Name,data.Projects[i].Project_Id));
+                }
+                else
+                {
+                    $('#ddlProject').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(request, err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+function LoadCourse(){
+    var URL=$('#hdn_web_url').val()+ "/get_cand_course_basedon_proj_multiple"
+    $.ajax({
+        type:"POST",
+        url:URL,
+        async:false,
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "ProjectId":$('#ddlProject').val().toString()
+        },
+        success: function (data){
+            if(data.Courses != null)
+            {
+                $('#ddlCourse').empty();
+                var count=data.Courses.length;
+                if( count> 0)
+                {
+                    $('#ddlCourse').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
+                }
+                else
+                {
+                    $('#ddlCourse').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
+function LoadCenter(){
+    var URL=$('#hdn_web_url').val()+ "/get_cand_center_basedon_course_multiple"
+    $.ajax({
+        type:"POST",
+        url:URL,
+        async:false,
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "CourseId":$('#ddlCourse').val().toString(),
+            "RegionId":$('#ddlRegion').val().toString()
+        },
+        success: function (data){
+            if(data.Centers != null)
+            {
+                $('#ddlCenter').empty();
+                var count=data.Centers.length;
+                if( count> 0)
+                {
+                    $('#ddlCenter').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlCenter').append(new Option(data.Centers[i].Center_Name,data.Centers[i].Center_Id));
+                }
+                else
+                {
+                    $('#ddlCenter').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {   
+            
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
 function LoadTable()
 {
     vartable = $("#tbl_batchs").DataTable({
@@ -30,13 +227,19 @@ function LoadTable()
         "processing": true,
         "language": { "processing": 'Loading..!' },
         "ajax": {
-            "url": $('#hdn_web_url').val()+ "/batch_list",
+            "url": $('#hdn_web_url').val()+ "/batch_list_updated",
             "type": "POST",
             "dataType": "json",
             "data": function (d) {
                 d.batch_id = 0;
 		        d.user_id = $('#hdn_home_user_id').val();
-		        d.user_role_id  = $('#hdn_home_user_role_id').val();
+                d.user_role_id  = $('#hdn_home_user_role_id').val();
+                d.status = $('#ddlStatus').val();
+                d.customer = $('#ddlClient').val().toString();
+                d.project = $('#ddlProject').val().toString();
+                d.course = $('#ddlCourse').val().toString();
+                d.region = $('#ddlRegion').val().toString();
+                d.center = $('#ddlCenter').val().toString();
             },
             error: function (e) {
                 $("#tbl_batchs tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -151,6 +354,7 @@ function MapCandidateBatch(CourseId,CenterId,BatchId){
             // }
             Course=CourseId;
             Batch=BatchId;
+            $('#get0').hide();
             $('#get').hide();
             $('.center').show();
             
@@ -228,6 +432,7 @@ function DropCandidateBatch(CourseId,CenterId,BatchId){
 Course=CourseId;
 Batch=BatchId;
 $('#get').hide();
+$('#get0').hide();
 $('.center').show();
 
 }
