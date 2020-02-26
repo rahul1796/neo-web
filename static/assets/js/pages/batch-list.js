@@ -354,6 +354,7 @@ function MapCandidateBatch(CourseId,CenterId,BatchId){
             // }
             Course=CourseId;
             Batch=BatchId;
+            $('#get0').hide();
             $('#get').hide();
             $('.center').show();
             
@@ -431,6 +432,7 @@ function DropCandidateBatch(CourseId,CenterId,BatchId){
 Course=CourseId;
 Batch=BatchId;
 $('#get').hide();
+$('#get0').hide();
 $('.center').show();
 
 }
