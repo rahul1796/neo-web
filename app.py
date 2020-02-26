@@ -23,6 +23,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import re
 import filter_tma_report
+import filter_tma_report_new
 from Models import DownloadDump
 
 app = Flask(__name__)
@@ -3697,11 +3698,35 @@ class updated_tma_report(Resource):
                 resp = filter_tma_report.create_report(from_date, to_date, Customers, Centers, Courses, file_name)
                 
                 return resp
-                return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:
-                print(str(e))
+                #print(str(e))
                 return {"exceptione":str(e)}
 api.add_resource(updated_tma_report,'/updated_tma_report')
+
+class updated_new_tma_report(Resource):
+    report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                
+                from_date = request.form["from_date"]
+                to_date = request.form["to_date"]
+                Customers = request.form["Customers"]
+                Centers =request.form["Centers"]
+                Courses = request.form["Courses"]
+
+                file_name='tma_report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+
+                resp = filter_tma_report_new.create_report(from_date, to_date, Customers, Centers, Courses, file_name)
+                
+                return resp
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                #print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(updated_new_tma_report,'/updated_new_tma_report')
 
 
 class GetAllContractStages(Resource):
