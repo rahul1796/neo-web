@@ -220,8 +220,7 @@ function LoadClusterddl(){
             }
         });
         return false;
-    }
-    
+    }  
 	
 	function LoadTable(Centers, Status)
 {
@@ -328,8 +327,7 @@ function LoadClusterddl(){
     
 </script>
 	<div class="container-fluid">
-    
-                    <!-- start page title -->
+                   <!-- start page title -->
                     <div class="row">
                         <div class="col-12">
                             <div class="page-title-box">
@@ -350,9 +348,16 @@ function LoadClusterddl(){
             <div class="card-box">
                 <form id="DownloadReport" action="javascript:DownloadReport();" name="DownloadReport" method="POST">
                     
-					<div class="row"> 
+					<div class="row">
                         <div class="col-lg-3">
-							<label for="ddlDept" class="mr-2">Department Name</label>
+                            <label for="ddlentity" class="mr-2">Entity</label>
+                            <select class="form-control dropdown-search-filter" id="ddlentity" multiple>
+                                <option selected="" value="">All</option>
+                                
+                            </select>
+                        </div> 
+                        <div class="col-lg-3">
+							<label for="ddlDept" class="mr-2">Business Unit</label>
 							<select class="form-control dropdown-search-filter" id="ddlDept" multiple>
 								<option selected="" value="">All</option>
 							</select>
@@ -366,29 +371,26 @@ function LoadClusterddl(){
 
 						<div class="col-lg-3">
 							<label for="ddlRegion" class="mr-2">Region</label>
-							<select class="form-control dropdown-search-filter" id="ddlRegion" onchange="LoadClusterddl()" multiple>
+							<select class="form-control dropdown-search-filter" id="ddlRegion" multiple>
 								<option selected="" value="">All</option>
 								
 							</select>
-						</div>
-						
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="ddl_Project" class="mr-2">Project</label>
+                            <select class="form-control dropdown-search-filter" id="ddl_Project" multiple>
+                                <option selected="" value="">All</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
 						<div class="col-lg-3">
-							<label for="ddlCluster" class="mr-2">Cluster</label>
-							<select class="form-control dropdown-search-filter" id="ddlCluster" onchange="LoadCenter()" multiple>
+							<label for="ddlSector" class="mr-2">Sector</label>
+							<select class="form-control dropdown-search-filter" id="ddlSector" multiple>
 								<option selected="" value="">All</option>
 							</select>
 						</div>
-						
-						<div class="col-lg-3">
-                            <label for="ddlCenter" class="mr-2">Center</label>
-                            <select class="form-control dropdown-search-filter" id="ddlCenter" multiple >
-                                <!-- <option value="0">All</option> -->
-                            </select>
-                        </div>
-					</div>
-					<div class="row"> 
-						
-                        <div class="col-lg-3">
+					    <div class="col-lg-3">
                             <label for="ddlStatus" class="mr-2">Status</label>
                             <select class="form-control dropdown-search-filter" id="ddlStatus">
                                 <!-- <option  value="0">All</option> -->

@@ -60,7 +60,9 @@
     }
 </style>
 <script type="text/javascript">
-    $(document).ready(function(){       
+
+    $(document).ready(function(){   
+        $('#span_candidate_block').hide()
         LoadDashboardcount(); 
         LoadDepartmentTrainers();    
     });
@@ -352,7 +354,7 @@
                 </div> <!-- end widget-rounded-circle-->
             </div> <!-- end col-->
 
-            <div class="col-md-6 col-xl-3">
+            <div class="col-md-6 col-xl-3" id="span_candidate_block" style="display: none" >
                 <div class="widget-rounded-circle card-box">
                     <div class="row">   
                         <div class="col-5">

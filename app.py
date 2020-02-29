@@ -3651,7 +3651,18 @@ class AllCustomer_report(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 
-api.add_resource(AllCustomer_report,'/AllCustomer_report')
+api.add_resource(AllCustomer_report,'/AllCustomer_report_new')
+class AllCustomer_report_new(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.AllCustomer_report_db()
+                return {'Customer':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(AllCustomer_report_new,'/AllCustomer_report_new')
 
 class All_Center_based_on_customer(Resource):
     @staticmethod
