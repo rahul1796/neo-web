@@ -1,7 +1,8 @@
         <link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
         
          <!-- third party css -->
-         <link href="static/assets/libs/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+         <link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+         <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
          <!-- third party css end -->
 
         <!-- App css -->
@@ -387,9 +388,12 @@ function LoadClusterddl(){
 				d.centers = Centers;
 				d.Dept = $('#ddlDept').val().toString();        // ddlbu
 				d.Region_id = $('#ddlRegion').val().toString();
-				d.Cluster_id = $('#ddlCluster').val().toString();
-                d.status = Status;
+				d.Cluster_id = '';//$('#ddlCluster').val().toString();
+                d.status = Status.toString();
                 d.user_region_id = $('#hdn_user_region_id').val();
+                d.entity_ids = $('#ddlentity').val().toString();
+                d.project_ids = $('#ddl_Project').val().toString();
+                d.sector_ids = $('#ddlSector').val().toString();
             },
             error: function (e) {
                 $("#tbl_users tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -401,27 +405,36 @@ function LoadClusterddl(){
             { "data": "S_No"},
             { "data": "User_Name" },
             { "data": "Email" },
-            
-			{ "data": function (row, type, val, meta) {
-                var varStatus = ""; 
-                if(row.Is_Active)
-                    varStatus="Active";
-                else
-                    varStatus="In Active";
-                return varStatus;
-                }
-            },
+            { "data": "Entity_Name" },
+            { "data": "Employee_Department_Name" },
+            { "data": "Region_Name" },
+            { "data": "Project_Name" },
+            { "data": "Sector_Name" },
+            { "data": "Employment_Status_Name" },
+
+			// { "data": function (row, type, val, meta) {
+            //     var varStatus = ""; 
+            //     if(row.Is_Active)
+            //         varStatus="Active";
+            //     else
+            //         varStatus="In Active";
+            //     return varStatus;
+            //     }
+            // },
 			{ "visible":false, "data": "Center_Name" },
-            { "data": "Mobile_Number"}
+            // { "data": "Mobile_Number"}
        ],
+        drawCallback: function(){
+            $('#tbl_users_paginate ul.pagination').addClass("pagination-rounded");
+        }
 
 
     });
 }
 	
     function LoadTableBasedOnSearch(){
-		LoadTable($('#ddlCenter').val().toString(), $('#ddlStatus').val());
-		/*
+		LoadTable('', $('#ddlStatus').val());
+		/*$('#ddlCenter').val().toString()
         if($('#ddlCenter').val().toString()==''|| $('#ddlCenter').val().toString()==null){
             alert("Please select a Center.");
         }
@@ -544,7 +557,7 @@ function LoadClusterddl(){
                         </div>
                         <div class="col-lg-1" >
                             <!-- <button class="btn btn-primary" type="submit" >Download Report</button> -->
-                            <button style="margin-top: 30px" type="submit" class="btn btn-primary waves-effect waves-light" >Download</button>
+                            <button style="margin-top: 30px;display:none" type="submit"  class="btn btn-primary waves-effect waves-light" >Download</button>
                         </div>
                     </div>
                 </form>
@@ -570,15 +583,21 @@ function LoadClusterddl(){
                                     </div>
                                     <br/>
                                     <div class="col-lg-12">
-                                        <table id="tbl_users" class="table dt-responsive nowrap">
+                                        <table id="tbl_users" class="table dt-responsive wrap">
                                             <thead>
                                                 <tr>
                                                     <th>S No</th>
                                                     <th>Trainers Name</th>
                                                     <th>Email</th>
-													<th>Status</th>
+                                                    <th>Entity</th>
+                                                    <th>Business Unit</th>
+                                                    <th>Region</th>
+                                                    <th>Project</th>
+                                                    <th>Sector</th>
+                                                    <th>Employee Status</th>                                                    
+													<!-- <th>Status</th> -->
 													<th>Center(s)</th>
-                                                    <th>Mobile Number</th>
+                                                    <!-- <th>Mobile Number</th> -->
                                                 </tr>
                                             </thead>
                                         
