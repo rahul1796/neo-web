@@ -14,11 +14,14 @@
             $('.dropdown-search-filter').select2({
                 placeholder:''
             });
-            LoadRM_Role_ddl();
+
+            //LoadRM_Role_ddl();
             LoadRegionddl();
             LoadDEPTddl();
             Loadentityddl();
             LoadRoleddl();
+            LoadProjectddl();
+            LoadStatusddl();
             LoadTable('{{role}}'); 
             role_id=parseInt($('#hdn_home_user_role_id').val());
             if(role_id == 5)

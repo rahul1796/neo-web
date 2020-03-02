@@ -17,16 +17,158 @@
 			$('.dropdown-search-filter').select2({
                 placeholder:''
             });
-
             LoadBuddl();
             LoadDeptdl();
-			LoadRegionddl();
+            Loadentityddl();
+            LoadRegionddl();
+            LoadProjectddl();
+            LoadSectorddl();
+            LoadStatusddl();
             LoadTable("0","-1");
 			
 			$('#ddlStatus').append(new Option('ALL','-1'));
 			$('#ddlStatus').append(new Option('Active','1'));
 			$('#ddlStatus').append(new Option('InActive','0'));
         });
+
+function Loadentityddl(){
+    var URL=$('#hdn_web_url').val()+ "/All_entity"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Entity != null)
+            {
+                $('#ddlentity').empty();
+                var count=data.Entity.length;
+                if( count> 0)
+                {
+                    //$('#ddlentity').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlentity').append(new Option(data.Entity[i].Entity_Name,data.Entity[i].Entity_Id));
+                    //$('#ddlentity').val('-1');
+                }
+                else
+                {
+                    $('#ddlentity').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
+function LoadProjectddl(){
+    var URL=$('#hdn_web_url').val()+ "/AllProjectList"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Project != null)
+            {
+                $('#ddl_Project').empty();
+                var count=data.Project.length;
+                if( count> 0)
+                {
+                    //$('#ddl_Project').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddl_Project').append(new Option(data.Project[i].Project_Name,data.Project[i].Project_Id));
+                    //$('#ddlentity').val('-1');
+                }
+                else
+                {
+                    $('#ddl_Project').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
+function LoadStatusddl(){
+    var URL=$('#hdn_web_url').val()+ "/All_Emp_Status"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.emp_status != null)
+            {
+                $('#ddlStatus').empty();
+                var count=data.emp_status.length;
+                if( count> 0)
+                {
+                    //$('#ddlStatus').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlStatus').append(new Option(data.emp_status[i].Employment_Status_Name,data.emp_status[i].Employment_Status_Id));
+                    //$('#ddlentity').val('-1');
+                }
+                else
+                {
+                    $('#ddlStatus').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+function LoadSectorddl(){
+    var URL=$('#hdn_web_url').val()+ "/All_Sector"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Sectors != null)
+            {
+                $('#ddlSector').empty();
+                var count=data.Sectors.length;
+                if( count> 0)
+                {
+                    //$('#ddl_Project').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlSector').append(new Option(data.Sectors[i].Sector_Name,data.Sectors[i].Sector_Id));
+                    //$('#ddlentity').val('-1');
+                }
+                else
+                {
+                    $('#ddlSector').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
 
 function LoadDeptdl(){
     var URL=$('#hdn_web_url').val()+ "/GetAllDept"
@@ -122,7 +264,7 @@ function LoadRegionddl(){
                 var count=data.Regions.length;
                 if( count> 0)
                 {
-                    $('#ddlRegion').append(new Option('ALL','-1'));
+                    //$('#ddlRegion').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
                         $('#ddlRegion').append(new Option(data.Regions[i].Region_Name,data.Regions[i].Region_Id));
                     //$('#ddlCourse').val('-1');
@@ -142,7 +284,7 @@ function LoadRegionddl(){
     return false;
 }
 
-
+/*
 //LoadClusterddl
 function LoadClusterddl(){
     var URL=$('#hdn_web_url').val()+ "/Get_all_Cluster_Based_On_Region"
@@ -221,7 +363,7 @@ function LoadClusterddl(){
         });
         return false;
     }  
-	
+	*/
 	function LoadTable(Centers, Status)
 {
 		//alert(Centers+Status);
@@ -392,7 +534,7 @@ function LoadClusterddl(){
 						</div>
 					    <div class="col-lg-3">
                             <label for="ddlStatus" class="mr-2">Status</label>
-                            <select class="form-control dropdown-search-filter" id="ddlStatus">
+                            <select class="form-control dropdown-search-filter" id="ddlStatus" multiple>
                                 <!-- <option  value="0">All</option> -->
                             </select>
                         </div>

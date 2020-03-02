@@ -2889,6 +2889,20 @@ SELECT					cb.name as candidate_name,
         con.close()       
         return response
 
+    def All_Emp_Status_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        cur.execute("SELECT distinct [employment_status_id] ,[employment_status_name] FROM [users].[tbl_employment_status] where is_active=1 and is_deleted=0")
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
     def All_RM_role_db():
         response=[]
         con = pyodbc.connect(conn_str)
