@@ -2955,7 +2955,7 @@ SELECT					cb.name as candidate_name,
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         
-        cur.execute("SELECT employee_role_id, employee_role_name  FROM [users].[tbl_employee_role] where is_active=1 and is_deleted=0")
+        cur.execute("SELECT employee_role_id, employee_role_name  FROM [users].[tbl_employee_role] where is_active=1 and is_deleted=0 and employee_role_name not like '%trainer%'")
         columns = [column[0].title() for column in cur.description]
         for row in cur:
             h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}

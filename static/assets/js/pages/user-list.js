@@ -39,6 +39,7 @@ function LoadRM_Role_ddl(){
 
 
 //LoadClusterddl
+*/
 function LoadR_Manager_ddl(){
     var URL=$('#hdn_web_url').val()+ "/All_Reporting_manager_basedon_role_id"
         $.ajax({
@@ -48,7 +49,7 @@ function LoadR_Manager_ddl(){
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json", 
         data:{
-            "rm_role_id" : $('#ddlRM_role').val().toString()//$('#ddlProject option:selected').val()
+            "rm_role_id" : ''//$('#ddlRM_role').val().toString()//$('#ddlProject option:selected').val()
         },
 		success: function (data){
             if(data.Users != null)
@@ -57,7 +58,7 @@ function LoadR_Manager_ddl(){
                 var count=data.Users.length;
                 if( count> 0)
                 {
-                    $('#ddl_R_Manager').append(new Option('ALL','-1'));
+                    //$('#ddl_R_Manager').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
                         $('#ddl_R_Manager').append(new Option(data.Users[i].User_Name,data.Users[i].User_Id));
                     //$('#ddlCourse').val('-1');
@@ -76,7 +77,7 @@ function LoadR_Manager_ddl(){
     });
     return false;
 }
-*/
+
 function LoadRegionddl(){
     var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
         $.ajax({
