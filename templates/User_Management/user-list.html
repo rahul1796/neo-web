@@ -14,11 +14,14 @@
             $('.dropdown-search-filter').select2({
                 placeholder:''
             });
-            LoadRM_Role_ddl();
+
+            //LoadRM_Role_ddl();
             LoadRegionddl();
             LoadDEPTddl();
             Loadentityddl();
             LoadRoleddl();
+            LoadProjectddl();
+            LoadStatusddl();
             LoadTable('{{role}}'); 
             role_id=parseInt($('#hdn_home_user_role_id').val());
             if(role_id == 5)
@@ -49,26 +52,7 @@
                         <div class="col-12">
                             <div class="card-box">
 								<div class="row">
-                                    
-                                    <div class="col-lg-3">
-                                        <label for="ddlRM_role" class="mr-2">RM Role</label>
-                                        <select class="form-control dropdown-search-filter" id="ddlRM_role" onchange="LoadR_Manager_ddl()" multiple>
-                                            <option selected="" value="">All</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <label for="ddl_R_Manager" class="mr-2">Reporting Manager</label>
-                                        <select class="form-control dropdown-search-filter" id="ddl_R_Manager" multiple>
-                                            <option selected="" value="">All</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <label for="ddlRegion" class="mr-2">Region</label>
-                                        <select class="form-control dropdown-search-filter" id="ddlRegion"  multiple>
-                                            <option selected="" value="">All</option>
-                                            
-                                        </select>
-                                    </div>
+
                                     <div class="col-lg-3">
                                         <label for="ddlentity" class="mr-2">Entity</label>
                                         <select class="form-control dropdown-search-filter" id="ddlentity" multiple>
@@ -76,9 +60,6 @@
                                             
                                         </select>
                                     </div>
-                                    
-                                </div>
-                                <div class="row">
                                     <div class="col-lg-3">
                                         <label for="ddlDEPT" class="mr-2">DEPT</label>
                                         <select class="form-control dropdown-search-filter" id="ddlDEPT"  multiple>
@@ -93,7 +74,34 @@
                                             
                                         </select>
                                     </div>
-                                                                      
+                                    <div class="col-lg-3">
+                                        <label for="ddlRegion" class="mr-2">Region</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlRegion"  multiple>
+                                            <option selected="" value="">All</option>
+                                            
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label for="ddl_Project" class="mr-2">Project</label>
+                                        <select class="form-control dropdown-search-filter" id="ddl_Project" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddl_R_Manager" class="mr-2">Reporting Manager</label>
+                                        <select class="form-control dropdown-search-filter" id="ddl_R_Manager" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddl_status" class="mr-2">Status</label>
+                                        <select class="form-control dropdown-search-filter" id="ddl_status" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
                                     <div class="col-lg-3" >
                                         <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
                                         onclick="LoadTable('-1')">Search</button>
