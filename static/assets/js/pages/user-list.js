@@ -309,12 +309,14 @@ function LoadTable(FilterRoleId)
             "dataType": "json",
             "data": function (d) {
                 d.user_id = 0;
-                d.dept_ids = $('#ddlDEPT').val().toString();
-                d.role_ids = $('#ddlRole').val().toString();
                 d.entity_ids = $('#ddlentity').val().toString();
+                d.dept_ids = $('#ddlDEPT').val().toString();
+                d.role_ids = $('#ddlRole').val().toString();                
                 d.region_ids = $('#ddlRegion').val().toString();
-                d.RM_Role_ids = $('#ddlRM_role').val().toString();
+                d.RM_Role_ids = '';//$('#ddlRM_role').val().toString();
+                d.project_ids=$('#ddl_Project').val().toString();
                 d.R_mangager_ids = $('#ddl_R_Manager').val().toString();
+                d.status_ids=$('#ddl_status').val().toString();
                 d.filter_role_id=filter_role_id;
                 d.user_region_id = $('#hdn_user_region_id').val();
                 d.user_role_id = $('#hdn_home_user_role_id').val();
@@ -337,8 +339,13 @@ function LoadTable(FilterRoleId)
             },
             { "data": "User_Name" },
             { "data": "Email" },
-            { "data": "User_Role_Name" },
-            { "data": "Mobile_Number"},
+            { "data": "Entity_Name" },
+            { "data": "Department_Name" },
+            { "data": "Employee_Role_Name" },
+            { "data": "Region" },
+            { "data": "Project"},
+            { "data": "Reporting_Manager_Name"},
+            { "data": "Employment_Status"},
             { "visible":false, "data": "Center_Name" },
             { "data": function (row, type, val, meta) {
                 var varStatus = ""; 
