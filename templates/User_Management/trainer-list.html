@@ -27,9 +27,9 @@
             LoadStatusddl();
             LoadTable("0","-1");
 			
-			$('#ddlStatus').append(new Option('ALL','-1'));
-			$('#ddlStatus').append(new Option('Active','1'));
-			$('#ddlStatus').append(new Option('InActive','0'));
+			// $('#ddlStatus').append(new Option('ALL','-1'));
+			// $('#ddlStatus').append(new Option('Active','1'));
+			// $('#ddlStatus').append(new Option('InActive','0'));
         });
 
 function Loadentityddl(){
@@ -531,26 +531,27 @@ function LoadClusterddl(){
 								
 							</select>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-3" style="display: none;">
                             <label for="ddl_Project" class="mr-2">Project</label>
                             <select class="form-control dropdown-search-filter" id="ddl_Project" multiple>
                                 <option selected="" value="">All</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="row">
-						<div class="col-lg-3">
-							<label for="ddlSector" class="mr-2">Sector</label>
-							<select class="form-control dropdown-search-filter" id="ddlSector" multiple>
-								<option selected="" value="">All</option>
-							</select>
-						</div>
-					    <div class="col-lg-3">
+                        <div class="col-lg-3">
                             <label for="ddlStatus" class="mr-2">Status</label>
                             <select class="form-control dropdown-search-filter" id="ddlStatus" multiple>
                                 <!-- <option  value="0">All</option> -->
                             </select>
                         </div>
+                    </div>
+                    <div class="row">
+						<div class="col-lg-3" style="display: none;">
+							<label for="ddlSector" class="mr-2">Sector</label>
+							<select class="form-control dropdown-search-filter" id="ddlSector" multiple>
+								<option selected="" value="">All</option>
+							</select>
+						</div>
+					    
                         
                         <div class="col-lg-1" >
                             <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
