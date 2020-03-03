@@ -10,6 +10,7 @@ $(document).ready(function () {
         placeholder:''
     });
     LoadFunding_Resourcesdl();
+    LoadCustomer_Groupdl();
     LoadTable(); 
 
 
@@ -31,7 +32,7 @@ function LoadFunding_Resourcesdl(){
                 var count=data.Funding_Resources.length;
                 if( count> 0)
                 {
-                    $('#ddlFundingSource').append(new Option('ALL','-1'));
+                    //$('#ddlFundingSource').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
                         $('#ddlFundingSource').append(new Option(data.Funding_Resources[i].Funding_Source_Name,data.Funding_Resources[i].Funding_Source_Id));
                     //$('#ddlCourse').val('-1');
@@ -39,6 +40,44 @@ function LoadFunding_Resourcesdl(){
                 else
                 {
                     $('#ddlFundingSource').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
+function LoadCustomer_Groupdl(){
+    var URL=$('#hdn_web_url').val()+ "/Get_all_Customer_Group"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "customer_group_id" : 0 //$('#ddlRM_role').val().toString()//$('#ddlProject option:selected').val()
+        },
+        success: function (data){
+            if(data.Customer_Group != null)
+            {
+                $('#ddlcustomergroup').empty();
+                var count=data.Customer_Group.length;
+                if( count> 0)
+                {
+                    //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlcustomergroup').append(new Option(data.Customer_Group[i].Customer_Group_Name,data.Customer_Group[i].Customer_Group_Id));
+                    //$('#ddlCourse').val('-1');
+                }
+                else
+                {
+                    $('#ddlcustomergroup').append(new Option('ALL','-1'));
                 }
             }
         },
@@ -71,6 +110,7 @@ function LoadTable()
                 d.client_id = 0;
                 d.funding_resources=$('#ddlFundingSource').val().toString();
                 d.is_active=-1;
+                d.customer_groups = $('#ddlFundingSource').val().toString();
             },
             error: function (e) {
                 $("#tbl_clients tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
