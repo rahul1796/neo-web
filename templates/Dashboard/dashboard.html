@@ -101,6 +101,7 @@
                         $('#span_trainer').text(data.Dashboard.Trainer_Count);
                         $('#span_mobilizer').text(data.Dashboard.Mobilizer_Count);
                         $('#span_candidate').text(data.Dashboard.Candidate_Count);
+                        $('#span_PO').text(data.Dashboard.Candidate_Count);
                     }
                 }
             },
@@ -334,7 +335,26 @@
                     </div> <!-- end row-->
                 </div> <!-- end widget-rounded-circle-->
             </div> <!-- end col-->
-
+            
+            <div class="col-md-6 col-xl-3" id="span_candidate_block" style="display: none" >
+                <div class="widget-rounded-circle card-box">
+                    <div class="row">   
+                        <div class="col-5">
+                            <div class="avatar-lg rounded-circle bg-soft-secondary border-dark border">
+                                <i class="fas fa-users font-22 avatar-title text-warning"></i>
+                            </div>
+                        </div>                    
+                        <div class="col-6">
+                            <div class="text-right">
+                                <h3 class="text-dark mt-1"><span id="span_candidate" data-plugin="counterup"></span></h3>
+                                <p class="text-muted mb-1 text-truncate">Candidates</p>
+                            </div>
+                        </div>
+                        <div class="col-1"></div>
+                    </div> <!-- end row-->
+                </div> <!-- end widget-rounded-circle-->
+            </div> <!-- end col-->
+            
             <div class="col-md-6 col-xl-3">
                 <div class="widget-rounded-circle card-box">
                     <div class="row"> 
@@ -354,7 +374,8 @@
                 </div> <!-- end widget-rounded-circle-->
             </div> <!-- end col-->
 
-            <div class="col-md-6 col-xl-3" id="span_candidate_block" style="display: none" >
+            <!-- placement officer-->
+            <div class="col-md-6 col-xl-3" id="span_candidate_block">
                 <div class="widget-rounded-circle card-box">
                     <div class="row">   
                         <div class="col-5">
@@ -364,16 +385,20 @@
                         </div>                    
                         <div class="col-6">
                             <div class="text-right">
-                                <h3 class="text-dark mt-1"><span id="span_candidate" data-plugin="counterup"></span></h3>
-                                <p class="text-muted mb-1 text-truncate">Candidates</p>
+                                <h3 class="text-dark mt-1"><a href="/user?role_id=1"><span id="span_PO" data-plugin="counterup"></span></a></h3>
+                                <p class="text-muted mb-1 text-nowrap">Placement Officer</p>  <!--text-truncate-->
                             </div>
                         </div>
                         <div class="col-1"></div>
                     </div> <!-- end row-->
                 </div> <!-- end widget-rounded-circle-->
             </div> <!-- end col-->
+
         </div>
         <!-- end row-->
+        
+    <!-- </div> -->
+    <!-- end row-->
 
         <div class="row">
             <div class="col-lg-6">

@@ -1123,13 +1123,13 @@ class Database:
         con.close()
         return section
 
-    def client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources):
+    def client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources,customer_groups):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_client_list] ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, funding_resources)
+        sql = 'exec [masters].[sp_get_client_list] ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, funding_resources,customer_groups)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -3103,6 +3103,22 @@ SELECT					cb.name as candidate_name,
         cur = con.cursor()
         
         cur.execute("SELECT distinct [employee_department_id],[employee_department_name] FROM [users].[tbl_employee_department] where is_active=1 and is_deleted=0 and is_oprt=1")
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+    
+    def Get_all_Customer_Group_db(customer_group_id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_all_customer_group]  ?'
+        values = (customer_group_id,)
+        cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
             h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}

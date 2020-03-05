@@ -29,9 +29,7 @@ from Models import DownloadDump
 app = Flask(__name__)
 
 api = Api(app)
-
 app.config["SESSION_PERMANENT"] = True
-
 app.secret_key = config.secret_key
 
 #sessions
@@ -672,6 +670,7 @@ def after_popup_user():
 class user_list(Resource):
     @staticmethod
     def post():
+        
         if request.method == 'POST':
             user_id = request.form['user_id']
             start_index = request.form['start']
@@ -691,6 +690,7 @@ class user_list(Resource):
             user_role_id=request.form['user_role_id']
             status_ids=request.form['status_ids']
             project_ids=request.form['project_ids']
+            print(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,dept_ids,role_ids,entity_ids,region_ids,RM_Role_ids,R_mangager_ids,filter_role_id,user_region_id,user_role_id,status_ids,project_ids)
             return UsersM.user_list(user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids)
             
 
@@ -1184,8 +1184,9 @@ class client_list(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             funding_resources = request.form['funding_resources']
+            customer_groups = request.form['customer_groups']
             #print(order_by_column_position,order_by_column_direction)
-            return Master.client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources)
+            return Master.client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources,customer_groups)
 
 class add_client_details(Resource):
     @staticmethod
@@ -3938,6 +3939,18 @@ class GetAllDepartment(Resource):
                 print(str(e))
                 return {} 
 api.add_resource(GetAllDepartment,'/GetAllDept')
+
+class Get_all_Customer_Group(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                customer_group_id=request.args.get('customer_group_id',0,type=int)
+                response = Database.Get_all_Customer_Group_db(customer_group_id)
+                return {'Customer_Group':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(Get_all_Customer_Group,'/Get_all_Customer_Group')
 
 if __name__ == '__main__':    
     app.run(debug=True)
