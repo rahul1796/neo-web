@@ -689,7 +689,9 @@ class user_list(Resource):
             filter_role_id=request.form['filter_role_id']
             user_region_id=request.form['user_region_id']
             user_role_id=request.form['user_role_id']
-            return UsersM.user_list(user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids)
+            status_ids=request.form['status_ids']
+            project_ids=request.form['project_ids']
+            return UsersM.user_list(user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids)
             
 
 class add_user_details(Resource):
@@ -2608,7 +2610,10 @@ class trainer_list(Resource):
             Region_id = request.form['Region_id']
             Cluster_id = request.form['Cluster_id']
             Dept = request.form['Dept']
-            return UsersM.trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id, centers, status, Region_id, Cluster_id, Dept)
+            entity_ids= request.form['entity_ids']
+            project_ids= request.form['project_ids']
+            sector_ids= request.form['sector_ids']
+            return UsersM.trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id, centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids)
 
 api.add_resource(trainer_list, '/trainer_list')
 
@@ -3651,7 +3656,17 @@ class AllCustomer_report(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 
-api.add_resource(AllCustomer_report,'/AllCustomer_report')
+api.add_resource(AllCustomer_report,'/AllCustomer_report_new')
+class AllCustomer_report_new(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.AllCustomer_report_db()
+                return {'Customer':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(AllCustomer_report_new,'/AllCustomer_report_new')
 
 class All_Center_based_on_customer(Resource):
     @staticmethod
@@ -3750,8 +3765,19 @@ class All_Sector(Resource):
                 return {'Sectors':response}
             except Exception as e:
                 return {'exception':str(e)}
-
 api.add_resource(All_Sector,'/All_Sector')
+
+class All_Emp_Status(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                
+                response = Database.All_Emp_Status_db()
+                return {'emp_status':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(All_Emp_Status,'/All_Emp_Status')
 
 class AllQPBasedOnSector(Resource):
     @staticmethod

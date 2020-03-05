@@ -1,8 +1,7 @@
 
 var varTable;
 var filter_role_id;
-
-
+/*
 function LoadRM_Role_ddl(){
     var URL=$('#hdn_web_url').val()+ "/All_RM_role"
         $.ajax({
@@ -40,6 +39,7 @@ function LoadRM_Role_ddl(){
 
 
 //LoadClusterddl
+*/
 function LoadR_Manager_ddl(){
     var URL=$('#hdn_web_url').val()+ "/All_Reporting_manager_basedon_role_id"
         $.ajax({
@@ -49,7 +49,7 @@ function LoadR_Manager_ddl(){
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json", 
         data:{
-            "rm_role_id" : $('#ddlRM_role').val().toString()//$('#ddlProject option:selected').val()
+            "rm_role_id" : ''//$('#ddlRM_role').val().toString()//$('#ddlProject option:selected').val()
         },
 		success: function (data){
             if(data.Users != null)
@@ -58,7 +58,7 @@ function LoadR_Manager_ddl(){
                 var count=data.Users.length;
                 if( count> 0)
                 {
-                    $('#ddl_R_Manager').append(new Option('ALL','-1'));
+                    //$('#ddl_R_Manager').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
                         $('#ddl_R_Manager').append(new Option(data.Users[i].User_Name,data.Users[i].User_Id));
                     //$('#ddlCourse').val('-1');
@@ -98,7 +98,7 @@ function LoadRegionddl(){
                 var count=data.Regions.length;
                 if( count> 0)
                 {
-                    $('#ddlRegion').append(new Option('ALL','-1'));
+                    //$('#ddlRegion').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
                         $('#ddlRegion').append(new Option(data.Regions[i].Region_Name,data.Regions[i].Region_Id));
                     //$('#ddlCourse').val('-1');
@@ -133,7 +133,7 @@ function Loadentityddl(){
                 var count=data.Entity.length;
                 if( count> 0)
                 {
-                    $('#ddlentity').append(new Option('ALL','-1'));
+                    //$('#ddlentity').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
                         $('#ddlentity').append(new Option(data.Entity[i].Entity_Name,data.Entity[i].Entity_Id));
                     //$('#ddlCourse').val('-1');
@@ -141,6 +141,74 @@ function Loadentityddl(){
                 else
                 {
                     $('#ddlentity').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+function LoadProjectddl(){
+    var URL=$('#hdn_web_url').val()+ "/AllProjectList"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Project != null)
+            {
+                $('#ddl_Project').empty();
+                var count=data.Project.length;
+                if( count> 0)
+                {
+                    //$('#ddl_Project').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddl_Project').append(new Option(data.Project[i].Project_Name,data.Project[i].Project_Id));
+                    //$('#ddlentity').val('-1');
+                }
+                else
+                {
+                    $('#ddl_Project').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+function LoadStatusddl(){
+    var URL=$('#hdn_web_url').val()+ "/All_Emp_Status"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.emp_status != null)
+            {
+                $('#ddl_status').empty();
+                var count=data.emp_status.length;
+                if( count> 0)
+                {
+                    //$('#ddl_status').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddl_status').append(new Option(data.emp_status[i].Employment_Status_Name,data.emp_status[i].Employment_Status_Id));
+                    //$('#ddlentity').val('-1');
+                }
+                else
+                {
+                    $('#ddl_status').append(new Option('ALL','-1'));
                 }
             }
         },
@@ -168,7 +236,7 @@ function LoadRoleddl(){
                 var count=data.Role.length;
                 if( count> 0)
                 {
-                    $('#ddlRole').append(new Option('ALL','-1'));
+                    //$('#ddlRole').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
                         $('#ddlRole').append(new Option(data.Role[i].Employee_Role_Name,data.Role[i].Employee_Role_Id));
                     //$('#ddlCourse').val('-1');
@@ -187,7 +255,6 @@ function LoadRoleddl(){
     });
     return false;
 }
-
 function LoadDEPTddl(){
     var URL=$('#hdn_web_url').val()+ "/All_dept"
         $.ajax({
@@ -203,7 +270,7 @@ function LoadDEPTddl(){
                 var count=data.Dept.length;
                 if( count> 0)
                 {
-                    $('#ddlDEPT').append(new Option('ALL','-1'));
+                    //$('#ddlDEPT').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
                         $('#ddlDEPT').append(new Option(data.Dept[i].Employee_Department_Name,data.Dept[i].Employee_Department_Id));
                     //$('#ddlCourse').val('-1');
@@ -243,12 +310,14 @@ function LoadTable(FilterRoleId)
             "dataType": "json",
             "data": function (d) {
                 d.user_id = 0;
-                d.dept_ids = $('#ddlDEPT').val().toString();
-                d.role_ids = $('#ddlRole').val().toString();
                 d.entity_ids = $('#ddlentity').val().toString();
+                d.dept_ids = $('#ddlDEPT').val().toString();
+                d.role_ids = $('#ddlRole').val().toString();                
                 d.region_ids = $('#ddlRegion').val().toString();
-                d.RM_Role_ids = $('#ddlRM_role').val().toString();
+                d.RM_Role_ids = '';//$('#ddlRM_role').val().toString();
+                d.project_ids=$('#ddl_Project').val().toString();
                 d.R_mangager_ids = $('#ddl_R_Manager').val().toString();
+                d.status_ids=$('#ddl_status').val().toString();
                 d.filter_role_id=filter_role_id;
                 d.user_region_id = $('#hdn_user_region_id').val();
                 d.user_role_id = $('#hdn_home_user_role_id').val();
@@ -271,8 +340,13 @@ function LoadTable(FilterRoleId)
             },
             { "data": "User_Name" },
             { "data": "Email" },
-            { "data": "User_Role_Name" },
-            { "data": "Mobile_Number"},
+            { "data": "Entity_Name" },
+            { "data": "Department_Name" },
+            { "data": "Employee_Role_Name" },
+            { "data": "Region" },
+            { "data": "Project"},
+            { "data": "Reporting_Manager_Name"},
+            { "data": "Employment_Status"},
             { "visible":false, "data": "Center_Name" },
             { "data": function (row, type, val, meta) {
                 var varStatus = ""; 
