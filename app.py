@@ -3430,6 +3430,8 @@ class contract_list(Resource):
             stage_ids = request.form['stage_ids'] 
             from_date = request.form['from_date'] 
             to_date = request.form['to_date'] 
+            entity_ids = request.form['entity_ids'] 
+            sales_category_ids = request.form['sales_category_ids'] 
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
@@ -3437,7 +3439,7 @@ class contract_list(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             print(order_by_column_position,order_by_column_direction)
-            return Master.contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Master.contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 
 class add_contract_details(Resource):
     @staticmethod
@@ -3938,6 +3940,13 @@ class GetAllDepartment(Resource):
                 print(str(e))
                 return {} 
 api.add_resource(GetAllDepartment,'/GetAllDept')
+
+class GetAllSalesCategory(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            return Master.GetAllSalesCategory()
+api.add_resource(GetAllSalesCategory,'/GetAllSalesCategory')
 
 if __name__ == '__main__':    
     app.run(debug=True)

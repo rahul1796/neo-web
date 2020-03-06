@@ -308,13 +308,17 @@ class Database:
         return content
     def GetALLClient():
         client = []
+        h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        cur2.execute("SELECT * FROM [masters].[tbl_client] where is_active=1 and is_deleted=0")
+        cur2.execute("SELECT * FROM [masters].[tbl_customer] where is_active=1 and is_deleted=0")
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
-            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
-            client.append(h)
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]            
+            client.append(h.copy())
+            #h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            #client.append(h)
         cur2.close()
         con.close()
         return client
@@ -2672,22 +2676,25 @@ SELECT					cb.name as candidate_name,
         con.close()
         return content
 
-    def contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_contract_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (contract_id,customer_ids,stage_ids,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [masters].[sp_get_contract_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[11]
-            fil=row[10]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9]}
-            d.append(h)
+            record=row[len(columns)]
+            fil=row[len(columns)-1]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9]}
+            d.append(h.copy())
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
@@ -2940,12 +2947,13 @@ SELECT					cb.name as candidate_name,
         response=[]
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        
+        h={}
         cur.execute("SELECT entity_id,entity_name  FROM [masters].[tbl_entity] where is_active=1 and is_deleted=0")
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
-            response.append(h)
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
         cur.commit()
         cur.close()
         con.close()       
@@ -3110,4 +3118,18 @@ SELECT					cb.name as candidate_name,
         cur.commit()
         cur.close()
         con.close()       
+        return response
+    def GetAllSalesCategory():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        cur2.execute("exec [masters].[sp_get_sales_category]")
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
         return response
