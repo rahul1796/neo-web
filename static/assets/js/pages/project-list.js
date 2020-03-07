@@ -2,12 +2,22 @@ var varTable;
 $(document).ready(function () {
     $("#alternative-page-datatable").dataTable().fnDestroy();
 	$('.dropdown-search-filter').select2({
-                placeholder:'Select Option'
+                placeholder:''
             });
-	LoadRegionddl();
-	LoadQPddl();
-    LoadTable();      
+    
+    $('#ddlStatus').append(new Option('Yet To Start','1'));
+    $('#ddlStatus').append(new Option('Open','2'));
+    $('#ddlStatus').append(new Option('Expired','3'));
 
+    LoadEntitydl();
+    LoadCustomerdl();
+    LoadProjectGroupdl();
+    LoadBlockdl();
+    LoadPracticedl();
+    LoadBUdl();
+    LoadProductdl();
+    LoadTable(); 
+                 
   /*  $("#alternative-page-datatable").DataTable({
 		pagingType: "full_numbers",
 		drawCallback: function () {
@@ -15,34 +25,29 @@ $(document).ready(function () {
 		}
     })*/
 });
-function LoadRegionddl(){
-    var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
+function LoadEntitydl(){
+    var URL=$('#hdn_web_url').val()+ "/Get_all_Entity"
         $.ajax({
         type:"GET",
         url:URL,
         async:false,        
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
-        data:{
-            "user_id": $('#hdn_home_user_id').val(),
-            "user_role_id" : $('#hdn_home_user_role_id').val(),
-            "user_region_id" : $('#hdn_user_region_id').val()
-        },
         success: function (data){
-            if(data.Regions != null)
+            if(data.Entity != null)
             {
-                $('#ddlRegion').empty();
-                var count=data.Regions.length;
+                $('#ddlEntity').empty();
+                var count=data.Entity.length;
                 if( count> 0)
                 {
                     //$('#ddlRegion').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
-                        $('#ddlRegion').append(new Option(data.Regions[i].Region_Name,data.Regions[i].Region_Id));
+                        $('#ddlEntity').append(new Option(data.Entity[i].Entity_Name,data.Entity[i].Entity_Id));
                     //$('#ddlCourse').val('-1');
                 }
                 else
                 {
-                    //$('#ddlRegion').append(new Option('No Regions','-1'));
+                    $('#ddlEntity').append(new Option('No Entity','-1'));
                 }
             }
         },
@@ -54,125 +59,210 @@ function LoadRegionddl(){
     });
     return false;
 }
-
-
-//LoadClusterddl
-function LoadClusterddl(){
-    var URL=$('#hdn_web_url').val()+ "/Get_all_Cluster_Based_On_Region"
+function LoadCustomerdl(){
+    var URL=$('#hdn_web_url').val()+ "/GetALLClient"
         $.ajax({
-        type:"POST",
-        url:URL,
-        async:false,       
-        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-        datatype:"json", 
-        data:{
-            "region_id" : $('#ddlRegion').val().toString()//$('#ddlProject option:selected').val()
-        },
-		success: function (data){
-            if(data.ClusterOnRegion != null)
-            {
-                $('#ddlCluster').empty();
-                var count=data.ClusterOnRegion.length;
-                if( count> 0)
-                {
-                    $('#ddlCluster').append(new Option('ALL','-1'));
-                    for(var i=0;i<count;i++)
-                        $('#ddlCluster').append(new Option(data.ClusterOnRegion[i].Cluster_Name,data.ClusterOnRegion[i].Cluster_Id));
-                    //$('#ddlCourse').val('-1');
-                }
-                else
-                {
-                    $('#ddlCluster').append(new Option('ALL','-1'));
-                }
-            }
-        },
-        error:function(err)
-        {
-            alert('Error while loading Cluster! Please try again');
-            return false;
-        }
-    });
-    return false;
-}
-
-	
-    function LoadCenter()
-    {
-        
-        var URL=$('#hdn_web_url').val()+ "/AllCenterList";
-        $.ajax({
-            type:"GET",
-            url:URL,
-            async:false,        
-            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-            datatype:"json",
-			"data": {cluster_id : $('#ddlCluster').val().toString()},
-            success: function (data){
-                if(data.Centers != null)
-                {
-                    $('#ddlCenter').empty();
-                    var count=data.Centers.length;
-                    if( count> 0)
-                    {
-                        $('#ddlCenter').append(new Option('ALL','0'));
-                        for(var i=0;i<count;i++)
-                            $('#ddlCenter').append(new Option(data.Centers[i].Center_Name,data.Centers[i].Center_Id));
-                        //$('#ddlCenterType').val('');
-                    }
-                    else
-                    {
-                        $('#ddlCenter').append(new Option('ALL','0'));
-                    }
-                    //$("#ddlCenter option[value='0']").attr('disabled','disabled');
-                }
-            },
-            error:function(err)
-            {
-                alert('Error! Please try again');
-                return false;
-            }
-        });
-        return false;
-    }
-function LoadQPddl()
-{
-    var URL=$('#hdn_web_url').val()+ "/AllQPBasedOnSector"
-	//alert($('#ddlSector').val().toString())
-    $.ajax({
         type:"GET",
         url:URL,
         async:false,        
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
-		"data": {sector_id : ''},
-		success: function (data){
-            if(data.QP != null)
-                {	
-                    $('#ddlQP').empty();
-                    var count=data.QP.length;
-					//alert(count)
-                    if( count> 0)
-                    {
-                        $('#ddlQP').append(new Option('ALL',''));
-                        for(var i=0;i<count;i++)
-                            $('#ddlQP').append(new Option(data.QP[i].Qp_Name,data.QP[i].Qp_Id));
-                    }
-                    else
-                    {
-                        $('#ddlQP').append(new Option('ALL',''));
-                    }
-                    
+        success: function (data){
+            if(data.Clients != null)
+            {
+                $('#ddlCustomer').empty();
+                var count=data.Clients.length;
+                if( count> 0)
+                {
+                    //$('#ddlRegion').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
+                    //$('#ddlCourse').val('-1');
                 }
+                else
+                {
+                    $('#ddlCustomer').append(new Option('No Customer','-1'));
+                }
+            }
         },
         error:function(err)
         {
-            alert('Error! Please try again');
+            alert('Error while loading BU! Please try again');
             return false;
         }
     });
     return false;
 }
-
+function LoadProjectGroupdl(){
+    var URL=$('#hdn_web_url').val()+ "/Get_all_Project_Group"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Project_Group != null)
+            {
+                $('#ddlP_Group').empty();
+                var count=data.Project_Group.length;
+                if( count> 0)
+                {
+                    //$('#ddlRegion').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlP_Group').append(new Option(data.Project_Group[i].Project_Group_Name,data.Project_Group[i].Project_Group_Id));
+                    //$('#ddlCourse').val('-1');
+                }	
+                else
+                {
+                    $('#ddlP_Group').append(new Option('No Project Group','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+function LoadBlockdl(){
+    var URL=$('#hdn_web_url').val()+ "/Get_all_Block"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Block != null)
+            {
+                $('#ddlBlock').empty();
+                var count=data.Block.length;
+                if( count> 0)
+                {
+                    
+                    for(var i=0;i<count;i++)
+                        $('#ddlBlock').append(new Option(data.Block[i].Block_Name,data.Block[i].Block_Id));
+                    
+                }	
+                else
+                {
+                    $('#ddlBlock').append(new Option('No Block','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+function LoadPracticedl(){
+    var URL=$('#hdn_web_url').val()+ "/AllPracticeList"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Pratices != null)
+            {
+                $('#ddlPractice').empty();
+                var count=data.Pratices.length;
+                if( count> 0)
+                {
+                    
+                    for(var i=0;i<count;i++)
+                        $('#ddlPractice').append(new Option(data.Pratices[i].Practice_Name,data.Pratices[i].Practice_Id));
+                    
+                }	
+                else
+                {
+                    $('#ddlPractice').append(new Option('No Practice','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+function LoadBUdl(){
+    var URL=$('#hdn_web_url').val()+ "/Get_all_BU"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.BU != null)
+            {
+                $('#ddlBU').empty();
+                var count=data.BU.length;
+                if( count> 0)
+                {
+                    
+                    for(var i=0;i<count;i++)
+                        $('#ddlBU').append(new Option(data.BU[i].Bu_Name,data.BU[i].Bu_Id));
+                    
+                }	
+                else  	
+                {
+                    $('#ddlBU').append(new Option('No BU','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+function LoadProductdl(){
+    var URL=$('#hdn_web_url').val()+ "/Get_all_Product"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Product != null)
+            {
+                $('#ddlProduct').empty();
+                var count=data.Product.length;
+                if( count> 0)
+                {
+                    
+                    for(var i=0;i<count;i++)
+                        $('#ddlProduct').append(new Option(data.Product[i].Product_Name,data.Product[i].Product_Id));
+                        
+                }	
+                else  		
+                {
+                    $('#ddlProduct').append(new Option('No Product','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
 
 function LoadTable()
 {
@@ -191,11 +281,15 @@ function LoadTable()
             "type": "POST",
             "dataType": "json",
             "data": function (d) {
-                d.project_id = 0;
-				d.region_ids = $('#ddlRegion').val().toString();
-				d.cluster_id = $('#ddlCluster').val().toString();
-				d.center_id = $('#ddlCenter').val().toString();
-                d.qp = $('#ddlQP').val().toString();
+                d.entity = $('#ddlEntity').val().toString();
+                d.customer  = $('#ddlCustomer').val().toString();
+                d.p_group   = $('#ddlP_Group').val().toString();
+                d.block     = $('#ddlBlock').val().toString();
+                d.practice  = $('#ddlPractice').val().toString();
+                d.bu        = $('#ddlBU').val().toString();
+                d.product   = $('#ddlProduct').val().toString();
+                d.status    = $('#ddlStatus').val().toString();
+                
                 d.user_id =$('#hdn_home_user_id').val();
                 d.user_role_id = $('#hdn_home_user_role_id').val();
                 d.user_region_id=$('#hdn_user_region_id').val();
@@ -205,21 +299,47 @@ function LoadTable()
             }
 
         },
-
         "columns": [
             { "data": "S_No"},
-            { "data": "Project_Name" },
-            { "data": "Contract_Name" },
-            { "data": "Client_Name" },            
-            { "data": "Practice_Name"},
-            {"visible": false,
-            "data": function (row, type, val, meta) {
-            var varButtons = ""; 
-            varButtons += '<a onclick="EditProjectDetail(\'' + row.Project_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Project" class="fas fa-edit" ></i></a>';
-            return varButtons;
-            }
+            { "data": "Entity_Name"},
+            //{ "data": "Customer_Name"},
+            {
+                "data": function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Customer_Name=="")
+                        varButtons=row.Customer_Name;
+                    else
+                    {
+                        varButtons += '<a onclick="GetCustomerList(\'' + row.Customer_Id + '\')"  style="color:blue;cursor:pointer" >' + row.Customer_Name + '</a>';
+                    }
+                    
+                    return varButtons;
+                    }
             },
-            { "data": "Sub_Project_Names"},
+            {
+                "data": function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Project_Code=="")
+                        varButtons=row.Project_Code;
+                    else
+                    {
+                        varButtons += '<a onclick="GetSub_project(\'' + row.Project_Id + '\')"  style="color:blue;cursor:pointer" >' + row.Project_Code + '</a>';
+                    }
+                    
+                    return varButtons;
+                    }
+            },
+            // "data": "Project_Code"},
+            { "data": "Project_Name"},
+            { "data": "Project_Group_Name"},
+            { "data": "Project_Type_Name"},
+            { "data": "Block_Name"},
+            { "data": "Practice_Name"},
+            { "data": "Bu_Name"},
+            { "data": "Product_Name"},
+            { "data": "Project_Manager"},
+            { "data": "Status"},
+            
         ],
         drawCallback: function(){
             $('#alternative-page-datatable_paginate ul.pagination').addClass("pagination-rounded");
@@ -233,3 +353,115 @@ function EditProjectDetail(ProjectId)
     $('#form1').submit();
     
 }
+
+function GetCustomerList(Customer_Id){
+    var URL=$('#hdn_web_url').val()+ "/GetContractbycustomer?Customer_Id="+Customer_Id;
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            varHtml='';
+            $("#tblTrAct tbody").empty();
+            if(!jQuery.isEmptyObject(data.contracts))
+            {   //alert(data.Customer_Name)
+                $('#txtcustomer_name').val(data.Customer_Name);
+                $('#txtfundingsource').val(data.Funding_Source);
+                $('#txtcustomer_group').val(data.Customer_Group);
+                $('#txtindustrytype').val(data.Industry_type);
+
+                if (data.contracts != null){
+                    var count=data.contracts.length;
+                    if( count> 0)
+                    {
+                        for(var i=0;i<count;i++)
+                        {
+                            varHtml+='<tr>';
+                            varHtml+='  <td style="text-align:center;">'+ data.contracts[i].Contract_Id +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.contracts[i].Contract_Name +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.contracts[i].Contract_Code +'</td>';
+                            varHtml+='</tr>';
+                        }
+                        
+                    }
+                    $("#tblTrAct tbody").append(varHtml);
+                    $('#tr_sess_act').modal('show');
+                }
+            }
+            else
+            {
+                varHtml='<tr><td colspan="3" style="text-align:center;">No records found</td></tr>'
+                $("#tblTrAct tbody").append(varHtml);
+                $('#tr_sess_act').modal('show');
+            }   
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+    
+} 
+function GetSub_project(Project_Id){
+    //alert(Project_Id)
+    var URL=$('#hdn_web_url').val()+ "/Getsubprojectbyproject?Project_Id="+Project_Id;
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            varHtml='';
+            $("#tblsub_project tbody").empty();
+            if(!jQuery.isEmptyObject(data.sub_project))
+            {   //alert(data.Customer_Name)
+                $('#txtproject_name').val(data.project_name);
+                $('#txtprojectcode').val(data.project_code);
+
+                if (data.sub_project[0].Sub_Project_Id != null){
+                    var count=data.sub_project.length;
+                    if( count> 0)
+                    {
+                        for(var i=0;i<count;i++)
+                        {
+                            varHtml+='<tr>';
+                            varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Sub_Project_Id +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Sub_Project_Name +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Sub_Project_Code +'</td>';
+                            varHtml+='</tr>';
+                        }
+                        
+                    }
+                    $("#tblsub_project tbody").append(varHtml);
+                    $('#tr_sub_project').modal('show');
+                }
+                else
+            {
+                varHtml='<tr><td colspan="3" style="text-align:center;">No records found</td></tr>'
+                $("#tblsub_project tbody").append(varHtml);
+                $('#tr_sub_project').modal('show');
+            }
+            }
+            else
+            {
+                varHtml='<tr><td colspan="3" style="text-align:center;">No records found</td></tr>'
+                $("#tblsub_project tbody").append(varHtml);
+                $('#tr_sub_project').modal('show');
+            }   
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+    
+} 

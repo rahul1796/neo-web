@@ -37,38 +37,65 @@
                             <div class="card-box">
 								<div class="row">
                                     <div class="col-lg-3">
-										<label for="ddlRegion" class="mr-2">Region</label>
-										<select class="form-control dropdown-search-filter" id="ddlRegion" onchange="LoadClusterddl()" multiple>
+										<label for="ddlEntity" class="mr-2">Entity</label>
+										<select class="form-control dropdown-search-filter" id="ddlEntity" multiple>
 											<option selected="" value="">All</option>
 											
 										</select>
-									</div>
-									
-									<div class="col-lg-3">
-										<label for="ddlCluster" class="mr-2">Cluster</label>
-										<select class="form-control dropdown-search-filter" id="ddlCluster" onchange="LoadCenter()" multiple>
+                                    </div>
+                                    <div class="col-lg-3">
+										<label for="ddlCustomer" class="mr-2">Customer</label>
+										<select class="form-control dropdown-search-filter" id="ddlCustomer" multiple>
 											<option selected="" value="">All</option>
+											
 										</select>
-									</div>
-									
-									<div class="col-lg-3">
-										<label for="ddlCenter" class="mr-2">Center</label>
-										<select class="form-control dropdown-search-filter" id="ddlCenter" multiple >
-											<!-- <option value="0">All</option> -->
+                                    </div>
+                                    <div class="col-lg-3">
+										<label for="ddlP_Group" class="mr-2">Project Group</label>
+										<select class="form-control dropdown-search-filter" id="ddlP_Group" multiple>
+											<option selected="" value="">All</option>
+											
 										</select>
-									</div>
-									<div class="col-lg-3">
-                                            <label for="ddlQP" class="mr-2">QP</label>
-                                            <select class="form-control dropdown-search-filter" id="ddlQP" multiple>
-                                                <!--option selected="" value="0">All</option-->
-                                            </select>
-                                        </div>
-									
-                                    
-                                    
+                                    </div>
+                                    <div class="col-lg-3">
+										<label for="ddlBlock" class="mr-2">Block</label>
+										<select class="form-control dropdown-search-filter" id="ddlBlock" multiple>
+											<option selected="" value="">All</option>
+											
+										</select>
+                                    </div>
+
                                 </div>
                                 <div class="row">
-                                    
+                                    <div class="col-lg-3">
+										<label for="ddlPractice" class="mr-2">Practice</label>
+										<select class="form-control dropdown-search-filter" id="ddlPractice"  multiple>
+											<option selected="" value="">All</option>
+											
+										</select>
+                                    </div>
+                                    <div class="col-lg-3">
+										<label for="ddlBU" class="mr-2">BU</label>
+										<select class="form-control dropdown-search-filter" id="ddlBU"  multiple>
+											<option selected="" value="">All</option>
+											
+										</select>
+                                    </div>
+                                    <div class="col-lg-3">
+										<label for="ddlProduct" class="mr-2">Product</label>
+										<select class="form-control dropdown-search-filter" id="ddlProduct"  multiple>
+											<option selected="" value="">All</option>
+											
+										</select>
+                                    </div>
+                                    <div class="col-lg-3">
+										<label for="ddlStatus" class="mr-2">Status</label>
+										<select class="form-control dropdown-search-filter" id="ddlStatus" >
+											<option selected="" value="">All</option>
+										</select>
+                                    </div>
+                                </div>    
+                                <div class="row">
                                     <div class="col-lg-3" >
 										
                                         <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
@@ -101,12 +128,18 @@
                                             <thead>
                                                 <tr>
                                                     <th>S No</th>
-                                                    <th>Project Name</th>
-                                                    <th>Contract Name</th>
+                                                    <th>Entity Name</th>
                                                     <th>Customer Name</th>
+                                                    <th>Project Code</th>
+                                                    <th>Project Name</th>
+                                                    <th>Group</th>
+                                                    <th>Type</th>
+                                                    <th>Block</th>
                                                     <th>Practice</th>
-                                                    <th>Actions</th>
-                                                    <th>Sub Project(s)</th>
+                                                    <th>BU</th>
+                                                    <th>Product</th>
+                                                    <th>Project Manager</th>
+                                                    <th>Status</th>
                                                 </tr>
                                             </thead>
                                         
@@ -137,3 +170,137 @@
 
         <!-- datatables init js-->
         <script src="static/assets/js/pages/project-list.js"></script>
+
+        <div id="tr_sess_act" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Contracts</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body"> 
+                                    <div class="col-md-12">                                
+                                        <div class="col-md-4 form-group">
+                                            <h5>Customer Name</h5>                                           
+                                        </div>
+                                        <div class="col-md-4" style="margin-top: -38px; margin-left: 13%;">
+                                            <div class="form-group" style="margin-bottom: 20px;">        
+                                                <input type="text" class="form-control" id="txtcustomer_name"  disabled/>                               
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 form-group" style="margin-top: -45px; margin-left: 50%;">
+                                            <h5>Funding Source</h5>                                           
+                                        </div>
+                                        <div class="col-md-4" style="margin-top: -42px; margin-left: 63%;">
+                                            <div class="form-group" style="margin-bottom: 20px;">        
+                                                <input type="text" class="form-control" id="txtfundingsource"  disabled/>                               
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-12">                                
+                                        <div class="col-md-4 form-group">
+                                            <h5>Customer Group</h5>                                           
+                                        </div>
+                                        <div class="col-md-4" style="margin-top: -38px; margin-left: 13%;">
+                                            <div class="form-group" style="margin-bottom: 20px;">        
+                                                <input type="text" class="form-control" id="txtcustomer_group"  disabled/>                               
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 form-group" style="margin-top: -45px; margin-left: 50%;">
+                                            <h5>Industry Type</h5>                                           
+                                        </div>
+                                        <div class="col-md-4" style="margin-top: -42px; margin-left: 63%;">
+                                            <div class="form-group" style="margin-bottom: 20px;">        
+                                                <input type="text" class="form-control" id="txtindustrytype"  disabled/>                                
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div> <!--end card-body-->
+                            </div> <!-- end card-->
+                        </div>
+                    </div>
+
+                    <div class="modal-body">
+                        <table id="tblTrAct" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                            <thead>
+                                <tr style="background-color: #f5f6f8;">
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch Code</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Trainer Email</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Session Start</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        
+                            </tbody>
+                        </table>	
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->
+
+        <div id="tr_sub_project" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Sub Project</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body"> 
+                                    <div class="col-md-12">                                
+                                        <div class="col-md-4 form-group">
+                                            <h5>Project Name</h5>                                           
+                                        </div>
+                                        <div class="col-md-4" style="margin-top: -38px; margin-left: 13%;">
+                                            <div class="form-group" style="margin-bottom: 20px;">        
+                                                <input type="text" class="form-control" id="txtproject_name"  disabled/>                               
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 form-group" style="margin-top: -45px; margin-left: 50%;">
+                                            <h5>Project Code</h5>                                           
+                                        </div>
+                                        <div class="col-md-4" style="margin-top: -42px; margin-left: 63%;">
+                                            <div class="form-group" style="margin-bottom: 20px;">        
+                                                <input type="text" class="form-control" id="txtprojectcode"  disabled/>                               
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div> <!--end card-body-->
+                            </div> <!-- end card-->
+                        </div>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <table id="tblsub_project" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                            <thead>
+                                <tr style="background-color: #f5f6f8;">
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch Code</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Trainer Email</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Session Start</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        
+                            </tbody>
+                        </table>	
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->
