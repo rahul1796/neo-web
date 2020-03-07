@@ -286,21 +286,21 @@ class Database:
         con.close()
         return h
     
-    def project_list(project_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp):
+    def project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (project_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, region_ids, cluster_id, center_id, qp)
+        sql = 'exec [masters].[sp_get_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,entity,customer,p_group,block,practice,bu,product,status)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[12]
-            fil=row[11]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10]}
+            record=row[16]
+            fil=row[15]
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14]}
             d.append(h)
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
@@ -310,7 +310,7 @@ class Database:
         client = []
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        cur2.execute("SELECT * FROM [masters].[tbl_client] where is_active=1 and is_deleted=0")
+        cur2.execute("select customer_id, customer_name from masters.tbl_customer where is_deleted=0")
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
             h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
@@ -3127,3 +3127,99 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return response
+
+    def Get_all_Entity_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[get_all_entity]'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    def Get_all_Project_Group_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[get_all_group]'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+    
+    def Get_all_Block_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[get_all_block]'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    def Get_all_Product_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[get_all_product]'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    def GetContractbycustomer_db(Customer_Id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_GetContractbycustomer]  ?'
+        values = (Customer_Id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2]}
+            response.append(h)
+
+        out = {'contracts':response,'Customer_Name':row[3],'Funding_Source':row[4],'Customer_Group':row[5],'Industry_type':row[6]}
+        cur.commit()
+        cur.close()
+        con.close()       
+        return out
+
+    def Getsubprojectbyproject_db(Project_Id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_Getsubprojectbyproject]  ?'
+        values = (Project_Id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2]}
+            response.append(h)
+
+        out = {'sub_project':response,'project_name':row[3],'project_code':row[4]}
+        cur.commit()
+        cur.close()
+        con.close()       
+        return out

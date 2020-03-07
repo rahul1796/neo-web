@@ -690,7 +690,7 @@ class user_list(Resource):
             user_role_id=request.form['user_role_id']
             status_ids=request.form['status_ids']
             project_ids=request.form['project_ids']
-            print(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,dept_ids,role_ids,entity_ids,region_ids,RM_Role_ids,R_mangager_ids,filter_role_id,user_region_id,user_role_id,status_ids,project_ids)
+            #print(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,dept_ids,role_ids,entity_ids,region_ids,RM_Role_ids,R_mangager_ids,filter_role_id,user_region_id,user_role_id,status_ids,project_ids)
             return UsersM.user_list(user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids)
             
 
@@ -2459,7 +2459,15 @@ class project_list(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
-            project_id = request.form['project_id']
+            entity = request.form['entity']
+            customer = request.form['customer']
+            p_group = request.form['p_group']
+            block = request.form['block']
+            practice = request.form['practice']
+            bu = request.form['bu']
+            product = request.form['product']
+            status = request.form['status']
+            
             user_id = request.form['user_id']
             user_role_id = request.form['user_role_id'] 
             user_region_id = request.form['user_region_id']
@@ -2469,12 +2477,8 @@ class project_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            region_ids=request.form['region_ids']
-            cluster_id=request.form['cluster_id']
-            center_id=request.form['center_id']
-            qp=request.form['qp']
-            
-            return Master.project_list(project_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp)
+            print(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+            return Master.project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status)
 
 
 class add_project_details(Resource):
@@ -3951,6 +3955,76 @@ class Get_all_Customer_Group(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(Get_all_Customer_Group,'/Get_all_Customer_Group')
+#####################################################################################################
+class Get_all_Entity(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.Get_all_Entity_db()
+                return {'Entity':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(Get_all_Entity,'/Get_all_Entity')
+
+class Get_all_Project_Group(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.Get_all_Project_Group_db()
+                return {'Project_Group':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(Get_all_Project_Group,'/Get_all_Project_Group')
+
+class Get_all_Block(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.Get_all_Block_db()
+                return {'Block':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(Get_all_Block,'/Get_all_Block')
+
+class Get_all_Product(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.Get_all_Product_db()
+                return {'Product':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(Get_all_Product,'/Get_all_Product')
+
+
+class GetContractbycustomer(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                Customer_Id=request.args.get('Customer_Id',0,type=int)
+                response = Database.GetContractbycustomer_db(Customer_Id)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetContractbycustomer,'/GetContractbycustomer')
+
+class Getsubprojectbyproject(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                Project_Id=request.args.get('Project_Id',0,type=int)
+                response = Database.Getsubprojectbyproject_db(Project_Id)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(Getsubprojectbyproject,'/Getsubprojectbyproject')
+
 
 if __name__ == '__main__':    
     app.run(debug=True)
