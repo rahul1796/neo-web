@@ -10,6 +10,8 @@ $(document).ready(function () {
         placeholder:''
     });
     LoadFunding_Resourcesdl();
+    LoadCustomer_Groupdl();
+    LoadSalesCategoryddl();
     LoadTable(); 
 
 
@@ -31,7 +33,7 @@ function LoadFunding_Resourcesdl(){
                 var count=data.Funding_Resources.length;
                 if( count> 0)
                 {
-                    $('#ddlFundingSource').append(new Option('ALL','-1'));
+                    //$('#ddlFundingSource').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
                         $('#ddlFundingSource').append(new Option(data.Funding_Resources[i].Funding_Source_Name,data.Funding_Resources[i].Funding_Source_Id));
                     //$('#ddlCourse').val('-1');
@@ -45,6 +47,78 @@ function LoadFunding_Resourcesdl(){
         error:function(err)
         {
             alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
+function LoadCustomer_Groupdl(){
+    var URL=$('#hdn_web_url').val()+ "/Get_all_Customer_Group"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "customer_group_id" : 0 //$('#ddlRM_role').val().toString()//$('#ddlProject option:selected').val()
+        },
+        success: function (data){
+            if(data.Customer_Group != null)
+            {
+                $('#ddlcustomergroup').empty();
+                var count=data.Customer_Group.length;
+                if( count> 0)
+                {
+                    //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlcustomergroup').append(new Option(data.Customer_Group[i].Customer_Group_Name,data.Customer_Group[i].Customer_Group_Id));
+                    //$('#ddlCourse').val('-1');
+                }
+                else
+                {
+                    $('#ddlcustomergroup').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
+function LoadSalesCategoryddl(){
+    var URL=$('#hdn_web_url').val()+ "/GetAllCategoryTypes"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.CategoryType != null)
+            {
+                $('#ddlCategoryType').empty();
+                var count=data.CategoryType.length;
+                if( count> 0)
+                {
+                    for(var i=0;i<count;i++)
+                        $('#ddlCategoryType').append(new Option(data.CategoryType[i].Category_Type_Name,data.CategoryType[i].Category_Type_Id));
+                    
+                }
+                else
+                {
+                    $('#ddlCategoryType').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading Category Type! Please try again');
             return false;
         }
     });
@@ -69,8 +143,10 @@ function LoadTable()
             "dataType": "json",
             "data": function (d) {
                 d.client_id = 0;
-                d.funding_resources=$('#ddlFundingSource').val().toString();
+                d.funding_sources=$('#ddlFundingSource').val().toString();
                 d.is_active=-1;
+                d.customer_groups = $('#ddlcustomergroup').val().toString();
+                d.category_type_ids = $('#ddlCategoryType').val().toString();
             },
             error: function (e) {
                 $("#tbl_clients tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -89,7 +165,10 @@ function LoadTable()
             },
             { "data": "Client_Name" },
             { "data": "Client_Code" },
-            { "data": "Funding_Source_Name" }
+            { "data": "Funding_Source_Name" },
+            { "data": "Customer_Group_Name" },
+            { "data": "Category_Type_Name" },
+            { "data": "Industry_Type_Name" }
           
         ],
         // "ColumnDefs"  :[

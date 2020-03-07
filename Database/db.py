@@ -311,9 +311,9 @@ class Database:
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        cur2.execute("SELECT * FROM [masters].[tbl_customer] where is_active=1 and is_deleted=0")
+        cur2.execute("SELECT customer_id,customer_name FROM [masters].[tbl_customer] where is_active=1 and is_deleted=0")
         columns = [column[0].title() for column in cur2.description]
-        for r in cur2:
+        for row in cur2:
             for i in range(len(columns)):
                 h[columns[i]]=row[i]            
             client.append(h.copy())
@@ -355,20 +355,22 @@ class Database:
     def center_list(center_id,user_id,user_role_id,user_region_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses):
         content = {}
         d = []
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec [masters].[sp_get_centers_list] ?,?,?,?, ?, ?, ?, ?, ?,?,?,?,?,?,?'        
         values = (center_id,user_id,user_role_id,user_region_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,regions,clusters,courses)
-        print(values)
+        #print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[21]
-            fil=row[20]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16],""+columns[17]+"":row[17],""+columns[18]+"":row[18],""+columns[19]+"":row[19]}
-            d.append(h)
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]            
+            d.append(h.copy())
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
@@ -443,7 +445,7 @@ class Database:
         cluster = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = "SELECT * FROM [masters].[tbl_cluster] where is_active=1 AND (('{}'='-1')OR(region_id in (select	value from	string_split('{}',',')   WHERE	trim(value)!='' )));".format(region_id,region_id)
+        sql = "SELECT state_id,state_name FROM [masters].[tbl_states] where is_active=1 AND (('{}'='-1')OR(region_id in (select	value from	string_split('{}',',')   WHERE	trim(value)!='' )));".format(region_id,region_id)
         cur.execute(sql)
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -1127,22 +1129,25 @@ class Database:
         con.close()
         return section
 
-    def client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources):
+    def client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_sources,customer_groups,category_type_ids):
         content = {}
         d = []
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_client_list] ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, funding_resources)
+        sql = 'exec [masters].[sp_get_client_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (client_id,Is_Active, funding_sources,customer_groups,category_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[8]
-            fil=row[7]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
-            d.append(h)
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+            d.append(h.copy())
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
@@ -2689,8 +2694,8 @@ SELECT					cb.name as candidate_name,
         record="0"
         fil="0"
         for row in cur:
-            record=row[len(columns)]
-            fil=row[len(columns)-1]
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
             for i in range(len(columns)-2):
                 h[columns[i]]=row[i]
             #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9]}
@@ -3119,12 +3124,62 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return response
+
     def GetAllSalesCategory():
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
         cur2.execute("exec [masters].[sp_get_sales_category]")
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    
+    def Get_all_Customer_Group_db(customer_group_id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_all_customer_group]  ?'
+        values = (customer_group_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()     
+        return response
+
+    def GetAllCategoryTypes():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        cur2.execute("exec [masters].[sp_get_category_type]")
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    def GetSubProjectsForCenter(center_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_sub_projects_for_center]  ?'
+        values = (center_id,)
+        cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
             for i in range(len(columns)):

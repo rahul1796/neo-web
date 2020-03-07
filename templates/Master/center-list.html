@@ -42,7 +42,7 @@
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-3" style="display: none;">
                                         <label for="ddlBu" class="mr-2">Business Unit</label>
                                         <select class="form-control dropdown-search-filter" id="ddlBu" multiple>
                                             <option selected="" value="">All</option>
@@ -55,18 +55,9 @@
                                             
                                         </select>
                                     </div>
-                                    
-                                </div>
-                                <div class="row">
                                     <div class="col-lg-3">
-                                        <label for="ddlCluster" class="mr-2">Cluster</label>
+                                        <label for="ddlCluster" class="mr-2">State</label>
                                         <select class="form-control dropdown-search-filter" id="ddlCluster" multiple>
-                                            <option selected="" value="">All</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <label for="ddlCourse" class="mr-2">Course</label>
-                                        <select class="form-control dropdown-search-filter" id="ddlCourse" multiple>
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
@@ -78,11 +69,21 @@
                                             <option  value="0">In Active</option>
                                         </select>
                                     </div>
+                                </div>
+                                <div class="row">
+                                    
+                                    <div class="col-lg-3" style="display: none;">
+                                        <label for="ddlCourse" class="mr-2">Course</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlCourse" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    
                                     <div class="col-lg-3" >
                                         <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
                                         onclick="LoadTableBasedOnSearch()">Search</button>
                                         &nbsp
-                                        <button style="margin-top: 30px" type="button" class="btn btn-primary waves-effect waves-light submit" 
+                                        <button style="margin-top: 30px; display: none;" type="button" class="btn btn-primary waves-effect waves-light submit" 
                                         onclick="Download()">Download</button>
                                     </div>
                                 </div>
@@ -108,20 +109,15 @@
                                                 <tr>
                                                     <th>S.No</th>                                               
                                                     <th>Actions</th>
+                                                    <th>Center Code</th>
                                                     <th>Center Name</th>
                                                     <th>Center Type</th>
-													<!--
-                                                    <th>Center Category</th>
-                                                    -->
-													<th>Business Unit</th>  
-                                                    <th>Status</th>
-                                                    <th>Region</th>
-                                                    <th>Cluster</th>
-                                                    <th>Country</th>
+                                                    <th>Location</th> 
+                                                    <th>District</th>                                                    
                                                     <th>State</th>
-                                                    <th>District</th>
-                                                    <th>Location</th>   
-                                                    <th>Sub Center(s)</th>
+                                                    <th>Region</th>
+                                                    <th>Country</th>                                                       
+                                                    <th>Status</th>
                                                 </tr>
                                             </thead>
                                         
@@ -155,3 +151,36 @@
         <script src="static/assets/js/pages/center-list.js"></script>
 
         <!-- App js-->
+    
+<div id="divSubProjectList" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title">Sub Project List</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <table id="tblSubProject" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                    <thead>                        
+                        <tr style="background-color: #f5f6f8;">
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Name</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Code</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Name</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Code</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Name</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Business Unit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div><!--/.modal-->    

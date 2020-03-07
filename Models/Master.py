@@ -70,10 +70,10 @@ class Master:
         BU={"BU":Database.get_all_BU()}
         return BU
     def get_all_Cluster_Based_On_Region(region_id):
-        Cluster={"ClusterOnRegion":Database.get_all_Cluster_Based_On_Region(region_id)}
+        Cluster={"States":Database.get_all_Cluster_Based_On_Region(region_id)}
         return Cluster
-    def client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources):
-        client_l = Database.client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources)
+    def client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_sources,customer_groups,category_type_ids):
+        client_l = Database.client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_sources,customer_groups,category_type_ids)
         return client_l
     def add_client(client_name,client_code,user_id,is_active,client_id):
         popupMessage = {"PopupMessage": Database.add_client_details(client_name,client_code,user_id,is_active,client_id)}
@@ -135,3 +135,8 @@ class Master:
     def GetAllSalesCategory():
         response={"SalesCategory":Database.GetAllSalesCategory()}
         return response
+    def GetAllCategoryTypes():
+        response={"CategoryType":Database.GetAllCategoryTypes()}
+        return response
+    def GetSubProjectsForCenter(center_id):
+        return Database.GetSubProjectsForCenter(center_id)
