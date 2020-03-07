@@ -1183,10 +1183,11 @@ class client_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            funding_resources = request.form['funding_resources']
+            funding_sources = request.form['funding_sources']
             customer_groups = request.form['customer_groups']
+            category_type_ids = request.form['category_type_ids']
             #print(order_by_column_position,order_by_column_direction)
-            return Master.client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources,customer_groups)
+            return Master.client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_sources,customer_groups,category_type_ids)
 
 class add_client_details(Resource):
     @staticmethod
@@ -3435,6 +3436,8 @@ class contract_list(Resource):
             stage_ids = request.form['stage_ids'] 
             from_date = request.form['from_date'] 
             to_date = request.form['to_date'] 
+            entity_ids = request.form['entity_ids'] 
+            sales_category_ids = request.form['sales_category_ids'] 
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
@@ -3442,7 +3445,7 @@ class contract_list(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             print(order_by_column_position,order_by_column_direction)
-            return Master.contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Master.contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 
 class add_contract_details(Resource):
     @staticmethod
@@ -3944,6 +3947,14 @@ class GetAllDepartment(Resource):
                 return {} 
 api.add_resource(GetAllDepartment,'/GetAllDept')
 
+
+class GetAllSalesCategory(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            return Master.GetAllSalesCategory()
+api.add_resource(GetAllSalesCategory,'/GetAllSalesCategory')
+
 class Get_all_Customer_Group(Resource):
     @staticmethod
     def get():
@@ -4026,6 +4037,22 @@ class Getsubprojectbyproject(Resource):
 api.add_resource(Getsubprojectbyproject,'/Getsubprojectbyproject')
 
 
+
+class GetAllCategoryTypes(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            return Master.GetAllCategoryTypes()
+api.add_resource(GetAllCategoryTypes,'/GetAllCategoryTypes')
+
+class GetSubProjectsForCenter(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            center_id=request.args.get('center_id',0,type=int)
+            response={"SubProjects":Master.GetSubProjectsForCenter(center_id)}
+            return response
+api.add_resource(GetSubProjectsForCenter,'/GetSubProjectsForCenter')
 if __name__ == '__main__':    
     app.run(debug=True)
 

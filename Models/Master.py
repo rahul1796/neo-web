@@ -70,10 +70,10 @@ class Master:
         BU={"BU":Database.get_all_BU()}
         return BU
     def get_all_Cluster_Based_On_Region(region_id):
-        Cluster={"ClusterOnRegion":Database.get_all_Cluster_Based_On_Region(region_id)}
+        Cluster={"States":Database.get_all_Cluster_Based_On_Region(region_id)}
         return Cluster
-    def client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources,customer_groups):
-        client_l = Database.client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources,customer_groups)
+    def client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_sources,customer_groups,category_type_ids):
+        client_l = Database.client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_sources,customer_groups,category_type_ids)
         return client_l
     def add_client(client_name,client_code,user_id,is_active,client_id):
         popupMessage = {"PopupMessage": Database.add_client_details(client_name,client_code,user_id,is_active,client_id)}
@@ -118,8 +118,8 @@ class Master:
     def sector_list(sector_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         sector_l = Database.sector_list(sector_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
         return sector_l
-    def contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        contract_l = Database.contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        contract_l = Database.contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
         return contract_l
     def GetAllBusBasedOn_User(UserId,UserRoleId):
         return Database.GetAllBusBasedOn_User(UserId,UserRoleId)
@@ -132,4 +132,11 @@ class Master:
 
     def GetDepartmentUsers(UserId,UserRoleId,UserRegionId):
         return Database.GetDepartmentUsers(UserId,UserRoleId,UserRegionId)
-     
+    def GetAllSalesCategory():
+        response={"SalesCategory":Database.GetAllSalesCategory()}
+        return response
+    def GetAllCategoryTypes():
+        response={"CategoryType":Database.GetAllCategoryTypes()}
+        return response
+    def GetSubProjectsForCenter(center_id):
+        return Database.GetSubProjectsForCenter(center_id)
