@@ -21,7 +21,9 @@
             dateFormat:'d-M-Y'
         });
         LoadCustomers();
-        LoadStages();
+        //LoadStages();
+        Loadentityddl();
+        LoadSalesCategoryddl();
         LoadTable(); 
         role_id=parseInt($('#hdn_home_user_role_id').val());        
     });
@@ -41,7 +43,7 @@
                     if( count> 0)
                     {
                         for(var i=0;i<count;i++)
-                            $('#ddlCustomer').append(new Option(data.Clients[i].Client_Name,data.Clients[i].Client_Id));
+                            $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
                     }
                     else
                     {
@@ -89,6 +91,74 @@
         });
         return false;        
     }
+    function Loadentityddl(){
+        var URL=$('#hdn_web_url').val()+ "/All_entity"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                if(data.Entity != null)
+                {
+                    $('#ddlentity').empty();
+                    var count=data.Entity.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlentity').append(new Option('ALL','-1'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlentity').append(new Option(data.Entity[i].Entity_Name,data.Entity[i].Entity_Id));
+                        //$('#ddlCourse').val('-1');
+                    }
+                    else
+                    {
+                        $('#ddlentity').append(new Option('ALL','-1'));
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error while loading BU! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function LoadSalesCategoryddl(){
+        var URL=$('#hdn_web_url').val()+ "/GetAllSalesCategory"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                if(data.SalesCategory != null)
+                {
+                    $('#ddlSalesCategory').empty();
+                    var count=data.SalesCategory.length;
+                    if( count> 0)
+                    {
+                        for(var i=0;i<count;i++)
+                            $('#ddlSalesCategory').append(new Option(data.SalesCategory[i].Sales_Category_Name,data.SalesCategory[i].Sales_Category_Id));
+                        
+                    }
+                    else
+                    {
+                        $('#ddlSalesCategory').append(new Option('ALL','-1'));
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error while loading BU! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    
     function LoadTable()
     {
         vartable1 = $("#tbl_contract").DataTable({
@@ -111,6 +181,8 @@
                     d.stage_ids= $('#ddlStage').val().toString();
                     d.from_date= $('#FromDate').val().toString();
                     d.to_date= $('#ToDate').val().toString();
+                    d.entity_ids= $('#ddlentity').val().toString();
+                    d.sales_category_ids= $('#ddlSalesCategory').val().toString();
                 },
                 error: function (e) {
                     $("#tbl_contract tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -127,8 +199,10 @@
                 { "data": "Stage_Name" },
                 { "visible":false,"data": "Value" },
                 { "data": "Contract_Code" },
-                { "data": "Bu_Name" },
-                { "data": "Entity_Name" }
+                //{ "data": "Bu_Name" },
+                { "data": "Entity_Name" },
+                { "data": "Account_Manager_Name" },
+                { "data": "Sales_Manager_Name" }
                 // { "data": function (row, type, val, meta) {
                 //     var varStatus = ""; 
                 //     if(row.Is_Active)
@@ -177,6 +251,12 @@
                     <form id="DownloadReport" action="javascript:DownloadReport();" name="DownloadReport" method="POST">
                         <div class="row">
                             <div class="col-lg-3">
+                                <label for="ddlentity" class="mr-2">Entity</label>
+                                <select class="form-control dropdown-search-filter" id="ddlentity" multiple>
+                                    <!-- <option selected="" value="">All</option>                                     -->
+                                </select>
+                            </div>
+                            <div class="col-lg-3">
                                 <label for="ddlCustomer" class="mr-2">Customer</label>
                                 <select class="form-control dropdown-search-filter" id="ddlCustomer" multiple>
                                     <!-- <option value="" disabled selected>Select Region</option> -->
@@ -185,12 +265,17 @@
                             <div class="col-lg-3">
                                 <label for="ddlStage" class="mr-2">Stage</label>
                                 <select class="form-control dropdown-search-filter" id="ddlStage" multiple >
-                                    <!-- <option value="0">All</option> -->
+                                     <option value="1">Open</option> 
+                                     <option value="2">Expired</option> 
                                 </select>
                             </div>
-                            <div class="col-lg-1" >
-                                <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+                            <div class="col-lg-3">
+                                <label for="ddlSalesCategory" class="mr-2">Sales Category</label>
+                                <select class="form-control dropdown-search-filter" id="ddlSalesCategory" multiple>
+                                    <!-- <option selected="" value="">All</option>                                     -->
+                                </select>
                             </div>
+                            
                             <div class="col-lg-3" style="display: none;">
                                 <label for="FromDate" class="mr-2" >From Date</label>
                                 <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
@@ -205,7 +290,9 @@
                         </br>
                         </div>
                         <div class="row">                             
-                            
+                            <div class="col-lg-1" >
+                                <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+                            </div>
                              <!-- <div class="col-lg-1" >
                                  <button class="btn btn-primary" type="submit" >Download Report</button> 
                                 <button style="margin-top: 30px" type="submit" class="btn btn-primary waves-effect waves-light" >Download</button>
@@ -229,10 +316,10 @@
                            </div>
                            <br/>
                            <div class="col-lg-12">
-                               <table id="tbl_contract" class="table dt-responsive nowrap">
+                               <table id="tbl_contract" class="table dt-responsive wrap">
                                    <thead>
                                        <tr>
-                                           <th>S No</th>
+                                           <th>S.No</th>
                                            <th>Contract Name</th>
                                            <th>Customer Name</th>
                                            <th>From Date</th>
@@ -240,8 +327,10 @@
                                            <th>Stage</th>
                                            <th>Value</th>
                                            <th>Contract Code</th>
-                                           <th>BU</th>
+                                           <!-- <th>BU</th> -->
                                            <th>Entity Name</th>
+                                           <th>Account Manager</th>
+                                           <th>Sales Manager</th>
                                        </tr>
                                    </thead>
                                

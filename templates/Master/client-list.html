@@ -47,6 +47,12 @@
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddlCategoryType" class="mr-3">Category Type</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlCategoryType" multiple>
+                                            <!-- <option selected="" value="">All</option> -->
+                                        </select>
+                                    </div>
                                     <div class="col-lg-3" >
                                         &nbsp
                                         <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
@@ -74,7 +80,7 @@
                                     </div>
                                     <br/>
                                     <div class="col-lg-12">
-                                        <table id="tbl_clients" class="table w-100 nowrap dataTable no-footer">
+                                        <table id="tbl_clients" class="table w-100 wrap dataTable no-footer">
                                             <thead>
                                                 <tr>
                                                     <th>S No</th>
@@ -82,6 +88,9 @@
                                                     <th>Customer Name</th>
                                                     <th>Customer Code</th>
                                                     <th>Funding Source</th>
+                                                    <th>Customer Group</th>
+                                                    <th>Category Type</th>
+                                                    <th>Industry Type</th>
                                                 </tr>
                                             </thead>
                                         
