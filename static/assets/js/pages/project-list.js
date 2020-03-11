@@ -380,9 +380,11 @@ function GetCustomerList(Customer_Id){
                         for(var i=0;i<count;i++)
                         {
                             varHtml+='<tr>';
-                            varHtml+='  <td style="text-align:center;">'+ data.contracts[i].Contract_Id +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.contracts[i].S_No +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.contracts[i].Contract_Name +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.contracts[i].Contract_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.contracts[i].Start_Date +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.contracts[i].End_Date +'</td>';
                             varHtml+='</tr>';
                         }
                         
@@ -425,16 +427,19 @@ function GetSub_project(Project_Id){
                 $('#txtproject_name').val(data.project_name);
                 $('#txtprojectcode').val(data.project_code);
 
-                if (data.sub_project[0].Sub_Project_Id != null){
+                if (data.sub_project[0].Sub_Project_Name != null){
                     var count=data.sub_project.length;
                     if( count> 0)
                     {
                         for(var i=0;i<count;i++)
                         {
                             varHtml+='<tr>';
-                            varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Sub_Project_Id +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].S_No +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Sub_Project_Name +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Sub_Project_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Center_Name +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Start_Date +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].End_Date +'</td>';
                             varHtml+='</tr>';
                         }
                         
