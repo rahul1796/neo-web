@@ -3260,10 +3260,10 @@ SELECT					cb.name as candidate_name,
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4]}
             response.append(h)
 
-        out = {'contracts':response,'Customer_Name':row[3],'Funding_Source':row[4],'Customer_Group':row[5],'Industry_type':row[6]}
+        out = {'contracts':response,'Customer_Name':row[5],'Funding_Source':row[6],'Customer_Group':row[7],'Industry_type':row[8]}
         cur.commit()
         cur.close()
         con.close()       
@@ -3278,10 +3278,10 @@ SELECT					cb.name as candidate_name,
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2], ""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5]}
             response.append(h)
 
-        out = {'sub_project':response,'project_name':row[3],'project_code':row[4]}
+        out = {'sub_project':response,'project_name':row[6],'project_code':row[7]}
         cur.commit()
         cur.close()
         con.close()       

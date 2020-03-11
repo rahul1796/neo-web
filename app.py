@@ -2481,7 +2481,6 @@ class project_list(Resource):
             print(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
             return Master.project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status)
 
-
 class add_project_details(Resource):
     @staticmethod
     def post():
