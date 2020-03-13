@@ -262,7 +262,6 @@ class get_center_details(Resource):
         if request.method == 'GET':
             return jsonify(Master.AllCenters(g.center_id))
 
-
 class get_all_BU(Resource):
     @staticmethod
     def get():
@@ -4052,6 +4051,18 @@ class GetSubProjectsForCenter(Resource):
             response={"SubProjects":Master.GetSubProjectsForCenter(center_id)}
             return response
 api.add_resource(GetSubProjectsForCenter,'/GetSubProjectsForCenter')
+
+class Get_all_Center(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.Get_all_Center_db()
+                return {'Center':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(Get_all_Center,'/Get_all_Center')
+
 if __name__ == '__main__':    
     app.run(debug=True)
 

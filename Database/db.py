@@ -787,6 +787,7 @@ class Database:
         cur.close()
         con.close()
         return content
+        
     def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, course, region, center):
         #print(status, customer, project, course, region, center)
         content = {}
@@ -3241,6 +3242,21 @@ SELECT					cb.name as candidate_name,
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec [masters].[get_all_product]'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    def Get_all_Center_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[get_all_Center]'
         cur.execute(sql)
         columns = [column[0].title() for column in cur.description]
         for row in cur:

@@ -468,5 +468,4 @@ function GetSub_project(Project_Id){
         }
     });
     return false;
-    
 } 
