@@ -787,27 +787,29 @@ class Database:
         cur.close()
         con.close()
         return content
-    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, course, region, center):
+        
+    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center):
         #print(status, customer, project, course, region, center)
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, course, region, center)
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[19]
-            fil=row[18]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16],""+columns[17]+"":row[17]}
+            record=row[15]
+            fil=row[14]
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13]}
             d.append(h)
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
         return content
+
     def add_batch_details(batch_id,batch_name,course_id,batch_code,center_id,trainer_id,center_manager_id,start_date,end_date,start_time,end_time,user_id,is_active,actual_start_date,actual_end_date):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -828,6 +830,7 @@ class Database:
                     if pop==2:
                         msg={"message":"Batch with the Batch code already exists","batch_flag":2}
         return msg
+
     def get_batch_details(batch_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -1107,7 +1110,7 @@ class Database:
         center = []
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = """SELECT distinct cen.center_id,cen.center_name FROM masters.tbl_center As cen LEFT JOIN masters.tbl_map_course_center As map on map.center_id=cen.center_id where cen.is_active=1 and cen.is_deleted=0 and ('{}'='-1' or '{}'='' or cen.region_id in (select value from string_split('{}',',') where trim(value)!='')) and ('{}'='-1' or map.course_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(RegionId, RegionId, RegionId, course_id, course_id)
+        sql = """SELECT distinct cen.center_id,cen.center_name FROM masters.tbl_center As cen left join masters.tbl_states as st on st.state_id=cen.state_id where cen.is_active=1 and cen.is_deleted=0 and ('{}'='-1' or '{}'='' or st.region_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(RegionId, RegionId, RegionId)
         cur2.execute(sql)
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
@@ -3100,7 +3103,7 @@ SELECT					cb.name as candidate_name,
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
         #print(client_id)
-        sql = """SELECT * FROM masters.tbl_projects WHERE is_active=1 and is_deleted=0 and ('{}'='-1' or client_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(client_id, client_id)  #'{}'='' or 
+        sql = """SELECT project_id, project_name FROM masters.tbl_projects WHERE is_active=1 and is_deleted=0 and ('{}'='-1' or customer_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(client_id, client_id)  #'{}'='' or 
         cur2.execute(sql)
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
@@ -3251,6 +3254,21 @@ SELECT					cb.name as candidate_name,
         con.close()       
         return response
 
+    def Get_all_Center_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[get_all_Center]'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
     def GetContractbycustomer_db(Customer_Id):
         response=[]
         con = pyodbc.connect(conn_str)
@@ -3286,3 +3304,18 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return out
+
+    def get_subproject_basedon_proj_multiple(project_id):
+        courses = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+
+        sql = """SELECT distinct sub_project_id, sub_project_name FROM masters.tbl_sub_projects WHERE is_active=1 and is_deleted=0 and ('{}'='-1' or project_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(project_id, project_id)  #'{}'='' or 
+        cur2.execute(sql)
+        columns = [column[0].title() for column in cur2.description]
+        for r in cur2:
+            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            courses.append(h)
+        cur2.close()
+        con.close()
+        return courses

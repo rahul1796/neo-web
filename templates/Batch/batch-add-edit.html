@@ -7,8 +7,26 @@
 <script type="text/javascript">
 var Candidates = {};
     $(document).ready(function(){
-        
-        LoadCourseList();
+        $('.dropdown-search-filter').select2({
+                placeholder:''
+            });
+        $(".date-picker").flatpickr();             
+        $(".time-picker").flatpickr({
+            enableTime: !0,
+            noCalendar: !0,
+            dateFormat: "H:i",
+            time_24hr:  !0
+            });
+        $('#StartDate').flatpickr({
+            minDate: "today"
+        });
+        $('#EndDate').flatpickr({
+            minDate: "today"
+        });
+
+        LoadProductList();
+        LoadCenterList();
+
         if('{{batch_id}}' !=0)
         {
             var URL=$('#hdn_web_url').val()+ "/GetBatchDetails";
@@ -50,20 +68,7 @@ var Candidates = {};
                 }
             });
         }
-        $('.dropdown-search-filter').select2();
-        $(".date-picker").flatpickr();             
-        $(".time-picker").flatpickr({
-            enableTime: !0,
-            noCalendar: !0,
-            dateFormat: "H:i",
-            time_24hr:  !0
-            });
-        $('#StartDate').flatpickr({
-            minDate: "today"
-        });
-        $('#EndDate').flatpickr({
-            minDate: "today"
-        });
+        
     });
 
         function myfunction(valuereceived)
@@ -71,7 +76,75 @@ var Candidates = {};
             TrainersBasedOnUsers(valuereceived,0);
             CenterManagerBasedOnUsers(valuereceived),0;
         }
-    
+        function LoadProductList()
+        {
+            var URL=$('#hdn_web_url').val()+ "/Get_all_Product"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.Product != null)
+                    {
+                        $('#ddlProduct').empty();
+                        var count=data.Product.length;
+                        if( count> 0)
+                        {
+                            $('#ddlProduct').append(new Option('Choose Product',''));
+                            for(var i=0;i<count;i++)
+                                $('#ddlProduct').append(new Option(data.Product[i].Product_Name,data.Product[i].Product_Id));
+                        }
+                        else
+                        {
+                            $('#ddlProduct').append(new Option('No Product','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+        function LoadCenterList()
+        {
+            var URL=$('#hdn_web_url').val()+ "/Get_all_Center"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.Center != null)
+                    {
+                        $('#ddlCenter').empty();
+                        var count=data.Center.length;
+                        if( count> 0)
+                        {
+                            $('#ddlCenter').append(new Option('Choose Center',''));
+                            for(var i=0;i<count;i++)
+                                $('#ddlCenter').append(new Option(data.Center[i].Center_Name,data.Center[i].Center_Id));
+                        }
+                        else
+                        {
+                            $('#ddlCenter').append(new Option('No Center','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+
         function LoadCourseList()
         {
             var URL=$('#hdn_web_url').val()+ "/AllCourseList"
@@ -106,47 +179,47 @@ var Candidates = {};
             });
             return false;
         }
-        function LoadCenterList(Course_selected,needed)
-        {
-            var URL=$('#hdn_web_url').val()+ "/CentersBasedOnCourse"
-            $.ajax({
-                type:"POST",
-                url:URL,
-                async:false,
-                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                datatype:"json",
-                data:{
-                    "course_id": Course_selected
-                },
-                success: function (data){
-                    if(data.Centers != null)
-                    {
-                        $('#ddlCenter').empty();
-                        var count=data.Centers.length;
-                        if( count> 0)
-                        {
-                            $('#ddlCenter').append(new Option('Choose Center',''));
-                            for(var i=0;i<count;i++)
-                                $('#ddlCenter').append(new Option(data.Centers[i].Center_Name,data.Centers[i].Center_Id));
-                        }
-                        else
-                        {
-                            $('#ddlCenter').append(new Option('Choose Center',''));
-                        }
-                    }
-                },
-                error:function(err)
-                {
-                    alert('Error! Please try again');
-                    return false;
-                }
-            });
-                if (needed !=0)
-                {
-                    $('#ddlCenter').val(needed);
-                }
-            return false;
-        }
+        // function LoadCenterList(Course_selected,needed)
+        // {
+        //     var URL=$('#hdn_web_url').val()+ "/CentersBasedOnCourse"
+        //     $.ajax({
+        //         type:"POST",
+        //         url:URL,
+        //         async:false,
+        //         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        //         datatype:"json",
+        //         data:{
+        //             "course_id": Course_selected
+        //         },
+        //         success: function (data){
+        //             if(data.Centers != null)
+        //             {
+        //                 $('#ddlCenter').empty();
+        //                 var count=data.Centers.length;
+        //                 if( count> 0)
+        //                 {
+        //                     $('#ddlCenter').append(new Option('Choose Center',''));
+        //                     for(var i=0;i<count;i++)
+        //                         $('#ddlCenter').append(new Option(data.Centers[i].Center_Name,data.Centers[i].Center_Id));
+        //                 }
+        //                 else
+        //                 {
+        //                     $('#ddlCenter').append(new Option('Choose Center',''));
+        //                 }
+        //             }
+        //         },
+        //         error:function(err)
+        //         {
+        //             alert('Error! Please try again');
+        //             return false;
+        //         }
+        //      });
+        //         if (needed !=0)
+        //         {
+        //             $('#ddlCenter').val(needed);
+        //         }
+        //     return false;
+        // }
 		function LoadSubCenterList(Center_selected,needed)
         {
             //alert("hello");
@@ -477,41 +550,65 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="CourseId">Course *:</label>
+                                <label for="ProductId">Product *:</label>
                             </div>
                             <div class="col-lg-6">
-                                <select id="ddlCourse" class="form-control dropdown-search-filter" name="CourseId" onchange="LoadCenterList(this.value,0)" ClientIdMode="static" required="">
-                                    <option value="">Choose Course</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                     <div class="form-group">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <label for="CenterId">Center *:</label>
-                            </div>
-                            <div class="col-lg-6">
-                                <select id="ddlCenter" class="form-control dropdown-search-filter" onchange="LoadSubCenterList(this.value,0)" name="CenterId" ClientIdMode="static"  required="">
-                                    <option value="">Choose Center</option>
+                                <select id="ddlProduct" class="form-control dropdown-search-filter" name="ProductId"> <!-- ClientIdMode="static" required="" -->>
+                                    <option selected="" value="">Choose Product</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <label for="SubCenterId">Sub Center :</label>
-                        </div>
-                        <div class="col-lg-6">
-                            <select id="ddlSubCenter" class="form-control dropdown-search-filter"  onchange="myfunction(this.value)" name="SubCenterId" ClientIdMode="static"  >
-                                <option value="">Choose Sub Center</option>
-                            </select>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="CenterId">Center :</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <select id="ddlCenter" class="form-control dropdown-search-filter"  onchange="loadcourse_list(this.value)" name="CenterId" ClientIdMode="static"  > <!-- myfunction(this.value) -->>
+                                    <option value="">Center</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-					</div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="CourseId">Course *:</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <select id="ddlCourse" class="form-control dropdown-search-filter" name="CourseId" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                    <option value="">Choose Course</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="SubProjectId">Sub Project *:</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <select id="ddlSubProject" class="form-control dropdown-search-filter" name="SubProjectId" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                    <option value="">Choose Sub Project</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="CoFundingprojectId">Co Funding Sub Project *:</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <select id="ddlCofunding" class="form-control dropdown-search-filter" name="CoFundingprojectId" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                    <option value="">Choose Co Funding Sub Project</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <!--onchange="myfunction(this.value)"-->
-                <div class="form-group">
+                    <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
                                 <label for="TrainerId">Trainer *:</label>
@@ -523,18 +620,8 @@ var Candidates = {};
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <label for="CentralManagerId">Central Manager *:</label>
-                            </div>
-                            <div class="col-lg-6">
-                                <select id="ddlCentralManager" class="form-control dropdown-search-filter" name="CentralManagerId" ClientIdMode="static" required="">
-                                    <option value="">Choose Central Manager</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+                    
+                    
                     <div class="form-group row ">
                             <div class="col-lg-6">
                                     <label for="StartDate">Start Date *:</label>
