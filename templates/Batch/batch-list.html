@@ -41,7 +41,7 @@
                     </div>     
                     <!-- end page title -->
                     
-                    <div id="get0" class="row">  <!--  id="get0"  -->>
+                    <div id="get0" class="row">  <!--  id="get0"  -->
                         <div class="col-12">
                             <div class="card-box">
                                 <div class="row">
@@ -53,13 +53,13 @@
                                     </div>
                                     <div class="col-lg-3">
                                         <label for="ddlProject" class="mr-2">Project</label>
-                                        <select class="form-control dropdown-search-filter" onchange="LoadCourse();" id="ddlProject" multiple>
+                                        <select class="form-control dropdown-search-filter" onchange="LoadSubProject();" id="ddlProject" multiple>
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
                                     <div class="col-lg-3">
-                                        <label for="ddlCourse" class="mr-2">Course</label>
-                                        <select class="form-control dropdown-search-filter" onchange="LoadCenter();" id="ddlCourse" multiple>
+                                        <label for="ddlSubProject" class="mr-2">Sub Project</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlSubProject" multiple>  <!-- onchange="LoadCenter();"-->>
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
@@ -78,13 +78,11 @@
                                         </select>
                                     </div>
                                     <div class="col-lg-3">
-                                        <label for="ddlStatus" class="mr-2">Batch Status</label>
-                                        <select class="form-control dropdown-search-filter1" id="ddlStatus"  >
-                                            
-                                        </select>
+										<label for="ddlStatus" class="mr-2">Batch Status</label>
+										<select class="form-control dropdown-search-filter" id="ddlStatus" >
+											<option selected="" value="">All</option>
+										</select>
                                     </div>
-                                    <!-- end col-->
-									
                                     <div class="col-lg-1" style="float: center; margin-top: 30px">
                                         <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTable()">Search</button>
                                     </div>
@@ -112,19 +110,19 @@
                                             <thead>
                                                 <tr>
                                                     <th>S No</th>
-                                                    <th>Actions</th>
                                                     <th>Batch Name</th>
                                                     <th>Batch Code</th>
-                                                    <th>Course</th>
+                                                    <th>Product</th>
                                                     <th>Center</th>
-                                                    <th>Trainer</th>
-                                                    <th>Center Manager</th>
+                                                    <th>Course</th>
+                                                    <th>Sub Project</th>
+                                                    <th>Trainer Email</th>
+                                                    <th>Center Manager Email</th>
                                                     <th>Start Date</th>
                                                     <th>End Date</th>
                                                     <th>Start Time</th>
                                                     <th>End Time</th>
-                                                    <th>Actual Start Date</th>
-                                                    <th>Actual End Date</th>
+                                                    <th>Status</th>
                                                 </tr>
                                             </thead>
                                         
@@ -246,7 +244,3 @@
                 </div>
             </div>
         </div><!--/.modal-->
-        
-        
-        
-        

@@ -10,12 +10,11 @@ $(document).ready(function () {
     $('.dropdown-search-filter').select2({
         placeholder:''
     });
-
-    $('#ddlStatus').append(new Option('ALL','-1'));
-	$('#ddlStatus').append(new Option('Active','1'));
-    $('#ddlStatus').append(new Option('InActive','0'));
-
-    LoadRegionddl();       
+    $('#ddlStatus').append(new Option('Yet To Start','1'));
+    $('#ddlStatus').append(new Option('Open','2'));
+    $('#ddlStatus').append(new Option('Expired','3'));
+    
+    LoadRegionddl();
     loadClient();
     LoadTable(); 
     role_id=parseInt($('#hdn_home_user_role_id').val());
@@ -48,7 +47,7 @@ function LoadRegionddl(){
                 var count=data.Regions.length;
                 if( count> 0)
                 {
-                    $('#ddlRegion').append(new Option('ALL','-1'));
+                    //$('#ddlRegion').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
                         $('#ddlRegion').append(new Option(data.Regions[i].Region_Name,data.Regions[i].Region_Id));
                     //$('#ddlCourse').val('-1');
@@ -84,9 +83,9 @@ function loadClient(){
                 var count=data.Clients.length;
                 if( count> 0)
                 {
-                    $('#ddlClient').append(new Option('ALL','-1'));
+                    //$('#ddlClient').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
-                        $('#ddlClient').append(new Option(data.Clients[i].Client_Name,data.Clients[i].Client_Id));
+                        $('#ddlClient').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
                 }
                 else
                 {
@@ -121,7 +120,7 @@ function LoadProject(){
                 var count=data.Projects.length;
                 if( count> 0)
                 {
-                    $('#ddlProject').append(new Option('ALL','-1'));
+                    //$('#ddlProject').append(new Option('ALL','-1'));  , 
                     for(var i=0;i<count;i++)
                         $('#ddlProject').append(new Option(data.Projects[i].Project_Name,data.Projects[i].Project_Id));
                 }
@@ -139,8 +138,9 @@ function LoadProject(){
     });
     return false;
 }
-function LoadCourse(){
-    var URL=$('#hdn_web_url').val()+ "/get_cand_course_basedon_proj_multiple"
+function LoadSubProject(){
+    //alert($('#ddlProject').val().toString())
+    var URL=$('#hdn_web_url').val()+ "/get_subproject_basedon_proj_multiple"
     $.ajax({
         type:"POST",
         url:URL,
@@ -151,19 +151,19 @@ function LoadCourse(){
             "ProjectId":$('#ddlProject').val().toString()
         },
         success: function (data){
-            if(data.Courses != null)
+            if(data.Sub_Project != null)
             {
-                $('#ddlCourse').empty();
-                var count=data.Courses.length;
+                $('#ddlSubProject').empty();
+                var count=data.Sub_Project.length;
                 if( count> 0)
                 {
-                    $('#ddlCourse').append(new Option('ALL','-1'));
+                    //$('#ddlCourse').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
-                        $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
+                        $('#ddlSubProject').append(new Option(data.Sub_Project[i].Sub_Project_Name,data.Sub_Project[i].Sub_Project_Id));
                 }
                 else
                 {
-                    $('#ddlCourse').append(new Option('ALL','-1'));
+                    $('#ddlSubProject').append(new Option('ALL','-1'));
                 }
             }
         },
@@ -185,7 +185,7 @@ function LoadCenter(){
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
         data:{
-            "CourseId":$('#ddlCourse').val().toString(),
+            "CourseId":"",
             "RegionId":$('#ddlRegion').val().toString()
         },
         success: function (data){
@@ -195,7 +195,7 @@ function LoadCenter(){
                 var count=data.Centers.length;
                 if( count> 0)
                 {
-                    $('#ddlCenter').append(new Option('ALL','-1'));
+                    //$('#ddlCenter').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
                         $('#ddlCenter').append(new Option(data.Centers[i].Center_Name,data.Centers[i].Center_Id));
                 }
@@ -237,7 +237,7 @@ function LoadTable()
                 d.status = $('#ddlStatus').val();
                 d.customer = $('#ddlClient').val().toString();
                 d.project = $('#ddlProject').val().toString();
-                d.course = $('#ddlCourse').val().toString();
+                d.sub_project = $('#ddlSubProject').val().toString();
                 d.region = $('#ddlRegion').val().toString();
                 d.center = $('#ddlCenter').val().toString();
             },
@@ -248,28 +248,31 @@ function LoadTable()
         },
 
         "columns": [
+
+            								
             { "data": "S_No"},
-            { "visible":(($('#hdn_home_user_role_id').val() =='1') || ($('#hdn_home_user_role_id').val() =='5')||($('#hdn_home_user_role_id').val() =='15')) ?true: false,
-            "data": function (row, type, val, meta) {
-                var varButtons = ""; 
+            // { "visible":(($('#hdn_home_user_role_id').val() =='1') || ($('#hdn_home_user_role_id').val() =='5')||($('#hdn_home_user_role_id').val() =='15')) ?true: false,
+            // "data": function (row, type, val, meta) {
+            //     var varButtons = ""; 
                 
-                if(role_id == 1 || role_id == 15 || role_id ==5)//|| role_id == 7 || role_id == 5 || role_id == 4
-                    varButtons += '<a onclick="EditBatchDetail(\'' + row.Batch_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Batch" class="fas fa-edit" ></i></a><a onclick="MapCandidateBatch('+row.Course_Id+','+row.Center_Id+','+row.Batch_Id+')" class="btn" style="cursor:pointer" ><i title="Map Candidate" class="fas fa-plus" ></i></a><a onclick="DropCandidateBatch('+row.Course_Id+','+row.Center_Id+','+row.Batch_Id+')" class="btn" style="cursor:pointer" ><i title="Drop Candidate" class="fas fa-minus" ></i></a>';
-                return varButtons;
-                }
-            },
+            //     if(role_id == 1 || role_id == 15 || role_id ==5)//|| role_id == 7 || role_id == 5 || role_id == 4
+            //         varButtons += '<a onclick="EditBatchDetail(\'' + row.Batch_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Batch" class="fas fa-edit" ></i></a><a onclick="MapCandidateBatch('+row.Course_Id+','+row.Center_Id+','+row.Batch_Id+')" class="btn" style="cursor:pointer" ><i title="Map Candidate" class="fas fa-plus" ></i></a><a onclick="DropCandidateBatch('+row.Course_Id+','+row.Center_Id+','+row.Batch_Id+')" class="btn" style="cursor:pointer" ><i title="Drop Candidate" class="fas fa-minus" ></i></a>';
+            //     return varButtons;
+            //     }
+            // },	
             { "data": "Batch_Name" },
             { "data": "Batch_Code"},
-            { "data": "Course_Name" },
+            { "data": "Product_Name" },
             { "data": "Center_Name" },
-            { "data": "Trainer_Name" },
-            { "data": "Center_Manager_Name" },
+            { "data": "Course_Name" },
+            { "data": "Sub_Project_Name" },
+            { "data": "Trainer_Email" },
+            { "data": "Center_Manager_Email" },
             { "data": "Start_Date" },
             { "data": "End_Date" },
-            { "data": "Start_Time" },
-            { "data": "End_Time" },
-            { "data": "Actual_Start_Date"},
-            { "data": "Actual_End_Date"}
+            { "data": "Start_Time"},
+            { "data": "End_Time"},
+            { "data": "Status"}
         ],
         drawCallback: function(){
             $('#tbl_batchs_paginate ul.pagination').addClass("pagination-rounded");

@@ -802,22 +802,24 @@ class batch_list_updated(Resource):
     def post():
         if request.method == 'POST':
             batch_id = request.form['batch_id'] 
+
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
+
             user_role_id  = request.form['user_role_id']
             user_id = request.form['user_id']
             status = request.form['status']
             customer = request.form['customer']
             project = request.form['project']
-            course = request.form['course']
+            sub_project = request.form['sub_project']
             region = request.form['region']
             center = request.form['center']
             
-            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, course, region, center)
+            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center)
 
 class add_batch_details(Resource):
     @staticmethod
@@ -4062,6 +4064,15 @@ class Get_all_Center(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(Get_all_Center,'/Get_all_Center')
+
+class get_subproject_basedon_proj_multiple(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            project_id=request.form['ProjectId']
+            return {"Sub_Project": Database.get_subproject_basedon_proj_multiple(project_id)} 
+api.add_resource(get_subproject_basedon_proj_multiple,'/get_subproject_basedon_proj_multiple')
+
 
 if __name__ == '__main__':    
     app.run(debug=True)
