@@ -10,10 +10,13 @@ $(document).ready(function () {
     $('.dropdown-search-filter').select2({
         placeholder:''
     });
+
+    $('#ddlStatus').empty();
     $('#ddlStatus').append(new Option('Yet To Start','1'));
     $('#ddlStatus').append(new Option('Open','2'));
     $('#ddlStatus').append(new Option('Expired','3'));
     
+    LoadCenterType();
     LoadRegionddl();
     loadClient();
     LoadTable(); 
@@ -234,12 +237,13 @@ function LoadTable()
                 d.batch_id = 0;
 		        d.user_id = $('#hdn_home_user_id').val();
                 d.user_role_id  = $('#hdn_home_user_role_id').val();
-                d.status = $('#ddlStatus').val();
+                d.status = $('#ddlStatus').val().toString();
                 d.customer = $('#ddlClient').val().toString();
                 d.project = $('#ddlProject').val().toString();
                 d.sub_project = $('#ddlSubProject').val().toString();
                 d.region = $('#ddlRegion').val().toString();
                 d.center = $('#ddlCenter').val().toString();
+                d.center_type = $('#ddlCenterType').val().toString();
             },
             error: function (e) {
                 $("#tbl_batchs tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -277,7 +281,6 @@ function LoadTable()
         drawCallback: function(){
             $('#tbl_batchs_paginate ul.pagination').addClass("pagination-rounded");
         }
-
     });
 }
 function EditBatchDetail(BatchId)
@@ -541,4 +544,105 @@ function add_map_message(){
                         return false;
                     }
                 });
+        }
+
+        function GetProjectDetails(CenterId,CenterName)
+        {
+            var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForCenter?center_id="+CenterId;
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                overflow:true,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    varHtml='';
+                    $("#tblSubProject tbody").empty();
+                    if(!jQuery.isEmptyObject(data.SubProjects))
+                    {   if (data.SubProjects != null){
+                            count=data.SubProjects.length;
+                            if (count>0)
+                            {   varHtml='';
+                                console.log(count);
+                                for(var i=0;i<count;i++)
+                                {
+                                    td_open= '  <td style="text-align:center;">' ;
+                                    td_close=   '</td>';       
+                                    varHtml+='<tr>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].S_No +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ CenterName +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Sub_Project_Code +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Sub_Project_Name +'</td>';                    
+                                    varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Code +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Name +'</td>';  
+                                    varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Bu +'</td>';         
+                                    varHtml+='</tr>';
+                                    $("#tblSubProject tbody").append(varHtml);
+                                    $('#divSubProjectList').modal('show');
+                                    varHtml='';
+                                }
+                            }
+                            else
+                            {
+                                varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                                $("#tblSubProject tbody").append(varHtml);
+                                $('#divSubProjectList').modal('show');
+                            } 
+                            
+                        }
+                    }
+                    else
+                    {
+                        varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                        $("#tblSubProject tbody").append(varHtml);
+                        $('#divSubProjectList').modal('show');
+                    }   
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+
+        function LoadCenterType()
+        {       
+            var URL=$('#hdn_web_url').val()+ "/AllCenterTypes"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                        "user_id": $('#hdn_home_user_id').val(),
+                        "user_role_id" : $('#hdn_home_user_role_id').val()
+                },
+                success: function (data){
+                    if(data.Center_Types != null)
+                    {
+                        $('#ddlCenterType').empty();
+                        var count=data.Center_Types.length;
+                        if( count> 0)
+                        {
+                            for(var i=0;i<count;i++)
+                                $('#ddlCenterType').append(new Option(data.Center_Types[i].Center_Type_Name,data.Center_Types[i].Center_Type_Id));                    
+                        }
+                        else
+                        {
+                            $('#ddlCenterType').append(new Option('ALL',''));
+                        }
+                        $("#ddlCenterType option[value='']").attr('disabled','disabled');
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
         }

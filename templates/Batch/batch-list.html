@@ -5,6 +5,12 @@
          <link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
         <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
          <!-- third party css end -->
+
+         <!-- App css -->
+        <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
         <style>
             .center {
                 margin: auto;
@@ -78,8 +84,14 @@
                                         </select>
                                     </div>
                                     <div class="col-lg-3">
+                                        <label for="ddlCenterType" class="mr-2">Center Type</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlCenterType" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
 										<label for="ddlStatus" class="mr-2">Batch Status</label>
-										<select class="form-control dropdown-search-filter" id="ddlStatus" >
+										<select class="form-control dropdown-search-filter" id="ddlStatus" multiple>
 											<option selected="" value="">All</option>
 										</select>
                                     </div>
@@ -218,7 +230,6 @@
         <!-- third party js ends -->
         <script src="static/assets/js/pages/batch-list.js"></script>
 
-
         <div id="con_close_modal" class="modal fade" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -244,3 +255,36 @@
                 </div>
             </div>
         </div><!--/.modal-->
+
+        <div id="divSubProjectList" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Sub Project List</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <table id="tblSubProject" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                            <thead>                        
+                                <tr style="background-color: #f5f6f8;">
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Name</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Code</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Name</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Code</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Name</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Business Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        
+                            </tbody>
+                        </table>	
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->    
