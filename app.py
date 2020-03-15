@@ -801,7 +801,20 @@ class batch_list_updated(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
+            
             batch_id = request.form['batch_id'] 
+            
+            user_role_id  = request.form['user_role_id']
+            user_id = request.form['user_id']
+            customer = request.form['customer']
+            project = request.form['project']
+            sub_project = request.form['sub_project']
+            region = request.form['region']
+            center = request.form['center']
+            center_type = request.form['center_type']
+            print('before hi')
+            status = request.form['status']
+            print('hi')
 
             start_index = request.form['start']
             page_length = request.form['length']
@@ -810,16 +823,7 @@ class batch_list_updated(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
 
-            user_role_id  = request.form['user_role_id']
-            user_id = request.form['user_id']
-            status = request.form['status']
-            customer = request.form['customer']
-            project = request.form['project']
-            sub_project = request.form['sub_project']
-            region = request.form['region']
-            center = request.form['center']
-            
-            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center)
+            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type)
 
 class add_batch_details(Resource):
     @staticmethod
@@ -4073,6 +4077,20 @@ class get_subproject_basedon_proj_multiple(Resource):
             return {"Sub_Project": Database.get_subproject_basedon_proj_multiple(project_id)} 
 api.add_resource(get_subproject_basedon_proj_multiple,'/get_subproject_basedon_proj_multiple')
 
+#QP_API's
+@app.route("/sales_dashboard_page")
+def sales_dashboard_page():
+    if g.user:
+        return render_template("Report-powerbi/sales_dashboard.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/sales_dashboard")
+def sales_dashboard():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="sales_dashboard_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
 
 if __name__ == '__main__':    
     app.run(debug=True)
