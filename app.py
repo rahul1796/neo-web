@@ -1105,21 +1105,25 @@ class candidate_list(Resource):
     def post():
         if request.method == 'POST':
             candidate_id = request.form['candidate_id']
-            client_id = request.form['client_id']
-            project_id = request.form['project_id']
-            center_id = request.form['center_id']
-            course_ids = request.form['course_id']
-            section_id = request.form['section_id']
+            sub_project = request.form['sub_project']
+            project = request.form['project']
+            region = request.form['region']
+            customer = request.form['customer']
+            status = request.form['status']
+            center_type = request.form['center_type']
+            center = request.form['center']
+            user_id=request.form['user_id']
+            user_role_id=request.form['user_role_id']
+            
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            user_id=request.form['user_id']
-            user_role_id=request.form['user_role_id']
-            # print(candidate_id,client_id,project_id,course_ids,center_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-            return Candidate.candidate_list(candidate_id,client_id,project_id,center_id,course_ids,section_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, user_id, user_role_id)
+            
+            print(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Candidate.candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 
 
 api.add_resource(candidate_list, '/candidate_list')

@@ -1033,22 +1033,25 @@ class Database:
         con.close()
         return h
 
-    def candidate_list(candidate_id,client_id,project_id,center_id,course_ids,section_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id, user_role_id):
+    def candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
+        h={}
+        
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_web_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (candidate_id,client_id,project_id,center_id,course_ids,section_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id, user_role_id)
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?'
+        values = (candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[7]
-            fil=row[6]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5]}
-            d.append(h)
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())            
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
