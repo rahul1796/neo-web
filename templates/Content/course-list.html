@@ -2,7 +2,12 @@
         
         <link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
         <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
-        <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
+        <!--link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /-->
+
+        <!-- App css -->
+        <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
         
 		<style>
             .center {
@@ -11,7 +16,7 @@
                 padding: 20px;
                 box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
             }
-            
+        
             .hidedialog {
                 display: none;
             }
@@ -64,8 +69,14 @@
                                                 <!--option selected="" value="0">All</option-->
                                             </select>
                                         </div>
-                                        <div class="col-lg-4">
-                                                <button style="float: right; margin-top: 30px;" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+                                        <div class="col-lg-3">
+                                            <label for="ddlStatus" class="mr-2">Status</label>
+                                            <select class="form-control dropdown-search-filter" id="ddlStatus">
+                                                <option selected="" value="">All</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-3">
+                                                <button  type="button" style="margin-top: 30px;" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button> <!--float: right;   -->
                                         </div><!-- end col-->
                                     </div> <!-- end row -->
                                 </div> <!-- end card-box -->

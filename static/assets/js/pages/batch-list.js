@@ -267,7 +267,26 @@ function LoadTable()
             { "data": "Batch_Name" },
             { "data": "Batch_Code"},
             { "data": "Product_Name" },
-            { "data": "Center_Name" },
+            {
+                "data": function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Center_Name=="")
+                        {
+                            //console.log(row.Center_Id);
+                            varButtons=row.Center_Name;
+                        }
+                        
+                    else
+                    {   
+                        //console.log(row.Center_Id);
+                        //varButtons += '<a onclick="GetProjectDetails(\'' + row.Center_Id +  '\' )"  style="color:blue;cursor:pointer" >' + row.Center_Id + '</a>';
+                        varButtons += '<a onclick="GetProjectDetails(\'' + row.Center_Id + '\',\'' + row.Center_Name + '\' )"  style="color:blue;cursor:pointer" >' + row.Center_Name + '</a>';
+                    }
+                    
+                    return varButtons;
+                    }
+            },
+            //{ "data": "Center_Name" },
             { "data": "Course_Name" },
             { "data": "Sub_Project_Name" },
             { "data": "Trainer_Email" },
