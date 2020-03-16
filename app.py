@@ -472,7 +472,7 @@ def course_list_page():
         return render_template("Content/course-list.html")
     else:
         return render_template("login.html",error="Session Time Out!!")
-        
+
 @app.route("/course")
 def course():
     if g.user:
@@ -812,9 +812,9 @@ class batch_list_updated(Resource):
             region = request.form['region']
             center = request.form['center']
             center_type = request.form['center_type']
-            print('before hi')
+            #print('before hi')
             status = request.form['status']
-            print('hi')
+            #print('hi')
 
             start_index = request.form['start']
             page_length = request.form['length']
@@ -4091,6 +4091,14 @@ def sales_dashboard():
         return render_template("home.html",values=g.User_detail_with_ids,html="sales_dashboard_page")
     else:
         return render_template("login.html",error="Session Time Out!!")
+
+class get_user_details_new(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            user_id=int(request.args['user_id'])
+            return UsersM.get_user(user_id)
+api.add_resource(get_user_details_new,'/get_user_details_new')
 
 if __name__ == '__main__':    
     app.run(debug=True)

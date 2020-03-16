@@ -289,7 +289,26 @@ function LoadTable()
             //{ "data": "Center_Name" },
             { "data": "Course_Name" },
             { "data": "Sub_Project_Name" },
-            { "data": "Trainer_Email" },
+            {
+                "data": function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Trainer_Email=="")
+                        {
+                            //console.log(row.Center_Id);
+                            varButtons=row.Trainer_Email;
+                        }
+                        
+                    else
+                    {   //console.log(row.Trainer_Id)
+                        //console.log(row.Center_Id);
+                        //varButtons += '<a onclick="GetProjectDetails(\'' + row.Center_Id +  '\' )"  style="color:blue;cursor:pointer" >' + row.Center_Id + '</a>';
+                        varButtons += '<a onclick="GetUserDetail(\'' + row.Trainer_Id + '\',\'' + 'trainer' + '\' )"  style="color:blue;cursor:pointer" >' + row.Trainer_Email + '</a>';
+                    }
+                    
+                    return varButtons;
+                    }
+            },
+            //{ "data": "Trainer_Email" },
             { "data": "Center_Manager_Email" },
             { "data": "Start_Date" },
             { "data": "End_Date" },
@@ -656,6 +675,40 @@ function add_map_message(){
                         }
                         $("#ddlCenterType option[value='']").attr('disabled','disabled');
                     }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+
+        function GetUserDetail(user_id,type)
+        {
+            var URL=$('#hdn_web_url').val()+ "/get_user_details_new?user_id="+user_id;
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                overflow:true,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+
+                    $('#txtEmployee_Code').val(data.UserDetail.Employee_Code);
+                    $('#txtname').val(data.UserDetail.Name);
+                    $('#txtEmail').val(data.UserDetail.Email);
+                    $('#txtMobile_Number').val(data.UserDetail.Mobile_Number);
+                    $('#txtEmployment_Grade').val(data.UserDetail.Employment_Grade_Id);
+                    $('#txtEmployment_Status').val(data.UserDetail.Employment_Status_Id);
+                    $('#txtReporting_Manager_Name').val(data.UserDetail.Reporting_Manager_Name);
+                    $('#txtEmployee_Department_Name').val(data.UserDetail.Employee_Department_Name);
+                    $('#txtEntity_Name').val(data.UserDetail.Entity_Name);
+
+                    $('#trainer_details_modal').modal('show');
+                          
                 },
                 error:function(err)
                 {
