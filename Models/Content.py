@@ -1,7 +1,7 @@
 from Database import Database
 class Content:
-    def course_list(course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        course_l = Database.course_list(course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def course_list(course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status):
+        course_l = Database.course_list(course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status)
         return course_l
     def AllPractice():
         practice_list={"Pratices":Database.GetPractice()}

@@ -472,7 +472,7 @@ def course_list_page():
         return render_template("Content/course-list.html")
     else:
         return render_template("login.html",error="Session Time Out!!")
-
+        
 @app.route("/course")
 def course():
     if g.user:

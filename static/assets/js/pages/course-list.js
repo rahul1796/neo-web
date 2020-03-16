@@ -5,14 +5,19 @@ $(document).ready(function () {
 	$('.dropdown-search-filter').select2({
                 placeholder:''
             });
+            
+    $('#ddlStatus').empty();
+    $('#ddlStatus').append(new Option('ALL','-1'));
+    $('#ddlStatus').append(new Option('Active','1'));
+    $('#ddlStatus').append(new Option('InActive','0'));
+
     LoadSectorddl();
-	LoadTable('','');
+	LoadTable('','','');
     role_id=parseInt($('#hdn_home_user_role_id').val());
     // if(role_id == 3 || role_id == 8)
     //     $('#btn_create').hide();
 });
-
-function LoadTable(sectors, qps)
+function LoadTable(sectors, qps, status)
 {
     vartable1 = $("#tbl_courses").DataTable({
         "serverSide": true,
@@ -32,6 +37,7 @@ function LoadTable(sectors, qps)
                 d.course_id = 0;
                 d.sectors = sectors;
                 d.qps = qps;
+                d.status = status;
             },
             error: function (e) {
                 $("#tbl_courses tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -55,16 +61,18 @@ function LoadTable(sectors, qps)
             { "data": "Qp_Code" },
             { "data": "Qp_Name" },
             { "visible":false,"data": "Practice_Name" },
-            { "data": function (row, type, val, meta) {
-                var varStatus = ""; 
-                if(row.Is_Active)
-                    varStatus="Active";
-                else
-                    varStatus="In Active";
-                return varStatus;
-                }
-            }
+            {"data": "Is_Active"}
+            // { "data": function (row, type, val, meta) {
+            //     var varStatus = ""; 
+            //     if(row.Is_Active)
+            //         varStatus="Active";
+            //     else
+            //         varStatus="In Active";
+            //     return varStatus;
+            //     }
+            // }
         ],
+        
         drawCallback: function(){
             $('#tbl_courses_paginate ul.pagination').addClass("pagination-rounded");
         }
@@ -162,5 +170,5 @@ function LoadQPddl()
 
 function LoadTableBasedOnSearch(){
     $("#tbl_courses").dataTable().fnDestroy();
-    LoadTable($('#ddlSector').val().toString(),$('#ddlQP').val().toString()); 
+    LoadTable($('#ddlSector').val().toString(),$('#ddlQP').val().toString(),$('#ddlStatus').val()); 
 }
