@@ -1,30 +1,4 @@
 var varTable;
-$(document).ready(function () {
-    $("#alternative-page-datatable").dataTable().fnDestroy();
-	$('.dropdown-search-filter').select2({
-                placeholder:''
-            });
-    
-    $('#ddlStatus').append(new Option('Yet To Start','1'));
-    $('#ddlStatus').append(new Option('Open','2'));
-    $('#ddlStatus').append(new Option('Expired','3'));
-
-    LoadEntitydl();
-    LoadCustomerdl();
-    LoadProjectGroupdl();
-    LoadBlockdl();
-    LoadPracticedl();
-    LoadBUdl();
-    LoadProductdl();
-    LoadTable(); 
-                 
-  /*  $("#alternative-page-datatable").DataTable({
-		pagingType: "full_numbers",
-		drawCallback: function () {
-			$(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-		}
-    })*/
-});
 function LoadEntitydl(){
     var URL=$('#hdn_web_url').val()+ "/Get_all_Entity"
         $.ajax({

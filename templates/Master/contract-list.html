@@ -20,10 +20,17 @@
         $(".date-picker").flatpickr({
             dateFormat:'d-M-Y'
         });
+        
+        $('#ddlStage').empty();
+        $('#ddlStage').append(new Option('Yet To Start','0'));
+        $('#ddlStage').append(new Option('Open','1'));
+        $('#ddlStage').append(new Option('Expired','2'));
         LoadCustomers();
         //LoadStages();
         Loadentityddl();
         LoadSalesCategoryddl();
+        if ('{{status}}'==1)
+            $('#ddlStage').val("1");
         LoadTable(); 
         role_id=parseInt($('#hdn_home_user_role_id').val());        
     });
@@ -266,10 +273,8 @@
                             <div class="col-lg-3">
                                 <label for="ddlStage" class="mr-2">Stage</label>
                                 <select class="form-control dropdown-search-filter" id="ddlStage" multiple >
-                                     <option value="0">Yet To Start</option> 
-                                     <option value="1">Open</option> 
-                                     <option value="2">Expired</option> 
-                                </select>
+
+                                 </select>
                             </div>
                             <div class="col-lg-3">
                                 <label for="ddlSalesCategory" class="mr-2">Sales Category</label>

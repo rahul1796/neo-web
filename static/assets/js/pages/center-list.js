@@ -1,19 +1,4 @@
 var varTable;
-$(document).ready(function () {
-    $("#tbl_centers").dataTable().fnDestroy();
-    
-    $('.dropdown-search-filter').select2({
-        placeholder:''
-    });
-    role_id=parseInt($('#hdn_home_user_role_id').val());
-    if(role_id == 5)
-        $('#btn_create').hide();
-    LoadCenterType();
-    LoadBuddl();
-	LoadCourseddl();
-	LoadRegionddl();
-    LoadTable(); 
-});
 
 function LoadCenterType()
 {       

@@ -1,22 +1,5 @@
 var varTable;
 var role_id;
-$(document).ready(function () {
-    $("#tbl_courses").dataTable().fnDestroy();
-	$('.dropdown-search-filter').select2({
-                placeholder:''
-            });
-            
-    $('#ddlStatus').empty();
-    $('#ddlStatus').append(new Option('ALL','-1'));
-    $('#ddlStatus').append(new Option('Active','1'));
-    $('#ddlStatus').append(new Option('InActive','0'));
-
-    LoadSectorddl();
-	LoadTable('','','');
-    role_id=parseInt($('#hdn_home_user_role_id').val());
-    // if(role_id == 3 || role_id == 8)
-    //     $('#btn_create').hide();
-});
 function LoadTable(sectors, qps, status)
 {
     vartable1 = $("#tbl_courses").DataTable({

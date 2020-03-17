@@ -3,32 +3,6 @@ var varTable1;
 var flag = "";
 var role_id;
 
-$(document).ready(function () {
-    var Course=0,Batch=0;
-    $("#tbl_batchs").dataTable().fnDestroy();
-
-    $('.dropdown-search-filter').select2({
-        placeholder:''
-    });
-
-    $('#ddlStatus').empty();
-    $('#ddlStatus').append(new Option('Yet To Start','1'));
-    $('#ddlStatus').append(new Option('Open','2'));
-    $('#ddlStatus').append(new Option('Expired','3'));
-    
-    LoadCenterType();
-    LoadRegionddl();
-    loadClient();
-    LoadTable(); 
-    role_id=parseInt($('#hdn_home_user_role_id').val());
-    if(role_id == 1 || role_id ==5 || role_id ==15)
-        $('#btn_create').show();
-    else 
-        $('#btn_create').hide();
-	// if(role_id == 7 || role_id==5 || role_id == 4)
-	// 	$('#btn_create').hide();
-});
-
 function LoadRegionddl(){
     var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
         $.ajax({

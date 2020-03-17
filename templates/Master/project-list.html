@@ -10,7 +10,37 @@
         <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
         <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+        
+        <script type="text/javascript">
+        $(document).ready(function () {
+    $("#alternative-page-datatable").dataTable().fnDestroy();
+	$('.dropdown-search-filter').select2({
+                placeholder:''
+            });
+    
+    $('#ddlStatus').append(new Option('Yet To Start','1'));
+    $('#ddlStatus').append(new Option('Open','2'));
+    $('#ddlStatus').append(new Option('Expired','3'));
 
+    LoadEntitydl();
+    LoadCustomerdl();
+    LoadProjectGroupdl();
+    LoadBlockdl();
+    LoadPracticedl();
+    LoadBUdl();
+    LoadProductdl();
+    if ('{{status}}'==1)
+        $('#ddlStatus').val('2');
+    LoadTable(); 
+                 
+  /*  $("#alternative-page-datatable").DataTable({
+		pagingType: "full_numbers",
+		drawCallback: function () {
+			$(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+		}
+    })*/
+});
+        </script>
         <form id='form1' method="POST" action="/assign_project_add_edit_to_home">
             
                 <input type="hidden" id="hdn_project_id" name="hdn_project_id" value="0">
@@ -199,7 +229,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+                                
                                     <div class="col-md-12">                                
                                         <div class="col-md-4 form-group">
                                             <h5>Customer Group</h5>                                           

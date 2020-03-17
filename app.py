@@ -195,18 +195,24 @@ def login():
             return redirect(url_for('index'))
         
 ####################################################################################################
+
+        
+
 #Center_API's
 @app.route("/center_list_page")
 def center_list_page():
     if g.user:
-        return render_template("Master/center-list.html")
+        status=request.args.get('status',-1,type=int)
+        return render_template("Master/center-list.html", status=status)
     else:
         return redirect("/")
 
 @app.route("/center")
 def center():
     if g.user:
-        return render_template("home.html",values=g.User_detail_with_ids,html="center_list_page")
+        status=request.args.get('status',-1,type=int) 
+        html_str="center_list_page?status=" + str(status)
+        return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
     else:
         return render_template("login.html",error="Session Time Out!!")
     
@@ -463,20 +469,21 @@ api.add_resource(add_center_category_details, '/add_center_category_details')
 api.add_resource(get_center_category_details, '/GetCenterCategoryDetails')
  
 ####################################################################################################
-
-
 #Course_API's
 @app.route("/course_list_page")
 def course_list_page():
     if g.user:
-        return render_template("Content/course-list.html")
+        status=request.args.get('status',-1,type=int)
+        return render_template("Content/course-list.html",status=status)
     else:
         return render_template("login.html",error="Session Time Out!!")
 
 @app.route("/course")
 def course():
     if g.user:
-        return render_template("home.html",values=g.User_detail_with_ids,html="course_list_page")
+        status=request.args.get('status',-1,type=int) 
+        html_str="course_list_page?status=" + str(status)
+        return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
     else:
         return render_template("login.html",error="Session Time Out!!")
 
@@ -741,10 +748,11 @@ api.add_resource(get_user_details, '/GetUserDetails')
 @app.route("/batch_list_page")
 def batch_list_page():
     if g.user:
+        status=request.args.get('status',-1,type=int)
         if int(g.user_role) in [11,12,13,14,18]:
             return render_template("Batch/home-batch-list.html")
         else:
-            return render_template("Batch/batch-list.html")
+            return render_template("Batch/batch-list.html", status=status)
     else:
         return render_template("login.html",error="Session Time Out!!")
 
@@ -752,7 +760,9 @@ def batch_list_page():
 @app.route("/batch")
 def batch():
     if g.user:
-        return render_template("home.html",values=g.User_detail_with_ids,html="batch_list_page")
+        status=request.args.get('status',-1,type=int) 
+        html_str="batch_list_page?status=" + str(status)
+        return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
     else:
         return render_template("login.html",error="Session Time Out!!")
 
@@ -2427,19 +2437,21 @@ api.add_resource(GetSessionDetails,'/GetSessionDetails')
 
 
 #####################################################################################################
-
 #Project_API's
 @app.route("/project_list_page")
 def project_list_page():
     if g.user:
-        return render_template("Master/project-list.html")
+        status=request.args.get('status',-1,type=int)
+        return render_template("Master/project-list.html", status=status)
     else:
         return render_template("login.html",error="Session Time Out!!")
 
 @app.route("/project")
 def project():
     if g.user:
-        return render_template("home.html",values=g.User_detail_with_ids,html="project_list_page")
+        status=request.args.get('status',-1,type=int) 
+        html_str="project_list_page?status=" + str(status)
+        return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
     else:
         return render_template("login.html",error="Session Time Out!!")
 
@@ -3396,13 +3408,13 @@ api.add_resource(get_sector_details,'/GetSectorDetails')
 
 
 ####################################################################################################
-
-
 #Contract_API's
+
 @app.route("/contract_list_page")
 def contract_list_page():
     if g.user:
-        return render_template("Master/contract-list.html")
+        status=request.args.get('status',-1,type=int)
+        return render_template("Master/contract-list.html", status=status)
     else:
         return render_template("login.html",error="Session Time Out!!")
 
@@ -3410,7 +3422,9 @@ def contract_list_page():
 @app.route("/contract")
 def contract():
     if g.user:
-        return render_template("home.html",values=g.User_detail_with_ids,html="contract_list_page")
+        status=request.args.get('status',-1,type=int) 
+        html_str="contract_list_page?status=" + str(status)
+        return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
     else:
         return render_template("login.html",error="Session Time Out!!")
 
