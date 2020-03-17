@@ -262,15 +262,16 @@ function LoadTable()
             { "data": "State_Name" },                       
             { "data": "Region_Name"},
             { "visible": false,"data": "Country_Name"},
-            { "data": function (row, type, val, meta) {
-                var varStatus = ""; 
-                if(row.Is_Active)
-                    varStatus="Active";
-                else
-                    varStatus="In Active";
-                return varStatus;
-                }
-            }
+            {"data":"Is_Active"}
+            // { "data": function (row, type, val, meta) {
+            //     var varStatus = ""; 
+            //     if(row.Is_Active)
+            //         varStatus="Active";
+            //     else
+            //         varStatus="In Active";
+            //     return varStatus;
+            //     }
+            // }
             
         ],
         "ColumnDefs":[
