@@ -22,6 +22,7 @@
         });
         
         $('#ddlStage').empty();
+        $('#ddlStage').append(new Option('Yet To Start','0'));
         $('#ddlStage').append(new Option('Open','1'));
         $('#ddlStage').append(new Option('Expired','2'));
         LoadCustomers();
@@ -207,6 +208,7 @@
                 { "data": "Contract_Code" },
                 //{ "data": "Bu_Name" },
                 { "data": "Entity_Name" },
+                { "data": "Sales_Category_Name" },
                 { "data": "Account_Manager_Name" },
                 { "data": "Sales_Manager_Name" }
                 // { "data": function (row, type, val, meta) {
@@ -271,8 +273,8 @@
                             <div class="col-lg-3">
                                 <label for="ddlStage" class="mr-2">Stage</label>
                                 <select class="form-control dropdown-search-filter" id="ddlStage" multiple >
-                                     
-                                </select>
+
+                                 </select>
                             </div>
                             <div class="col-lg-3">
                                 <label for="ddlSalesCategory" class="mr-2">Sales Category</label>
@@ -334,6 +336,7 @@
                                            <th>Contract Code</th>
                                            <!-- <th>BU</th> -->
                                            <th>Entity Name</th>
+                                           <th>Sales Category</th>
                                            <th>Account Manager</th>
                                            <th>Sales Manager</th>
                                        </tr>
