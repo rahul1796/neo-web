@@ -30,8 +30,8 @@ class Content:
         else:
             popupMessage = {"PopupMessage": Database.add_course_details(course_name,project_id,user_id,is_active,center_ids,qp_id,course_id,items,course_code)}
             return popupMessage
-    def get_course(glob_course_id):
-        indi_course={"CourseDetail":Database.get_course_details(glob_course_id)}
+    def get_course(course_id):
+        indi_course={"CourseDetail":Database.get_course_details(course_id)}
         return indi_course
     def get_qp_for_course():
         qp_t={"Qp":Database.get_qp_course()}

@@ -287,7 +287,23 @@ function LoadTable()
                     }
             },
             //{ "data": "Center_Name" },
-            { "data": "Course_Name" },
+            //{ "data": "Course_Name" },
+            {
+                "data": function (row, type, val, meta) {
+                    var varButtons = "";
+                    if(row.Course_Name=="")
+                        {
+                            varButtons=row.Course_Name;
+                        }
+                    
+                    else
+                    {   
+                        varButtons += '<a onclick="GetCourseDetail(\'' + row.Course_Id +  '\' )"  style="color:blue;cursor:pointer" >' + row.Course_Name + '</a>';
+                    }
+                    
+                    return varButtons;
+                    }
+            },
             { "data": "Sub_Project_Name" },
             {
                 "data": function (row, type, val, meta) {
@@ -297,7 +313,7 @@ function LoadTable()
                             //console.log(row.Center_Id);
                             varButtons=row.Trainer_Email;
                         }
-                        
+                    
                     else
                     {   //console.log(row.Trainer_Id)
                         //console.log(row.Center_Id);
@@ -708,6 +724,35 @@ function add_map_message(){
                     $('#txtEntity_Name').val(data.UserDetail.Entity_Name);
 
                     $('#trainer_details_modal').modal('show');
+                          
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+
+        function GetCourseDetail(course_id)
+        {
+            var URL=$('#hdn_web_url').val()+ "/GetCourseDetails?course_id="+course_id;
+            
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                overflow:true,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    
+                    $('#txtSub_Project_Name').val(data.CourseDetail.Sub_Project_Name);
+                    $('#txtCourse_Code').val(data.CourseDetail.Course_Code);
+                    $('#txtCourse_Name').val(data.CourseDetail.Course_Name);
+                    
+                    $('#course_details_modal').modal('show');
                           
                 },
                 error:function(err)

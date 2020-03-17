@@ -528,7 +528,8 @@ class GetCourseDetails(Resource):
     @staticmethod
     def get():
         if request.method == 'GET':
-            return Content.get_course(g.course_id)
+            course_id=int(request.args['course_id'])
+            return Content.get_course(course_id)
 
 class get_qp_for_course(Resource):
     @staticmethod
