@@ -140,3 +140,14 @@ class Master:
         return response
     def GetSubProjectsForCenter(center_id):
         return Database.GetSubProjectsForCenter(center_id)
+    
+    def GetProjectsForCourse(CourseId):
+        return Database.GetProjectsForCourse(CourseId)
+    def GetSubProjectsForCourse(CourseId):
+        return Database.GetSubProjectsForCourse(CourseId)
+    def GetCourseVariantsForCourse(CourseId):
+        return Database.GetCourseVariantsForCourse(CourseId)
+    def GetCentersForCourse(CourseId):
+        return Database.GetCentersForCourse(CourseId)
+        
+        
