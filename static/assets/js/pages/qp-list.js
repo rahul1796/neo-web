@@ -50,15 +50,8 @@ function LoadSector()
         return false;
 }
 
-function LoadTableBasedOnSearch(){
-        if($('#ddlsector').val().toString()==''|| $('#ddlsector').val().toString()==null){
-            alert("Please select a Sector.");
-        }
-        else{
-            
+function LoadTableBasedOnSearch(){      
             LoadTable($('#ddlsector').val().toString());
-        }
-        
     }
 	
 	
@@ -101,7 +94,7 @@ function LoadTable(sectors)
             { "data": "Qp_Name" },
             { "data": "Qp_Code"},
             { "data": "Sector_Name"},
-            { "data": function (row, type, val, meta) {
+            { "visible":false,"data": function (row, type, val, meta) {
                 var varStatus = ""; 
                 if(row.Is_Active)
                     varStatus="Active";
