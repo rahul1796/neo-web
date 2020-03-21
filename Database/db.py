@@ -1156,11 +1156,11 @@ class Database:
         cur.close()
         con.close()
         return content
-    def add_client_details(client_name,client_code,user_id,is_active,client_id):
+    def add_client_details(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_client] ?, ?, ?, ?, ?'
-        values = (client_name,client_code,user_id,is_active,client_id)
+        sql = 'exec	[masters].[sp_add_edit_client] ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -1176,15 +1176,16 @@ class Database:
                     if pop==2:
                         msg={"message":"Customer with the Customer code already exists","client_flag":2}
         return msg
+
     def get_client_detail(glob_client_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'SELECT * FROM [masters].[tbl_client] where client_id=?'
+        sql = 'select customer_name,customer_code,is_active,funding_source_id,customer_group_id,industry_type_id,category_type_id from masters.tbl_customer where customer_id=?'
         values = (glob_client_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
         cur.close()
         con.close()
         return h
@@ -3320,3 +3321,18 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return courses
+
+    def Get_all_industry_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'SELECT distinct [industry_type_id], [industry_type_name] FROM [masters].[tbl_industry_type] where is_deleted=0'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
