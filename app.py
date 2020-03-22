@@ -4128,6 +4128,18 @@ class get_user_details_new(Resource):
             return UsersM.get_user(user_id)
 api.add_resource(get_user_details_new,'/get_user_details_new')
 
+class GetProjectsForCourse(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                CourseId=request.args.get('CourseId',0,type=int)
+                response = Master.GetProjectsForCourse(CourseId)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetProjectsForCourse,'/GetProjectsForCourse')
+
 class Get_all_industry(Resource):
     @staticmethod
     def get():
@@ -4138,6 +4150,19 @@ class Get_all_industry(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(Get_all_industry,'/Get_all_industry')
+
+class GetSubProjectsForCourse(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                CourseId=request.args.get('CourseId',0,type=int)
+                response = Master.GetSubProjectsForCourse(CourseId)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetSubProjectsForCourse,'/GetSubProjectsForCourse')
+             
 
 class SqlServerApi(Resource):
     @staticmethod
@@ -4154,7 +4179,31 @@ class SqlServerApi(Resource):
             finally:
                 log.info("< SqlServerApi --> " + Log.str(response))
                 return jsonify(response)
-api.add_resource(SqlServerApi,'/SqlServerApi')
+api.add_resource(SqlServerApi,'/SqlServerApi')               
+
+class GetCourseVariantsForCourse(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                CourseId=request.args.get('CourseId',0,type=int)
+                response = Master.GetCourseVariantsForCourse(CourseId)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetCourseVariantsForCourse,'/GetCourseVariantsForCourse')
+
+class GetCentersForCourse(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                CourseId=request.args.get('CourseId',0,type=int)
+                response = Master.GetCentersForCourse(CourseId)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetCentersForCourse,'/GetCentersForCourse')
 
 
 if __name__ == '__main__':    

@@ -4,12 +4,8 @@
         <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
         <!--link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /-->
 
-        <!-- App css -->
-        <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-        <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-        <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
         
-		<style>
+		<!-- <style>
             .center {
                 margin: auto;
                 width: 90%;
@@ -20,8 +16,8 @@
             .hidedialog {
                 display: none;
             }
-        </style>
-        <script type="text/javascript">
+        </style> -->
+    <script type="text/javascript">
         $(document).ready(function () {
         $("#tbl_courses").dataTable().fnDestroy();
         $('.dropdown-search-filter').select2({
@@ -46,10 +42,10 @@
         // if(role_id == 3 || role_id == 8)
         //     $('#btn_create').hide();
         });
-        </script>
+    </script>
 		<form id='form1' method="POST" action="/assign_course_add_edit_to_home">
             <input type="hidden" id="hdn_course_id" name="hdn_course_id" value="-1">
-			
+			<input type="hidden" id="hdn_is_course_variant" name="hdn_is_course_variant" value="0">
 				<div class="container-fluid">
                     
                     <!-- start page title -->
@@ -71,18 +67,6 @@
                             <div class="col-12">
                                 <div class="card-box">
                                     <div class="row">
-                                        <!--div class="col-lg-3">
-                                            <label for="ddlPractice" class="mr-2">Practice</label>
-                                            <select class="form-control" id="ddlPractice" onchange="LoadProjectddl(this.value)">
-                                                <option selected="" value="0">All</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label for="ddlProject" class="mr-2">Project</label>
-                                            <select class="form-control" id="ddlProject">
-                                                <option selected="" value="0">All</option>
-                                            </select>
-                                        </div-->
 										<div class="col-lg-3">
                                             <label for="ddlSector" class="mr-2">Sector</label>
                                             <select class="form-control dropdown-search-filter" id="ddlSector" onchange="LoadQPddl()" multiple>
@@ -125,16 +109,19 @@
                                     </div>
                                     <br/>
                                     <div class="col-lg-12">
-                                        <table id="tbl_courses" class="table dt-responsive nowrap">
+                                        <table id="tbl_courses" class="table dt-responsive wrap">
                                             <thead>
                                                 <tr>
-                                                    <th>S No</th>
+                                                    <th>S.No</th>
                                                     <th>Actions</th>
                                                     <th>Course Code</th> 
-                                                    <th>Course Name</th>                                                     
+                                                    <th>Course Name</th>  
+                                                    <th>Course Variant</th>       
+                                                    <th>Projects</th>  
+                                                    <th>Sub Projects</th>  
+                                                    <th>Centers</th>                                           
                                                     <th>QP Code</th> 
-                                                    <th>QP Name</th>                                                   
-                                                    <th>Practice Name</th>
+                                                    <th>QP Name</th>
                                                     <th>Status</th>
                                                 </tr>
                                             </thead>
@@ -167,3 +154,137 @@
         <!-- datatables init js-->
         <script src="static/assets/js/pages/course-list.js"></script>
 
+        <div id="mdl_Cou_variants" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title" ><span id="headerNameCouVariants"></span></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>                    
+                    <div class="modal-body">
+                        <table id="tbl_course_variants" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                            <thead>
+                                <tr style="background-color: #f5f6f8;">
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Actions</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Variant Name</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Variant Code</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Projects</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Projects</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Centers</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        
+                            </tbody>
+                        </table>	
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->
+
+        <div id="mdl_Cou_Projects" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title" ><span id="hdCourseName"></span></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>                    
+                    <div class="modal-body">
+                        <table id="tbl_project" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                            <thead>
+                                <tr style="background-color: #f5f6f8;">
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Name</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Code</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Contract Name</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Contract Code</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Customer Name</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Customer Code</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        
+                            </tbody>
+                        </table>	
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="OpenCourseVariantModal()">Back</button>
+                        <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->
+
+        <div id="mdl_Cou_Sub_Projects" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title" ><span id="headerName"></span></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>                    
+                    <div class="modal-body">
+                        <table id="tbl_sub_project" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                            <thead>
+                                <tr style="background-color: #f5f6f8;">
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Name</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Code</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Name</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Code</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Contract Name</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Contract Code</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Customer Name</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Customer Code</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        
+                            </tbody>
+                        </table>	
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="OpenCourseVariantModal()">Back</button>
+                        <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->
+
+        <div id="mdl_Cou_Centes" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title" ><span id="headerCenter"></span></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>                    
+                    <div class="modal-body">
+                        <table id="tbl_centers" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                            <thead>
+                                <tr style="background-color: #f5f6f8;">
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Name</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Code</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Type</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">State</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Region</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        
+                            </tbody>
+                        </table>	
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"onclick="OpenCourseVariantModal()"> Back</button>
+                        <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->
+        
+        
