@@ -25,6 +25,9 @@ import re
 import filter_tma_report
 import filter_tma_report_new
 from Models import DownloadDump
+from lib.ms_sql import MsSql
+from lib.log import Log
+from lib.log import log
 
 app = Flask(__name__)
 
@@ -1215,15 +1218,21 @@ class add_client_details(Resource):
         if request.method == 'POST':
             client_name=request.form['ClientName']
             client_code=request.form['ClientCode']
+            FundingSource=request.form['FundingSource']
+            CustomerGroup=request.form['CustomerGroup']
+            IndustryType=request.form['IndustryType']
+            CategoryType=request.form['CategoryType']
+
             user_id=g.user_id
             is_active=request.form['isactive']
             client_id=g.client_id
-            return Master.add_client(client_name,client_code,user_id,is_active,client_id)
+            return Master.add_client(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType)
 
 class get_client_details(Resource):
     @staticmethod
     def get():
         if request.method == 'GET':
+            #
             return Master.get_client(g.client_id)
 
 api.add_resource(client_list,'/client_list')
@@ -4119,7 +4128,6 @@ class get_user_details_new(Resource):
             return UsersM.get_user(user_id)
 api.add_resource(get_user_details_new,'/get_user_details_new')
 
-
 class GetProjectsForCourse(Resource):
     @staticmethod
     def get():
@@ -4132,6 +4140,17 @@ class GetProjectsForCourse(Resource):
                 return {'exception':str(e)}
 api.add_resource(GetProjectsForCourse,'/GetProjectsForCourse')
 
+class Get_all_industry(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.Get_all_industry_db()
+                return {'Industry':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(Get_all_industry,'/Get_all_industry')
+
 class GetSubProjectsForCourse(Resource):
     @staticmethod
     def get():
@@ -4143,6 +4162,24 @@ class GetSubProjectsForCourse(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(GetSubProjectsForCourse,'/GetSubProjectsForCourse')
+             
+
+class SqlServerApi(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                ms_sql = MsSql()
+                log.info("> MS_SQL data request")
+                data = ms_sql.get_data()
+                response = {"status": 200, "data": data}
+            except Exception as error:
+                log.error("SqlServerApi request error: {}".format(error))
+                response = {"status": 400, "message": str(error)}
+            finally:
+                log.info("< SqlServerApi --> " + Log.str(response))
+                return jsonify(response)
+api.add_resource(SqlServerApi,'/SqlServerApi')               
 
 class GetCourseVariantsForCourse(Resource):
     @staticmethod
@@ -4167,6 +4204,7 @@ class GetCentersForCourse(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(GetCentersForCourse,'/GetCentersForCourse')
+
 
 if __name__ == '__main__':    
     app.run(debug=True)

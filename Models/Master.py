@@ -75,8 +75,8 @@ class Master:
     def client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_sources,customer_groups,category_type_ids):
         client_l = Database.client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_sources,customer_groups,category_type_ids)
         return client_l
-    def add_client(client_name,client_code,user_id,is_active,client_id):
-        popupMessage = {"PopupMessage": Database.add_client_details(client_name,client_code,user_id,is_active,client_id)}
+    def add_client(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType):
+        popupMessage = {"PopupMessage": Database.add_client_details(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType)}
         return popupMessage
     def get_client(glob_client_id):
         indi_client={"ClientDetail":Database.get_client_detail(glob_client_id)}
