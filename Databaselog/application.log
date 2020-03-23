@@ -74,3 +74,325 @@
 [2020-03-21 11:40:59 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masterss.tbl_countries'. (208) (SQLExecDirectW)")
 [2020-03-21 11:40:59 app.py:4151 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO_MAR_15.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, '
 [2020-03-21 11:40:59 _internal.py:113 INFO                 _log()] 127.0.0.1 - - [21/Mar/2020 11:40:59] "[37mGET /SqlServerApi HTTP/1.1[0m" 200 -
+[2020-03-22 17:49:32 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 17:49:32 _internal.py:122 INFO                 _log()]  * Restarting with stat
+[2020-03-22 17:49:34 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 17:49:34 _internal.py:122 WARNING                 _log()]  * Debugger is active!
+[2020-03-22 17:49:34 _internal.py:122 INFO                 _log()]  * Debugger PIN: 112-502-404
+[2020-03-22 17:49:34 _internal.py:122 INFO                 _log()]  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+[2020-03-22 17:49:50 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 17:49:53 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 17:51:13 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 17:51:13 app.py:4177 ERROR                  get()] SqlServerApi request error: module 'Database.config' has no attribute 'TABLES'
+[2020-03-22 17:51:13 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 400, 'message': "module 'Database.config' has no attribute 'TABLES'"}
+[2020-03-22 17:52:54 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 17:52:55 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_block error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_block'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_bu error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_bu'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_category_type error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_category_type'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_center error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_center'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_center_category error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_center_category'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_center_type error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_center_type'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_cluster error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_cluster'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_contract error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_contract'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_contract_stages error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_contract_stages'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_courses error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_courses'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_customer error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_customer'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_customer_address error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_customer_address'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_customer_group error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_customer_group'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_customer_spoc error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_customer_spoc'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_districts error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_districts'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_entity error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_entity'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_funding_source error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_funding_source'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_industry_type error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_industry_type'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_practice error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_practice'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_product error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_product'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_project_group error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_project_group'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_project_type error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_project_type'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_projects error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_projects'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_qp error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_qp'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_question_type error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_question_type'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_region error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_region'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_sales_category error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_sales_category'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_sector error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_sector'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_states error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_states'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_sub_center error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_sub_center'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_sub_projects error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_sub_projects'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_target_type error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_target_type'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_tma_candidate_attendance error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_tma_candidate_attendance'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.masters.tbl_tma_trainer_stage_log error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.masters.tbl_tma_trainer_stage_log'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.users.tbl_users error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.users.tbl_users'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.users.tbl_user_details error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.users.tbl_user_details'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 ms_sql.py:45 ERROR       get_table_data()] NEO_MAR_15.users.tbl_map_user_employee_department error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO_MAR_15.users.tbl_map_user_employee_department'. (208) (SQLExecDirectW)")
+[2020-03-22 17:52:55 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO_MAR_15.masters.tbl_block': '(\'42S02\', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name \'NEO_MAR_15.masters.tbl_block\'. (208) (SQLExecDirect
+[2020-03-22 17:53:53 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 17:53:53 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 17:53:54 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 17:53:54 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 17:56:26 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 17:56:26 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 17:56:27 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 17:56:27 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 17:56:28 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 17:57:12 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 17:57:12 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 17:57:13 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:02:24 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:02:24 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:02:25 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:02:38 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:02:38 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:02:39 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:02:40 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:02:40 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:02:41 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:08:18 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:08:18 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:08:19 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:08:21 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:08:21 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:08:22 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:14:43 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:14:43 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:14:43 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:20:03 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:20:03 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:20:03 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:21:48 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:21:48 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:21:49 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:21:53 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:21:53 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:21:54 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:22:32 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:22:32 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:22:33 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:23:23 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:23:24 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:23:24 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:24:43 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:24:43 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:24:43 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:25:08 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:25:08 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:25:08 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:25:20 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:25:20 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:25:20 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:27:36 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:27:36 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:27:36 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:46:04 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 18:46:05 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:46:05 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:46:05 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:56:48 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:56:48 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:56:48 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 18:57:01 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 18:57:01 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 18:57:01 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:23:10 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 19:23:11 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:23:11 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:23:11 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:25:15 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:25:16 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:25:16 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:27:12 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:27:12 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:27:12 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:27:13 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:27:13 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:27:13 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:28:00 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:28:00 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:28:01 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:29:17 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:29:17 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:29:18 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:30:58 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:30:59 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:30:59 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:32:21 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:32:21 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:32:22 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:33:48 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:33:48 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:33:48 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:34:48 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:34:48 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:34:49 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:35:10 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:35:11 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:35:11 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:35:55 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:35:55 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:35:55 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:40:35 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:40:35 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:40:36 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:41:06 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:41:06 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:41:07 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:41:37 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:41:37 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:41:38 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:42:11 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:42:11 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:42:12 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:42:40 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:42:40 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:42:40 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:43:10 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:43:10 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:43:10 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:43:20 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 19:43:20 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 19:43:21 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 19:43:21 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 19:43:40 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:43:40 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:43:41 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:44:15 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:44:15 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:44:15 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:44:44 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:44:44 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:44:44 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:45:15 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:45:15 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:45:15 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:54:38 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:54:38 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:54:39 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 19:54:54 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 19:54:54 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 19:54:55 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:09:40 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 20:09:40 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:09:40 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:09:41 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:09:56 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:09:56 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:09:57 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:14:58 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:14:58 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:14:59 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:17:33 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:17:33 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:17:34 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:19:47 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:19:47 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:19:47 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:21:31 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:21:31 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:21:32 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:23:14 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:23:15 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:23:15 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:25:23 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:25:24 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:25:25 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:26:57 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:26:57 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:26:57 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:29:03 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:29:03 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:29:04 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:31:20 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:31:21 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:31:22 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:32:07 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:32:08 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:32:08 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:32:26 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:32:26 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:32:26 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:32:53 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:32:53 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:32:54 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:33:26 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:33:26 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:33:27 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:33:55 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:33:55 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:33:56 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:34:28 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:34:28 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:34:29 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:34:56 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:34:56 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:34:56 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:35:28 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:35:28 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:35:28 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:36:00 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:36:00 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:36:00 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:36:29 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:36:29 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:36:30 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:37:01 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:37:01 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:37:02 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:37:30 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:37:30 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:37:31 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:38:05 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:38:05 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:38:05 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:38:34 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:38:34 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:38:35 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:39:04 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:39:04 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:39:05 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:39:35 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:39:35 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:39:35 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:40:06 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:40:06 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:40:07 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:40:35 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:40:36 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:40:36 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:41:07 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:41:07 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:41:08 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:41:30 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 20:41:30 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 20:41:31 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 20:41:31 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 20:41:31 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-22 20:41:40 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:41:40 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:41:40 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-22 20:42:09 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-22 20:42:09 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-22 20:42:09 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-23 00:28:25 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 00:28:29 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 00:28:29 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 00:28:29 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 09:15:07 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 09:15:12 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 09:15:12 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 09:41:49 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 09:41:52 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 09:41:52 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 09:41:52 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-23 09:41:52 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-23 09:41:53 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-23 09:42:42 app.py:4173 INFO                  get()] > MS_SQL data request
+[2020-03-23 09:42:42 ms_sql.py:45 ERROR       get_table_data()] NEO.masterss.tbl_countries error: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'NEO.masterss.tbl_countries'. (208) (SQLExecDirectW)")
+[2020-03-23 09:42:42 app.py:4180 INFO                  get()] < SqlServerApi --> {'status': 200, 'data': {'NEO.masters.tbl_block': [{'block_id': 1, 'block_name': 'Block A', 'created_by': 1, 'created_on': datetime.datetime(2020, 3, 6, 15, 7, 18, 113000), 'is_active': True, 'is_dele
+[2020-03-23 10:09:56 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 10:10:00 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 10:10:00 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 10:10:00 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 10:10:01 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 10:32:41 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 10:32:43 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
+[2020-03-23 10:32:43 log.py:30 CRITICAL           initialize()] Logging initialised, level=20
