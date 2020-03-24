@@ -1,7 +1,7 @@
 #import pypyodbc as pyodbc
 import pyodbc
 from Database import config
-from lib.log import log
+#from lib.log import log
 
 
 class MsSql:
@@ -30,19 +30,21 @@ class MsSql:
     def get_table_data(self, table):
         try:
             columns = self.cursor.columns(table=table.split(".")[-1])
+            
             column_name = []
             for row in columns:
                 column_name.append(row.column_name)
             query = "SELECT * FROM {};".format(table)
             rows = self.cursor.execute(query)
             data = []
+            #print(column_name)
             for row in rows:
                 column_data = list(row)
                 column_dict = dict(zip(column_name, column_data))
                 data.append(column_dict)
             response = data
         except Exception as error:
-            log.error("{} error: {}".format(table, error))
+            #log.error("{} error: {}".format(table, error))
             response = str(error)
         finally:
             return response

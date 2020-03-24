@@ -12,6 +12,12 @@ $(document).ready(function () {
     LoadFunding_Resourcesdl();
     LoadCustomer_Groupdl();
     LoadSalesCategoryddl();
+    role_id=parseInt($('#hdn_home_user_role_id').val());
+                if(role_id == 1)
+                    $('#btn_create').show();
+                else 
+                    $('#btn_create').hide();
+
     LoadTable(); 
 
 
@@ -156,7 +162,7 @@ function LoadTable()
 
         "columns": [
             { "data": "S_No"},  
-            {//"visible": false,
+            {"visible": false,
              "data": function (row, type, val, meta) {
                 var varButtons = ""; 
                 varButtons += '<a onclick="EditClientDetail(\'' + row.Client_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Client" class="fas fa-edit" ></i></a>';

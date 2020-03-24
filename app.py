@@ -26,8 +26,8 @@ import filter_tma_report
 import filter_tma_report_new
 from Models import DownloadDump
 from lib.ms_sql import MsSql
-from lib.log import Log
-from lib.log import log
+#from lib.log import Log
+#from lib.log import log
 
 app = Flask(__name__)
 
@@ -843,22 +843,23 @@ class add_batch_details(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
-            batch_id=request.form['BatchId']
-            batch_name=request.form['BatchName']
-            course_id=request.form['CourseId']
-            batch_code=request.form['BatchCode']
-            center_id=request.form['CenterId']
-            trainer_id=request.form['TrainerId']
-            center_manager_id=request.form['CentralManagerId']
-            start_date=request.form['StartDate']
-            end_date=request.form['EndDate']
-            start_time=request.form['StartTime']
-            end_time=request.form['EndTime']
+            BatchId=request.form['BatchId']
+            BatchName=request.form['BatchName']
+            BatchCode=request.form['BatchCode']
+            Center=request.form['Center']
+            Trainer=request.form['Trainer']
+            StartDate=request.form['StartDate']
+            EndDate=request.form['EndDate']
+            StartTime=request.form['StartTime']
+            EndTime=request.form['EndTime']
             user_id=g.user_id
-            is_active=request.form['isactive']
-            actual_start_date=request.form['ActualStartDate']
-            actual_end_date=request.form['ActualEndDate']
-            return Batch.add_batch(batch_id,batch_name,course_id,batch_code,center_id,trainer_id,center_manager_id,start_date,end_date,start_time,end_time,user_id,is_active,actual_start_date,actual_end_date)
+            isactive=request.form['isactive']
+            Product=request.form['Product']
+            Course=request.form['Course']
+            SubProject=request.form['SubProject']
+            Cofunding=request.form['Cofunding']
+            
+            return Batch.add_batch(BatchName, BatchCode, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, StartDate, EndDate, StartTime, EndTime, BatchId, user_id)
 
 
 class get_batch_details(Resource):
@@ -2516,14 +2517,23 @@ class add_project_details(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
-            project_name=request.form['ProjectName']
-            client_id=request.form['ClientId']
-            practice_id=request.form['PracticeId']
+            ProjectName=request.form['ProjectName']
+            ProjectCode=request.form['ProjectCode']
+            ClientName=request.form['ClientName']
+            ContractName=request.form['ContractName']
+            Practice=request.form['Practice']
+            BU=request.form['BU']
+            projectgroup=request.form['projectgroup']
+            ProjectType=request.form['ProjectType']
+            Block=request.form['Block']
+            Product=request.form['Product']
+            StartDate=request.form['StartDate']
+            EndDate=request.form['EndDate']
+            
             user_id=g.user_id
             project_id=g.project_id
-            is_active=request.form['isactive']
-            print(project_name,client_id,practice_id,user_id,is_active,project_id)
-            return Master.add_project_details(project_name,client_id,practice_id,user_id,is_active,project_id)
+            isactive=request.form['isactive']
+            return Master.add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, StartDate, EndDate, isactive, project_id, user_id)
                     
 class client_all(Resource):
     @staticmethod
@@ -3440,7 +3450,7 @@ def contract():
 @app.route("/contract_add_edit")
 def contract_add_edit():
     if g.user:
-        return render_template("Master/contract-add-edit.html",sector_id=g.sector_id)
+        return render_template("Master/contract-add-edit.html", contract_id=g.contract_id )
     else:
         return render_template("login.html",error="Session Time Out!!")
 
@@ -3476,19 +3486,25 @@ class contract_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            print(order_by_column_position,order_by_column_direction)
             return Master.contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 
 class add_contract_details(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
-            sector_name=request.form['SectorName']
-            sector_code=request.form['SectorCode']
+            ContractName=request.form['ContractName']
+            ContractCode=request.form['ContractCode']
+            ClientName=request.form['ClientName']
+            EntityName=request.form['EntityName']
+            SalesCatergory=request.form['SalesCatergory']
+            StartDate=request.form['StartDate']
+            EndDate=request.form['EndDate']
+            isactive=request.form['isactive']
+
             user_id=g.user_id
-            is_active=request.form['isactive']
-            sector_id=g.sector_id
-            return Master.add_sector(sector_name,sector_code,user_id,is_active,sector_id)
+            contract_id=g.contract_id
+            
+            return Master.add_contract(ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, isactive, user_id, contract_id)
 
 class get_contract_details(Resource):
     @staticmethod
@@ -4170,14 +4186,14 @@ class SqlServerApi(Resource):
         if request.method=='GET':
             try:
                 ms_sql = MsSql()
-                log.info("> MS_SQL data request")
+                #log.info("> MS_SQL data request")
                 data = ms_sql.get_data()
                 response = {"status": 200, "data": data}
             except Exception as error:
-                log.error("SqlServerApi request error: {}".format(error))
+                #log.error("SqlServerApi request error: {}".format(error))
                 response = {"status": 400, "message": str(error)}
             finally:
-                log.info("< SqlServerApi --> " + Log.str(response))
+                #log.info("< SqlServerApi --> " + Log.str(response))
                 return jsonify(response)
 api.add_resource(SqlServerApi,'/SqlServerApi')               
 
@@ -4205,6 +4221,50 @@ class GetCentersForCourse(Resource):
                 return {'exception':str(e)}
 api.add_resource(GetCentersForCourse,'/GetCentersForCourse')
 
+class Get_all_ProjectType(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.Get_all_ProjectType_db()
+                return {'ProjectType':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(Get_all_ProjectType,'/Get_all_ProjectType')
+
+class All_Course_basedon_center(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                center_id=request.args['Center_id']
+                response = Database.AllCourse_center_db(center_id)
+                return {'Courses':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(All_Course_basedon_center,'/All_Course_basedon_center')
+
+class GetSubProjectsForCenter_Course(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            center_id=request.args.get('center_id',0,type=int)
+            course_id=request.args.get('course_id',0,type=int)
+            sub_project_id=request.args.get('sub_project_id',0,type=int)
+            response={"SubProjects":Master.GetSubProjectsForCenter_course(center_id, course_id, sub_project_id)}
+            return response
+api.add_resource(GetSubProjectsForCenter_Course,'/GetSubProjectsForCenter_Course')
+
+class GetcofundingForCenter_Course(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            center_id=request.args.get('center_id',0,type=int)
+            course_id=request.args.get('course_id',0,type=int)
+            sub_project_id = request.args.get('sub_project_id',0,type=int)
+            response={"SubProjects":Master.GetSubProjectsForCenter(center_id, course_id, sub_project_id)}
+            return response
+api.add_resource(GetcofundingForCenter_Course,'/GetcofundingForCenter_Course')
 
 if __name__ == '__main__':    
     app.run(debug=True)
