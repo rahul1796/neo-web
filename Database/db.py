@@ -796,23 +796,25 @@ class Database:
         con.close()
         return content
         
-    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type):
+    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids):
         #print(status, customer, project, course, region, center)
         content = {}
         d = []
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type)
+        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[18]
-            fil=row[17]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16]}
-            d.append(h)
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
@@ -3472,8 +3474,27 @@ SELECT					cb.name as candidate_name,
         out = {'Centers':response}
         cur.commit()
         cur.close()
+        con.close()
+        return out
+    def GetBatchAssessments(BatchId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [assessments].[get_batch_assessments] ?'
+        values = (BatchId,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = {'Assessments':response}
+        cur.commit()
+        cur.close()
         con.close()       
         return out
+
 
     def Get_all_ProjectType_db():
         response=[]
@@ -3506,3 +3527,81 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return response
+
+    def GetAssessmentTypes():
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [assessments].[sp_get_assessment_types]'
+        #values = (BatchId,)
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = {'AssessmentTypes':response}
+        cur.commit()
+        cur.close()
+        con.close()       
+        return out
+    def GetAssessmentAgency():
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [assessments].[sp_get_assessment_agency] '
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = {'AssessmentAgency':response}
+        cur.close()
+        con.close()       
+        return out
+    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_type_id,assessment_agency_id,assessment_id):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?'
+        values = (batch_id,user_id,requested_date,scheduled_date,assessment_type_id,assessment_agency_id,assessment_id)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            pop=row[0]
+
+        cur.commit()
+        cur.close()
+        con.close() 
+        if pop>0:
+            out={"message":"Assessment Scheduled Successfully","success":1,"assessment_id":pop}
+        else:
+            out={"message":"Error scheduling assessment","success":0,"assessment_id":pop}
+        return out
+    def GetAssessmentCandidateResults(AssessmentId):
+        try:
+            col=[]
+            response={}
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            sql = 'exec [assessments].[sp_get_candidate_result] ?'
+            values=(AssessmentId,)            
+            cur.execute(sql,(values))
+            col = [column[0].title() for column in cur.description]
+            data=cur.fetchall()   
+            out = []
+            for i in data:
+                out.append(list(i))        
+            df=pd.DataFrame(out)       
+            cur.close()
+            con.close()
+            response= {"columns":col,"data":df}
+            return response
+        except Exception as e:
+            print(str(e))
+        return out
+
