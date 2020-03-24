@@ -5,3 +5,5 @@ from .Batch import Batch
 from .Candidate import Candidate
 from .Report import Report
 from .DownloadDump import DownloadDump
+from .Assessments import Assessments
+from .Assessments import DownloadAssessmentResult

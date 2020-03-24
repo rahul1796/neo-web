@@ -2,7 +2,7 @@ from flask import Flask,render_template,request,redirect,url_for,session,g,jsoni
 from flask_restful import Resource
 from flask_restful import Api
 #from flask_session import Session
-from Models import Content
+from Models import Content,Assessments,DownloadAssessmentResult
 from Models import Master
 from Models import UsersM
 from Models import Batch
@@ -825,7 +825,9 @@ class batch_list_updated(Resource):
             center_type = request.form['center_type']
             #print('before hi')
             status = request.form['status']
-            #print('hi')
+            course_ids=''
+            if 'course_ids' in request.form:
+                course_ids=request.form['course_ids']
 
             start_index = request.form['start']
             page_length = request.form['length']
@@ -833,8 +835,8 @@ class batch_list_updated(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-
-            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type)
+            
+            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids)
 
 class add_batch_details(Resource):
     @staticmethod
@@ -3512,6 +3514,7 @@ api.add_resource(GetAllBusBasedOn_User,'/GetAllBusBasedOn_User')
 @app.route("/Downloads/<path:path>")
 def get_download_file(path):
     """Download a file."""
+    print(path)
     filename = r"{}{}".format(config.DownloadPathLocal,path)
     print(filename)
     if not(os.path.exists(filename)):
@@ -4167,6 +4170,78 @@ class GetCentersForCourse(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(GetCentersForCourse,'/GetCentersForCourse')
+
+####################################################################################################
+#Assessment_API's
+
+@app.route("/assessment_page")
+def assessment_page():
+    if g.user:
+        status=request.args.get('status',-1,type=int)
+        return render_template("Assessment/assessments-batch-list.html", status=status)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
+@app.route("/assessment")
+def assessment():
+    if g.user:
+        status=request.args.get('status',-1,type=int) 
+        html_str="assessment_page?status=" + str(status)
+        return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class GetBatchAssessments(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                BatchId=request.args.get('BatchId',0,type=int)
+                response = Assessments.GetBatchAssessments(BatchId)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetBatchAssessments,'/GetBatchAssessments')
+
+class GetAssessmentTypes(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Assessments.GetAssessmentTypes()
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetAssessmentTypes,'/GetAssessmentTypes')
+
+class GetAssessmentAgency(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Assessments.GetAssessmentAgency()
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetAssessmentAgency,'/GetAssessmentAgency')
+
+class ScheduleAssessment(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            batch_id=request.form['batch_id']
+            user_id=request.form['user_id']
+            requested_date=request.form['requested_date']
+            scheduled_date=request.form['scheduled_date']
+            assessment_type_id=request.form['assessment_type_id']
+            assessment_agency_id=request.form['assessment_agency_id']
+            assessment_id=request.form['assessment_id']
+            return Assessments.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_type_id,assessment_agency_id,assessment_id)
+api.add_resource(ScheduleAssessment,'/ScheduleAssessment')
+
+api.add_resource(DownloadAssessmentResult,'/DownloadAssessmentResult')
+################################################################################################################
 
 if __name__ == '__main__':    
     app.run(debug=True)
