@@ -156,7 +156,7 @@ function LoadTable()
 
         "columns": [
             { "data": "S_No"},  
-            {"visible": false,
+            {//"visible": false,
              "data": function (row, type, val, meta) {
                 var varButtons = ""; 
                 varButtons += '<a onclick="EditClientDetail(\'' + row.Client_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Client" class="fas fa-edit" ></i></a>';
