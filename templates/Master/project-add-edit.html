@@ -4,11 +4,22 @@
         <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
         <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
-        <script type="text/javascript" src="static/assets/libs/jquery/jquery.min.js"></script>
+
+        <!-- <script type="text/javascript" src="static/assets/libs/jquery/jquery.min.js"></script> -->
         <script type="text/javascript">
             $(document).ready(function(){
-                LoadClientList();
+                $(".date-picker").flatpickr();
+
+                LoadCustomerdl();
+                Contractbycustomer();
                 LoadPracticeList();
+                LoadBUdl();
+                LoadProjectGroupdl();
+                LoadProductdl();
+                LoadBlockdl();
+                LoadProjectTypedl();
+
+
                 if('{{project_id}}' !=0)
                 {
                     var URL=$('#hdn_web_url').val()+ "/GetProjectDetails";
@@ -40,31 +51,242 @@
                         }
                     });
                 }
+            }); 
+            function LoadProjectTypedl(){
+            var URL=$('#hdn_web_url').val()+ "/Get_all_ProjectType"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.ProjectType != null)
+                    {  
+                        $('#ddlProjectType').empty();
+                        var count=data.ProjectType.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            for(var i=0;i<count;i++)
+                                $('#ddlProjectType').append(new Option(data.ProjectType[i].Project_Type_Name, data.ProjectType[i].Project_Type_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                            $('#ddlProjectType').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
             });
+            return false;
+            }
+            function LoadBlockdl(){
+            var URL=$('#hdn_web_url').val()+ "/Get_all_Block"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.Block != null)
+                    { 
+                        $('#ddlBlock').empty();
+                        var count=data.Block.length;
+                        if( count> 0)
+                        {   
+                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            for(var i=0;i<count;i++)
+                                $('#ddlBlock').append(new Option(data.Block[i].Block_Name, data.Block[i].Block_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                            $('#ddlBlock').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
+            });
+            return false;
+            }
+            function LoadProductdl(){
+            var URL=$('#hdn_web_url').val()+ "/Get_all_Product"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.Product != null)
+                    { 
+                        $('#ddlProduct').empty();
+                        var count=data.Product.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            for(var i=0;i<count;i++)
+                                $('#ddlProduct').append(new Option(data.Product[i].Product_Name, data.Product[i].Product_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                            $('#ddlProduct').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
+            });
+            return false;
+            }
 
-            function LoadClientList()
+            
+            function LoadProjectGroupdl(){
+            var URL=$('#hdn_web_url').val()+ "/Get_all_Project_Group"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.Project_Group != null)
+                    { 
+                        $('#ddlprojectgroup').empty();
+                        var count=data.Project_Group.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            for(var i=0;i<count;i++)
+                                $('#ddlprojectgroup').append(new Option(data.Project_Group[i].Project_Group_Name, data.Project_Group[i].Project_Group_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                            $('#ddlprojectgroup').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
+            });
+            return false;
+            }
+
+            function LoadBUdl(){
+            var URL=$('#hdn_web_url').val()+ "/Get_all_BU"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.BU != null)
+                    {  
+                        $('#ddlBU').empty();
+                        var count=data.BU.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            for(var i=0;i<count;i++)
+                                $('#ddlBU').append(new Option(data.BU[i].Bu_Name, data.BU[i].Bu_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                            $('#ddlBU').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
+            });
+            return false;
+            }
+
+            function LoadCustomerdl(){
+            var URL=$('#hdn_web_url').val()+ "/GetALLClient"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.Clients != null)
+                    {
+                        $('#ClientName').empty();
+                        var count=data.Clients.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            for(var i=0;i<count;i++)
+                                $('#ClientName').append(new Option(data.Clients[i].Customer_Name, data.Clients[i].Customer_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                            $('#ClientName').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
+            });
+            return false;
+            }
+
+            function Contractbycustomer()
             {
-                var URL=$('#hdn_web_url').val()+ "/GetALLClient"
+                var URL=$('#hdn_web_url').val()+ "/GetContractbycustomer"
                 $.ajax({
                     type:"GET",
                     url:URL,
                     async:false,
                     beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                     datatype:"json",
+                    data:{
+                        "Customer_Id": $('#ClientName').val()
+                    },
                     success: function (data){
-                        if(data.Clients != null)
+                        if(data.contracts != null)
                         {
-                            $('#ddlClient').empty();
-                            var count=data.Clients.length;
+                            $('#ContractName').empty();
+                            var count=data.contracts.length;
                             if( count> 0)
                             {
-                                $('#ddlClient').append(new Option('Choose Customer',''));
+                                //$('#ddlCentralManager').append(new Option('Choose Center Manager',''));
                                 for(var i=0;i<count;i++)
-                                    $('#ddlClient').append(new Option(data.Clients[i].Client_Name,data.Clients[i].Client_Id));
+                                    $('#ContractName').append(new Option(data.contracts[i].Contract_Name,data.contracts[i].Contract_Id));
                             }
                             else
                             {
-                                $('#ddlClient').append(new Option('Choose Customer',''));
+                                $('#ContractName').append(new Option('Choose Center Manager',''));
                             }
                         }
                     },
@@ -76,6 +298,7 @@
                 });
                 return false;
             }
+
             function LoadPracticeList()
             {
                 var URL=$('#hdn_web_url').val()+ "/AllPracticeList"
@@ -92,7 +315,7 @@
                             var count=data.Pratices.length;
                             if( count> 0)
                             {
-                                $('#ddlPractice').append(new Option('Choose Practice',''));
+                                //$('#ddlPractice').append(new Option('Choose Practice',''));
                                 for(var i=0;i<count;i++)
                                     $('#ddlPractice').append(new Option(data.Pratices[i].Practice_Name,data.Pratices[i].Practice_Id));
                             }
@@ -110,28 +333,47 @@
                 });
                 return false;
             }
+            
             function add_popup_message(){
-                // alert($('#ProjectName').val());
                 var URL=$('#hdn_web_url').val()+ "/add_project_details";
                     $.ajax({
                         type:"POST",
                         url:URL,
                         data:{
                             "ProjectName" : $('#ProjectName').val(),
-                            "ClientId" : $('#ddlClient').val(),
-                            "PracticeId": $('#ddlPractice').val(),
+                            "ProjectCode" : $('#ProjectCode').val(),
+                            "ClientName" : $('#ClientName').val(),
+                            "ContractName" : $('#ContractName').val(),
+                            "Practice" : $('#ddlPractice').val(),
+                            "BU" : $('#ddlBU').val(),
+                            "projectgroup" : $('#ddlprojectgroup').val(),
+                            "ProjectType" : $('#ddlProjectType').val(),
+                            "Block" : $('#ddlBlock').val(),
+                            "Product" : $('#ddlProduct').val(),
+                            "StartDate" : $('#StartDate').val(),
+                            "EndDate" : $('#EndDate').val(),
                             "isactive" : $('#isactive').prop('checked')
                         },
                         success:function(data){
-                    
-                            swal({   
-                                        title:"Success",
-                                        text:data.PopupMessage.message+" Successfully!!",
-                                        icon:"success",
-                                        confirmButtonClass:"btn btn-confirm mt-2"
-                                        }).then(function(){
-                                            window.location.href = '/after_popup_project';
-                                        });
+                            var message="",title="",icon="";
+                    if(data.PopupMessage.client_flag==2){
+                        message=data.PopupMessage.message;
+                        title="Error";
+                        icon="error";
+                    }
+                    else{
+                        message=data.PopupMessage.message;
+                        title="Success";
+                        icon="success";
+                    }
+                    swal({   
+                                title:title,
+                                text:message,
+                                icon:icon,
+                                confirmButtonClass:"btn btn-confirm mt-2"
+                                }).then(function(){
+                                    window.location.href = '/after_popup_project';
+                                });
                         //    alert("The Inserted/Upadated Id is "+data.PopupMessage.message);
                         //    window.location.href="/after_popup"; 
                         },
@@ -184,18 +426,40 @@
                                                 <label for="ProjectName">Project Name * :</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <input type="text" class="form-control" name="ProjectName" id="ProjectName" required placeholder="project name">
+                                                <input type="text" class="form-control" name="ProjectName" id="ProjectName" required placeholder="Project Name">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <label for="client">Customer *:</label>
+                                                <label for="ProjectCode">Project Code * :</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="ddlClient" class="form-control" name="ClientId" ClientIdMode="static" required="">
-                                                    <option value="">Choose Customer</option>
+                                                <input type="text" class="form-control" name="ProjectCode" id="ProjectCode" required placeholder="Project Code">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ClientName">Customer Name :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ClientName" class="form-control dropdown-search-filter" onchange="Contractbycustomer()" name="Customer_Name" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                                    <option value="">Choose Customer Name</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ContractName">Contract Name :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ContractName" class="form-control dropdown-search-filter" name="ContractName" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                                    <option value="">Choose Contract Name</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -203,7 +467,7 @@
                                     <div class="form-group">
                                             <div class="row">
                                                 <div class="col-lg-6">
-                                                    <label for="practice">Practice *:</label>
+                                                    <label for="practice">Practice :</label>
                                                 </div>
                                                 <div class="col-lg-6">
                                                     <select id="ddlPractice" class="form-control" name="PracticeId" ClientIdMode="static"  required="">
@@ -211,9 +475,84 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                    </div>                                  
-    
-                                    
+                                    </div>
+                                    <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <label for="ddlBU">BU :</label>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <select id="ddlBU" class="form-control" name="PracticeId" ClientIdMode="static"  required="">
+                                                        <option value="">Choose BU</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                    </div> 
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ddlprojectgroup">Project Group :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ddlprojectgroup" class="form-control" name="PracticeId" ClientIdMode="static"  required="">
+                                                    <option value="">Choose Project Group</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ddlProjectType">Project Type :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ddlProjectType" class="form-control" name="PracticeId" ClientIdMode="static"  required="">
+                                                    <option value="">Choose Project Type</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ddlBlock">Block :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ddlBlock" class="form-control" name="PracticeId" ClientIdMode="static"  required="">
+                                                    <option value="">Choose Block</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ddlProduct">Product :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ddlProduct" class="form-control" name="PracticeId" ClientIdMode="static"  required="">
+                                                    <option value="">Choose Product</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row ">
+                                        <div class="col-lg-6">
+                                            <label for="StartDate">Start Date *:</label>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <input type="text" id="StartDate" name="StartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row ">
+                                        <div class="col-lg-6">
+                                            <label for="EndDate">End Date *:</label>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <input type="text" id="EndDate" name="EndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date">
+                                        </div>
+                                    </div>
+
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-lg-6">
@@ -245,4 +584,11 @@
         <script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>
         <script src="static/assets/libs/jquery-knob/jquery.knob.min.js"></script>
         <script src="static/assets/libs/jquery-sparkline/jquery.sparkline.min.js"></script>
+
+
+        <script src="static/assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+        <link href="static/assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" />
+        <script src="static/assets/libs/clockpicker/bootstrap-clockpicker.min.js"></script>
+        <link href="static/assets/libs/bootstrap-colorpicker/bootstrap-colorpicker.min.css" rel="stylesheet" type="text/css" />
+       
        

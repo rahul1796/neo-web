@@ -322,12 +322,12 @@ class Database:
         cur2.close()
         con.close()
         return client
-    def add_project_details(project_name,client_id,practice_id,user_id,is_active,project_id):
+    def add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, StartDate, EndDate, isactive, project_id, user_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_project] ?, ?, ?, ?, ?, ?'
-        values = (project_name,client_id,practice_id,user_id,is_active,project_id)
-        print(values)
+        sql = 'exec	[masters].[sp_add_edit_project] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, StartDate, EndDate, isactive, project_id, user_id)
+        #print(values)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -335,10 +335,15 @@ class Database:
         cur.close()
         con.close()
         if pop ==1:
-            msg={"message":"Updated"}
-        else:
-            msg={"message":"Created"}
+            msg={"message":"Updated","client_flag":1}
+        else: 
+                if pop==0:
+                    msg={"message":"Created","client_flag":0}
+                else:
+                    if pop==2:
+                        msg={"message":"Customer with the Customer code already exists","client_flag":2}
         return msg
+        
     def get_project_details(glob_project_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -815,11 +820,11 @@ class Database:
         con.close()
         return content
 
-    def add_batch_details(batch_id,batch_name,course_id,batch_code,center_id,trainer_id,center_manager_id,start_date,end_date,start_time,end_time,user_id,is_active,actual_start_date,actual_end_date):
+    def add_batch_details(BatchName, BatchCode, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, StartDate, EndDate, StartTime, EndTime, BatchId, user_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec	batches.sp_add_edit_batches ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (batch_id,batch_name,course_id,center_id,trainer_id,center_manager_id,start_date,end_date,start_time,end_time,user_id,is_active,batch_code,actual_start_date,actual_end_date)
+        values = (BatchName, BatchCode, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, StartDate, EndDate, StartTime, EndTime, BatchId, user_id)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -876,7 +881,7 @@ class Database:
         trainers = []
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        cur2.execute("EXEC [masters].[sp_get_trainer_based_on_center] @center_id="+center_id)
+        cur2.execute("EXEC [masters].[sp_get_trainer_based_on_center] @center_id="+str(center_id))
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
             h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
@@ -1185,6 +1190,40 @@ class Database:
         return msg
 
     def get_client_detail(glob_client_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'select customer_name,customer_code,is_active,funding_source_id,customer_group_id,industry_type_id,category_type_id from masters.tbl_customer where customer_id=?'
+        values = (glob_client_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+        cur.close()
+        con.close()
+        return h
+
+    def add_contract_details(ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, isactive, user_id, contract_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_add_edit_contract] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, isactive, user_id, contract_id)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated Successfully","client_flag":1}
+        else: 
+                if pop==0:
+                    msg={"message":"Created Successfully","client_flag":0}
+                else:
+                    if pop==2:
+                        msg={"message":"Customer with the Customer code already exists","client_flag":2}
+        return msg
+
+    def get_contract_detail(glob_client_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'select customer_name,customer_code,is_active,funding_source_id,customer_group_id,industry_type_id,category_type_id from masters.tbl_customer where customer_id=?'
@@ -3204,7 +3243,24 @@ SELECT					cb.name as candidate_name,
         return response
         con.close()       
         return response
-
+    def GetSubProjectsForCenter_course(center_id, course_id, sub_project_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_sub_projects_for_center_course]  ?, ?, ?'
+        values = (center_id, course_id, sub_project_id)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+        con.close()       
+        return response
     def Get_all_Entity_db():
         response=[]
         con = pyodbc.connect(conn_str)
@@ -3439,6 +3495,39 @@ SELECT					cb.name as candidate_name,
         con.close()       
         return out
 
+
+    def Get_all_ProjectType_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[get_all_ProjectType]'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    @classmethod
+    def AllCourse_center_db(cls, center_id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_course_basedon_center] ?'
+        values = (center_id, )
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
     def GetAssessmentTypes():
         response=[]
         h={}
@@ -3515,3 +3604,4 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             print(str(e))
         return out
+

@@ -10,14 +10,15 @@
             $(document).ready(function(){
                 // $('.dropdown-search-filter').select2();
                 //    { placeholder:''}
+                $(".date-picker").flatpickr();
                 // 
                 
-                LoadFunding_Resourcesdl();
-                LoadCustomer_Groupdl();
-                Loadddlindustrytypedl();
-                Loadddlcategorytypedl();
+                LoadCustomerdl();
+                LoadEntitydl();
+                Loadsalescattegorydl();
+
                 
-                if('{{client_id}}' !=0)
+                if('{{contract_id}}' !=0)
                 {
                     var URL=$('#hdn_web_url').val()+ "/GetClientDetails";
                     $.ajax({
@@ -48,33 +49,97 @@
                     });
                 }
             });
-            
-            function LoadCustomer_Groupdl(){
-            var URL=$('#hdn_web_url').val()+ "/Get_all_Customer_Group"
+            function Loadsalescattegorydl(){
+            var URL=$('#hdn_web_url').val()+ "/GetAllSalesCategory"
                 $.ajax({
                 type:"GET",
                 url:URL,
                 async:false,        
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
-                data:{
-                    "customer_group_id" : 0 //$('#ddlRM_role').val().toString()//$('#ddlProject option:selected').val()
-                },
                 success: function (data){
-                    if(data.Customer_Group != null)
+                    if(data.SalesCategory != null)
                     {
-                        $('#ddl_customer_group').empty();
-                        var count=data.Customer_Group.length;
+                        $('#ddlsalescatergoryname').empty();
+                        var count=data.SalesCategory.length;
                         if( count> 0)
                         {
                             //$('#ddlcustomergroup').append(new Option('ALL','-1'));
                             for(var i=0;i<count;i++)
-                                $('#ddl_customer_group').append(new Option(data.Customer_Group[i].Customer_Group_Name,data.Customer_Group[i].Customer_Group_Id));
+                                $('#ddlsalescatergoryname').append(new Option(data.SalesCategory[i].Sales_Category_Name, data.SalesCategory[i].Sales_Category_Id));
                             //$('#ddlCourse').val('-1');
                         }
                         else
                         {
-                            $('#ddl_customer_group').append(new Option('ALL','-1'));
+                            $('#ddlsalescatergoryname').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+            function LoadEntitydl(){
+            var URL=$('#hdn_web_url').val()+ "/All_entity"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.Entity != null)
+                    {
+                        $('#EntityName').empty();
+                        var count=data.Entity.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            for(var i=0;i<count;i++)
+                                $('#EntityName').append(new Option(data.Entity[i].Entity_Name, data.Entity[i].Entity_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                            $('#EntityName').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+            function LoadCustomerdl(){
+            var URL=$('#hdn_web_url').val()+ "/GetALLClient"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.Clients != null)
+                    {
+                        $('#ClientName').empty();
+                        var count=data.Clients.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            for(var i=0;i<count;i++)
+                                $('#ClientName').append(new Option(data.Clients[i].Customer_Name, data.Clients[i].Customer_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                            $('#ClientName').append(new Option('ALL','-1'));
                         }
                     }
                 },
@@ -87,123 +152,21 @@
             return false;
         }
             
-        function LoadFunding_Resourcesdl(){
-                var URL=$('#hdn_web_url').val()+ "/Get_all_Funding_resources"
-                    $.ajax({
-                    type:"GET",
-                    url:URL,
-                    async:false,        
-                    beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                    datatype:"json",
-                    success: function (data){
-                        if(data.Funding_Resources != null)
-                        {
-                            $('#ddlfundingsource').empty();
-                            var count=data.Funding_Resources.length;
-                            if( count> 0)
-                            {
-                                //$('#ddlFundingSource').append(new Option('ALL','-1'));
-                                for(var i=0;i<count;i++)
-                                    $('#ddlfundingsource').append(new Option(data.Funding_Resources[i].Funding_Source_Name,data.Funding_Resources[i].Funding_Source_Id));
-                                //$('#ddlCourse').val('-1');
-                            }
-                            else
-                            {
-                                $('#ddlfundingsource').append(new Option('ALL','-1'));
-                            }
-                        }
-                    },
-                    error:function(err)
-                    {
-                        alert('Error while loading BU! Please try again');
-                        return false;
-                    }
-                });
-                return false;
-            }
 
-            function Loadddlindustrytypedl(){
-                var URL=$('#hdn_web_url').val()+ "/Get_all_industry"
-                    $.ajax({
-                    type:"GET",
-                    url:URL,
-                    async:false,        
-                    beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                    datatype:"json",
-                    success: function (data){
-                        if(data.Industry != null)
-                        {
-                            $('#ddlindustrytype').empty();
-                            var count=data.Industry.length;
-                            if( count> 0)
-                            {
-                                //$('#ddlFundingSource').append(new Option('ALL','-1'));
-                                for(var i=0;i<count;i++)
-                                    $('#ddlindustrytype').append(new Option(data.Industry[i].Industry_Type_Name,data.Industry[i].Industry_Type_Id));
-                                //$('#ddlCourse').val('-1');
-                            }
-                            else
-                            {
-                                $('#ddlindustrytype').append(new Option('ALL','-1'));
-                            }
-                        }
-                    },
-                    error:function(err)
-                    {
-                        alert('Error while loading BU! Please try again');
-                        return false;
-                    }
-                });
-                return false;
-            }
-            function Loadddlcategorytypedl(){
-                var URL=$('#hdn_web_url').val()+ "/GetAllCategoryTypes"
-                $.ajax({
-                type:"GET",
-                url:URL,
-                async:false,        
-                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                datatype:"json",
-                success: function (data){
-                    if(data.CategoryType != null)
-                    {
-                        $('#ddl_category_type').empty();
-                        var count=data.CategoryType.length;
-                        if( count> 0)
-                        {
-                            for(var i=0;i<count;i++)
-                                $('#ddl_category_type').append(new Option(data.CategoryType[i].Category_Type_Name,data.CategoryType[i].Category_Type_Id));
-                            
-                        }
-                        else
-                        {
-                            $('#ddl_category_type').append(new Option('ALL','-1'));
-                        }
-                    }
-                },
-                error:function(err)
-                {
-                    alert('Error while loading Category Type! Please try again');
-                    return false;
-                }
-            });
-            return false;
-            }
 
             function add_popup_message(){
-                var URL=$('#hdn_web_url').val()+ "/add_client_details";
+                var URL=$('#hdn_web_url').val()+ "/add_contract_details";
                     $.ajax({
                         type:"POST",
                         url:URL,
                         data:{
+                            "ContractName" : $('#ContractName').val(),
+                            "ContractCode" : $('#ContractCode').val(),
                             "ClientName" : $('#ClientName').val(),
-                            "ClientCode" : $('#ClientCode').val(),
-
-                            "FundingSource" : $('#ddlfundingsource').val(),
-                            "CustomerGroup" : $('#ddl_customer_group').val(),
-                            "IndustryType" : $('#ddlindustrytype').val(),
-                            "CategoryType" : $('#ddl_category_type').val(),
-
+                            "EntityName" : $('#EntityName').val(),
+                            "SalesCatergory" : $('#ddlsalescatergoryname').val(),
+                            "StartDate" : $('#StartDate').val(),
+                            "EndDate" : $('#EndDate').val(),
                             "isactive" : $('#isactive').prop('checked')
                         },
                         success:function(data){
@@ -224,7 +187,7 @@
                                 icon:icon,
                                 confirmButtonClass:"btn btn-confirm mt-2"
                                 }).then(function(){
-                                    window.location.href = '/after_popup_client';
+                                    window.location.href = '/after_popup_contract';
                                 });
                         //    alert("The Inserted/Upadated Id is "+data.PopupMessage.message);
                         //    window.location.href="/after_popup"; 
@@ -274,30 +237,30 @@
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <label for="ClientName">Customer Name * :</label>
+                                                <label for="ContractName">Contract Name :</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <input type="text" maxlength="25" class="form-control" name="ClientName" id="ClientName" required placeholder="Customer name">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-lg-6">
-                                                <label for="ClientCode">Customer Code * :</label>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <input type="text" maxlength="25" class="form-control" name="ClientCode" id="ClientCode" required placeholder="Customer code">
+                                                <input type="text" maxlength="25" class="form-control" name="ContractName" id="ContractName" required placeholder="Contract name">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <label for="ddlfundingsource">Funding Source</label>
+                                                <label for="ContractCode">Contract Code :</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="ddlfundingsource" class="form-control dropdown-search-filter" name="Funding_source" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                                <input type="text" maxlength="25" class="form-control" name="ContractCode" id="ContractCode" required placeholder="Contract Code">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ClientName">Customer Name :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ClientName" class="form-control dropdown-search-filter" name="Customer_Name" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
                                                     <option value="">Choose Funding Source</option>
                                                 </select>
                                             </div>
@@ -306,24 +269,11 @@
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <label for="ddl_customer_group" class="mr-3">Customer Group</label>
+                                                <label for="EntityName">Entity Name :</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="ddl_customer_group" class="form-control dropdown-search-filter" placeholder="Choose Customer Group"> <!-- LoadCenterList(this.value,0) -->>
-                                                    <option selected ="" value="">Choose Customer Group</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-lg-6">
-                                                <label for="ddlindustrytype">Industry Type</label>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <select id="ddlindustrytype" class="form-control dropdown-search-filter" name="industry_type" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
-                                                    <option value="">Choose Industry Type</option>
+                                                <select id="EntityName" class="form-control dropdown-search-filter" name="Entity_Name" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                                    <option value="">Choose Entity Name</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -331,16 +281,31 @@
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <label for="ddl_category_type">Category Type</label>
+                                                <label for="ddlsalescatergoryname">Sales Category Name</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="ddl_category_type" class="form-control dropdown-search-filter" name="category_type" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
-                                                    <option value="">Choose Category Type</option>
+                                                <select id="ddlsalescatergoryname" class="form-control dropdown-search-filter" name="sales_catergoryname" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                                    <option value="">Choose Sales Catergory</option>
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
-                                    
+                                    <div class="form-group row ">
+                                        <div class="col-lg-6">
+                                                <label for="StartDate">Start Date *:</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                        <input type="text" id="StartDate" name="StartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date">
+                                    </div>
+                                </div>
+                                <div class="form-group row ">
+                                        <div class="col-lg-6">
+                                                <label for="EndDate">End Date *:</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                        <input type="text" id="EndDate" name="EndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date">
+                                    </div>
+                                </div>
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-lg-6">
@@ -373,4 +338,10 @@
         <script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>
         <script src="static/assets/libs/jquery-knob/jquery.knob.min.js"></script>
         <script src="static/assets/libs/jquery-sparkline/jquery.sparkline.min.js"></script>
+
+
+        <script src="static/assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+        <link href="static/assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" />
+        <script src="static/assets/libs/clockpicker/bootstrap-clockpicker.min.js"></script>
+        <link href="static/assets/libs/bootstrap-colorpicker/bootstrap-colorpicker.min.css" rel="stylesheet" type="text/css" />
        

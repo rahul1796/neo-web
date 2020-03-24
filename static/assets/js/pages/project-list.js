@@ -320,7 +320,9 @@ function LoadTable()
         }
 
     });
+    
 }
+
 function EditProjectDetail(ProjectId)
 {
     $('#hdn_project_id').val(ProjectId);

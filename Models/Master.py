@@ -32,8 +32,8 @@ class Master:
     def all_client():
         all_client={"Clients":Database.GetALLClient()}
         return all_client
-    def add_project_details(project_name,client_id,practice_id,user_id,is_active,project_id):
-        popupMessage = {"PopupMessage":  Database.add_project_details(project_name,client_id,practice_id,user_id,is_active,project_id)}
+    def add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, StartDate, EndDate, isactive, project_id, user_id):
+        popupMessage = {"PopupMessage":  Database.add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, StartDate, EndDate, isactive, project_id, user_id)}
         return popupMessage
     def get_project_details(glob_project_id):
         indi_project={"ProjectDetail":Database.get_project_details(glob_project_id)}
@@ -140,6 +140,8 @@ class Master:
         return response
     def GetSubProjectsForCenter(center_id):
         return Database.GetSubProjectsForCenter(center_id)
+    def GetSubProjectsForCenter_course(center_id, course_id, sub_project_id):
+        return Database.GetSubProjectsForCenter_course(center_id, course_id, sub_project_id)
     
     def GetProjectsForCourse(CourseId):
         return Database.GetProjectsForCourse(CourseId)
@@ -150,4 +152,6 @@ class Master:
     def GetCentersForCourse(CourseId):
         return Database.GetCentersForCourse(CourseId)
         
-        
+    def add_contract(ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, isactive, user_id, contract_id):
+        popupMessage = {"PopupMessage": Database.add_contract_details(ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, isactive, user_id, contract_id)}
+        return popupMessage

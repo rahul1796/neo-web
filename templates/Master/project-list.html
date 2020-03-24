@@ -31,6 +31,11 @@
     LoadProductdl();
     if ('{{status}}'==1)
         $('#ddlStatus').val('2');
+    role_id=parseInt($('#hdn_home_user_role_id').val());
+    if(role_id == 1)
+        $('#btn_create').show();
+    else 
+        $('#btn_create').hide();
     LoadTable(); 
                  
   /*  $("#alternative-page-datatable").DataTable({
@@ -125,13 +130,17 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-lg-3" >
+                                    <div class="col-lg-6" >
 										
                                         <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
                                         onclick="LoadTable()">Search</button>
                                         &nbsp
+                                        
                                         <!--button style="margin-top: 30px" type="button" class="btn btn-primary waves-effect waves-light submit" 
                                         onclick="Download()">Download</button-->
+                                    </div>
+                                    <div class="col-lg-6" >                                        
+                                        <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-primary">Create Project</a>
                                     </div>
                                 </div>
                             </div>

@@ -7,9 +7,9 @@
 <script type="text/javascript">
 var Candidates = {};
     $(document).ready(function(){
-        $('.dropdown-search-filter').select2({
-                placeholder:''
-            });
+        // $('.dropdown-search-filter').select2({
+        //         placeholder:''
+        //     });
         $(".date-picker").flatpickr();             
         $(".time-picker").flatpickr({
             enableTime: !0,
@@ -26,6 +26,11 @@ var Candidates = {};
 
         LoadProductList();
         LoadCenterList();
+        LoadCourseList('0');
+        LoadsubProject('0');
+        LoadCoFunding('0');
+        TrainersBasedOnUsers();
+
 
         if('{{batch_id}}' !=0)
         {
@@ -43,7 +48,6 @@ var Candidates = {};
                             $('#ddlCourse').val(data.BatchDetail.Course_Id).change();
                             $('#BatchCode').val(data.BatchDetail.Batch_Code);
                             LoadCenterList($('#ddlCourse').val(),data.BatchDetail.Center_Id);
-                            console.log('fvhg',data);
                             TrainersBasedOnUsers($('#ddlCenter').val(),data.BatchDetail.Trainer_Id);
                             CenterManagerBasedOnUsers($('#ddlCenter').val(),data.BatchDetail.Center_Manager_Id);
                             $('#StartDate').val(data.BatchDetail.Start_Date);
@@ -92,7 +96,7 @@ var Candidates = {};
                         var count=data.Product.length;
                         if( count> 0)
                         {
-                            $('#ddlProduct').append(new Option('Choose Product',''));
+                            //$('#ddlProduct').append(new Option('Choose Product',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlProduct').append(new Option(data.Product[i].Product_Name,data.Product[i].Product_Id));
                         }
@@ -126,7 +130,7 @@ var Candidates = {};
                         var count=data.Center.length;
                         if( count> 0)
                         {
-                            $('#ddlCenter').append(new Option('Choose Center',''));
+                            //$('#ddlCenter').append(new Option('Choose Center',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlCenter').append(new Option(data.Center[i].Center_Name,data.Center[i].Center_Id));
                         }
@@ -145,15 +149,18 @@ var Candidates = {};
             return false;
         }
 
-        function LoadCourseList()
+        function LoadCourseList(needed)
         {
-            var URL=$('#hdn_web_url').val()+ "/AllCourseList"
+            var URL=$('#hdn_web_url').val()+ "/All_Course_basedon_center"
             $.ajax({
                 type:"GET",
                 url:URL,
                 async:false,
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
+                data:{
+                        "Center_id": $('#ddlCenter').val()
+                    },
                 success: function (data){
                     if(data.Courses != null)
                     {
@@ -161,7 +168,7 @@ var Candidates = {};
                         var count=data.Courses.length;
                         if( count> 0)
                         {
-                            $('#ddlCourse').append(new Option('Choose Course',''));
+                            //$('#ddlCourse').append(new Option('Choose Course',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
                         }
@@ -177,6 +184,98 @@ var Candidates = {};
                     return false;
                 }
             });
+            if (needed !=0)
+                {
+                    $('#ddlCourse').val(needed);
+                }
+            return false;
+        }
+        function LoadsubProject(needed)
+        {
+            var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForCenter_Course"
+            alert($('#ddlCenter').val())
+            alert($('#ddlCourse').val())
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                        "center_id": $('#ddlCenter').val(),
+                        "course_id": $('#ddlCourse').val(),
+                        "sub_project_id": '0'
+                    },
+                success: function (data){
+                    if(data.SubProjects != null)
+                    {
+                        $('#ddlSubProject').empty();
+                        var count=data.SubProjects.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlCourse').append(new Option('Choose Course',''));
+                            for(var i=0;i<count;i++)
+                                $('#ddlSubProject').append(new Option(data.SubProjects[i].Sub_Project_Name,data.SubProjects[i].Sub_Project_Id));
+                        }
+                        else
+                        {
+                            $('#ddlSubProject').append(new Option('Choose Sub Project','0'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            if (needed !=0)
+                {
+                    $('#ddlSubProject').val(needed);
+                }
+            return false;
+        }
+        function LoadCoFunding(needed)
+        {
+            var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForCenter_Course"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                        "center_id": $('#ddlCenter').val(),
+                        "course_id": $('#ddlCourse').val(),
+                        "sub_project_id": $('#ddlSubProject').val()
+                    },
+                success: function (data){
+                    if(data.SubProjects != null)
+                    {
+                        $('#ddlCofunding').empty();
+                        var count=data.SubProjects.length;
+                        if( count> 0)
+                        {
+                            $('#ddlCofunding').append(new Option('NA','-1'));
+                            for(var i=0;i<count;i++)
+                                $('#ddlCofunding').append(new Option(data.SubProjects[i].Sub_Project_Name,data.SubProjects[i].Sub_Project_Id));
+                        }
+                        else
+                        {
+                            $('#ddlCofunding').append(new Option('NA','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            if (needed !=0)
+                {
+                    $('#ddlCofunding').val(needed);
+                }
             return false;
         }
         // function LoadCenterList(Course_selected,needed)
@@ -220,56 +319,57 @@ var Candidates = {};
         //         }
         //     return false;
         // }
-		function LoadSubCenterList(Center_selected,needed)
-        {
-            //alert("hello");
-            if(needed ==0){
-                myfunction(Center_selected);
-            }
-            //myfunction(Center_selected);
-            var URL=$('#hdn_web_url').val()+ "/SubCenterBasedOnCenter";
-            $.ajax({
-                type:"POST",
-                url:URL,
-                async:false,
-                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                datatype:"json",
-                data:{
-                    "center_id": Center_selected
-                },
-                success: function (res){
-                    //alert(JSON.stringify(res));
-                    if(res.SubCenter != null)
-                    {
-                        $('#ddlSubCenter').empty();
-                        var count=res.SubCenter.length;
-                        
-                        if( count> 0)
-                        {
-                            $('#ddlSubCenter').append(new Option('Choose Sub Center',''));
-                            for(var i=0;i<count;i++)
-                                $('#ddlSubCenter').append(new Option(res.SubCenter[i].Center_Name,res.SubCenter[i].Center_Id));
-                        }
-                        else
-                        {
-                            $('#ddlSubCenter').append(new Option('Choose Sub Center',''));
-                        }
-                    }
-                },
-                error:function(err)
-                {
-                    //alert('Error! Please try again');
-                    return false;
-                }
-            });
-                if (needed !=0)
-                {
-                    $('#ddlSubCenter').val(needed);
-                }
-            return false;
-        }
 
-        function TrainersBasedOnUsers(CenterSeleceted,needed)
+		// function LoadSubCenterList(Center_selected,needed)
+        // {
+        //     //alert("hello");
+        //     if(needed ==0){
+        //         myfunction(Center_selected);
+        //     }
+        //     //myfunction(Center_selected);
+        //     var URL=$('#hdn_web_url').val()+ "/SubCenterBasedOnCenter";
+        //     $.ajax({
+        //         type:"POST",
+        //         url:URL,
+        //         async:false,
+        //         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        //         datatype:"json",
+        //         data:{
+        //             "center_id": Center_selected
+        //         },
+        //         success: function (res){
+        //             //alert(JSON.stringify(res));
+        //             if(res.SubCenter != null)
+        //             {
+        //                 $('#ddlSubCenter').empty();
+        //                 var count=res.SubCenter.length;
+                        
+        //                 if( count> 0)
+        //                 {
+        //                     $('#ddlSubCenter').append(new Option('Choose Sub Center',''));
+        //                     for(var i=0;i<count;i++)
+        //                         $('#ddlSubCenter').append(new Option(res.SubCenter[i].Center_Name,res.SubCenter[i].Center_Id));
+        //                 }
+        //                 else
+        //                 {
+        //                     $('#ddlSubCenter').append(new Option('Choose Sub Center',''));
+        //                 }
+        //             }
+        //         },
+        //         error:function(err)
+        //         {
+        //             //alert('Error! Please try again');
+        //             return false;
+        //         }
+        //     });
+        //         if (needed !=0)
+        //         {
+        //             $('#ddlSubCenter').val(needed);
+        //         }
+        //     return false;
+        // }
+
+        function TrainersBasedOnUsers()
         {
             var URL=$('#hdn_web_url').val()+ "/TrainersBasedOnCenter"
             $.ajax({
@@ -279,7 +379,7 @@ var Candidates = {};
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
                 data:{
-                    "center_id": CenterSeleceted
+                    "center_id": '0'
                 },
                 success: function (data){
                     if(data.Trainers != null)
@@ -288,7 +388,7 @@ var Candidates = {};
                         var count=data.Trainers.length;
                         if( count> 0)
                         {
-                            $('#ddlTrainer').append(new Option('Choose Trainer',''));
+                            //$('#ddlTrainer').append(new Option('Choose Trainer',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlTrainer').append(new Option(data.Trainers[i].User_Name,data.Trainers[i].User_Id));
                         }
@@ -304,10 +404,7 @@ var Candidates = {};
                     return false;
                 }
             });
-            if (needed !=0)
-                {
-                    $('#ddlTrainer').val(needed);
-                }
+            
             return false;
         }
         // function CandidatesBasedOnCourse(CourseId)
@@ -375,82 +472,83 @@ var Candidates = {};
         //     //add_popup_message();
         // }
 
-        function CenterManagerBasedOnUsers(CenterSeleceted1,needed)
-        {
-            var URL=$('#hdn_web_url').val()+ "/CenterManagerBasedOnCenter"
-            $.ajax({
-                type:"POST",
-                url:URL,
-                async:false,
-                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                datatype:"json",
-                data:{
-                    "center_id": CenterSeleceted1
-                },
-                success: function (data){
-                    if(data.CenterManager != null)
-                    {
-                        $('#ddlCentralManager').empty();
-                        var count=data.CenterManager.length;
-                        if( count> 0)
-                        {
-                            $('#ddlCentralManager').append(new Option('Choose Center Manager',''));
-                            for(var i=0;i<count;i++)
-                                $('#ddlCentralManager').append(new Option(data.CenterManager[i].User_Name,data.CenterManager[i].User_Id));
-                        }
-                        else
-                        {
-                            $('#ddlCentralManager').append(new Option('Choose Center Manager',''));
-                        }
-                    }
-                },
-                error:function(err)
-                {
-                    alert('Error! Please try again');
-                    return false;
-                }
-            });
-            if (needed !=0)
-                {
-                    $('#ddlCentralManager').val(needed);
-                }
-            return false;
-        }
-        
+        // function CenterManagerBasedOnUsers(CenterSeleceted1,needed)
+        // {
+        //     var URL=$('#hdn_web_url').val()+ "/CenterManagerBasedOnCenter"
+        //     $.ajax({
+        //         type:"POST",
+        //         url:URL,
+        //         async:false,
+        //         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        //         datatype:"json",
+        //         data:{
+        //             "center_id": CenterSeleceted1
+        //         },
+        //         success: function (data){
+        //             if(data.CenterManager != null)
+        //             {
+        //                 $('#ddlCentralManager').empty();
+        //                 var count=data.CenterManager.length;
+        //                 if( count> 0)
+        //                 {
+        //                     $('#ddlCentralManager').append(new Option('Choose Center Manager',''));
+        //                     for(var i=0;i<count;i++)
+        //                         $('#ddlCentralManager').append(new Option(data.CenterManager[i].User_Name,data.CenterManager[i].User_Id));
+        //                 }
+        //                 else
+        //                 {
+        //                     $('#ddlCentralManager').append(new Option('Choose Center Manager',''));
+        //                 }
+        //             }
+        //         },
+        //         error:function(err)
+        //         {
+        //             alert('Error! Please try again');
+        //             return false;
+        //         }
+        //     });
+        //     if (needed !=0)
+        //         {
+        //             $('#ddlCentralManager').val(needed);
+        //         }
+        //     return false;
+        // }
         
         function add_popup_message(){
-            if(($('#StartTime').val() < $("#EndTime").val()) && ($('#StartDate').val() <= $('#EndDate').val()) && ($('#ActualStartDate').val()<=$('#ActualEndDate').val()))
+            if(($('#StartTime').val() < $("#EndTime").val()) && ($('#StartDate').val() <= $('#EndDate').val()) )
             {
 				var centertype;
                 //alert($('#ActualStartDate').val());
-				if($('#ddlSubCenter').val() != '')
-                {
-                    centertype = $('#ddlSubCenter').val()
-                }
-                else
-                {
-                    centertype = $('#ddlCenter').val()
-                }
+				// if($('#ddlSubCenter').val() != '')
+                // {
+                //     centertype = $('#ddlSubCenter').val()
+                // }
+                // else
+                // {
+                //     centertype = $('#ddlCenter').val()
+                // }
+
                 var URL=$('#hdn_web_url').val()+ "/add_batch_details";
                 //alert($('#ddlCourse').val());
                     $.ajax({
                         type:"POST",
                         url:URL,
                         data:{
+                            
                             "BatchName" : $('#BatchName').val(),
                             "BatchCode" : $('#BatchCode').val(),
+                            "Product" : $('#ddlProduct').val(),
+                            "Center" : $('#ddlCenter').val(),
+                            "Course":$('#ddlCourse').val(),
+                            "SubProject":$('#ddlSubProject').val(),
+                            "Cofunding":$('#ddlCofunding').val(),
+                            "Trainer":$('#ddlTrainer').val(),
                             "isactive" : $('#isactive').prop('checked'),
-                            "CourseId" : $('#ddlCourse').val(),
-                            "CenterId" : centertype,
-                            "TrainerId":$('#ddlTrainer').val(),
-                            "CentralManagerId":$('#ddlCentralManager').val(),
                             "StartDate":$('#StartDate').val(),
                             "EndDate":$('#EndDate').val(),
                             "StartTime":$('#StartTime').val(),
                             "EndTime":$("#EndTime").val(),
-                            "ActualStartDate":$('#ActualStartDate').val(),
-                            "ActualEndDate":$('#ActualEndDate').val(),
-							"BatchId":'{{batch_id}}'
+                            "BatchId":'{{batch_id}}'
                         },
                         success:function(data){
                             var message="",title="",icon="";
@@ -540,12 +638,12 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="BatchName">Batch Code * :</label>
+                                <label for="BatchCode">Batch Code * :</label>
                             </div>
                             <div class="col-lg-6">
                                 <input type="text" class="form-control" name="BatchCode" id="BatchCode"  ClientIdMode="static" required placeholder="Batch Code">
                             </div>
-                        </div>
+                        </div> 
                     </div>
                     <div class="form-group">
                         <div class="row">
@@ -565,10 +663,10 @@ var Candidates = {};
                                 <label for="CenterId">Center :</label>
                             </div>
                             <div class="col-lg-6">
-                                <select id="ddlCenter" class="form-control dropdown-search-filter"  onchange="loadcourse_list(this.value)" name="CenterId" ClientIdMode="static"  > <!-- myfunction(this.value) -->>
+                                <select id="ddlCenter" class="form-control dropdown-search-filter"  onchange="LoadCourseList('0')" name="CenterId" ClientIdMode="static"  > <!-- myfunction(this.value) -->>
                                     <option value="">Center</option>
                                 </select>
-                            </div>
+                            </div> 
                         </div>
                     </div>
                     <div class="form-group">
@@ -594,7 +692,7 @@ var Candidates = {};
                                 </select>
                             </div>
                         </div>
-                    </div>
+                    </div> 
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
@@ -620,8 +718,6 @@ var Candidates = {};
                             </div>
                         </div>
                     </div>
-                    
-                    
                     <div class="form-group row ">
                             <div class="col-lg-6">
                                     <label for="StartDate">Start Date *:</label>
@@ -652,22 +748,6 @@ var Candidates = {};
                                 </div>
                                 <div class="col-lg-6">
                             <input type="text" id="EndTime" name="EndTime" class="form-control time-picker" ClientIdMode="static" placeholder="End Time">
-                        </div>
-                    </div>
-                    <div class="form-group row ">
-                            <div class="col-lg-6">
-                                    <label for="ActualStartDate">Actual Start Date :</label>
-                                </div>
-                                <div class="col-lg-6">
-                            <input type="text" id="ActualStartDate" name="ActualStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Actual Start Date">
-                        </div>
-                    </div>
-                    <div class="form-group row ">
-                            <div class="col-lg-6">
-                                    <label for="ActualEndDate">Actual End Date :</label>
-                                </div>
-                                <div class="col-lg-6">
-                            <input type="text" id="ActualEndDate" name="ActualEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="Actual End Date">
                         </div>
                     </div>
                     <div class="form-group">
@@ -729,4 +809,3 @@ var Candidates = {};
 <script src="static/assets/libs/datatables/buttons.print.min.js"></script>
 <script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
 <script src="static/assets/libs/datatables/dataTables.select.min.js"></script> 
-
