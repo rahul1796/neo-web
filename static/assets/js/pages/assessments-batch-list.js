@@ -758,6 +758,7 @@ function add_map_message(){
                                 varHtml+='<tr>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].S_No +'</td>';
                                 txt='<a onclick="DownloadAssessmentResult(\'' + data.Assessments[i].Assessment_Id + '\')" class="btn" style="cursor:pointer" ><i title="Download Assessment Result" class="fe-download" ></i></a>';
+                                txt+='<a onclick="EditAssessmentDetails(\'' + data.Assessments[i].Assessment_Id + '\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Assessment Detail" class="fe-edit-1" ></i></a>';
                                 varHtml+='  <td style="text-align:center;">'+ txt +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Batch_Code +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Requested_Date +'</td>';
@@ -802,7 +803,18 @@ function add_map_message(){
         $('#hdn_batch_assessment_id').val(BatchId);
         $('#mdl_create_batch_assessments').modal('show');
     }
-
+    function EditAssessmentDetails(AssessmentId,ReqDate,SchDate,AssessmentTypeId,AssessmentAgencyId)
+    {
+        LoadAssessmentTypes();
+        LoadAssessmentAgency();
+        $('#TxtRequestedDate').val(ReqDate);
+        $('#TxtScheduledDate').val(SchDate);
+        $('#ddlAssessmentType').val(AssessmentTypeId);
+        $('#ddlAssessmentAgency').val(AssessmentAgencyId);
+        $('#hdn_assessment_id').val(AssessmentId);
+        $('#mdl_batch_assessments').modal('hide');
+        $('#mdl_create_batch_assessments').modal('show');
+    }
     function LoadAssessmentTypes(){
         var URL=$('#hdn_web_url').val()+ "/GetAssessmentTypes"
         $.ajax({
