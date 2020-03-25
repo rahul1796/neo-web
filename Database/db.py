@@ -347,12 +347,12 @@ class Database:
     def get_project_details(glob_project_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'SELECT * FROM [masters].[tbl_projects] where project_id=?'
+        sql = 'select project_name, project_code, customer_id, contract_id, practice_id, bu_id, project_group_id, project_type_id, block_id, product_id, actual_start_date, actual_end_date, is_active from masters.tbl_projects where project_id=?'
         values = (glob_project_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12]}
         cur.close()
         con.close()
         return h
@@ -803,8 +803,8 @@ class Database:
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
-        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids)
+        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type) #course_ids
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -844,12 +844,12 @@ class Database:
     def get_batch_details(batch_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'SELECT * FROM [batches].[tbl_batches] where batch_id=?'
+        sql = 'select batch_name, batch_code, product_id, center_id, course_id, sub_project_id, coalesce(co_funding_project_id,-1) as co_funding_project_id, trainer_id, actual_start_date, actual_end_date, training_start_time, training_end_time, is_active from batches.tbl_batches where batch_id =?'
         values = (batch_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16],""+columns[17]+"":row[17],""+columns[18]+"":row[18]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[12]+"":row[12],""+columns[11]+"":row[11]}
         cur.close()
         con.close()
         return h
@@ -1198,6 +1198,20 @@ class Database:
         columns = [column[0].title() for column in cur.description]
         for row in cur:
             h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+        cur.close()
+        con.close()
+        return h
+    
+    def get_contarct_detail(glob_contract_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'select contract_name, contract_code, customer_id, entity_id, sales_category_id, start_date, end_date, is_active  from masters.tbl_contract where contract_id=?'
+        values = (glob_contract_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        h={}
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7]}
         cur.close()
         con.close()
         return h

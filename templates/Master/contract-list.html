@@ -9,7 +9,6 @@
 <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
 
-
 <script>
     var varTable;
     $(document).ready(function () {
@@ -204,7 +203,18 @@
             },
 
             "columns": [
-                { "data": "S_No"},                
+                { "data": "S_No"}, 
+                {"visible": function (){
+                    if($('#hdn_home_user_role_id').val()=='1')
+                        return true;
+                    else return false;
+                },
+                "data": function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    varButtons += '<a onclick="EditContractDetail(\'' + row.Contract_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Contract" class="fas fa-edit" ></i></a>';
+                    return varButtons;
+                    }
+                },              
                 { "data": "Contract_Name" },
                 { "data": "Client_Name" },
                 { "data": "From_Date" },
@@ -233,6 +243,13 @@
 
         });
     }
+    function EditContractDetail(Contract_Id)
+    {
+        $('#hdn_contract_id').val(Contract_Id);
+        $('#form1').submit();
+        
+    }
+
     function LoadTableBasedOnSearch(){
         LoadTable();
     }
@@ -332,7 +349,7 @@
                                    <thead>
                                        <tr>
                                            <th>S.No</th>
-                                           
+                                           <th>Actions</th>
                                            <th>Contract Name</th>
                                            <th>Customer Name</th>
                                            <th>From Date</th>

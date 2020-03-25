@@ -37,7 +37,7 @@ class Master:
         return popupMessage
     def get_project_details(glob_project_id):
         indi_project={"ProjectDetail":Database.get_project_details(glob_project_id)}
-        print(indi_project)
+        #print(indi_project)
         return indi_project
 
 
@@ -80,6 +80,9 @@ class Master:
         return popupMessage
     def get_client(glob_client_id):
         indi_client={"ClientDetail":Database.get_client_detail(glob_client_id)}
+        return indi_client
+    def get_contract(glob_contract_id):
+        indi_client={"Contract_details":Database.get_contarct_detail(glob_contract_id)}
         return indi_client
 
     def region_list(region_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):

@@ -31,7 +31,7 @@ var Candidates = {};
         LoadCoFunding('0');
         TrainersBasedOnUsers();
 
-
+        // alert('{{batch_id}}')
         if('{{batch_id}}' !=0)
         {
             var URL=$('#hdn_web_url').val()+ "/GetBatchDetails";
@@ -42,20 +42,22 @@ var Candidates = {};
                     if(data!=null)
                     {
                         if(data.BatchDetail!="")
-                        {
-                            //alert(data.BatchDetail.Course_Id);-- dropdown-search-filter
+                        {   
                             $('#BatchName').val(data.BatchDetail.Batch_Name);
-                            $('#ddlCourse').val(data.BatchDetail.Course_Id).change();
                             $('#BatchCode').val(data.BatchDetail.Batch_Code);
-                            LoadCenterList($('#ddlCourse').val(),data.BatchDetail.Center_Id);
-                            TrainersBasedOnUsers($('#ddlCenter').val(),data.BatchDetail.Trainer_Id);
-                            CenterManagerBasedOnUsers($('#ddlCenter').val(),data.BatchDetail.Center_Manager_Id);
-                            $('#StartDate').val(data.BatchDetail.Start_Date);
-                            $('#EndDate').val(data.BatchDetail.End_Date);
+                            $('#ddlProduct').val(data.BatchDetail.Product_Id);
+                            $('#ddlCenter').val(data.BatchDetail.Center_Id);
+                            LoadCourseList(data.BatchDetail.Course_Id);
+                            LoadsubProject(data.BatchDetail.Sub_Project_Id);
+                            LoadCoFunding(data.BatchDetail.Co_Funding_Project_Id);
+                            // alert(data.BatchDetail.Sub_Project_Id);
+                            // alert(data.BatchDetail.Course_Id);
+                            $('#ddlTrainer').val(data.BatchDetail.Trainer_Id);
+                            $('#StartDate').val(data.BatchDetail.Actual_Start_Date);
+                            $('#EndDate').val(data.BatchDetail.Actual_End_Date);
                             $('#StartTime').val(data.BatchDetail.Training_Start_Time);
-                            $('#EndTime').val(data.BatchDetail.Training_End_Time);
-                            $('#ActualStartDate').val(data.BatchDetail.Actual_Start_Date);
-                            $('#ActualEndDate').val(data.BatchDetail.Actual_End_Date);
+                            $("#EndTime").val(data.BatchDetail.Training_End_Time);
+                            
                             if(data.BatchDetail.Is_Active)
                             {
                                 $('#isactive').prop('checked',true);
@@ -193,8 +195,7 @@ var Candidates = {};
         function LoadsubProject(needed)
         {
             var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForCenter_Course"
-            alert($('#ddlCenter').val())
-            alert($('#ddlCourse').val())
+            
             $.ajax({
                 type:"GET",
                 url:URL,
