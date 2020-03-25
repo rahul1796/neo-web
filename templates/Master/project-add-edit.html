@@ -11,7 +11,7 @@
                 $(".date-picker").flatpickr();
 
                 LoadCustomerdl();
-                Contractbycustomer();
+                Contractbycustomer(0);
                 LoadPracticeList();
                 LoadBUdl();
                 LoadProjectGroupdl();
@@ -28,14 +28,25 @@
                         url:URL,
                         success:function(data){
                            if(data!=null)
-                           {
+                           {    
+                                $('#ProjectName').val(data.ProjectDetail.Project_Name);
+                                $('#ProjectCode').val(data.ProjectDetail.Project_Code);
+                                $('#ClientName').val(data.ProjectDetail.Customer_Id);
+                                Contractbycustomer(data.ProjectDetail.Contract_Id);
+                                $('#ContractName').val();
+                                $('#ddlPractice').val(data.ProjectDetail.Practice_Id);
+                                $('#ddlBU').val(data.ProjectDetail.Bu_Id);
+                                $('#ddlprojectgroup').val(data.ProjectDetail.Project_Group_Id);
+                                $('#ddlProjectType').val(data.ProjectDetail.Project_Type_Id);
+                                $('#ddlBlock').val(data.ProjectDetail.Block_Id);
+                                $('#ddlProduct').val(data.ProjectDetail.Product_Id);
+                                $('#StartDate').val(data.ProjectDetail.Actual_Start_Date);
+                                $('#EndDate').val(data.ProjectDetail.Actual_End_Date);
+
                                if(data.ProjectDetail!="")
                                {
-                                   //alert(data.ProjectDetail.Is_Active);
-                                   $('#ProjectName').val(data.ProjectDetail.Project_Name);
-                                   $('#ddlClient').val(data.ProjectDetail.Client_Id);
-                                   $('#ddlPractice').val(data.ProjectDetail.Practice_Id);
-                                   if(data.ProjectDetail.Is_Active)
+                                   
+                                    if(data.ProjectDetail.Is_Active)
                                    {
                                         $('#isactive').prop('checked',true);
                                     }
@@ -261,7 +272,7 @@
             return false;
             }
 
-            function Contractbycustomer()
+            function Contractbycustomer(needed)
             {
                 var URL=$('#hdn_web_url').val()+ "/GetContractbycustomer"
                 $.ajax({
@@ -296,6 +307,10 @@
                         return false;
                     }
                 });
+                if (needed !=0)
+                {
+                    $('#ContractName').val(needed);
+                }
                 return false;
             }
 
@@ -446,7 +461,7 @@
                                                 <label for="ClientName">Customer Name :</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="ClientName" class="form-control dropdown-search-filter" onchange="Contractbycustomer()" name="Customer_Name" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                                <select id="ClientName" class="form-control dropdown-search-filter" onchange="Contractbycustomer(0)" name="Customer_Name"  ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
                                                     <option value="">Choose Customer Name</option>
                                                 </select>
                                             </div>

@@ -16,27 +16,26 @@
                 LoadCustomerdl();
                 LoadEntitydl();
                 Loadsalescattegorydl();
-
-                
+                //alert('{{contract_id}}')
                 if('{{contract_id}}' !=0)
                 {
-                    var URL=$('#hdn_web_url').val()+ "/GetClientDetails";
+                    var URL=$('#hdn_web_url').val()+ "/GetContractDetails";
                     $.ajax({
                         type:"GET",
                         url:URL,
                         success:function(data){
                            if(data!=null)
                            {
-                               if(data.ClientDetail!="")
-                               {    
-                                   $('#ClientName').val(data.ClientDetail.Customer_Name);
-                                   $('#ClientCode').val(data.ClientDetail.Customer_Code);
-                                   $('#ddlfundingsource').val(data.ClientDetail.Funding_Source_Id);
-                                   $('#ddl_customer_group').val(data.ClientDetail.Customer_Group_Id);
-                                   $('#ddlindustrytype').val(data.ClientDetail.Industry_Type_Id);
-                                   $('#ddl_category_type').val(data.ClientDetail.Category_Type_Id);
-
-                                   if(data.ClientDetail.Is_Active)
+                               if(data.Contract_details!="")
+                               {  
+                                $('#ContractName').val(data.Contract_details.Contract_Name);
+                                $('#ContractCode').val(data.Contract_details.Contract_Code);
+                                $('#ClientName').val(data.Contract_details.Customer_Id);
+                                $('#EntityName').val(data.Contract_details.Entity_Id);
+                                $('#ddlsalescatergoryname').val(data.Contract_details.Sales_Category_Id);
+                                $('#StartDate').val(data.Contract_details.Start_Date);
+                                $('#EndDate').val(data.Contract_details.End_Date);
+                                if (data.Contract_details.Is_Active)
                                         $('#isactive').prop('checked',true);
                                     else
                                         $('#isactive').prop('checked',false);
@@ -49,6 +48,7 @@
                     });
                 }
             });
+
             function Loadsalescattegorydl(){
             var URL=$('#hdn_web_url').val()+ "/GetAllSalesCategory"
                 $.ajax({

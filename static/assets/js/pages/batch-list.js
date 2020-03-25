@@ -229,15 +229,17 @@ function LoadTable()
 
             								
             { "data": "S_No"},
-            // { "visible":(($('#hdn_home_user_role_id').val() =='1') || ($('#hdn_home_user_role_id').val() =='5')||($('#hdn_home_user_role_id').val() =='15')) ?true: false,
-            // "data": function (row, type, val, meta) {
-            //     var varButtons = ""; 
-                
-            //     if(role_id == 1 || role_id == 15 || role_id ==5)//|| role_id == 7 || role_id == 5 || role_id == 4
-            //         varButtons += '<a onclick="EditBatchDetail(\'' + row.Batch_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Batch" class="fas fa-edit" ></i></a><a onclick="MapCandidateBatch('+row.Course_Id+','+row.Center_Id+','+row.Batch_Id+')" class="btn" style="cursor:pointer" ><i title="Map Candidate" class="fas fa-plus" ></i></a><a onclick="DropCandidateBatch('+row.Course_Id+','+row.Center_Id+','+row.Batch_Id+')" class="btn" style="cursor:pointer" ><i title="Drop Candidate" class="fas fa-minus" ></i></a>';
-            //     return varButtons;
-            //     }
-            // },	
+            {"visible": function (){
+                if(($('#hdn_home_user_role_id').val() =='1') || ($('#hdn_home_user_role_id').val() =='5')||($('#hdn_home_user_role_id').val() =='15'))
+                    return true;
+                else return false;
+            },
+             "data": function (row, type, val, meta) {
+                var varButtons = ""; 
+                varButtons += '<a onclick="EditBatchDetail(\'' + row.Batch_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Batch" class="fas fa-edit" ></i></a>';
+                return varButtons;
+                }
+            },
             { "data": "Batch_Name" },
             { "data": "Batch_Code"},
             { "data": "Product_Name" },

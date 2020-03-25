@@ -157,7 +157,6 @@ function LoadTable()
             error: function (e) {
                 $("#tbl_clients tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
             }
-
         },
 
         "columns": [

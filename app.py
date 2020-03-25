@@ -860,7 +860,7 @@ class add_batch_details(Resource):
             Course=request.form['Course']
             SubProject=request.form['SubProject']
             Cofunding=request.form['Cofunding']
-            
+        
             return Batch.add_batch(BatchName, BatchCode, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, StartDate, EndDate, StartTime, EndTime, BatchId, user_id)
 
 
@@ -1235,7 +1235,6 @@ class get_client_details(Resource):
     @staticmethod
     def get():
         if request.method == 'GET':
-            #
             return Master.get_client(g.client_id)
 
 api.add_resource(client_list,'/client_list')
@@ -3512,7 +3511,7 @@ class get_contract_details(Resource):
     @staticmethod
     def get():
         if request.method == 'GET':
-            return Master.get_sector(g.sector_id)
+            return Master.get_contract(g.contract_id)
 
 api.add_resource(contract_list,'/contract_list')
 api.add_resource(add_contract_details,'/add_contract_details')
