@@ -98,7 +98,7 @@ var Candidates = {};
                         var count=data.Product.length;
                         if( count> 0)
                         {
-                            //$('#ddlProduct').append(new Option('Choose Product',''));
+                            $('#ddlProduct').append(new Option('Choose Product',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlProduct').append(new Option(data.Product[i].Product_Name,data.Product[i].Product_Id));
                         }
@@ -132,7 +132,7 @@ var Candidates = {};
                         var count=data.Center.length;
                         if( count> 0)
                         {
-                            //$('#ddlCenter').append(new Option('Choose Center',''));
+                            $('#ddlCenter').append(new Option('Choose Center',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlCenter').append(new Option(data.Center[i].Center_Name,data.Center[i].Center_Id));
                         }
@@ -170,7 +170,7 @@ var Candidates = {};
                         var count=data.Courses.length;
                         if( count> 0)
                         {
-                            //$('#ddlCourse').append(new Option('Choose Course',''));
+                            $('#ddlCourse').append(new Option('Choose Course',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
                         }
@@ -214,7 +214,7 @@ var Candidates = {};
                         var count=data.SubProjects.length;
                         if( count> 0)
                         {
-                            //$('#ddlCourse').append(new Option('Choose Course',''));
+                            $('#ddlSubProject').append(new Option('Choose Sub Project',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlSubProject').append(new Option(data.SubProjects[i].Sub_Project_Name,data.SubProjects[i].Sub_Project_Id));
                         }
@@ -389,7 +389,7 @@ var Candidates = {};
                         var count=data.Trainers.length;
                         if( count> 0)
                         {
-                            //$('#ddlTrainer').append(new Option('Choose Trainer',''));
+                            $('#ddlTrainer').append(new Option('Choose Trainer',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlTrainer').append(new Option(data.Trainers[i].User_Name,data.Trainers[i].User_Id));
                         }
@@ -676,7 +676,7 @@ var Candidates = {};
                                 <label for="CourseId">Course *:</label>
                             </div>
                             <div class="col-lg-6">
-                                <select id="ddlCourse" class="form-control dropdown-search-filter" name="CourseId" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                <select id="ddlCourse" class="form-control dropdown-search-filter" name="CourseId" onchange="LoadsubProject('0')" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
                                     <option value="">Choose Course</option>
                                 </select>
                             </div>

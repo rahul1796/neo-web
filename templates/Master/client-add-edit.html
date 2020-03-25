@@ -67,7 +67,7 @@
                         var count=data.Customer_Group.length;
                         if( count> 0)
                         {
-                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            $('#ddl_customer_group').append(new Option('Choose Customer Group',''));
                             for(var i=0;i<count;i++)
                                 $('#ddl_customer_group').append(new Option(data.Customer_Group[i].Customer_Group_Name,data.Customer_Group[i].Customer_Group_Id));
                             //$('#ddlCourse').val('-1');
@@ -102,7 +102,7 @@
                             var count=data.Funding_Resources.length;
                             if( count> 0)
                             {
-                                //$('#ddlFundingSource').append(new Option('ALL','-1'));
+                                $('#ddlfundingsource').append(new Option('Choose Funding Source',''));
                                 for(var i=0;i<count;i++)
                                     $('#ddlfundingsource').append(new Option(data.Funding_Resources[i].Funding_Source_Name,data.Funding_Resources[i].Funding_Source_Id));
                                 //$('#ddlCourse').val('-1');
@@ -137,7 +137,7 @@
                             var count=data.Industry.length;
                             if( count> 0)
                             {
-                                //$('#ddlFundingSource').append(new Option('ALL','-1'));
+                                $('#ddlindustrytype').append(new Option('Choose Industry Type',''));
                                 for(var i=0;i<count;i++)
                                     $('#ddlindustrytype').append(new Option(data.Industry[i].Industry_Type_Name,data.Industry[i].Industry_Type_Id));
                                 //$('#ddlCourse').val('-1');
@@ -171,6 +171,7 @@
                         var count=data.CategoryType.length;
                         if( count> 0)
                         {
+                            $('#ddl_category_type').append(new Option('Choose Category Type',''));
                             for(var i=0;i<count;i++)
                                 $('#ddl_category_type').append(new Option(data.CategoryType[i].Category_Type_Name,data.CategoryType[i].Category_Type_Id));
                             
@@ -309,7 +310,7 @@
                                                 <label for="ddl_customer_group" class="mr-3">Customer Group</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="ddl_customer_group" class="form-control dropdown-search-filter" placeholder="Choose Customer Group"> <!-- LoadCenterList(this.value,0) -->>
+                                                <select id="ddl_customer_group" class="form-control dropdown-search-filter" placeholder="Choose Customer Group" required=""> <!-- LoadCenterList(this.value,0) -->>
                                                     <option selected ="" value="">Choose Customer Group</option>
                                                 </select>
                                             </div>

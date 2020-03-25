@@ -229,11 +229,12 @@ function LoadTable()
 
             								
             { "data": "S_No"},
-            {"visible": function (){
-                if(($('#hdn_home_user_role_id').val() =='1') || ($('#hdn_home_user_role_id').val() =='5')||($('#hdn_home_user_role_id').val() =='15'))
-                    return true;
-                else return false;
-            },
+            {"visible": $('#hdn_home_user_role_id').val()=='1'?true:false,
+            // function (){
+            //     if(($('#hdn_home_user_role_id').val() =='1') || ($('#hdn_home_user_role_id').val() =='5')||($('#hdn_home_user_role_id').val() =='15'))
+            //         return true;
+            //     else return false;
+            // },
              "data": function (row, type, val, meta) {
                 var varButtons = ""; 
                 varButtons += '<a onclick="EditBatchDetail(\'' + row.Batch_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Batch" class="fas fa-edit" ></i></a>';
