@@ -42,6 +42,7 @@
                 LoadCenterType();
                 LoadRegionddl();
                 loadClient();
+                loadBU();
                 
                 if ('{{status}}'==1)
                     $('#ddlStatus').val([1,2]);
@@ -97,6 +98,12 @@
                                         </select>
                                     </div>
                                     <div class="col-lg-3">
+                                        <label for="ddlBU" class="mr-2">BU</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlBU" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
                                         <label for="ddlProject" class="mr-2">Project</label>
                                         <select class="form-control dropdown-search-filter" onchange="LoadSubProject();" id="ddlProject" multiple>
                                             <option selected="" value="">All</option>
@@ -108,14 +115,14 @@
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
+								</div>
+								<div class="row">
                                     <div class="col-lg-3">
                                         <label for="ddlRegion" class="mr-2">Region</label>
                                         <select class="form-control dropdown-search-filter" onchange="LoadCenter();" id="ddlRegion" multiple>
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
-								</div>
-								<div class="row">
                                     <div class="col-lg-3">
                                         <label for="ddlCenter" class="mr-2">Center</label>
                                         <select class="form-control dropdown-search-filter" id="ddlCenter" multiple>
@@ -134,13 +141,16 @@
 											<option selected="" value="">All</option>
 										</select>
                                     </div>
-                                    <div class="col-lg-1" style="float: center; margin-top: 30px">
+                                    
+                                </div> 
+                                <div class="row">
+                                    <div class="col-lg-6" style="float: center; margin-top: 30px">
                                         <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTable()">Search</button>
                                     </div>
-                                    <div class="col-lg-2" >                                        
+                                    <div class="col-lg-6" >                                        
                                         <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-primary">Create Batch</a>
                                     </div>
-                                </div>    
+                                </div>
                                  <!-- end row -->
                             </div> <!-- end card-box -->
                         </div><!-- end col-->
@@ -167,6 +177,7 @@
                                                     <th>Actions</th>
                                                     <th>Batch Name</th>
                                                     <th>Batch Code</th>
+                                                    <th>Enrolled Count</th>
                                                     <th>Product</th>
                                                     <th>Center</th>
                                                     <th>Course</th>
@@ -503,6 +514,68 @@
                         </div>
                     </div>
 
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->
+
+        <div id="tr_candidate_detail" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Candiddate Details</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body"> 
+                                    <div class="col-md-12">                                
+                                        <div class="col-md-4 form-group">
+                                            <h5>Batch Name</h5>                                           
+                                        </div>
+                                        <div class="col-md-4" style="margin-top: -38px; margin-left: 13%;">
+                                            <div class="form-group" style="margin-bottom: 20px;">        
+                                                <input type="text" class="form-control" id="txtbatch_name"  disabled/>                               
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 form-group" style="margin-top: -45px; margin-left: 50%;">
+                                            <h5>Center Name</h5>                                           
+                                        </div>
+                                        <div class="col-md-4" style="margin-top: -42px; margin-left: 63%;">
+                                            <div class="form-group" style="margin-bottom: 20px;">        
+                                                <input type="text" class="form-control" id="txtcenter_name"  disabled/>                               
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div> <!--end card-body-->
+                            </div> <!-- end card-->
+                        </div>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <table id="tblcandidate_details" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                            <thead>
+                                <tr style="background-color: #f5f6f8;">
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S No</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Candidate Name</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Date Of Birth</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Gender</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Marital Status</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Caste</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Present District</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        
+                            </tbody>
+                        </table>	
+                    </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
                         <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->

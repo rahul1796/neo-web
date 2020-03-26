@@ -79,6 +79,40 @@ function loadClient(){
     });
 }
 
+function loadBU(){
+    var URL=$('#hdn_web_url').val()+ "/Get_all_BU"
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.BU != null)
+            {  
+                $('#ddlBU').empty();
+                var count=data.BU.length;
+                if( count> 0)
+                {
+                    //$('#ddlClient').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlBU').append(new Option(data.BU[i].Bu_Name,data.BU[i].Bu_Id));
+                }
+                else
+                {
+                    $('#ddlBU').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            //alert($('#ddlClient').val().toString())
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+}
+
 function LoadProject(){
     var URL=$('#hdn_web_url').val()+ "/GetALLProject_multiple"  //"/GetALLProject_multiple"
     $.ajax({
@@ -218,6 +252,7 @@ function LoadTable()
                 d.region = $('#ddlRegion').val().toString();
                 d.center = $('#ddlCenter').val().toString();
                 d.center_type = $('#ddlCenterType').val().toString();
+                d.BU =  $('#ddlBU').val().toString();
             },
             error: function (e) {
                 $("#tbl_batchs tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -243,6 +278,26 @@ function LoadTable()
             },
             { "data": "Batch_Name" },
             { "data": "Batch_Code"},
+            {
+                "data": function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Candidate_Count=="" || row.Candidate_Count=="0")
+                        {
+                            //console.log(row.Center_Id);
+                            varButtons=row.Candidate_Count;
+                        }
+                    
+                    else
+                    {   //console.log(row.Trainer_Id)
+                        //console.log(row.Center_Id);
+                        //varButtons += '<a onclick="GetProjectDetails(\'' + row.Center_Id +  '\' )"  style="color:blue;cursor:pointer" >' + row.Center_Id + '</a>';
+                        varButtons += '<a onclick="GetCandidate_Detail(\'' + row.Batch_Id + '\' )"  style="color:blue;cursor:pointer" >' + row.Candidate_Count + '</a>';
+                    }
+                    
+                    return varButtons;
+                    }
+            },
+            //{ "data": "Candidate_Count"},
             { "data": "Product_Name" },
             {
                 "data": function (row, type, val, meta) {
@@ -740,3 +795,65 @@ function add_map_message(){
             });
             return false;
         }
+
+        function GetCandidate_Detail(batch_id){
+            //alert(Project_Id)
+            var URL=$('#hdn_web_url').val()+ "/Getcandidatebybatch?batch_id="+batch_id;
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                overflow:true,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    varHtml='';
+                    $("#tblcandidate_details tbody").empty();
+                    if(!jQuery.isEmptyObject(data.candidates))
+                    {   //alert(data.Customer_Name)
+                        $('#txtbatch_name').val(data.batch_name);
+                        $('#txtcenter_name').val(data.center_name);
+        
+                        if (data.candidates[0].Candidate_Name != null){
+                            var count=data.candidates.length;
+                            if( count> 0)
+                            {
+                                for(var i=0;i<count;i++)
+                                {
+                                    varHtml+='<tr>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].S_No +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Candidate_Name +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Date_Of_Birth +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Gender +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Marital_Status +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Caste +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Present_District +'</td>';
+                                    varHtml+='</tr>';
+                                }
+                                
+                            }
+                            $("#tblcandidate_details tbody").append(varHtml);
+                            $('#tr_candidate_detail').modal('show');
+                        }
+                        else
+                    {
+                        varHtml='<tr><td colspan="3" style="text-align:center;">No records found</td></tr>'
+                        $("#tblcandidate_details tbody").append(varHtml);
+                        $('#tr_candidate_detail').modal('show');
+                    }
+                    }
+                    else
+                    {
+                        varHtml='<tr><td colspan="3" style="text-align:center;">No records found</td></tr>'
+                        $("#tblcandidate_details tbody").append(varHtml);
+                        $('#tr_candidate_detail').modal('show');
+                    }   
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        } 

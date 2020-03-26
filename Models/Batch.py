@@ -2,8 +2,8 @@ from Database import Database
 class Batch:
     def batch_list(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id):
         return Database.batch_list(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id)
-    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center,center_type,course_ids):
-        return Database.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids)
+    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center,center_type,course_ids, BU):
+        return Database.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU)
     
     def add_batch(BatchName, BatchCode, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, StartDate, EndDate, StartTime, EndTime, BatchId, user_id):
         popupMessage = {"PopupMessage": Database.add_batch_details(BatchName, BatchCode, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, StartDate, EndDate, StartTime, EndTime, BatchId, user_id)}
