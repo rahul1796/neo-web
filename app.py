@@ -828,8 +828,9 @@ class batch_list_updated(Resource):
             region = request.form['region']
             center = request.form['center']
             center_type = request.form['center_type']
-            #print('before hi')
             status = request.form['status']
+            #print('before hi')
+            BU = request.form['BU']
             course_ids=''
             if 'course_ids' in request.form:
                 course_ids=request.form['course_ids']
@@ -841,7 +842,7 @@ class batch_list_updated(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             
-            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids)
+            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU)
 
 class add_batch_details(Resource):
     @staticmethod
@@ -4366,12 +4367,24 @@ def operational_dashboard_page():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
-@app.route("/operational_dashboard")
-def operational_dashboard():
+@app.route("/operation_dashboard")
+def operation_dashboard():
     if g.user:
         return render_template("home.html",values=g.User_detail_with_ids,html="operational_dashboard_page")
     else:
         return render_template("login.html",error="Session Time Out!!")
+
+class Getcandidatebybatch(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                batch_id=request.args.get('batch_id',0,type=int)
+                response = Database.Getcandidatebybatch_db(batch_id)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(Getcandidatebybatch,'/Getcandidatebybatch')
 
 
 if __name__ == '__main__':    
