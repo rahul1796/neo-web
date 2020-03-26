@@ -26,6 +26,8 @@ import filter_tma_report
 import filter_tma_report_new
 from Models import DownloadDump
 from lib.ms_sql import MsSql
+from lib.postgre_sql import PostgreSql
+
 #from lib.log import Log
 #from lib.log import log
 
@@ -4339,7 +4341,22 @@ api.add_resource(ScheduleAssessment,'/ScheduleAssessment')
 
 api.add_resource(DownloadAssessmentResult,'/DownloadAssessmentResult')
 ################################################################################################################
-
+class PostgreSqlServerApi(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                postgre_sql = PostgreSql()
+                #log.info("> MS_SQL data request")
+                data = postgre_sql.get_data()
+                response = {"status": 200, "data": data}
+            except Exception as error:
+                #log.error("SqlServerApi request error: {}".format(error))
+                response = {"status": 400, "message": str(error)}
+            finally:
+                #log.info("< SqlServerApi --> " + Log.str(response))
+                return jsonify(response)
+api.add_resource(PostgreSqlServerApi,'/PostgreSqlServerApi')
 
 
 if __name__ == '__main__':    
