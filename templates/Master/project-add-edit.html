@@ -33,7 +33,7 @@
                                 $('#ProjectCode').val(data.ProjectDetail.Project_Code);
                                 $('#ClientName').val(data.ProjectDetail.Customer_Id);
                                 Contractbycustomer(data.ProjectDetail.Contract_Id);
-                                $('#ContractName').val();
+                                $('#ContractName').val(data.ProjectDetail.Contract_Id);
                                 $('#ddlPractice').val(data.ProjectDetail.Practice_Id);
                                 $('#ddlBU').val(data.ProjectDetail.Bu_Id);
                                 $('#ddlprojectgroup').val(data.ProjectDetail.Project_Group_Id);
@@ -78,7 +78,7 @@
                         var count=data.ProjectType.length;
                         if( count> 0)
                         {
-                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            $('#ddlProjectType').append(new Option('Choose Project Type',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlProjectType').append(new Option(data.ProjectType[i].Project_Type_Name, data.ProjectType[i].Project_Type_Id));
                             //$('#ddlCourse').val('-1');
@@ -112,7 +112,7 @@
                         var count=data.Block.length;
                         if( count> 0)
                         {   
-                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            $('#ddlBlock').append(new Option('Choose Block',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlBlock').append(new Option(data.Block[i].Block_Name, data.Block[i].Block_Id));
                             //$('#ddlCourse').val('-1');
@@ -146,7 +146,7 @@
                         var count=data.Product.length;
                         if( count> 0)
                         {
-                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            $('#ddlProduct').append(new Option('Choose Product',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlProduct').append(new Option(data.Product[i].Product_Name, data.Product[i].Product_Id));
                             //$('#ddlCourse').val('-1');
@@ -182,7 +182,7 @@
                         var count=data.Project_Group.length;
                         if( count> 0)
                         {
-                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            $('#ddlprojectgroup').append(new Option('Choose Project Group',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlprojectgroup').append(new Option(data.Project_Group[i].Project_Group_Name, data.Project_Group[i].Project_Group_Id));
                             //$('#ddlCourse').val('-1');
@@ -217,7 +217,7 @@
                         var count=data.BU.length;
                         if( count> 0)
                         {
-                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            $('#ddlBU').append(new Option('Choose BU',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlBU').append(new Option(data.BU[i].Bu_Name, data.BU[i].Bu_Id));
                             //$('#ddlCourse').val('-1');
@@ -252,7 +252,7 @@
                         var count=data.Clients.length;
                         if( count> 0)
                         {
-                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            $('#ClientName').append(new Option('Choose Customer',''));
                             for(var i=0;i<count;i++)
                                 $('#ClientName').append(new Option(data.Clients[i].Customer_Name, data.Clients[i].Customer_Id));
                             //$('#ddlCourse').val('-1');
@@ -274,6 +274,7 @@
 
             function Contractbycustomer(needed)
             {
+                
                 var URL=$('#hdn_web_url').val()+ "/GetContractbycustomer"
                 $.ajax({
                     type:"GET",
@@ -286,18 +287,22 @@
                     },
                     success: function (data){
                         if(data.contracts != null)
-                        {
+                        {   
                             $('#ContractName').empty();
                             var count=data.contracts.length;
                             if( count> 0)
                             {
-                                //$('#ddlCentralManager').append(new Option('Choose Center Manager',''));
+                                $('#ContractName').append(new Option('Choose Contract',''));
                                 for(var i=0;i<count;i++)
                                     $('#ContractName').append(new Option(data.contracts[i].Contract_Name,data.contracts[i].Contract_Id));
                             }
                             else
                             {
-                                $('#ContractName').append(new Option('Choose Center Manager',''));
+                                $('#ContractName').append(new Option('Choose Contract',''));
+                            }
+                            if (needed !=0)
+                            {
+                                $('#ContractName').val(needed);
                             }
                         }
                     },
@@ -307,10 +312,7 @@
                         return false;
                     }
                 });
-                if (needed !=0)
-                {
-                    $('#ContractName').val(needed);
-                }
+                
                 return false;
             }
 
@@ -330,7 +332,7 @@
                             var count=data.Pratices.length;
                             if( count> 0)
                             {
-                                //$('#ddlPractice').append(new Option('Choose Practice',''));
+                                $('#ddlPractice').append(new Option('Choose Practice',''));
                                 for(var i=0;i<count;i++)
                                     $('#ddlPractice').append(new Option(data.Pratices[i].Practice_Name,data.Pratices[i].Practice_Id));
                             }

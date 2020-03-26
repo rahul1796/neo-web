@@ -49,7 +49,7 @@
                 }
             });
 
-            function Loadsalescattegorydl(){
+            function Loadsalescattegorydl(){    
             var URL=$('#hdn_web_url').val()+ "/GetAllSalesCategory"
                 $.ajax({
                 type:"GET",
@@ -64,7 +64,7 @@
                         var count=data.SalesCategory.length;
                         if( count> 0)
                         {
-                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            $('#ddlsalescatergoryname').append(new Option('Choose Sales Category',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlsalescatergoryname').append(new Option(data.SalesCategory[i].Sales_Category_Name, data.SalesCategory[i].Sales_Category_Id));
                             //$('#ddlCourse').val('-1');
@@ -98,7 +98,7 @@
                         var count=data.Entity.length;
                         if( count> 0)
                         {
-                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            $('#EntityName').append(new Option('Choose Entity',''));
                             for(var i=0;i<count;i++)
                                 $('#EntityName').append(new Option(data.Entity[i].Entity_Name, data.Entity[i].Entity_Id));
                             //$('#ddlCourse').val('-1');
@@ -132,7 +132,7 @@
                         var count=data.Clients.length;
                         if( count> 0)
                         {
-                            //$('#ddlcustomergroup').append(new Option('ALL','-1'));
+                            $('#ClientName').append(new Option('Choose Customer',''));
                             for(var i=0;i<count;i++)
                                 $('#ClientName').append(new Option(data.Clients[i].Customer_Name, data.Clients[i].Customer_Id));
                             //$('#ddlCourse').val('-1');

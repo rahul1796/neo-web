@@ -22,7 +22,7 @@ class PostgreSql:
 
     def get_data(self):
         tables = {}
-        for table in POSTRESQL.TABLES:
+        for table in config.postgre_TABLES:
             data = self.get_table_data(table)
             tables[table] = data
         return tables
@@ -31,7 +31,7 @@ class PostgreSql:
         try:
             data = []
             query = "SELECT * FROM {} LIMIT 50;".format(table)
-            for df in pd.read_sql(query, self.conn, chunksize=400 ** 4):
+            for df in pd.read_sql(query, self.conn, chunksize=100 ** 4):
                 df = df.fillna('Na')
                 dict_data = df.reset_index().to_dict(orient='records')
                 data.append(dict_data)
