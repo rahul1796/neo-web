@@ -4358,6 +4358,21 @@ class PostgreSqlServerApi(Resource):
                 return jsonify(response)
 api.add_resource(PostgreSqlServerApi,'/PostgreSqlServerApi')
 
+#QP_API's
+@app.route("/operational_dashboard_page")
+def operational_dashboard_page():
+    if g.user:
+        return render_template("Report-powerbi/operational_dashboard.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/operational_dashboard")
+def operational_dashboard():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="operational_dashboard_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
 
 if __name__ == '__main__':    
     app.run(debug=True)
