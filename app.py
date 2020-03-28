@@ -852,11 +852,13 @@ class add_batch_details(Resource):
         if request.method == 'POST':
             BatchId=request.form['BatchId']
             BatchName=request.form['BatchName']
-            BatchCode=request.form['BatchCode']
+            #BatchCode=request.form['BatchCode']
             Center=request.form['Center']
             Trainer=request.form['Trainer']
-            StartDate=request.form['StartDate']
-            EndDate=request.form['EndDate']
+            PlannedStartDate=request.form['PlannedStartDate']
+            PlannedEndDate=request.form['PlannedEndDate']
+            ActualStartDate=request.form['ActualStartDate']
+            ActualEndDate=request.form['ActualEndDate']
             StartTime=request.form['StartTime']
             EndTime=request.form['EndTime']
             user_id=g.user_id
@@ -866,7 +868,7 @@ class add_batch_details(Resource):
             SubProject=request.form['SubProject']
             Cofunding=request.form['Cofunding']
         
-            return Batch.add_batch(BatchName, BatchCode, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, StartDate, EndDate, StartTime, EndTime, BatchId, user_id)
+            return Batch.add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id)
 
 
 class get_batch_details(Resource):
@@ -2533,13 +2535,17 @@ class add_project_details(Resource):
             ProjectType=request.form['ProjectType']
             Block=request.form['Block']
             Product=request.form['Product']
-            StartDate=request.form['StartDate']
-            EndDate=request.form['EndDate']
+            PlannedStartDate=request.form['PlannedStartDate']
+            PlannedEndDate=request.form['PlannedEndDate']
+            ActualStartDate=request.form['ActualStartDate']
+            ActualEndDate=request.form['ActualEndDate']
+            ProjectManager=request.form['ProjectManager']
+            
             
             user_id=g.user_id
             project_id=g.project_id
             isactive=request.form['isactive']
-            return Master.add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, StartDate, EndDate, isactive, project_id, user_id)
+            return Master.add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, ProjectManager, ActualEndDate, ActualStartDate, PlannedEndDate, PlannedStartDate, isactive, project_id, user_id)
                     
 class client_all(Resource):
     @staticmethod
@@ -3505,12 +3511,13 @@ class add_contract_details(Resource):
             SalesCatergory=request.form['SalesCatergory']
             StartDate=request.form['StartDate']
             EndDate=request.form['EndDate']
+            SalesManager=request.form['SalesManager']
+            ContractValue=request.form['ContractValue']
             isactive=request.form['isactive']
-
             user_id=g.user_id
             contract_id=g.contract_id
             
-            return Master.add_contract(ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, isactive, user_id, contract_id)
+            return Master.add_contract(ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, SalesManager, ContractValue, isactive, user_id, contract_id)
 
 class get_contract_details(Resource):
     @staticmethod
@@ -4344,22 +4351,20 @@ api.add_resource(ScheduleAssessment,'/ScheduleAssessment')
 
 api.add_resource(DownloadAssessmentResult,'/DownloadAssessmentResult')
 ################################################################################################################
-class PostgreSqlServerApi(Resource):
-    @staticmethod
-    def get():
-        if request.method=='GET':
-            try:
-                postgre_sql = PostgreSql()
-                #log.info("> MS_SQL data request")
-                data = postgre_sql.get_data()
-                response = {"status": 200, "data": data}
-            except Exception as error:
-                #log.error("SqlServerApi request error: {}".format(error))
-                response = {"status": 400, "message": str(error)}
-            finally:
-                #log.info("< SqlServerApi --> " + Log.str(response))
-                return jsonify(response)
-api.add_resource(PostgreSqlServerApi,'/PostgreSqlServerApi')
+@app.route("/PostgreSqlServerApi", defaults={"param": None})
+@app.route("/PostgreSqlServerApi/<string:param>", methods=["GET"])
+def postgre_sql_server_api(param):
+    try:
+        postgre_sql = PostgreSql()
+        #log.info("> POSTGRE_SQL data request")
+        data = postgre_sql.get_data(param)
+        response = {"status": 200, "data": data}
+    except Exception as error:
+        #log.error("PostgreSqlServerApi request error: {}".format(error))
+        response = {"status": 400, "message": str(error)}
+    finally:
+        #log.info("< PostgreSqlServerApi --> " + Log.str(response))
+        return jsonify(response)
 
 #QP_API's
 @app.route("/operational_dashboard_page")
@@ -4376,6 +4381,21 @@ def operation_dashboard():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+@app.route("/Trainer_Dashboard_page")
+def Trainer_Dashboard_page():
+    if g.user:
+        return render_template("Report-powerbi/Trainer_Dashboard.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/trainer_dashboard")
+def trainer_dashboard():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="Trainer_Dashboard_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
 class Getcandidatebybatch(Resource):
     @staticmethod
     def get():
@@ -4387,6 +4407,29 @@ class Getcandidatebybatch(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(Getcandidatebybatch,'/Getcandidatebybatch')
+
+
+class PMT_Department_user(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.PMT_Department_user_db()
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(PMT_Department_user,'/PMT_Department_user')
+
+class sales_Department_user(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.sales_Department_user_db()
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(sales_Department_user,'/sales_Department_user')
 
 
 if __name__ == '__main__':    
