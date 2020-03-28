@@ -32,8 +32,8 @@ class Master:
     def all_client():
         all_client={"Clients":Database.GetALLClient()}
         return all_client
-    def add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, StartDate, EndDate, isactive, project_id, user_id):
-        popupMessage = {"PopupMessage":  Database.add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, StartDate, EndDate, isactive, project_id, user_id)}
+    def add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, ProjectManager, ActualEndDate, ActualStartDate, PlannedEndDate, PlannedStartDate, isactive, project_id, user_id):
+        popupMessage = {"PopupMessage":  Database.add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, ProjectManager, ActualEndDate, ActualStartDate, PlannedEndDate, PlannedStartDate, isactive, project_id, user_id)}
         return popupMessage
     def get_project_details(glob_project_id):
         indi_project={"ProjectDetail":Database.get_project_details(glob_project_id)}
@@ -155,6 +155,6 @@ class Master:
     def GetCentersForCourse(CourseId):
         return Database.GetCentersForCourse(CourseId)
         
-    def add_contract(ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, isactive, user_id, contract_id):
-        popupMessage = {"PopupMessage": Database.add_contract_details(ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, isactive, user_id, contract_id)}
+    def add_contract(ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, SalesManager, ContractValue, isactive, user_id, contract_id):
+        popupMessage = {"PopupMessage": Database.add_contract_details(ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, SalesManager, ContractValue, isactive, user_id, contract_id)}
         return popupMessage
