@@ -830,7 +830,9 @@ class batch_list_updated(Resource):
             center_type = request.form['center_type']
             status = request.form['status']
             #print('before hi')
-            BU = request.form['BU']
+            BU=''
+            if 'BU' in request.form:
+                BU = request.form['BU']            
             course_ids=''
             if 'course_ids' in request.form:
                 course_ids=request.form['course_ids']
