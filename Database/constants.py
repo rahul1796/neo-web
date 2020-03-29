@@ -6,3 +6,6 @@ APP_LOG_FORMAT = "[%(asctime)s %(filename)s:%(lineno)s %(levelname)-2s %(funcNam
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
 APP_PATH = APP_PATH.replace("config", "")
 APP_LOG_FILENAME = APP_PATH + "log/application.log"
+
+CANDIDATES = "Candidates"
+NEO_BATCHES = "NeoBatches"

@@ -18,10 +18,16 @@
                 LoadProductdl();
                 LoadBlockdl();
                 LoadProjectTypedl();
-
+                PMT_Department();
+                
+                document.getElementById("PlannedStartDate").disabled = false;
+                document.getElementById("PlannedEndDate").disabled = false;
 
                 if('{{project_id}}' !=0)
-                {
+                {   
+                    document.getElementById("PlannedStartDate").disabled = true;
+                    document.getElementById("PlannedEndDate").disabled = true;
+
                     var URL=$('#hdn_web_url').val()+ "/GetProjectDetails";
                     $.ajax({
                         type:"GET",
@@ -33,15 +39,18 @@
                                 $('#ProjectCode').val(data.ProjectDetail.Project_Code);
                                 $('#ClientName').val(data.ProjectDetail.Customer_Id);
                                 Contractbycustomer(data.ProjectDetail.Contract_Id);
-                                $('#ContractName').val(data.ProjectDetail.Contract_Id);
+                                //$('#ContractName').val(data.ProjectDetail.Contract_Id);
                                 $('#ddlPractice').val(data.ProjectDetail.Practice_Id);
                                 $('#ddlBU').val(data.ProjectDetail.Bu_Id);
                                 $('#ddlprojectgroup').val(data.ProjectDetail.Project_Group_Id);
                                 $('#ddlProjectType').val(data.ProjectDetail.Project_Type_Id);
                                 $('#ddlBlock').val(data.ProjectDetail.Block_Id);
                                 $('#ddlProduct').val(data.ProjectDetail.Product_Id);
-                                $('#StartDate').val(data.ProjectDetail.Actual_Start_Date);
-                                $('#EndDate').val(data.ProjectDetail.Actual_End_Date);
+                                $('#PlannedStartDate').val(data.ProjectDetail.Planned_Start_Date);
+                                $('#PlannedEndDate').val(data.ProjectDetail.Planned_End_Date);
+                                $('#ActualStartDate').val(data.ProjectDetail.Actual_Start_Date);
+                                $('#ActualEndDate').val(data.ProjectDetail.Actual_End_Date);
+                                $('#ddlProjectManager').val(data.ProjectDetail.Project_Manager_Id);
 
                                if(data.ProjectDetail!="")
                                {
@@ -97,6 +106,42 @@
             });
             return false;
             }
+            function PMT_Department()
+        {
+            var URL=$('#hdn_web_url').val()+ "/PMT_Department_user"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.PMT_Dept_role != null)
+                    {
+                        $('#ddlProjectManager').empty();
+                        var count=data.PMT_Dept_role.length;
+                        if( count> 0)
+                        {
+                            $('#ddlProjectManager').append(new Option('Choose Project Manager',''));
+                            for(var i=0;i<count;i++)
+                                $('#ddlProjectManager').append(new Option(data.PMT_Dept_role[i].Name,data.PMT_Dept_role[i].User_Id));
+                        }
+                        else
+                        {
+                            $('#ddlProjectManager').append(new Option('Choose Project Manager',''));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            
+            return false;
+        }
+
             function LoadBlockdl(){
             var URL=$('#hdn_web_url').val()+ "/Get_all_Block"
                 $.ajax({
@@ -300,10 +345,7 @@
                             {
                                 $('#ContractName').append(new Option('Choose Contract',''));
                             }
-                            if (needed !=0)
-                            {
-                                $('#ContractName').val(needed);
-                            }
+                            
                         }
                     },
                     error:function(err)
@@ -312,7 +354,10 @@
                         return false;
                     }
                 });
-                
+                if (needed !=0)
+                            {
+                                $('#ContractName').val(needed);
+                            }
                 return false;
             }
 
@@ -367,8 +412,11 @@
                             "ProjectType" : $('#ddlProjectType').val(),
                             "Block" : $('#ddlBlock').val(),
                             "Product" : $('#ddlProduct').val(),
-                            "StartDate" : $('#StartDate').val(),
-                            "EndDate" : $('#EndDate').val(),
+                            "PlannedStartDate" : $('#PlannedStartDate').val(),
+                            "PlannedEndDate" : $('#PlannedEndDate').val(),
+                            "ActualStartDate" : $('#ActualStartDate').val(),
+                            "ActualEndDate" : $('#ActualEndDate').val(),
+                            "ProjectManager" : $('#ddlProjectManager').val(),
                             "isactive" : $('#isactive').prop('checked')
                         },
                         success:function(data){
@@ -553,23 +601,50 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group row ">
-                                        <div class="col-lg-6">
-                                            <label for="StartDate">Start Date *:</label>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ProjectManager">Project Manager</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ddlProjectManager" class="form-control dropdown-search-filter" name="ddlProjectManager" ClientIdMode="static"  required="">
+                                                    <option value="">Choose Project Manager</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                        <div class="col-lg-6">
-                                            <input type="text" id="StartDate" name="StartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date">
+                                    </div> 
+                                    <div class="form-group row ">
+                                            <div class="col-lg-6">
+                                                    <label for="PlannedStartDate">Planned Start Date</label>
+                                                </div>
+                                                <div class="col-lg-6">
+                                            <input type="text" id="PlannedStartDate" name="PlannedStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required="">
                                         </div>
                                     </div>
                                     <div class="form-group row ">
-                                        <div class="col-lg-6">
-                                            <label for="EndDate">End Date *:</label>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <input type="text" id="EndDate" name="EndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date">
+                                            <div class="col-lg-6">
+                                                    <label for="PlannedEndDate">Planned End Date</label>
+                                                </div>
+                                                <div class="col-lg-6">
+                                            <input type="text" id="PlannedEndDate" name="PlannedEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date" required="">
                                         </div>
                                     </div>
-
+                                    <div class="form-group row ">
+                                            <div class="col-lg-6">
+                                                    <label for="ActualStartDate">Actual Start Date</label>
+                                                </div>
+                                                <div class="col-lg-6">
+                                            <input type="text" id="ActualStartDate" name="ActualStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required="">
+                                        </div>
+                                    </div> 
+                                    <div class="form-group row ">
+                                            <div class="col-lg-6">
+                                                    <label for="ActualEndDate">Actual End Date</label>
+                                                </div>
+                                                <div class="col-lg-6">
+                                            <input type="text" id="ActualEndDate" name="ActualEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date" required="">
+                                        </div>
+                                    </div>
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-lg-6">
