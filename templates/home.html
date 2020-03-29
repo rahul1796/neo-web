@@ -211,7 +211,7 @@
                             $("#box").load(goto);
                         break;
                     case 5:             //Center Manager
-                        $('#Home').hide();
+                        $('#Home').show();
                         $('#Candidate_Menu').show();
                         $('#Batch_Menu').show();
                         $('#Assessment_Menu').hide();
@@ -233,7 +233,7 @@
                             $("#box").load(goto);
                         break;
                     case 2:             //Mobilizer
-                        $('#Home').hide();
+                        $('#Home').show();
                         $('#Candidate_Menu').show();
                         $('#Batch_Menu').show();
                         $('#Assessment_Menu').hide();
@@ -255,7 +255,7 @@
                             $("#box").load(goto);
                         break;
                     case 24:            //Counsellor
-                        $('#Home').hide();
+                        $('#Home').show();
                         $('#Candidate_Menu').show();
                         $('#Batch_Menu').show();
                         $('#Assessment_Menu').hide();
@@ -277,7 +277,7 @@
                             $("#box").load(goto);
                         break;
                     case 7:             //Trainer
-                        $('#Home').hide();
+                        $('#Home').show();
                         $('#Candidate_Menu').hide();
                         $('#Batch_Menu').show();
                         $('#Assessment_Menu').hide();
@@ -383,11 +383,11 @@
                             <a href="#" class="active">
                                     <span style="color: black;"><i class="fe-user"></i>{{values[0]}}</span><div class="arrow-down"></div></a>
                             <ul class="submenu">
+                                <li id="My_Projects_Menu">
+                                    <a href="/my_projects" >My Projects</a>
+                                </li>
                                 <li id="changepass_Menu">
                                     <a href="/change_password" >Change Password</a>
-                                </li>                                    
-                                <li id="My_Projects_Menu">
-                                        <a href="/my_projects" >My Projects</a>
                                 </li>
                                 <li id="UserRole_Menu">
                                     <a href="/log_out" ><i class="fe-log-out"></i>Logout</a>

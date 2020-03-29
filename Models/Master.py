@@ -163,3 +163,7 @@ class Master:
         return Database.my_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
     def GetCoursesForCenter(center_id):
         return Database.GetCoursesForCenter(center_id)
+    def GetCoursesForProject(project_id):
+        return Database.GetCoursesForProject(project_id)
+    def GetCentersForProject(project_id):
+        return Database.GetCentersForProject(project_id)

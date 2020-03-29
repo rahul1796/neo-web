@@ -220,6 +220,7 @@ function Get_projects(CourseId,CourseName,IsCourseVariant){
         datatype:"json",
         success: function (data){
             varHtml='';
+            $("#tbl_project").dataTable().fnDestroy();
             $("#tbl_project tbody").empty();
             if(!jQuery.isEmptyObject(data))
             {   
@@ -241,6 +242,7 @@ function Get_projects(CourseId,CourseName,IsCourseVariant){
                         }                        
                     }
                     $("#tbl_project tbody").append(varHtml);
+                    $("#tbl_project").DataTable();
                     $('#mdl_Cou_Projects').modal('show');
                 }
                 else
@@ -282,6 +284,7 @@ function Get_Sub_Projects(CourseId,CourseName,IsCourseVariant){
          datatype:"json",
          success: function (data){
              varHtml='';
+             $("#tbl_sub_project").dataTable().fnDestroy();
              $("#tbl_sub_project tbody").empty();
              if(!jQuery.isEmptyObject(data))
              {   
@@ -305,6 +308,7 @@ function Get_Sub_Projects(CourseId,CourseName,IsCourseVariant){
                          }                        
                      }
                      $("#tbl_sub_project tbody").append(varHtml);
+                     $("#tbl_sub_project").DataTable();
                      $('#mdl_Cou_Sub_Projects').modal('show');
                  }
                  else
@@ -347,6 +351,7 @@ function Get_Sub_Projects(CourseId,CourseName,IsCourseVariant){
         success: function (data){
             varHtml='';
             let varTxt='';
+            $("#tbl_centers").dataTable().fnDestroy();
             $("#tbl_centers tbody").empty();
             if(!jQuery.isEmptyObject(data))
             {   
@@ -367,6 +372,7 @@ function Get_Sub_Projects(CourseId,CourseName,IsCourseVariant){
                         }                        
                     }
                     $("#tbl_centers tbody").append(varHtml);
+                    $("#tbl_centers").DataTable();
                     $('#mdl_Cou_Centes').modal('show');
                 }
                 else

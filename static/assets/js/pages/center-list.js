@@ -336,6 +336,7 @@ function GetProjectDetails(CenterId,CenterName)
         datatype:"json",
         success: function (data){
             varHtml='';
+            $("#tblSubProject").dataTable().fnDestroy();
             $("#tblSubProject tbody").empty();
             if(!jQuery.isEmptyObject(data.SubProjects))
             {   if (data.SubProjects != null){
@@ -356,10 +357,12 @@ function GetProjectDetails(CenterId,CenterName)
                             varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Name +'</td>';  
                             varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Bu +'</td>';         
                             varHtml+='</tr>';
+                            
+                        }
                             $("#tblSubProject tbody").append(varHtml);
+                            $("#tblSubProject").DataTable();
                             $('#divSubProjectList').modal('show');
                             varHtml='';
-                        }
                     }
                     else
                     {
@@ -388,7 +391,7 @@ function GetProjectDetails(CenterId,CenterName)
 
 function GetCourseDetails(CenterId,CenterName)
 {
-    $('#HdCourse').text('CenterName');
+    $('#HdCourse').text(CenterName);
     var URL=$('#hdn_web_url').val()+ "/GetCoursesForCenter?center_id="+CenterId;
     $.ajax({
         type:"GET",
@@ -399,6 +402,7 @@ function GetCourseDetails(CenterId,CenterName)
         datatype:"json",
         success: function (data){
             varHtml='';
+            $("#tblCourses").dataTable().fnDestroy();
             $("#tblCourses tbody").empty();
             if(!jQuery.isEmptyObject(data))
             {   if (data.Courses != null){
@@ -417,10 +421,12 @@ function GetCourseDetails(CenterId,CenterName)
                             varHtml+='  <td style="text-align:center;">'+ data.Courses[i].Qp_Code +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.Courses[i].Qp_Name +'</td>';     
                             varHtml+='</tr>';
-                            $("#tblCourses tbody").append(varHtml);
+                            
+                        }
+                        $("#tblCourses tbody").append(varHtml);
+                            $("#tblCourses").DataTable();
                             $('#divCourseList').modal('show');
                             varHtml='';
-                        }
                     }
                     else
                     {
