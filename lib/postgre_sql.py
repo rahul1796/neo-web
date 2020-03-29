@@ -1,6 +1,7 @@
 import psycopg2
 import pandas as pd
 from Database import config
+from Database import constants as CONST
 #import config.postgre_sql_config as POSTRESQL
 #from lib.log import log
 
@@ -20,12 +21,18 @@ class PostgreSql:
         self.conn.autocommit = True
         self.cursor = self.conn.cursor()
 
-    def get_data(self):
-        tables = {}
-        for table in config.postgre_TABLES:
+    def get_data(self, param):
+        tables_data = {}
+        if param == CONST.CANDIDATES:
+            tables = config.CANDIDATES_TABLE
+        elif param == CONST.NEO_BATCHES:
+            tables = config.NEO_BATCHES_TABLE
+        else:
+            tables = config.GENERAL_TABLES
+        for table in tables:
             data = self.get_table_data(table)
-            tables[table] = data
-        return tables
+            tables_data[table] = data
+        return tables_data
 
     def get_table_data(self, table):
         try:

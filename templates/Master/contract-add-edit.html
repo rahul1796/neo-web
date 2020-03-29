@@ -16,7 +16,9 @@
                 LoadCustomerdl();
                 LoadEntitydl();
                 Loadsalescattegorydl();
+                Load_sales_Department();
                 //alert('{{contract_id}}')
+
                 if('{{contract_id}}' !=0)
                 {
                     var URL=$('#hdn_web_url').val()+ "/GetContractDetails";
@@ -35,6 +37,8 @@
                                 $('#ddlsalescatergoryname').val(data.Contract_details.Sales_Category_Id);
                                 $('#StartDate').val(data.Contract_details.Start_Date);
                                 $('#EndDate').val(data.Contract_details.End_Date);
+                                $('#ddlSalesManager').val(data.Contract_details.Sales_Manager_Id);
+                                $('#ContractValue').val(data.Contract_details.Value);
                                 if (data.Contract_details.Is_Active)
                                         $('#isactive').prop('checked',true);
                                     else
@@ -48,6 +52,42 @@
                     });
                 }
             });
+
+            function Load_sales_Department()
+        {  
+            var URL=$('#hdn_web_url').val()+ "/sales_Department_user"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.sales_Department_role != null)
+                    {
+                        $('#ddlSalesManager').empty();
+                        var count=data.sales_Department_role.length;
+                        if( count> 0)
+                        {
+                            $('#ddlSalesManager').append(new Option('Choose Sales Manager',''));
+                            for(var i=0;i<count;i++)
+                                $('#ddlSalesManager').append(new Option(data.sales_Department_role[i].Name,data.sales_Department_role[i].User_Id));
+                        }
+                        else
+                        {
+                            $('#ddlSalesManager').append(new Option('Choose Sales Manager',''));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            
+            return false;
+        }
 
             function Loadsalescattegorydl(){    
             var URL=$('#hdn_web_url').val()+ "/GetAllSalesCategory"
@@ -167,6 +207,8 @@
                             "SalesCatergory" : $('#ddlsalescatergoryname').val(),
                             "StartDate" : $('#StartDate').val(),
                             "EndDate" : $('#EndDate').val(),
+                            "SalesManager" : $('#ddlSalesManager').val(),
+                            "ContractValue" : $('#ContractValue').val(),
                             "isactive" : $('#isactive').prop('checked')
                         },
                         success:function(data){
@@ -253,6 +295,16 @@
                                                 <input type="text" maxlength="25" class="form-control" name="ContractCode" id="ContractCode" required placeholder="Contract Code">
                                             </div>
                                         </div>
+                                    </div> 
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ContractValue">Contract Value :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <input type="number" step="0.01" class="form-control" name="ContractValue" id="ContractValue" required placeholder="Contract Value">
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="form-group">
                                         <div class="row">
@@ -290,6 +342,18 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="SalesManager">Sales Manager</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ddlSalesManager" class="form-control dropdown-search-filter" name="ddlSalesManager" ClientIdMode="static"  required="">
+                                                    <option value="">Choose Sales Manager</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div> 
                                     <div class="form-group row ">
                                         <div class="col-lg-6">
                                                 <label for="StartDate">Start Date *:</label>

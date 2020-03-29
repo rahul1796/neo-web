@@ -326,11 +326,11 @@ class Database:
         cur2.close()
         con.close()
         return client
-    def add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, StartDate, EndDate, isactive, project_id, user_id):
+    def add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, ProjectManager, ActualEndDate, ActualStartDate, PlannedEndDate, PlannedStartDate, isactive, project_id, user_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_project] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, StartDate, EndDate, isactive, project_id, user_id)
+        sql = 'exec	[masters].[sp_add_edit_project] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, ProjectManager, ActualEndDate, ActualStartDate, PlannedEndDate, PlannedStartDate, isactive, project_id, user_id)
         #print(values)
         cur.execute(sql,(values))
         for row in cur:
@@ -351,12 +351,12 @@ class Database:
     def get_project_details(glob_project_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'select project_name, project_code, customer_id, contract_id, practice_id, bu_id, project_group_id, project_type_id, block_id, product_id, actual_start_date, actual_end_date, is_active from masters.tbl_projects where project_id=?'
+        sql = "select project_name, project_code, coalesce(customer_id,'') as customer_id, coalesce(contract_id,'') as contract_id, coalesce(practice_id,'') as practice_id, coalesce(bu_id,'') as bu_id, coalesce(project_group_id,'') as project_group_id, coalesce(project_type_id,'') as project_type_id, coalesce(block_id,'') as block_id, coalesce(product_id,'') as product_id,coalesce(planned_start_date,'') as planned_start_date, coalesce(planned_end_date,'') as planned_end_date, coalesce(actual_start_date,'') as actual_start_date, coalesce(actual_end_date,'') as actual_end_date, coalesce(project_manager_id,'') as project_manager_id, is_active from masters.tbl_projects where project_id=?"
         values = (glob_project_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15]}
         cur.close()
         con.close()
         return h
@@ -826,11 +826,11 @@ class Database:
         con.close()
         return content
 
-    def add_batch_details(BatchName, BatchCode, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, StartDate, EndDate, StartTime, EndTime, BatchId, user_id):
+    def add_batch_details(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	batches.sp_add_edit_batches ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (BatchName, BatchCode, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, StartDate, EndDate, StartTime, EndTime, BatchId, user_id)
+        sql = 'exec	batches.sp_add_edit_batches ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -850,12 +850,12 @@ class Database:
     def get_batch_details(batch_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'select batch_name, batch_code, product_id, center_id, course_id, sub_project_id, coalesce(co_funding_project_id,-1) as co_funding_project_id, trainer_id, actual_start_date, actual_end_date, training_start_time, training_end_time, is_active from batches.tbl_batches where batch_id =?'
+        sql = 'select batch_name, product_id, center_id, course_id, sub_project_id, coalesce(co_funding_project_id,-1) as co_funding_project_id, trainer_id, actual_start_date, actual_end_date, training_start_time, training_end_time, is_active, planned_start_date, planned_end_date from batches.tbl_batches where batch_id =?'
         values = (batch_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[12]+"":row[12],""+columns[11]+"":row[11]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[12]+"":row[12],""+columns[11]+"":row[11],""+columns[13]+"":row[13]}
         cur.close()
         con.close()
         return h
@@ -1211,22 +1211,22 @@ class Database:
     def get_contarct_detail(glob_contract_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'select contract_name, contract_code, customer_id, entity_id, sales_category_id, start_date, end_date, is_active  from masters.tbl_contract where contract_id=?'
+        sql = "select contract_name, contract_code, coalesce(customer_id,'') as customer_id, coalesce(entity_id,'') as entity_id, coalesce(sales_category_id,'') as sales_category_id, coalesce(start_date,'') as start_date, coalesce(end_date,'') as end_date, is_active, coalesce(value,'') as value, coalesce(sales_manager_id,'') as sales_manager_id  from masters.tbl_contract where contract_id=?"
         values = (glob_contract_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         h={}
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9]}
         cur.close()
         con.close()
         return h
 
-    def add_contract_details(ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, isactive, user_id, contract_id):
+    def add_contract_details(ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, SalesManager, ContractValue, isactive, user_id, contract_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_contract] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, isactive, user_id, contract_id)
+        sql = 'exec	[masters].[sp_add_edit_contract] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, SalesManager, ContractValue, isactive, user_id, contract_id)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -3627,20 +3627,36 @@ SELECT					cb.name as candidate_name,
             print(str(e))
         return out
 
-    def Getcandidatebybatch_db(batch_id):
+    def PMT_Department_user_db():
         response=[]
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_Getcandidatebybatch]  ?'
-        values = (batch_id,)
-        cur.execute(sql,(values))
+        sql = 'exec [users].[sp_get_PMT_Dept]'
+        cur.execute(sql)
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2], ""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
             response.append(h)
 
-        out = {'candidates':response,'batch_name':row[7],'center_name':row[8]}
-        cur.commit()
+        out = {"PMT_Dept_role":response}
+        #cur.commit()
+        cur.close()
+        con.close()       
+        return out
+
+    def sales_Department_user_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [users].[sales_Department_user_db]'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+
+        out = {"sales_Department_role":response}
+        #cur.commit()
         cur.close()
         con.close()        
         return out

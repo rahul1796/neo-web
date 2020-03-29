@@ -31,9 +31,15 @@ var Candidates = {};
         LoadCoFunding('0');
         TrainersBasedOnUsers();
 
+        document.getElementById("PlannedStartDate").disabled = false;
+        document.getElementById("PlannedEndDate").disabled = false;
+
         // alert('{{batch_id}}')
         if('{{batch_id}}' !=0)
-        {
+        {   
+            document.getElementById("PlannedStartDate").disabled = true;
+            document.getElementById("PlannedEndDate").disabled = true;
+
             var URL=$('#hdn_web_url').val()+ "/GetBatchDetails";
             $.ajax({
                 type:"GET",
@@ -44,7 +50,7 @@ var Candidates = {};
                         if(data.BatchDetail!="")
                         {   
                             $('#BatchName').val(data.BatchDetail.Batch_Name);
-                            $('#BatchCode').val(data.BatchDetail.Batch_Code);
+                            //$('#BatchCode').val(data.BatchDetail.Batch_Code);
                             $('#ddlProduct').val(data.BatchDetail.Product_Id);
                             $('#ddlCenter').val(data.BatchDetail.Center_Id);
                             LoadCourseList(data.BatchDetail.Course_Id);
@@ -53,11 +59,12 @@ var Candidates = {};
                             // alert(data.BatchDetail.Sub_Project_Id);
                             // alert(data.BatchDetail.Course_Id);
                             $('#ddlTrainer').val(data.BatchDetail.Trainer_Id);
-                            $('#StartDate').val(data.BatchDetail.Actual_Start_Date);
-                            $('#EndDate').val(data.BatchDetail.Actual_End_Date);
+                            $('#PlannedStartDate').val(data.BatchDetail.Planned_Start_Date);
+                            $('#PlannedEndDate').val(data.BatchDetail.Planned_End_Date);
+                            $('#ActualStartDate').val(data.BatchDetail.Actual_Start_Date);
+                            $('#ActualEndDate').val(data.BatchDetail.Actual_End_Date);
                             $('#StartTime').val(data.BatchDetail.Training_Start_Time);
                             $("#EndTime").val(data.BatchDetail.Training_End_Time);
-                            
                             if(data.BatchDetail.Is_Active)
                             {
                                 $('#isactive').prop('checked',true);
@@ -524,7 +531,7 @@ var Candidates = {};
         // }
         
         function add_popup_message(){
-            if(($('#StartTime').val() < $("#EndTime").val()) && ($('#StartDate').val() <= $('#EndDate').val()) )
+            if(($('#StartTime').val() < $("#EndTime").val()) && ($('#ActualStartDate').val() <= $('#ActualEndDate').val()) && ($('#PlannedStartDate').val() <= $('#PlannedEndDate').val()))
             {
 				var centertype;
                 //alert($('#ActualStartDate').val());
@@ -543,9 +550,8 @@ var Candidates = {};
                         type:"POST",
                         url:URL,
                         data:{
-                            
                             "BatchName" : $('#BatchName').val(),
-                            "BatchCode" : $('#BatchCode').val(),
+                            //"BatchCode" : $('#BatchCode').val(),
                             "Product" : $('#ddlProduct').val(),
                             "Center" : $('#ddlCenter').val(),
                             "Course":$('#ddlCourse').val(),
@@ -553,8 +559,10 @@ var Candidates = {};
                             "Cofunding":$('#ddlCofunding').val(),
                             "Trainer":$('#ddlTrainer').val(),
                             "isactive" : $('#isactive').prop('checked'),
-                            "StartDate":$('#StartDate').val(),
-                            "EndDate":$('#EndDate').val(),
+                            "PlannedStartDate":$('#PlannedStartDate').val(),
+                            "PlannedEndDate":$('#PlannedEndDate').val(),
+                            "ActualStartDate":$('#ActualStartDate').val(),
+                            "ActualEndDate":$('#ActualEndDate').val(),
                             "StartTime":$('#StartTime').val(),
                             "EndTime":$("#EndTime").val(),
                             "BatchId":'{{batch_id}}'
@@ -637,30 +645,30 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="BatchName">Batch Name * :</label>
+                                <label for="BatchName">Batch Name</label>   <!-- * : -->
                             </div>
                             <div class="col-lg-6">
                                 <input type="text" class="form-control" name="BatchName" id="BatchName"  ClientIdMode="static" required placeholder="Batch name">
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="BatchCode">Batch Code * :</label>
+                                <label for="BatchCode">Batch Code</label>
                             </div>
                             <div class="col-lg-6">
                                 <input type="text" class="form-control" name="BatchCode" id="BatchCode"  ClientIdMode="static" required placeholder="Batch Code">
                             </div>
                         </div> 
-                    </div>
+                    </div> -->
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="ProductId">Product *:</label>
+                                <label for="ProductId">Product</label>
                             </div>
                             <div class="col-lg-6">
-                                <select id="ddlProduct" class="form-control dropdown-search-filter" name="ProductId"> <!-- ClientIdMode="static" required="" -->>
+                                <select id="ddlProduct" class="form-control dropdown-search-filter" name="ProductId" required=""> <!-- ClientIdMode="static" required="" -->>
                                     <option selected="" value="">Choose Product</option>
                                 </select>
                             </div>
@@ -672,7 +680,7 @@ var Candidates = {};
                                 <label for="CenterId">Center :</label>
                             </div>
                             <div class="col-lg-6">
-                                <select id="ddlCenter" class="form-control dropdown-search-filter"  onchange="LoadCourseList('0')" name="CenterId" ClientIdMode="static"  > <!-- myfunction(this.value) -->>
+                                <select id="ddlCenter" class="form-control dropdown-search-filter"  onchange="LoadCourseList('0')" name="CenterId" ClientIdMode="static" required=""> <!-- myfunction(this.value) -->>
                                     <option value="">Center</option>
                                 </select>
                             </div> 
@@ -681,7 +689,7 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="CourseId">Course *:</label>
+                                <label for="CourseId">Course</label>
                             </div>
                             <div class="col-lg-6">
                                 <select id="ddlCourse" class="form-control dropdown-search-filter" name="CourseId" onchange="LoadsubProject('0')" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
@@ -693,7 +701,7 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="SubProjectId">Sub Project *:</label>
+                                <label for="SubProjectId">Sub Project</label>
                             </div>
                             <div class="col-lg-6">
                                 <select id="ddlSubProject" class="form-control dropdown-search-filter" name="SubProjectId" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
@@ -705,7 +713,7 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="CoFundingprojectId">Co Funding Sub Project *:</label>
+                                <label for="CoFundingprojectId">Co Funding Sub Project</label>
                             </div>
                             <div class="col-lg-6">
                                 <select id="ddlCofunding" class="form-control dropdown-search-filter" name="CoFundingprojectId" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
@@ -718,7 +726,7 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="TrainerId">Trainer *:</label>
+                                <label for="TrainerId">Trainer</label>
                             </div>
                             <div class="col-lg-6">
                                 <select id="ddlTrainer" class="form-control dropdown-search-filter" name="TrainerId" ClientIdMode="static"  required="">
@@ -729,40 +737,56 @@ var Candidates = {};
                     </div>
                     <div class="form-group row ">
                             <div class="col-lg-6">
-                                    <label for="StartDate">Start Date *:</label>
+                                    <label for="PlannedStartDate">Planned Start Date</label>
                                 </div>
                                 <div class="col-lg-6">
-                            <input type="text" id="StartDate" name="StartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date">
+                            <input type="text" id="PlannedStartDate" name="PlannedStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required="">
                         </div>
                     </div>
                     <div class="form-group row ">
                             <div class="col-lg-6">
-                                    <label for="EndDate">End Date *:</label>
+                                    <label for="PlannedEndDate">Planned End Date</label>
                                 </div>
                                 <div class="col-lg-6">
-                            <input type="text" id="EndDate" name="EndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date">
+                            <input type="text" id="PlannedEndDate" name="PlannedEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date" required="">
                         </div>
                     </div>
                     <div class="form-group row ">
                             <div class="col-lg-6">
-                                    <label for="StartTime">Start Time *:</label>
+                                    <label for="ActualStartDate">Actual Start Date</label>
                                 </div>
                                 <div class="col-lg-6">
-                            <input type="text" id="StartTime" name="StartTime" class="form-control time-picker" ClientIdMode="static" placeholder="Start Time">
+                            <input type="text" id="ActualStartDate" name="ActualStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required="">
                         </div>
                     </div>
                     <div class="form-group row ">
                             <div class="col-lg-6">
-                                    <label for="EndTime">End Time *:</label>
+                                    <label for="ActualEndDate">Actual End Date</label>
                                 </div>
                                 <div class="col-lg-6">
-                            <input type="text" id="EndTime" name="EndTime" class="form-control time-picker" ClientIdMode="static" placeholder="End Time">
+                            <input type="text" id="ActualEndDate" name="ActualEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date" required="">
+                        </div>
+                    </div>
+                    <div class="form-group row ">
+                            <div class="col-lg-6">
+                                    <label for="StartTime">Start Time</label>
+                                </div>
+                                <div class="col-lg-6">
+                            <input type="text" id="StartTime" name="StartTime" class="form-control time-picker" ClientIdMode="static" placeholder="Start Time" required="">
+                        </div>
+                    </div>
+                    <div class="form-group row ">
+                            <div class="col-lg-6">
+                                    <label for="EndTime">End Time</label>
+                                </div>
+                                <div class="col-lg-6">
+                            <input type="text" id="EndTime" name="EndTime" class="form-control time-picker" ClientIdMode="static" placeholder="End Time" required="">
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label>Is Active :</label>
+                                <label>Is Active</label>
                             </div>
                             <div class="col-lg-6">
                                 <div class="checkbox checkbox-pink mb-0">
