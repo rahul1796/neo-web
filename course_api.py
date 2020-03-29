@@ -7,10 +7,12 @@ class course_list(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
+            user_id=request.form['user_id']
+            user_role_id=request.form['user_role_id']
             course_id = request.form['course_id'] 
             sectors = request.form['sectors']
             qps = request.form['qps']
-
+            
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
@@ -19,7 +21,7 @@ class course_list(Resource):
             draw=request.form['draw']
 
             status = request.form['status']
-            return Content.course_list(course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status)
+            return Content.course_list(user_id,user_role_id,course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status)
 
 class AllCenterList(Resource,):
     @staticmethod

@@ -247,17 +247,21 @@ function LoadTable()
             { "data": "State_Name" },                       
             { "data": "Region_Name"},
             { "visible": false,"data": "Country_Name"},
-            {"data":"Is_Active"}
-            // { "data": function (row, type, val, meta) {
-            //     var varStatus = ""; 
-            //     if(row.Is_Active)
-            //         varStatus="Active";
-            //     else
-            //         varStatus="In Active";
-            //     return varStatus;
-            //     }
-            // }
-            
+            {"data":"Is_Active"},
+            //{"data":"Course_Count"},
+            { 
+              "data": 
+              function (row, type, val, meta) {
+                  var varButtons = ""; 
+                  if(row.Course_Count==0)
+                      varButtons=row.Course_Count;
+                  else
+                  {
+                      varButtons += '<a onclick="GetCourseDetails(\'' + row.Center_Id + '\',\'' + row.Center_Name + '\')"  style="color:blue;cursor:pointer" >' + row.Course_Count + '</a>';
+                  }                    
+                  return varButtons;
+              }
+           }
         ],
         "ColumnDefs":[
             {
@@ -371,6 +375,67 @@ function GetProjectDetails(CenterId,CenterName)
                 varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
                 $("#tblSubProject tbody").append(varHtml);
                 $('#divSubProjectList').modal('show');
+            }   
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
+function GetCourseDetails(CenterId,CenterName)
+{
+    $('#HdCourse').text('CenterName');
+    var URL=$('#hdn_web_url').val()+ "/GetCoursesForCenter?center_id="+CenterId;
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            varHtml='';
+            $("#tblCourses tbody").empty();
+            if(!jQuery.isEmptyObject(data))
+            {   if (data.Courses != null){
+                    count=data.Courses.length;
+                    if (count>0)
+                    {   varHtml='';
+                        console.log(count);
+                        for(var i=0;i<count;i++)
+                        {
+                            td_open= '  <td style="text-align:center;">' ;
+                            td_close=   '</td>';       
+                            varHtml+='<tr>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Courses[i].S_No +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Courses[i].Course_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Courses[i].Course_Name +'</td>';                    
+                            varHtml+='  <td style="text-align:center;">'+ data.Courses[i].Qp_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Courses[i].Qp_Name +'</td>';     
+                            varHtml+='</tr>';
+                            $("#tblCourses tbody").append(varHtml);
+                            $('#divCourseList').modal('show');
+                            varHtml='';
+                        }
+                    }
+                    else
+                    {
+                        varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                        $("#tblCourses tbody").append(varHtml);
+                        $('#divCourseList').modal('show');
+                    } 
+                    
+                }
+            }
+            else
+            {
+                varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                $("#tblCourses tbody").append(varHtml);
+                $('#divCourseList').modal('show');
             }   
         },
         error:function(err)

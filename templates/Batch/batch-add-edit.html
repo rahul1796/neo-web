@@ -125,6 +125,10 @@ var Candidates = {};
                 async:false,
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
+                data:{
+                        "user_id": $('#hdn_home_user_id').val(),
+                        "user_role_id": $('#hdn_home_user_role_id').val()
+                    },
                 success: function (data){
                     if(data.Center != null)
                     {
@@ -161,7 +165,9 @@ var Candidates = {};
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
                 data:{
-                        "Center_id": $('#ddlCenter').val()
+                        "Center_id": $('#ddlCenter').val(),
+                        "user_id": $('#hdn_home_user_id').val(),
+                        "user_role_id": $('#hdn_home_user_role_id').val()
                     },
                 success: function (data){
                     if(data.Courses != null)
@@ -205,7 +211,9 @@ var Candidates = {};
                 data:{
                         "center_id": $('#ddlCenter').val(),
                         "course_id": $('#ddlCourse').val(),
-                        "sub_project_id": '0'
+                        "sub_project_id": '0',
+                        "user_id": $('#hdn_home_user_id').val(),
+                        "user_role_id": $('#hdn_home_user_role_id').val()
                     },
                 success: function (data){
                     if(data.SubProjects != null)

@@ -55,12 +55,10 @@
                 
                 LoadTable(); 
                 role_id=parseInt($('#hdn_home_user_role_id').val());
-                if(role_id == 1 || role_id ==5 || role_id ==15)
+                if(role_id == 1 || role_id ==15)
                     $('#btn_create').show();
                 else 
                     $('#btn_create').hide();
-                // if(role_id == 7 || role_id==5 || role_id == 4)
-                // 	$('#btn_create').hide();
                 });
             </script>
             <!-- ============================================================== -->
@@ -163,9 +161,6 @@
                                     <div class="row">
                                         <div class="col-lg-6">
                                             <h4 class="header-title">Batch List</h4>
-                                        </div>
-                                        <div class="col-lg-6" style="display:none">                                        
-                                                <button style="float: right" type="submit" id="btn_create" class="btn btn-primary">Create Batch</a>
                                         </div>
                                     </div>
                                     <br/>

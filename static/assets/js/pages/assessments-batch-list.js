@@ -53,6 +53,10 @@ function loadClient(){
         async:false,
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
+        data:{
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
+        },
         success: function (data){
             if(data.Clients != null)
             {
@@ -88,7 +92,9 @@ function LoadProject(){
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
         data:{
-            "ClientId":$('#ddlClient').val().toString()
+            "ClientId":$('#ddlClient').val().toString(),
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
         },
         success: function (data){
             if(data.Projects != null)
@@ -125,7 +131,9 @@ function LoadSubProject(){
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
         data:{
-            "ProjectId":$('#ddlProject').val().toString()
+            "ProjectId":$('#ddlProject').val().toString(),
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
         },
         success: function (data){
             if(data.Sub_Project != null)
@@ -154,16 +162,18 @@ function LoadSubProject(){
 }
 
 function LoadCenter(){
-    var URL=$('#hdn_web_url').val()+ "/get_cand_center_basedon_course_multiple"
+    var URL=$('#hdn_web_url').val()+ "/GetAllCentersBasedOnRegion_User"
     $.ajax({
-        type:"POST",
+        type:"Get",
         url:URL,
         async:false,
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
         data:{
-            "CourseId":"",
-            "RegionId":$('#ddlRegion').val().toString()
+            //"CourseId":"",
+            "region_id":$('#ddlRegion').val().toString(),
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
         },
         success: function (data){
             if(data.Centers != null)
@@ -178,7 +188,7 @@ function LoadCenter(){
                 }
                 else
                 {
-                    $('#ddlCenter').append(new Option('ALL','-1'));
+                   // $('#ddlCenter').append(new Option('ALL','-1'));
                 }
             }
         },
