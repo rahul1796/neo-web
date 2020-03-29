@@ -41,6 +41,10 @@ function LoadCustomerdl(){
         async:false,        
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
+        data:{
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
+        },
         success: function (data){
             if(data.Clients != null)
             {
@@ -55,7 +59,7 @@ function LoadCustomerdl(){
                 }
                 else
                 {
-                    $('#ddlCustomer').append(new Option('No Customer','-1'));
+                   // $('#ddlCustomer').append(new Option('No Customer','-1'));
                 }
             }
         },
@@ -240,7 +244,7 @@ function LoadProductdl(){
 
 function LoadTable()
 {
-    vartable1 = $("#alternative-page-datatable").DataTable({
+    vartable1 = $("#tbl_projects").DataTable({
         "serverSide": true,
         "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
         "paging": true,
@@ -269,13 +273,13 @@ function LoadTable()
                 d.user_region_id=$('#hdn_user_region_id').val();
             },
             error: function (e) {
-                $("#alternative-page-datatable tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
+                $("#tbl_projects tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
             }
 
         },
         "columns": [
             { "data": "S_No"},
-            {"visible": $('#hdn_home_user_role_id').val()=='1'?true:false,
+            {"visible": ($('#hdn_home_user_role_id').val()=='1'||$('#hdn_home_user_role_id').val()=='15')?true:false,
             // function (){
             //     if($('#hdn_home_user_role_id').val()=='1')
             //         return true;
@@ -289,7 +293,6 @@ function LoadTable()
             },
 
             { "data": "Entity_Name"},
-            //{ "data": "Customer_Name"},
             {
                 "data": function (row, type, val, meta) {
                     var varButtons = ""; 
@@ -316,8 +319,9 @@ function LoadTable()
                     return varButtons;
                     }
             },
-            // "data": "Project_Code"},
             { "data": "Project_Name"},
+            { "visible":false,"data": "Center_Count"},
+            { "visible":false,"data": "Course_Count"},
             { "data": "Project_Group_Name"},
             { "data": "Project_Type_Name"},
             { "data": "Block_Name"},
@@ -325,11 +329,11 @@ function LoadTable()
             { "data": "Bu_Name"},
             { "data": "Product_Name"},
             { "data": "Project_Manager"},
-            { "data": "Status"},
+            { "data": "Status"}
             
         ],
         drawCallback: function(){
-            $('#alternative-page-datatable_paginate ul.pagination').addClass("pagination-rounded");
+            $('#tbl_projects_paginate ul.pagination').addClass("pagination-rounded");
         }
 
     });

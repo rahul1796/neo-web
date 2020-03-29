@@ -13,10 +13,10 @@ $(document).ready(function () {
     LoadCustomer_Groupdl();
     LoadSalesCategoryddl();
     role_id=parseInt($('#hdn_home_user_role_id').val());
-                if(role_id == 1)
-                    $('#btn_create').show();
-                else 
-                    $('#btn_create').hide();
+    if(role_id == 1)
+        $('#btn_create').show();
+    else 
+        $('#btn_create').hide();
 
     LoadTable(); 
 
@@ -148,6 +148,8 @@ function LoadTable()
             "type": "POST",
             "dataType": "json",
             "data": function (d) {
+                d.user_id=$('#hdn_home_user_id').val();
+                d.user_role_id=$('#hdn_home_user_role_id').val();
                 d.client_id = 0;
                 d.funding_sources=$('#ddlFundingSource').val().toString();
                 d.is_active=-1;

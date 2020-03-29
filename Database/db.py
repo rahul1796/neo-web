@@ -289,6 +289,7 @@ class Database:
     def project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status):
         content = {}
         d = []
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec [masters].[sp_get_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
@@ -298,20 +299,23 @@ class Database:
         record="0"
         fil="0"
         for row in cur:
-            record=row[16]
-            fil=row[15]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14]}
-            d.append(h)
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
         return content
-    def GetALLClient():
+    def GetALLClient(user_id,user_role_id):
         client = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        cur2.execute("SELECT customer_id,customer_name FROM [masters].[tbl_customer] where is_active=1 and is_deleted=0")
+        values=(user_id,user_role_id)
+        sql='exec [masters].[sp_get_all_clients] ?,?'
+        cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
             for i in range(len(columns)):
@@ -497,14 +501,14 @@ class Database:
         con.close()
         return districts
 
-    def course_list(course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status):
+    def course_list(user_id,user_role_id,course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status):
         content = {}
         d = []
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [content].[sp_get_course_list] ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,status)
+        sql = 'exec [content].[sp_get_course_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,status)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -804,7 +808,9 @@ class Database:
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
+
         values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids) #
+
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -990,13 +996,13 @@ class Database:
             msg={"message":"Error fetching batch data for Droping"}
         return msg
 
-    def qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors):
+    def qp_list(user_id,user_role_id,qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_qp_list] ?, ?, ?, ?, ?, ?, ?'
-        values = (qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, sectors)
+        sql = 'exec [masters].[sp_get_qp_list] ?,?,?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, sectors)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -1119,7 +1125,7 @@ class Database:
         cur2.close()
         con.close()
         return center
-    def get_cand_center_basedon_course_multiple(course_id, RegionId):
+    def get_cand_center_basedon_course_multiple(user_id,user_role_id,course_id, RegionId):
         center = []
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
@@ -1145,14 +1151,14 @@ class Database:
         con.close()
         return section
 
-    def client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_sources,customer_groups,category_type_ids):
+    def client_list(user_id,user_role_id,client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_sources,customer_groups,category_type_ids):
         content = {}
         d = []
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_client_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (client_id,Is_Active, funding_sources,customer_groups,category_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [masters].[sp_get_client_list] ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,client_id,Is_Active, funding_sources,customer_groups,category_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -2748,14 +2754,14 @@ SELECT					cb.name as candidate_name,
         con.close()
         return content
 
-    def contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_contract_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [masters].[sp_get_contract_list] ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -3162,13 +3168,13 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return res
-    def get_project_basedon_client_multiple(client_id):
+    def get_project_basedon_client_multiple(user_id,user_role_id,client_id):
         project = []
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        #print(client_id)
-        sql = """SELECT project_id, project_name FROM masters.tbl_projects WHERE is_active=1 and is_deleted=0 and ('{}'='-1' or customer_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(client_id, client_id)  #'{}'='' or 
-        cur2.execute(sql)
+        values=(user_id,user_role_id,client_id)
+        sql = 'exec masters.sp_get_projects_based_on_customer ?,?,?'
+        cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
             h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
@@ -3257,13 +3263,13 @@ SELECT					cb.name as candidate_name,
         return response
         con.close()       
         return response
-    def GetSubProjectsForCenter_course(center_id, course_id, sub_project_id):
+    def GetSubProjectsForCenter_course(user_id,user_role_id,center_id, course_id, sub_project_id):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec [masters].[sp_get_sub_projects_for_center_course]  ?, ?, ?'
-        values = (center_id, course_id, sub_project_id)
+        sql = 'exec [masters].[sp_get_sub_projects_for_center_course]  ?,?,?, ?, ?'
+        values = (user_id,user_role_id,center_id, course_id, sub_project_id)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -3335,12 +3341,13 @@ SELECT					cb.name as candidate_name,
         con.close()       
         return response
 
-    def Get_all_Center_db():
+    def Get_all_Center_db(user_id,user_role_id):
         response=[]
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[get_all_Center]'
-        cur.execute(sql)
+        sql = 'exec [masters].[get_all_Center] ?,?'
+        values=(user_id,user_role_id)
+        cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
             h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
@@ -3386,13 +3393,14 @@ SELECT					cb.name as candidate_name,
         con.close()       
         return out
 
-    def get_subproject_basedon_proj_multiple(project_id):
+    def get_subproject_basedon_proj_multiple(user_id,user_role_id,project_id):
         courses = []
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
 
-        sql = """SELECT distinct sub_project_id, sub_project_name FROM masters.tbl_sub_projects WHERE is_active=1 and is_deleted=0 and ('{}'='-1' or project_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(project_id, project_id)  #'{}'='' or 
-        cur2.execute(sql)
+        sql = 'exec [masters].[sp_get_sub_projects_based_on_projects] ?,?,?'
+        values=(user_id,user_role_id,project_id)
+        cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
             h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
@@ -3526,12 +3534,12 @@ SELECT					cb.name as candidate_name,
         return response
 
     @classmethod
-    def AllCourse_center_db(cls, center_id):
+    def AllCourse_center_db(cls, user_id,user_role_id,center_id):
         response=[]
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_course_basedon_center] ?'
-        values = (center_id, )
+        sql = 'exec [masters].[sp_course_basedon_center] ?,?,?'
+        values = (user_id,user_role_id,center_id, )
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -3650,5 +3658,45 @@ SELECT					cb.name as candidate_name,
         out = {"sales_Department_role":response}
         #cur.commit()
         cur.close()
-        con.close()       
+        con.close()        
         return out
+    def my_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        content = {}
+        d = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_my_project_list] ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
+        content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        return content
+    def GetCoursesForCenter(center_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_courses_for_center]  ?'
+        values = (center_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+        con.close()       
+        return response

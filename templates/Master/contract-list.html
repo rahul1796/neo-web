@@ -47,6 +47,10 @@
             async:false,
             beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
             datatype:"json",
+            data:{
+                "user_id": $('#hdn_home_user_id').val(),
+                "user_role_id": $('#hdn_home_user_role_id').val()
+            },
             success: function (data){
                 if(data.Clients != null)
                 {
@@ -59,7 +63,7 @@
                     }
                     else
                     {
-                        $('#ddlCustomer').append(new Option('Choose Customer',''));
+                     //   $('#ddlCustomer').append(new Option('Choose Customer',''));
                     }
                 }
             },
@@ -188,6 +192,8 @@
                 "type": "POST",
                 "dataType": "json",
                 "data": function (d) {
+                    d.user_id =$('#hdn_home_user_id').val();
+                    d.user_role_id = $('#hdn_home_user_role_id').val();
                     d.contract_id = 0;
                     d.customer_ids= $('#ddlCustomer').val().toString();
                     d.stage_ids= $('#ddlStage').val().toString();
