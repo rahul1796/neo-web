@@ -4483,6 +4483,23 @@ class GetCoursesForCenter(Resource):
             return response
 api.add_resource(GetCoursesForCenter,'/GetCoursesForCenter')
 
+class GetCoursesForProject(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            project_id=request.args.get('project_id',0,type=int)
+            response={"Courses":Master.GetCoursesForProject(project_id)}
+            return response
+api.add_resource(GetCoursesForProject,'/GetCoursesForProject')
+
+class GetCentersForProject(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            project_id=request.args.get('project_id',0,type=int)
+            response={"Centers":Master.GetCentersForProject(project_id)}
+            return response
+api.add_resource(GetCentersForProject,'/GetCentersForProject')
 
 class PMT_Department_user(Resource):
     @staticmethod
