@@ -620,3 +620,4 @@ function GetCenters(ProjectId,ProjectName)
         }
     });
     return false;
+}

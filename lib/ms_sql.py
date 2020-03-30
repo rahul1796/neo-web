@@ -2,6 +2,7 @@
 import pyodbc
 from Database import config
 from Database import constants as CONST
+import pandas as pd
 #from lib.log import log
 
 
@@ -12,19 +13,19 @@ class MsSql:
 
     def __init__(self):
         
-        conn = pyodbc.connect(config.conn_str)
+        self.conn = pyodbc.connect(config.conn_str)
         
         #conn = pyodbc.connect('Driver={' + MS_SQL.DRIVER + '};'
          #                     'Server=' + MS_SQL.SERVER + ';'
           #                    'Database=' + MS_SQL.DATABASE + ';'
            #                   'UID=' + MS_SQL.UID + ';'
             #                  'PWD=' + MS_SQL.PASSWORD + ';')
-        self.cursor = conn.cursor()
+        self.cursor = self.conn.cursor()
 
     def get_data(self, param):
         tables_data = {}
         if param == CONST.CANDIDATES:
-            tables = config.CANDIDATES_TABLE
+            tables = config.SQL_CANDIDATES_TABLE
         elif param == CONST.CANDIDATE_REG_ENROLL_DETAILS:
             tables = config.CANDIDATE_REG_ENROLL_DETAILS_TABLE
         elif param == CONST.CANDIDATE_REG_ENROLL_NON_MANDATORY_DETAILS:
@@ -36,7 +37,7 @@ class MsSql:
         elif param == CONST.MAP_CANDIDATE_INTERVENTION_SKILLING:
             tables = config.MAP_CANDIDATE_INTERVENTION_SKILLING_TABLE
         else:
-            tables = config.GENERAL_TABLES
+            tables = config.SQL_GENERAL_TABLES
         for table in tables:
             data = self.get_table_data(table)
             tables_data[table] = data
