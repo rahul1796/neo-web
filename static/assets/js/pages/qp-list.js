@@ -72,6 +72,8 @@ function LoadTable(sectors)
             "type": "POST",
             "dataType": "json",
             "data": function (d) {
+                d.user_id =$('#hdn_home_user_id').val();
+                d.user_role_id = $('#hdn_home_user_role_id').val();
                 d.qp_id = 0;
 				d.sectors = sectors;
             },

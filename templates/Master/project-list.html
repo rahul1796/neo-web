@@ -7,13 +7,13 @@
          <!-- third party css end -->
 
         <!-- App css -->
-        <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <!-- <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
         <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-        <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" /> -->
         
         <script type="text/javascript">
         $(document).ready(function () {
-    $("#alternative-page-datatable").dataTable().fnDestroy();
+    $("#tbl_projects").dataTable().fnDestroy();
 	$('.dropdown-search-filter').select2({
                 placeholder:''
             });
@@ -60,7 +60,7 @@
                             <div class="page-title-box">
                                 <div class="page-title-right">
                                     <ol class="breadcrumb m-0">
-                                        <li class="breadcrumb-item"><a href="javascript: void(0);">LN</a></li>
+                                        <li class="breadcrumb-item"><a href="javascript: void(0);">NEO</a></li>
                                         <li class="breadcrumb-item active">Projects</li>
                                     </ol>
                                 </div>
@@ -165,15 +165,18 @@
                                     </div>
                                     <br/>
                                     <div class="col-lg-12">
-                                        <table id="alternative-page-datatable" class="table dt-responsive wrap">
+                                        <!--  nowrap dataTable no-footer -->
+                                        <table id="tbl_projects" class="table w-100 dt-responsive wrap">
                                             <thead>
                                                 <tr>
-                                                    <th>S No</th>
+                                                    <th>S.No</th>
                                                     <th>Actions</th>
                                                     <th>Entity Name</th>
                                                     <th>Customer Name</th>
                                                     <th>Project Code</th>
                                                     <th>Project Name</th>
+                                                    <th>Center</th>
+                                                    <th>Course</th>
                                                     <th>Group</th>
                                                     <th>Type</th>
                                                     <th>Block</th>
@@ -360,4 +363,67 @@
             
             </div>
         </form>
+       </div><!--/.modal-->
+
+        <div id="divCourseList" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="HdCourse"></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <table id="tbl_proj_Courses" class="table table-bordered dt-responsive wrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                            <thead>                        
+                                <tr style="background-color: #f5f6f8;">
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Code</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Name</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">QP Code</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">QP Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        
+                            </tbody>
+                        </table>	
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->  
+
+        <div id="mdl_Centes" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title" ><span id="headerCenter"></span></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>                    
+                    <div class="modal-body">
+                        <table id="tbl_proj_centers" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                            <thead>
+                                <tr style="background-color: #f5f6f8;">
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Name</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Code</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Type</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">State</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Region</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        
+                            </tbody>
+                        </table>	
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"onclick="OpenCourseVariantModal()"> Back</button>
+                        <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+
         </div><!--/.modal-->

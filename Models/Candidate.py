@@ -16,12 +16,12 @@ class Candidate:
     def get_cand_center_basedon_course(course_id):
         centers = {"Centers": Database.get_cand_center_basedon_course(course_id)}
         return centers
-    def get_cand_center_basedon_course_multiple(course_id, RegionId):
-        centers = {"Centers": Database.get_cand_center_basedon_course_multiple(course_id, RegionId)}
+    def get_cand_center_basedon_course_multiple(user_id,user_role_id,course_id, RegionId):
+        centers = {"Centers": Database.get_cand_center_basedon_course_multiple(user_id,user_role_id,course_id, RegionId)}
         return centers
     def get_section_for_cand():
         section = {"Sections":Database.get_section_for_cand()}
         return section
-    def get_project_basedon_client_multiple(client_id):
-        projects ={"Projects": Database.get_project_basedon_client_multiple(client_id)}
+    def get_project_basedon_client_multiple(user_id,user_role_id,client_id):
+        projects ={"Projects": Database.get_project_basedon_client_multiple(user_id,user_role_id,client_id)}
         return projects
