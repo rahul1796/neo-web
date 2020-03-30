@@ -4209,23 +4209,6 @@ class GetSubProjectsForCourse(Resource):
 api.add_resource(GetSubProjectsForCourse,'/GetSubProjectsForCourse')
              
 
-class SqlServerApi(Resource):
-    @staticmethod
-    def get():
-        if request.method=='GET':
-            try:
-                ms_sql = MsSql()
-                #log.info("> MS_SQL data request")
-                data = ms_sql.get_data()
-                response = {"status": 200, "data": data}
-            except Exception as error:
-                #log.error("SqlServerApi request error: {}".format(error))
-                response = {"status": 400, "message": str(error)}
-            finally:
-                #log.info("< SqlServerApi --> " + Log.str(response))
-                return jsonify(response)
-api.add_resource(SqlServerApi,'/SqlServerApi')               
-
 class GetCourseVariantsForCourse(Resource):
     @staticmethod
     def get():
@@ -4518,6 +4501,21 @@ class add_subproject_details(Resource):
             isactive=request.form['isactive']
             return Master.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive)
 api.add_resource(add_subproject_details,'/add_subproject_details')
+
+@app.route("/SqlServerApi", defaults={"param": None})
+@app.route("/SqlServerApi/<string:param>", methods=["GET"])
+def SqlServerApi(param):
+    try:
+        ms_sql = MsSql()
+        #log.info("> POSTGRE_SQL data request")
+        data = ms_sql.get_data(param)
+        response = {"status": 200, "data": data}
+    except Exception as error:
+        #log.error("PostgreSqlServerApi request error: {}".format(error))
+        response = {"status": 400, "message": str(error)}
+    finally:
+        #log.info("< PostgreSqlServerApi --> " + Log.str(response))
+        return jsonify(response)
 
 if __name__ == '__main__':    
     app.run(debug=True)

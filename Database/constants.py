@@ -9,3 +9,9 @@ APP_LOG_FILENAME = APP_PATH + "log/application.log"
 
 CANDIDATES = "Candidates"
 NEO_BATCHES = "NeoBatches"
+
+CANDIDATE_REG_ENROLL_DETAILS = "CandidateRegEnrollDetails"
+CANDIDATE_REG_ENROLL_NON_MANDATORY_DETAILS = "CandidateRegEnrollNonMandatoryDetails"
+CANDIDATE_INTERVENTIONS = "CandidateInterventions"
+CANDIDATE_INTERVENTION_TRACKER = "CandidateInterventionTracker"
+MAP_CANDIDATE_INTERVENTION_SKILLING = "MapCandidateInterventionSkilling"
