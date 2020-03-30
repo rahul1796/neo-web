@@ -21,6 +21,8 @@ function LoadTable(sectors, qps, status)
                 d.sectors = sectors;
                 d.qps = qps;
                 d.status = status;
+                d.user_id =$('#hdn_home_user_id').val();
+                d.user_role_id = $('#hdn_home_user_role_id').val();
             },
             error: function (e) {
                 $("#tbl_courses tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -218,6 +220,7 @@ function Get_projects(CourseId,CourseName,IsCourseVariant){
         datatype:"json",
         success: function (data){
             varHtml='';
+            $("#tbl_project").dataTable().fnDestroy();
             $("#tbl_project tbody").empty();
             if(!jQuery.isEmptyObject(data))
             {   
@@ -239,6 +242,7 @@ function Get_projects(CourseId,CourseName,IsCourseVariant){
                         }                        
                     }
                     $("#tbl_project tbody").append(varHtml);
+                    $("#tbl_project").DataTable();
                     $('#mdl_Cou_Projects').modal('show');
                 }
                 else
@@ -280,6 +284,7 @@ function Get_Sub_Projects(CourseId,CourseName,IsCourseVariant){
          datatype:"json",
          success: function (data){
              varHtml='';
+             $("#tbl_sub_project").dataTable().fnDestroy();
              $("#tbl_sub_project tbody").empty();
              if(!jQuery.isEmptyObject(data))
              {   
@@ -303,6 +308,7 @@ function Get_Sub_Projects(CourseId,CourseName,IsCourseVariant){
                          }                        
                      }
                      $("#tbl_sub_project tbody").append(varHtml);
+                     $("#tbl_sub_project").DataTable();
                      $('#mdl_Cou_Sub_Projects').modal('show');
                  }
                  else
@@ -345,6 +351,7 @@ function Get_Sub_Projects(CourseId,CourseName,IsCourseVariant){
         success: function (data){
             varHtml='';
             let varTxt='';
+            $("#tbl_centers").dataTable().fnDestroy();
             $("#tbl_centers tbody").empty();
             if(!jQuery.isEmptyObject(data))
             {   
@@ -365,6 +372,7 @@ function Get_Sub_Projects(CourseId,CourseName,IsCourseVariant){
                         }                        
                     }
                     $("#tbl_centers tbody").append(varHtml);
+                    $("#tbl_centers").DataTable();
                     $('#mdl_Cou_Centes').modal('show');
                 }
                 else

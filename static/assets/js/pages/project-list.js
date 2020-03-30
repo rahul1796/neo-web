@@ -41,6 +41,10 @@ function LoadCustomerdl(){
         async:false,        
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
+        data:{
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
+        },
         success: function (data){
             if(data.Clients != null)
             {
@@ -55,7 +59,7 @@ function LoadCustomerdl(){
                 }
                 else
                 {
-                    $('#ddlCustomer').append(new Option('No Customer','-1'));
+                   // $('#ddlCustomer').append(new Option('No Customer','-1'));
                 }
             }
         },
@@ -240,7 +244,7 @@ function LoadProductdl(){
 
 function LoadTable()
 {
-    vartable1 = $("#alternative-page-datatable").DataTable({
+    vartable1 = $("#tbl_projects").DataTable({
         "serverSide": true,
         "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
         "paging": true,
@@ -269,13 +273,13 @@ function LoadTable()
                 d.user_region_id=$('#hdn_user_region_id').val();
             },
             error: function (e) {
-                $("#alternative-page-datatable tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
+                $("#tbl_projects tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
             }
 
         },
         "columns": [
             { "data": "S_No"},
-            {"visible": $('#hdn_home_user_role_id').val()=='1'?true:false,
+            {"visible": ($('#hdn_home_user_role_id').val()=='1'||$('#hdn_home_user_role_id').val()=='15')?true:false,
             // function (){
             //     if($('#hdn_home_user_role_id').val()=='1')
             //         return true;
@@ -289,7 +293,6 @@ function LoadTable()
             },
 
             { "data": "Entity_Name"},
-            //{ "data": "Customer_Name"},
             {
                 "data": function (row, type, val, meta) {
                     var varButtons = ""; 
@@ -316,8 +319,33 @@ function LoadTable()
                     return varButtons;
                     }
             },
-            // "data": "Project_Code"},
             { "data": "Project_Name"},
+            { "visible":true,
+            "data": function (row, type, val, meta) {
+                var varButtons = ""; 
+                if(row.Center_Count=="")
+                    varButtons=row.Center_Count;
+                else
+                {
+                    varButtons += '<a onclick="GetCenters(\'' + row.Project_Id + '\',\''+row.Project_Name+ '\')"  style="color:blue;cursor:pointer" >' + row.Center_Count + '</a>';
+                }
+                
+                return varButtons;
+                }
+            },
+            { "visible":true,
+            "data": function (row, type, val, meta) {
+                var varButtons = ""; 
+                if(row.Course_Count=="")
+                    varButtons=row.Course_Count;
+                else
+                {
+                    varButtons += '<a onclick="GetCourses(\'' + row.Project_Id + '\',\''+row.Project_Name+ '\')"  style="color:blue;cursor:pointer" >' + row.Course_Count + '</a>';
+                }
+                
+                return varButtons;
+                }
+            },
             { "data": "Project_Group_Name"},
             { "data": "Project_Type_Name"},
             { "data": "Block_Name"},
@@ -325,11 +353,11 @@ function LoadTable()
             { "data": "Bu_Name"},
             { "data": "Product_Name"},
             { "data": "Project_Manager"},
-            { "data": "Status"},
+            { "data": "Status"}
             
         ],
         drawCallback: function(){
-            $('#alternative-page-datatable_paginate ul.pagination').addClass("pagination-rounded");
+            $('#tbl_projects_paginate ul.pagination').addClass("pagination-rounded");
         }
 
     });
@@ -460,11 +488,135 @@ function GetSub_project(Project_Id){
         }
     });
     return false;
-} 
-
+}
 function EditsubProjectDetail(SubProjectId)
 {
     $('#hdn_subproject_id').val(SubProjectId);
     $('#form2').submit();
-    
 }
+function GetCourses(ProjectId,ProjectName)
+{
+    $('#HdCourse').text(ProjectName);
+    var URL=$('#hdn_web_url').val()+ "/GetCoursesForProject?project_id="+ProjectId;
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            varHtml='';
+            $("#tbl_proj_Courses").dataTable().fnDestroy();
+            $("#tbl_proj_Courses tbody").empty();
+            if(!jQuery.isEmptyObject(data))
+            {   if (data.Courses != null){
+                    count=data.Courses.length;
+                    if (count>0)
+                    {   varHtml='';
+                        console.log(count);
+                        for(var i=0;i<count;i++)
+                        {
+                            td_open= '  <td style="text-align:center;">' ;
+                            td_close=   '</td>';       
+                            varHtml+='<tr>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Courses[i].S_No +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Courses[i].Course_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Courses[i].Course_Name +'</td>';                    
+                            varHtml+='  <td style="text-align:center;">'+ data.Courses[i].Qp_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Courses[i].Qp_Name +'</td>';     
+                            varHtml+='</tr>';                            
+                        }
+                        $("#tbl_proj_Courses tbody").append(varHtml);
+                            $("#tbl_proj_Courses").DataTable();
+                            $('#divCourseList').modal('show');
+                            varHtml='';
+                    }
+                    else
+                    {
+                        varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                        $("#tbl_proj_Courses tbody").append(varHtml);
+                        $('#divCourseList').modal('show');
+                    } 
+                    
+                }
+            }
+            else
+            {
+                varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                $("#tbl_proj_Courses tbody").append(varHtml);
+                $('#divCourseList').modal('show');
+            }   
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
+function GetCenters(ProjectId,ProjectName)
+{
+    $('#headerCenter').text(ProjectName);
+    var URL=$('#hdn_web_url').val()+ "/GetCentersForProject?project_id="+ProjectId;
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            varHtml='';
+            $("#tbl_proj_centers").dataTable().fnDestroy();
+            $("#tbl_proj_centers tbody").empty();
+            if(!jQuery.isEmptyObject(data))
+            {   if (data.Centers != null){
+                    count=data.Centers.length;
+                    if (count>0)
+                    {   varHtml='';
+                        console.log(count);
+                        for(var i=0;i<count;i++)
+                        {
+                            td_open= '  <td style="text-align:center;">' ;
+                            td_close=   '</td>';       
+                            varHtml+='<tr>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Centers[i].S_No +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Centers[i].Center_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Centers[i].Center_Name +'</td>';                    
+                            varHtml+='  <td style="text-align:center;">'+ data.Centers[i].Center_Type_Name +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Centers[i].State_Name +'</td>';     
+                            varHtml+='  <td style="text-align:center;">'+ data.Centers[i].Region_Name +'</td>';   
+                            varHtml+='</tr>';
+                            
+                        }
+                        $("#tbl_proj_centers tbody").append(varHtml);
+                            $("#tbl_proj_centers").DataTable();
+                            $('#mdl_Centes').modal('show');
+                            varHtml='';
+                    }
+                    else
+                    {
+                        varHtml='<tr><td colspan="6" style="text-align:center;">No records found</td></tr>'
+                        $("#tbl_proj_centers tbody").append(varHtml);
+                        $('#mdl_Centes').modal('show');
+                    } 
+                    
+                }
+            }
+            else
+            {
+                varHtml='<tr><td colspan="6" style="text-align:center;">No records found</td></tr>'
+                $("#tbl_proj_centers tbody").append(varHtml);
+                $('#mdl_Centes').modal('show');
+            }   
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;

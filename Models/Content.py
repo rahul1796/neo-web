@@ -1,7 +1,7 @@
 from Database import Database
 class Content:
-    def course_list(course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status):
-        course_l = Database.course_list(course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status)
+    def course_list(user_id,user_role_id,course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status):
+        course_l = Database.course_list(user_id,user_role_id,course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status)
         return course_l
     def AllPractice():
         practice_list={"Pratices":Database.GetPractice()}
@@ -37,8 +37,8 @@ class Content:
         qp_t={"Qp":Database.get_qp_course()}
         return qp_t
 
-    def qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors):
-        qp_l=Database.qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors)
+    def qp_list(user_id,user_role_id,qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors):
+        qp_l=Database.qp_list(user_id,user_role_id,qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors)
         return qp_l
     def add_qp(qp_name,qp_code,user_id,is_active,qp_id):
         popupMessage = {"PopupMessage": Database.add_qp_details(qp_name,qp_code,user_id,is_active,qp_id)}    

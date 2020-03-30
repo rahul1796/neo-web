@@ -4,7 +4,7 @@
 <script>
 function add_popup_message(){
 	
-	var URL= 'http://neolive.southindia.cloudapp.azure.com:29092/' + 'recover_pass';
+	var URL=$('#hdn_web_url').val() + 'recover_pass';
 	   $.ajax({
 		   type:"GET",
 		   url:URL,
@@ -121,7 +121,7 @@ function add_popup_message(){
 
 
         <footer class="footer footer-alt" style="color: cornsilk;">
-            2013 - 2019 &copy; <a href="https://www.labournet.in/">LabourNet</a>- Theme by Team 
+            2013 - 2020 &copy; <a href="https://www.labournet.in/">LabourNet</a>- Theme by Team 
         </footer>
 
         <!-- Vendor js -->

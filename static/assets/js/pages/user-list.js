@@ -309,7 +309,7 @@ function LoadTable(FilterRoleId)
             "type": "POST",
             "dataType": "json",
             "data": function (d) {
-                d.user_id = 0;
+                d.user_id = $('#hdn_home_user_id').val();
                 d.entity_ids = $('#ddlentity').val().toString();
                 d.dept_ids = $('#ddlDEPT').val().toString();
                 d.role_ids = $('#ddlRole').val().toString();                

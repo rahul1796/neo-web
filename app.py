@@ -839,7 +839,9 @@ class batch_list_updated(Resource):
             center_type = request.form['center_type']
             status = request.form['status']
             #print('before hi')
-            BU = request.form['BU']
+            BU=''
+            if 'BU' in request.form:
+                BU = request.form['BU']            
             course_ids=''
             if 'course_ids' in request.form:
                 course_ids=request.form['course_ids']
@@ -1028,6 +1030,8 @@ class qp_list(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
+            user_id=request.form['user_id']
+            user_role_id=request.form['user_role_id']
             qp_id = request.form['qp_id']
             start_index = request.form['start']
             page_length = request.form['length']
@@ -1038,7 +1042,7 @@ class qp_list(Resource):
 
             sectors = request.form['sectors']
             
-            return Content.qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors)
+            return Content.qp_list(user_id,user_role_id,qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors)
 
 class add_qp_details(Resource):
     @staticmethod
@@ -1086,7 +1090,13 @@ class get_project_basedon_client_multiple(Resource):
     def post():
         if request.method == 'POST':
             client_id=request.form['ClientId']
-            return Candidate.get_project_basedon_client_multiple(client_id)
+            user_id=0
+            if 'user_id' in request.form:
+                user_id=request.form['user_id']
+            user_role_id=0
+            if 'user_role_id' in request.form:
+                user_role_id=request.form['user_role_id']
+            return Candidate.get_project_basedon_client_multiple(user_id,user_role_id,client_id)
 
 class get_project_basedon_client(Resource):
     @staticmethod
@@ -1121,9 +1131,15 @@ class get_cand_center_basedon_course_multiple(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
+            user_id=0
+            if 'user_id' in request.form:
+                user_id=request.form['user_id']
+            user_role_id=0
+            if 'user_role_id' in request.form:
+                user_role_id=request.form['user_role_id']
             course_id = request.form['CourseId']
             RegionId = request.form['RegionId']
-            return Candidate.get_cand_center_basedon_course_multiple(course_id, RegionId)
+            return Candidate.get_cand_center_basedon_course_multiple(user_id,user_role_id,course_id, RegionId)
 
 class get_section_for_cand(Resource):
     @staticmethod
@@ -1212,6 +1228,8 @@ class client_list(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
+            user_id = request.form['user_id'] 
+            user_role_id = request.form['user_role_id'] 
             client_id = request.form['client_id'] 
             if 'is_active' in request.form:
                 Is_Active=request.form['is_active']
@@ -1227,7 +1245,7 @@ class client_list(Resource):
             customer_groups = request.form['customer_groups']
             category_type_ids = request.form['category_type_ids']
             #print(order_by_column_position,order_by_column_direction)
-            return Master.client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_sources,customer_groups,category_type_ids)
+            return Master.client_list(user_id,user_role_id,client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_sources,customer_groups,category_type_ids)
 
 class add_client_details(Resource):
     @staticmethod
@@ -2560,7 +2578,9 @@ class client_all(Resource):
     @staticmethod
     def get():
         if request.method == 'GET':
-            return Master.all_client()
+            user_id=request.args.get('user_id',0,type=int)
+            user_role_id=request.args.get('user_role_id',0,type=int)
+            return Master.all_client(user_id,user_role_id)
 
 class get_project_details(Resource):
     @staticmethod
@@ -2808,7 +2828,8 @@ class GetAllCentersBasedOnRegion_User(Resource):
             try:
                 UserId=request.args.get('user_id',0,type=int)
                 UserRoleId=request.args.get('user_role_id',0,type=int)
-                RegionId=request.args.get('region_id',0,type=int)
+                RegionId=request.args.get('region_id','',type=str)
+                print(UserId,UserRoleId,RegionId)
                 response=Report.GetAllCentersBasedOnRegion_User(UserId,UserRoleId,RegionId)
                 return {'Centers':response}
             except Exception as e:
@@ -3500,6 +3521,8 @@ class contract_list(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
+            user_id=request.form['user_id']
+            user_role_id=request.form['user_role_id']
             contract_id = request.form['contract_id'] 
             customer_ids = request.form['customer_ids'] 
             stage_ids = request.form['stage_ids'] 
@@ -3513,7 +3536,7 @@ class contract_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            return Master.contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Master.contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 
 class add_contract_details(Resource):
     @staticmethod
@@ -4136,7 +4159,9 @@ class Get_all_Center(Resource):
     def get():
         if request.method=='GET':
             try:
-                response = Database.Get_all_Center_db()
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                response = Database.Get_all_Center_db(user_id,user_role_id)
                 return {'Center':response}
             except Exception as e:
                 return {'exception':str(e)}
@@ -4147,7 +4172,13 @@ class get_subproject_basedon_proj_multiple(Resource):
     def post():
         if request.method == 'POST':
             project_id=request.form['ProjectId']
-            return {"Sub_Project": Database.get_subproject_basedon_proj_multiple(project_id)} 
+            user_id=0
+            if 'user_id' in request.form:
+                user_id=request.form['user_id']
+            user_role_id=0
+            if 'user_role_id' in request.form:
+                user_role_id=request.form['user_role_id']
+            return {"Sub_Project": Database.get_subproject_basedon_proj_multiple(user_id,user_role_id,project_id)} 
 api.add_resource(get_subproject_basedon_proj_multiple,'/get_subproject_basedon_proj_multiple')
 
 #QP_API's
@@ -4266,8 +4297,10 @@ class All_Course_basedon_center(Resource):
     def get():
         if request.method=='GET':
             try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
                 center_id=request.args['Center_id']
-                response = Database.AllCourse_center_db(center_id)
+                response = Database.AllCourse_center_db(user_id,user_role_id,center_id)
                 return {'Courses':response}
             except Exception as e:
                 return {'exception':str(e)}
@@ -4277,10 +4310,12 @@ class GetSubProjectsForCenter_Course(Resource):
     @staticmethod
     def get():
         if request.method=='GET':
+            user_id=request.args.get('user_id',0,type=int)
+            user_role_id=request.args.get('user_role_id',0,type=int)
             center_id=request.args.get('center_id',0,type=int)
             course_id=request.args.get('course_id',0,type=int)
             sub_project_id=request.args.get('sub_project_id',0,type=int)
-            response={"SubProjects":Master.GetSubProjectsForCenter_course(center_id, course_id, sub_project_id)}
+            response={"SubProjects":Master.GetSubProjectsForCenter_course(user_id,user_role_id,center_id, course_id, sub_project_id)}
             return response
 api.add_resource(GetSubProjectsForCenter_Course,'/GetSubProjectsForCenter_Course')
 
@@ -4423,6 +4458,65 @@ class Getcandidatebybatch(Resource):
                 return {'exception':str(e)}
 api.add_resource(Getcandidatebybatch,'/Getcandidatebybatch')
 
+#####################################################################################################
+#Project_API's
+@app.route("/my_project_list_page")
+def my_project_list_page():
+    if g.user:
+        return render_template("Master/my-project-list.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/my_projects")
+def my_projects():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html='my_project_list_page')
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class my_project_list(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            user_id = request.form['user_id']
+            user_role_id = request.form['user_role_id'] 
+            user_region_id = request.form['user_region_id']
+            start_index = request.form['start']
+            page_length = request.form['length']
+            search_value = request.form['search[value]']
+            order_by_column_position = request.form['order[0][column]']
+            order_by_column_direction = request.form['order[0][dir]']
+            draw=request.form['draw']
+            return Master.my_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+api.add_resource(my_project_list,'/my_project_list')
+
+##################################################################################################
+class GetCoursesForCenter(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            center_id=request.args.get('center_id',0,type=int)
+            response={"Courses":Master.GetCoursesForCenter(center_id)}
+            return response
+api.add_resource(GetCoursesForCenter,'/GetCoursesForCenter')
+
+class GetCoursesForProject(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            project_id=request.args.get('project_id',0,type=int)
+            response={"Courses":Master.GetCoursesForProject(project_id)}
+            return response
+api.add_resource(GetCoursesForProject,'/GetCoursesForProject')
+
+class GetCentersForProject(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            project_id=request.args.get('project_id',0,type=int)
+            response={"Centers":Master.GetCentersForProject(project_id)}
+            return response
+api.add_resource(GetCentersForProject,'/GetCentersForProject')
 
 class PMT_Department_user(Resource):
     @staticmethod
