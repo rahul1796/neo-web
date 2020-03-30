@@ -78,6 +78,9 @@ def before_request():
     g.sector_id=None
     g.contract_id=None
     g.RegisteredCandidatesList=None
+    g.subproject_id=None
+    g.project_code=None
+    
     if 'user_name' in session.keys():
         g.user = session['user_name']
         g.user_id = session['user_id']
@@ -141,6 +144,12 @@ def before_request():
         g.sector_id = session['sector_id']
     if 'contract_id' in session.keys():
         g.contract_id = session['contract_id']
+    if 'project_code' in session.keys():
+        g.project_code=session['project_code']
+    if 'subproject_id' in session.keys():
+        g.subproject_id=session['subproject_id']
+    
+    
 
 #home_API's
 #home_batch -> for batchlist in home page
@@ -2341,7 +2350,9 @@ class get_sub_center_details(Resource):
     @staticmethod
     def get():
         if request.method == 'GET':
-            return Master.get_sub_center(g.sub_center_id)
+            return Master.get_sub_center(
+                
+            )
 
 api.add_resource(sub_center_list,'/sub_center_list')
 api.add_resource(add_sub_center_details,'/add_sub_center_details')
@@ -2577,12 +2588,18 @@ class get_project_details(Resource):
         if request.method == 'GET':
             return Master.get_project_details(g.project_id)
 
+class get_subproject_details(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            return Master.get_subproject_details(g.subproject_id)
 
 
 api.add_resource(project_list, '/project_list')
 api.add_resource(client_all, '/GetALLClient')
 api.add_resource(add_project_details, '/add_project_details')
 api.add_resource(get_project_details, '/GetProjectDetails')
+api.add_resource(get_subproject_details, '/get_subproject_details')
 
 ####################################################################################################
 
@@ -4523,6 +4540,78 @@ class sales_Department_user(Resource):
                 return {'exception':str(e)}
 api.add_resource(sales_Department_user,'/sales_Department_user')
 
+@app.route("/subproject_add_edit")
+def subproject_add_edit():
+    if g.user:
+        return render_template("Master/subproject-add-edit.html",project_code=g.project_code, subproject_id=g.subproject_id)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/assign_subproject_add_edit_to_home", methods=['GET','POST'])
+def assign_subproject_add_edit_to_home():
+    session['subproject_id']=request.form['hdn_subproject_id']
+    session['project_code']=request.form['hdn_project_code']
+    #print(request.form['hdn_subproject_id'], request.form['hdn_project_code'])
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="subproject_add_edit")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class all_states_based_on_region(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                region_id=request.args.get('region_id',0,type=int)
+                response = Database.Getstatebasedonregion_db(region_id)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(all_states_based_on_region,'/all_states_based_on_region')
+
+class all_center_based_on_state(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                state_id=request.args.get('state_id',0,type=int)
+                response = Database.Getcenterbasedonstate_db(state_id)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(all_center_based_on_state,'/all_center_based_on_state')
+
+class all_course_based_on_center(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            center_ids=request.form['center_ids']
+            project_code=request.form['project_code']
+            return Database.Getcoursebasedoncenter_db(center_ids,project_code)
+api.add_resource(all_course_based_on_center,'/all_course_based_on_center')
+
+class add_subproject_details(Resource):
+    @staticmethod
+    def post():
+        
+        if request.method == 'POST':
+            SubProjectName=request.form['SubProjectName']
+            SubProjectCode=request.form['SubProjectCode']
+            Region=request.form['Region']
+            State=request.form['State']
+            Centers=request.form['Centers']
+            Course=request.form['Course']
+            PlannedStartDate=request.form['PlannedStartDate']
+            PlannedEndDate=request.form['PlannedEndDate']
+            ActualStartDate=request.form['ActualStartDate']
+            ActualEndDate=request.form['ActualEndDate']
+            
+            user_id=g.user_id
+            subproject_id=g.subproject_id
+            project_code = g.project_code       
+            isactive=request.form['isactive']
+            return Master.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive)
+api.add_resource(add_subproject_details,'/add_subproject_details')
 
 if __name__ == '__main__':    
     app.run(debug=True)

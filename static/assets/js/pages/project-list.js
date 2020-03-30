@@ -443,7 +443,8 @@ function GetSub_project(Project_Id){
             {   //alert(data.Customer_Name)
                 $('#txtproject_name').val(data.project_name);
                 $('#txtprojectcode').val(data.project_code);
-
+                $('#hdn_project_code').val(data.project_id);
+                
                 if (data.sub_project[0].Sub_Project_Name != null){
                     var count=data.sub_project.length;
                     if( count> 0)
@@ -452,6 +453,8 @@ function GetSub_project(Project_Id){
                         {
                             varHtml+='<tr>';
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].S_No +'</td>';
+                            console.log(data.sub_project[i].Sub_Project_Id)
+                            varHtml+='  <td style="text-align:center;">'+ '<a onclick="EditsubProjectDetail(\'' + data.sub_project[i].Sub_Project_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Project" class="fas fa-edit" ></i></a>' +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Sub_Project_Name +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Sub_Project_Code +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Center_Name +'</td>';
@@ -485,7 +488,12 @@ function GetSub_project(Project_Id){
         }
     });
     return false;
-} 
+}
+function EditsubProjectDetail(SubProjectId)
+{
+    $('#hdn_subproject_id').val(SubProjectId);
+    $('#form2').submit();
+}
 function GetCourses(ProjectId,ProjectName)
 {
     $('#HdCourse').text(ProjectName);
@@ -612,4 +620,3 @@ function GetCenters(ProjectId,ProjectName)
         }
     });
     return false;
-}
