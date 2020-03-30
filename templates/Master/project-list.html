@@ -37,6 +37,9 @@
     else 
         $('#btn_create').hide();
     LoadTable(); 
+    if ('{{project_id}}'>0)
+        GetSub_project('{{project_id}}')
+        
                  
   /*  $("#alternative-page-datatable").DataTable({
 		pagingType: "full_numbers",
@@ -289,6 +292,9 @@
         </div><!--/.modal-->
 
         <div id="tr_sub_project" class="modal fade" role="dialog">
+            <form id='form2' method="POST" action="/assign_subproject_add_edit_to_home">
+                <input type="hidden" id="hdn_subproject_id" name="hdn_subproject_id" value="0">
+                <input type="hidden" id="hdn_project_code" name="hdn_project_code" value="0">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content ">
                     <div class="modal-header">
@@ -317,7 +323,11 @@
                                                 <input type="text" class="form-control" id="txtprojectcode"  disabled/>                               
                                             </div>
                                         </div>
+                                        <div class="col-md-12" >                                        
+                                            <button style="float: right; margin-top: 30px;"  id="btn_create2" type="submit" class="btn btn-primary">Create SubProject</a> <!--  onclick="window.location.href = '/sub_project?id=1';" -->
+                                        </div>
                                     </div>
+                                    
                                     
                                 </div> <!--end card-body-->
                             </div> <!-- end card-->
@@ -329,6 +339,7 @@
                             <thead>
                                 <tr style="background-color: #f5f6f8;">
                                     <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S No</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Action</th>
                                     <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Name</th>
                                     <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Code</th>
                                     <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Name</th>
@@ -346,5 +357,7 @@
                         <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
                     </div>
                 </div>
+            
             </div>
+        </form>
         </div><!--/.modal-->

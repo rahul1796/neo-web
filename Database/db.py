@@ -343,6 +343,28 @@ class Database:
                     if pop==2:
                         msg={"message":"Customer with the Customer code already exists","client_flag":2}
         return msg
+    
+    def add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_add_edit_subproject] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive)
+        #print(values)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated","client_flag":1}
+        else: 
+                if pop==0:
+                    msg={"message":"Created","client_flag":0}
+                else:
+                    if pop==2:
+                        msg={"message":"Customer with the Customer code already exists","client_flag":2}
+        return msg
         
     def get_project_details(glob_project_id):
         con = pyodbc.connect(conn_str)
@@ -353,6 +375,19 @@ class Database:
         columns = [column[0].title() for column in cur.description]
         for row in cur:
             h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15]}
+        cur.close()
+        con.close()
+        return h
+    
+    def get_subproject_details(glob_project_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = "exec	[masters].[sp_GetsubprojectDetails] ?"
+        values = (glob_project_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9].split(','),""+columns[10]+"":row[10].split(',')}
         cur.close()
         con.close()
         return h
@@ -3377,10 +3412,10 @@ SELECT					cb.name as candidate_name,
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2], ""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2], ""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
             response.append(h)
 
-        out = {'sub_project':response,'project_name':row[6],'project_code':row[7]}
+        out = {'sub_project':response,'project_name':row[7],'project_code':row[8],'project_id':row[9]}
         cur.commit()
         cur.close()
         con.close()       
@@ -3648,6 +3683,58 @@ SELECT					cb.name as candidate_name,
             response.append(h)
 
         out = {"sales_Department_role":response}
+        #cur.commit()
+        cur.close()
+        con.close()       
+        return out
+
+    def Getstatebasedonregion_db(region_id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'select state_id, state_name from masters.tbl_states where is_active=1 and region_id ='+str(region_id)
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+
+        out = {"state":response}
+        #cur.commit()
+        cur.close()
+        con.close()       
+        return out
+    
+    def Getcenterbasedonstate_db(state_id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'select center_id, center_name from masters.tbl_center where is_active=1 and state_id='+str(state_id)
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+
+        out = {"center":response}
+        #cur.commit()
+        cur.close()
+        con.close()       
+        return out
+
+    def Getcoursebasedoncenter_db(center_ids,project_code):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_course_basedon_center_project] ?, ?'
+        values=(center_ids,project_code)        
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+
+        out = {"course":response}
         #cur.commit()
         cur.close()
         con.close()       

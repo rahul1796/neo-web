@@ -1,0 +1,446 @@
+        <link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+
+        <!-- App css -->
+        <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+        <!-- <script type="text/javascript" src="static/assets/libs/jquery/jquery.min.js"></script> -->
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $(".date-picker").flatpickr();
+                $('.dropdown-search-filter').select2();
+                //alert('{{subproject_id}}')
+                LoadRegiondl();
+
+                document.getElementById("PlannedStartDate").disabled = false;
+                document.getElementById("PlannedEndDate").disabled = false;
+				//project_code, subproject_id
+                if('{{subproject_id}}' !=0)
+                {   
+                    document.getElementById("PlannedStartDate").disabled = true;
+                    document.getElementById("PlannedEndDate").disabled = true;
+
+                    var URL=$('#hdn_web_url').val()+ "/get_subproject_details";
+                    $.ajax({
+                        type:"GET",
+                        url:URL,
+                        success:function(data){
+                           if(data!=null)
+                           {    
+                            $('#ProjectName').val(data.SubProjectDetail.Sub_Project_Name);
+                            $('#ProjectCode').val(data.SubProjectDetail.Sub_Project_Code);
+                            $('#ddlRegion').val(data.SubProjectDetail.Region_Id);
+                            Statebyregion(data.SubProjectDetail.State_Id);
+                            Centerbystate(data.SubProjectDetail.Center_Ids);
+                            coursebycenter_project(data.SubProjectDetail.Course_Ids);
+                            $('#PlannedStartDate').val(data.SubProjectDetail.Planned_Start_Date);
+                            $('#PlannedEndDate').val(data.SubProjectDetail.Planned_End_Date);
+                            $('#ActualStartDate').val(data.SubProjectDetail.Actual_Start_Date);
+                            $('#ActualEndDate').val(data.SubProjectDetail.Actual_End_Date);
+                            if(data.SubProjectDetail.Is_Active)
+                                   {
+                                        $('#isactive').prop('checked',true);
+                                    }
+                                    else
+                                    {
+                                        $('#isactive').prop('checked',false);
+                                    }
+                              
+                           } 
+                        },
+                        error:function(x){
+                            alert('error');
+                        }
+                    });
+                }
+            }); 
+            
+            function LoadRegiondl(){
+            var URL=$('#hdn_web_url').val()+ "/Get_all_Region"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.Region != null)
+                    {
+                        $('#ddlRegion').empty();
+                        var count=data.Region.length;
+                        if( count> 0)
+                        {
+                            $('#ddlRegion').append(new Option('Choose Region',''));
+                            for(var i=0;i<count;i++)
+                                $('#ddlRegion').append(new Option(data.Region[i].Region_Name, data.Region[i].Region_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                            $('#ddlRegion').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
+            });
+            return false;
+            }
+            
+            function Statebyregion(needed)
+            {
+                
+                var URL=$('#hdn_web_url').val()+ "/all_states_based_on_region"
+                $.ajax({
+                    type:"GET",
+                    url:URL,
+                    async:false,
+                    beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                    datatype:"json",
+                    data:{
+                        "region_id": $('#ddlRegion').val()
+                    },
+                    success: function (data){
+                        if(data.state != null)
+                        {   
+                            $('#ddlState').empty();
+                            var count=data.state.length;
+                            if( count> 0)
+                            {
+                                $('#ddlState').append(new Option('Choose State',''));
+                                for(var i=0;i<count;i++)
+                                    $('#ddlState').append(new Option(data.state[i].State_Name,data.state[i].State_Id));
+                            }
+                            else
+                            {
+                                $('#ddlState').append(new Option('Choose State',''));
+                            }
+                            
+                        }
+                    },
+                    error:function(err)
+                    {
+                        alert('Error! Please try again');
+                        return false;
+                    }
+                });
+                if (needed !=0)
+                            {
+                                $('#ddlState').val(needed);
+                            }
+                return false;
+            }
+            function Centerbystate(needed)
+            { 
+                var URL=$('#hdn_web_url').val()+ "/all_center_based_on_state"
+                $.ajax({
+                    type:"GET",
+                    url:URL,
+                    async:false,
+                    beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                    datatype:"json",
+                    data:{
+                        "state_id": $('#ddlState').val()
+                    },
+                    success: function (data){
+                        if(data.center != null)
+                        {   
+                            $('#ddlCenters').empty();
+                            var count=data.center.length;
+                            if( count> 0)
+                            {
+                                $('#ddlCenters').append(new Option('Choose Center',''));
+                                for(var i=0;i<count;i++)
+                                    $('#ddlCenters').append(new Option(data.center[i].Center_Name,data.center[i].Center_Id));
+                            }
+                            else
+                            {
+                                $('#ddlCenters').append(new Option('Choose Center',''));
+                            }
+                            
+                        }
+                    },
+                    error:function(err)
+                    {
+                        alert('Error! Please try again');
+                        return false;
+                    }
+                });
+                if (needed !=0)
+                            {
+                                $('#ddlCenters').val(needed);
+                            }
+                return false;
+            }
+
+            function coursebycenter_project(needed)
+            {   
+                var URL=$('#hdn_web_url').val()+ "/all_course_based_on_center"
+                $.ajax({
+                        type:"POST",
+                        url:URL,
+                        data:{
+                            "center_ids" : $('#ddlCenters').val().toString(),
+                            "project_code" : '{{project_code}}'
+                        },
+                        success:function(data){
+                        if(data.course != null)
+                        {   
+                            $('#ddlCourse').empty();
+                            var count=data.course.length;
+                            if( count> 0)
+                            {
+                                $('#ddlCourse').append(new Option('Choose Course',''));
+                                for(var i=0;i<count;i++)
+                                    $('#ddlCourse').append(new Option(data.course[i].Course_Name,data.course[i].Course_Id));
+                            }
+                            else
+                            {
+                                $('#ddlCourse').append(new Option('Choose Course',''));
+                            }
+                            
+                        }
+                    },
+                    error:function(err)
+                    {
+                        alert('Error! Please try again');
+                        return false;
+                    }
+                });
+
+                if (needed !=0)
+                            {
+                                $('#ddlCourse').val(needed);
+                            }
+                return false;
+            }
+            function add_popup_message(){
+                var URL=$('#hdn_web_url').val()+ "/add_subproject_details";
+                    $.ajax({
+                        type:"POST",
+                        url:URL,
+                        data:{
+                            "SubProjectName" : $('#ProjectName').val(),
+                            "SubProjectCode" : $('#ProjectCode').val(),
+                            "Region" : $('#ddlRegion').val(),
+                            "State" : $('#ddlState').val(),
+                            "Centers" : $('#ddlCenters').val().toString(),
+                            "Course" : $('#ddlCourse').val().toString(),
+                            "PlannedStartDate" : $('#PlannedStartDate').val(),
+                            "PlannedEndDate" : $('#PlannedEndDate').val(),
+                            "ActualStartDate" : $('#ActualStartDate').val(),
+                            "ActualEndDate" : $('#ActualEndDate').val(),
+                            "isactive" : $('#isactive').prop('checked')
+                        },
+                        success:function(data){
+                            var message="",title="",icon="";
+                    if(data.PopupMessage.client_flag==2){
+                        message=data.PopupMessage.message;
+                        title="Error";
+                        icon="error";
+                        
+                    }
+                    else{
+                        message=data.PopupMessage.message;
+                        title="Success";
+                        icon="success";
+                        
+                    }
+                    swal({  
+                                title:title,
+                                text:message,
+                                icon:icon,
+                                confirmButtonClass:"btn btn-confirm mt-2"
+                                }).then(function(){
+                                    window.location.href = '/after_popup_project';
+                                });
+                        //    alert("The Inserted/Upadated Id is "+data.PopupMessage.message);
+                        //    window.location.href="/after_popup"; 
+                        },
+                        error:function(x){
+                            alert('error');
+                        }
+                    });
+            }
+        
+        </script>
+                <div class="container-fluid">
+                    <form  action="javascript:add_popup_message();">
+                    <!-- start page title -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="page-title-box">
+                                <div class="page-title-right">
+                                    <ol class="breadcrumb m-0">
+                                        <li class="breadcrumb-item"><a href="javascript: void(0);">LN</a></li>
+                                        <li class="breadcrumb-item"><a href="/project">Project</a></li>
+                                        <li class="breadcrumb-item active">Add-Edit Sub Project</li>
+                                    </ol>
+                                </div>
+                                <h4 class="page-title">Sub Project Details</h4>
+                            </div>
+                        </div>
+                    </div>     
+                    <!-- end page title --> 
+    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card-box">
+                                <h4 class="header-title">Sub Project Details</h4>
+                                <br/>
+                                <div class="alert alert-warning d-none fade show">
+                                    <h4>Oh snap!</h4>
+                                    <p class="mb-0">This form seems to be invalid :(</p>
+                                </div>
+    
+                                <div class="alert alert-info d-none fade show">
+                                    <h4>Yay!</h4>
+                                    <p class="mb-0">Everything seems to be ok :)</p>
+                                </div>
+    
+                                <form id="demo-form" data-parsley-validate="">
+                                    
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ProjectName">Sub Project Name * :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <input type="text" class="form-control" name="ProjectName" id="ProjectName" required placeholder="Project Name">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ProjectCode">Sub Project Code * :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <input type="text" class="form-control" name="ProjectCode" id="ProjectCode" required placeholder="Project Code">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ddlRegion">Region :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ddlRegion" class="form-control" name="ddlRegion" onchange="Statebyregion(0)" ClientIdMode="static"  required="">
+                                                    <option value="">Choose Region</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ddlState">State :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ddlState" class="form-control" name="ddlState" onchange="Centerbystate(0)" ClientIdMode="static"  required="">
+                                                    <option value="">Choose State</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ddlCenters">Center :</label>
+                                            </div>
+                                            
+                                            <div class="col-lg-6">
+                                                <select id="ddlCenters" class="form-control dropdown-search-filter" name="ddlCenters" onchange="coursebycenter_project(0)" ClientIdMode="static"  required="" multiple>
+                                                    <option value="">Choose Center</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ddlCourse">Course :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ddlCourse" class="form-control dropdown-search-filter" name="ddlCourse" ClientIdMode="static"  required="" multiple>
+                                                    <option value="">Choose Course</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row ">
+                                            <div class="col-lg-6">
+                                                    <label for="PlannedStartDate">Planned Start Date</label>
+                                                </div>
+                                                <div class="col-lg-6">
+                                            <input type="text" id="PlannedStartDate" name="PlannedStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row ">
+                                            <div class="col-lg-6">
+                                                    <label for="PlannedEndDate">Planned End Date</label>
+                                                </div>
+                                                <div class="col-lg-6">
+                                            <input type="text" id="PlannedEndDate" name="PlannedEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date" required="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row ">
+                                            <div class="col-lg-6">
+                                                    <label for="ActualStartDate">Actual Start Date</label>
+                                                </div>
+                                                <div class="col-lg-6">
+                                            <input type="text" id="ActualStartDate" name="ActualStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required="">
+                                        </div>
+                                    </div> 
+                                    <div class="form-group row ">
+                                            <div class="col-lg-6">
+                                                    <label for="ActualEndDate">Actual End Date</label>
+                                                </div>
+                                                <div class="col-lg-6">
+                                            <input type="text" id="ActualEndDate" name="ActualEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date" required="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label>Is Active *:</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="checkbox checkbox-pink mb-0">
+                                                    <input type="checkbox" name="isactive" id="isactive" ClientIdMode="static" 
+                                                                    value="1" data-parsley-mincheck="1" >
+                                                    <label for="isactive"> Is active </label>
+                                                </div>
+                                            </div>   
+                                        </div>                                     
+                                    </div>    
+    
+                                    <div class="form-group mb-0">
+                                        <button class="btn btn-primary" type="submit">Save</button>
+                                    </div>
+    
+                                </form>
+                            </div> <!-- end card-box-->
+                        </div> <!-- end col-->
+                    </div>
+                    <!-- end row-->
+    
+                </form>
+                
+                </div> <!-- end container -->
+        <script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>
+        <script src="static/assets/libs/jquery-knob/jquery.knob.min.js"></script>
+        <script src="static/assets/libs/jquery-sparkline/jquery.sparkline.min.js"></script>
+
+
+        <script src="static/assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+        <link href="static/assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" />
+        <script src="static/assets/libs/clockpicker/bootstrap-clockpicker.min.js"></script>
+        <link href="static/assets/libs/bootstrap-colorpicker/bootstrap-colorpicker.min.css" rel="stylesheet" type="text/css" />
+       
+       

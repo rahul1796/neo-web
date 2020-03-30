@@ -35,8 +35,15 @@ class Master:
     def add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, ProjectManager, ActualEndDate, ActualStartDate, PlannedEndDate, PlannedStartDate, isactive, project_id, user_id):
         popupMessage = {"PopupMessage":  Database.add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, ProjectManager, ActualEndDate, ActualStartDate, PlannedEndDate, PlannedStartDate, isactive, project_id, user_id)}
         return popupMessage
+    def add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive):
+        popupMessage = {"PopupMessage":  Database.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive)}
+        return popupMessage
     def get_project_details(glob_project_id):
         indi_project={"ProjectDetail":Database.get_project_details(glob_project_id)}
+        #print(indi_project)
+        return indi_project
+    def get_subproject_details(glob_project_id):
+        indi_project={"SubProjectDetail":Database.get_subproject_details(glob_project_id)}
         #print(indi_project)
         return indi_project
 
