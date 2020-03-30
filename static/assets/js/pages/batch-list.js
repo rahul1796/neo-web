@@ -823,7 +823,7 @@ function add_map_message(){
                     {   //alert(data.Customer_Name)
                         $('#txtbatch_name').val(data.batch_name);
                         $('#txtcenter_name').val(data.center_name);
-        
+                        
                         if (data.candidates[0].Candidate_Name != null){
                             var count=data.candidates.length;
                             if( count> 0)

@@ -3827,3 +3827,20 @@ SELECT					cb.name as candidate_name,
         con.close()       
         return response
 
+    def Getcandidatebybatch_db(batch_id):
+        response = []
+        
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_Getcandidatebybatch]  ?'
+        values = (batch_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+            response.append(h)
+        out = {"candidates":response,"batch_name":row[7],"center_name":row[8]}
+        cur.close()
+        con.close()       
+        return out
+
