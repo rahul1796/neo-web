@@ -9,7 +9,7 @@ $(document).ready(function () {
     role_id=parseInt($('#hdn_home_user_role_id').val());
     if(role_id == 5)
         $('#btn_create').hide();
-    LoadTable();
+    //LoadTable();
 });
 
 
@@ -62,6 +62,10 @@ function loadClient(){
         async:false,
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
+        data:{
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
+        },
         success: function (data){
             if(data.Clients != null)
             {
@@ -135,7 +139,9 @@ function LoadProject(){
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
         data:{
-            "ClientId":$('#ddlClient').val().toString()
+            "ClientId":$('#ddlClient').val().toString(),
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
         },
         success: function (data){
             if(data.Projects != null)
@@ -172,7 +178,9 @@ function LoadSubProject(){
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
         data:{
-            "ProjectId":$('#ddlProject').val().toString()
+            "ProjectId":$('#ddlProject').val().toString(),
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
         },
         success: function (data){
             if(data.Sub_Project != null)
