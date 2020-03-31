@@ -818,6 +818,7 @@ function add_map_message(){
                 datatype:"json",
                 success: function (data){
                     varHtml='';
+                    $("#tblcandidate_details").dataTable().fnDestroy();
                     $("#tblcandidate_details tbody").empty();
                     if(!jQuery.isEmptyObject(data.candidates))
                     {   //alert(data.Customer_Name)
@@ -843,6 +844,7 @@ function add_map_message(){
                                 
                             }
                             $("#tblcandidate_details tbody").append(varHtml);
+                            $("#tblcandidate_details").DataTable();
                             $('#tr_candidate_detail').modal('show');
                         }
                         else

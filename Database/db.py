@@ -1100,8 +1100,8 @@ class Database:
         for row in cur:
             record=row[len(columns)-1]
             fil=row[len(columns)-2]
-            for i in range(len(columns)-2):
-                h[columns[i]]=row[i]
+            for i in range(len(columns)-2):                
+                h[columns[i]]=row[i] if row[i]!=None else 'NA'
             d.append(h.copy())            
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
