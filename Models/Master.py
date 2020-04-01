@@ -179,3 +179,5 @@ class Master:
         popupMessage = {"PopupMessage": Database.add_contract_details(ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, SalesManager, ContractValue, isactive, user_id, contract_id)}
         return popupMessage
 
+    def GetSubProjectsForuser(user_id):
+        return Database.GetSubProjectsForuser(user_id)

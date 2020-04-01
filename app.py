@@ -4611,6 +4611,15 @@ def SqlServerApi(param):
         #log.info("< PostgreSqlServerApi --> " + Log.str(response))
         return jsonify(response)
 
+class GetSubProjectsForUser(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            user_id=request.args.get('user_id',0,type=int)
+            response={"SubProjects":Master.GetSubProjectsForuser(user_id)}
+            return response
+api.add_resource(GetSubProjectsForUser,'/GetSubProjectsForUser')
+
 if __name__ == '__main__':    
     app.run(debug=True)
 

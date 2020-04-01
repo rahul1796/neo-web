@@ -419,6 +419,7 @@ class Database:
         cur.close()
         con.close()
         return content
+
     def add_center_details(center_name,user_id,is_active,center_id,center_type_id,center_category_id,bu_id,region_id,cluster_id,country_id,satet_id,district_id,location_name):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -3847,3 +3848,21 @@ SELECT					cb.name as candidate_name,
         con.close()       
         return out
 
+    def GetSubProjectsForuser(user_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [users].[sp_get_sub_projects_for_user]  ?'
+        values = (user_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+        con.close()       
+        return response

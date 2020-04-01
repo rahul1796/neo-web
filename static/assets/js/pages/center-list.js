@@ -227,41 +227,48 @@ function LoadTable()
                 $("#tbl_centers tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
             }
 
-        },
+        }, 
 
         "columns": [
             { "data": "S_No"},
-            {"orderable": false,
-                "data": function (row, type, val, meta) {
-                var varButtons = ""; 
-                //varButtons += '<a onclick="EditCenterDetail(\'' + row.Center_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Center" class="fas fa-edit" ></i></a><a onclick="AddSubCenterDetail(\'' + row.Center_Id + '\')" class="btn" style="cursor:pointer" ><i title="Add SubCenter" class="fas fa-plus" ></i></a>';
-                varButtons+='<a onclick="GetProjectDetails(\'' + row.Center_Id + '\',\'' + row.Center_Name + '\')" class="btn" style="cursor:pointer" ><i title="Associated Projects" class="fas fa-list-ul" ></i></a>'
-                return varButtons;
-                }
-            },
+            
             { "data": "Center_Code" },
             { "data": "Center_Name" },
             { "data": "Center_Type_Name"},
+            { 
+                "data": 
+                function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Sub_Project_Count==0)
+                        varButtons=row.Sub_Project_Count;
+                    else
+                    {
+                        varButtons += '<a onclick="GetProjectDetails(\'' + row.Center_Id + '\',\'' + row.Center_Name + '\')"  style="color:blue;cursor:pointer" >' + row.Sub_Project_Count + '</a>';
+                    }                    
+                    return varButtons;
+                }
+            },
+            { 
+                "data": 
+                function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Course_Count==0)
+                        varButtons=row.Course_Count;
+                    else
+                    {
+                        varButtons += '<a onclick="GetCourseDetails(\'' + row.Center_Id + '\',\'' + row.Center_Name + '\')"  style="color:blue;cursor:pointer" >' + row.Course_Count + '</a>';
+                    }                    
+                    return varButtons;
+                }
+            },
             { "data": "Location" },
             { "data": "District_Name"},
             { "data": "State_Name" },                       
             { "data": "Region_Name"},
             { "visible": false,"data": "Country_Name"},
-            {"data":"Is_Active"},
-            //{"data":"Course_Count"},
-            { 
-              "data": 
-              function (row, type, val, meta) {
-                  var varButtons = ""; 
-                  if(row.Course_Count==0)
-                      varButtons=row.Course_Count;
-                  else
-                  {
-                      varButtons += '<a onclick="GetCourseDetails(\'' + row.Center_Id + '\',\'' + row.Center_Name + '\')"  style="color:blue;cursor:pointer" >' + row.Course_Count + '</a>';
-                  }                    
-                  return varButtons;
-              }
-           }
+            {"data":"Is_Active"}
+            //{"data":"Course_Count"}
+            
         ],
         "ColumnDefs":[
             {
