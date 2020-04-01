@@ -186,11 +186,17 @@ var Candidates = {};
                             $('#ddlCourse').append(new Option('Choose Course',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
+                                if (needed !=0)
+                                {
+                                    $('#ddlCourse').val(needed);
+                                }
                         }
                         else
                         {
                             $('#ddlCourse').append(new Option('Choose Course',''));
                         }
+                        
+
                     }
                 },
                 error:function(err)
@@ -199,10 +205,7 @@ var Candidates = {};
                     return false;
                 }
             });
-            if (needed !=0)
-                {
-                    $('#ddlCourse').val(needed);
-                }
+            
             return false;
         }
         function LoadsubProject(needed)
@@ -232,6 +235,10 @@ var Candidates = {};
                             $('#ddlSubProject').append(new Option('Choose Sub Project',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlSubProject').append(new Option(data.SubProjects[i].Sub_Project_Name,data.SubProjects[i].Sub_Project_Id));
+                                if (needed !=0)
+                                {
+                                    $('#ddlSubProject').val(needed);
+                                }
                         }
                         else
                         {
@@ -245,10 +252,7 @@ var Candidates = {};
                     return false;
                 }
             });
-            if (needed !=0)
-                {
-                    $('#ddlSubProject').val(needed);
-                }
+            
             return false;
         }
         function LoadCoFunding(needed)
@@ -275,6 +279,10 @@ var Candidates = {};
                             $('#ddlCofunding').append(new Option('NA','-1'));
                             for(var i=0;i<count;i++)
                                 $('#ddlCofunding').append(new Option(data.SubProjects[i].Sub_Project_Name,data.SubProjects[i].Sub_Project_Id));
+                                if (needed !=0)
+                                {
+                                    $('#ddlCofunding').val(needed);
+                                }
                         }
                         else
                         {
@@ -288,10 +296,7 @@ var Candidates = {};
                     return false;
                 }
             });
-            if (needed !=0)
-                {
-                    $('#ddlCofunding').val(needed);
-                }
+            
             return false;
         }
         // function LoadCenterList(Course_selected,needed)

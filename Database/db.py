@@ -657,11 +657,14 @@ class Database:
         values = (course_id)
         cur.execute(sql,(values,))
         columns = [column[0].title() for column in cur.description]
+        response=[]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+            response.append(h)
+        data = {"CourseDetail":response,""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9]}
         cur.close()
         con.close()
-        return h
+        return data
 
     def get_qp_course():
         qp = []
