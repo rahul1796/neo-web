@@ -464,51 +464,59 @@
         </div><!--/.modal-->
 
         <div id="course_details_modal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
                     <div class="modal-header">
-                        <h4 class="modal-title">Course Details</h4>
+                        <h4 class="modal-title">SubProject Details</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                     </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="txtCourse_Name" class="control-label">Course Name</label>
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" id="txtCourse_Name" disabled>
-                                </div>
-                            </div>
-                        </div>  
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="txtCourse_Code" class="control-label">Course Code</label>
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" id="txtCourse_Code" disabled>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="txtSub_Project_Name" class="control-label">Sub Project Code</label>
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" id="txtSub_Project_Name" disabled>
-                                </div>
-                            </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body"> 
+                                    <div class="col-md-12">                                
+                                        <div class="col-md-4 form-group">
+                                            <h5>Course Name</h5>                                           
+                                        </div>
+                                        <div class="col-md-4" style="margin-top: -38px; margin-left: 13%;">
+                                            <div class="form-group" style="margin-bottom: 20px;">        
+                                                <input type="text" class="form-control" id="txtCourse_Name"  disabled/>                               
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 form-group" style="margin-top: -45px; margin-left: 50%;">
+                                            <h5>Course Code</h5>                                           
+                                        </div>
+                                        <div class="col-md-4" style="margin-top: -42px; margin-left: 63%;">
+                                            <div class="form-group" style="margin-bottom: 20px;">        
+                                                <input type="text" class="form-control" id="txtCourse_Code"  disabled/>                               
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div> <!--end card-body-->
+                            </div> <!-- end card-->
                         </div>
                     </div>
-
+                    
+                    <div class="modal-body">
+                        <table id="tblsubproject_details" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                            <thead>
+                                <tr style="background-color: #f5f6f8;">
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S No</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Name</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Name</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Code</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Product</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Region</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">State</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        
+                            </tbody>
+                        </table>	
+                    </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
                         <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
@@ -516,6 +524,7 @@
                 </div>
             </div>
         </div><!--/.modal-->
+
 
         <div id="tr_candidate_detail" class="modal fade" role="dialog">
             <div class="modal-dialog modal-xl">
