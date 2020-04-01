@@ -54,6 +54,7 @@ class MsSql:
             for df in pd.read_sql(query, self.conn, chunksize=100 ** 4):
                 if 'EndTime' in df.columns:
                     df = df.drop('EndTime', 1)
+                    df = df.drop('StartTime', 1)
                     #df = df.astype({"EndTime": str})
                 dict_data = df.reset_index().to_dict(orient='records')
                 data.append(dict_data)
