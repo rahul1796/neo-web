@@ -344,7 +344,19 @@ function LoadTable(FilterRoleId)
             { "data": "Department_Name" },
             { "data": "Employee_Role_Name" },
             { "data": "Region" },
-            { "data": "Project"},
+            { 
+                "data": 
+                function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Project==0)
+                        varButtons=row.Project;
+                    else
+                    {
+                        varButtons += '<a onclick="GetProjectDetails(\'' + row.User_Id + '\',\'' + row.User_Name + '\')"  style="color:blue;cursor:pointer" >' + row.Project + '</a>';
+                    }                    
+                    return varButtons;
+                }
+            },
             { "data": "Reporting_Manager_Name"},
             { "data": "Employment_Status"},
             { "visible":false, "data": "Center_Name" },
@@ -364,10 +376,75 @@ function LoadTable(FilterRoleId)
 
     });
 }
+
 function EditUserDetail(UserId,UserRoleId)
 {
     $('#hdn_user_id').val(UserId);
     //alert('Hi');
     $('#form1').submit();
     
+}
+function GetProjectDetails(User_Id,User_Name)
+{
+    var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForUser?user_id="+User_Id;
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            varHtml='';
+            $("#tblSubProject").dataTable().fnDestroy();
+            $("#tblSubProject tbody").empty();
+            if(!jQuery.isEmptyObject(data.SubProjects))
+            {   if (data.SubProjects != null){
+                    count=data.SubProjects.length;
+                    if (count>0)
+                    {   varHtml='';
+                        console.log(count);
+                        for(var i=0;i<count;i++)
+                        {
+                            td_open= '  <td style="text-align:center;">' ;
+                            td_close=   '</td>';       
+                            varHtml+='<tr>';
+                            varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].S_No +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ User_Name +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Sub_Project_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Sub_Project_Name +'</td>';                    
+                            varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Name +'</td>';  
+                            varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Bu +'</td>';         
+                            varHtml+='</tr>';
+                            
+                        }
+                            $("#tblSubProject tbody").append(varHtml);
+                            $("#tblSubProject").DataTable();
+                            $('#divSubProjectList').modal('show');
+                            varHtml='';
+                    }
+                    else
+                    {
+                        varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                        $("#tblSubProject tbody").append(varHtml);
+                        $('#divSubProjectList').modal('show');
+                    } 
+                    
+                }
+            }
+            else
+            {
+                varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                $("#tblSubProject tbody").append(varHtml);
+                $('#divSubProjectList').modal('show');
+            }   
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
 }
