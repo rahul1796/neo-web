@@ -37,7 +37,7 @@ class PostgreSql:
     def get_table_data(self, table):
         try:
             data = []
-            query = "SELECT * FROM {} LIMIT 50;".format(table)
+            query = "SELECT * FROM {};".format(table)
             for df in pd.read_sql(query, self.conn, chunksize=100 ** 4):
                 df = df.fillna('Na')
                 dict_data = df.reset_index().to_dict(orient='records')
