@@ -197,6 +197,10 @@
                                 $('#ddlCourse').append(new Option('Choose Course',''));
                                 for(var i=0;i<count;i++)
                                     $('#ddlCourse').append(new Option(data.course[i].Course_Name,data.course[i].Course_Id));
+								if (needed !=0)
+								{
+									$('#ddlCourse').val(needed);
+								}
                             }
                             else
                             {
@@ -212,10 +216,7 @@
                     }
                 });
 
-                if (needed !=0)
-                            {
-                                $('#ddlCourse').val(needed);
-                            }
+                
                 return false;
             }
             function add_popup_message(){

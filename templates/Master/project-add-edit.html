@@ -290,6 +290,10 @@
                 async:false,        
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
+				data:{
+						"user_id": $('#hdn_home_user_id').val(),
+						"user_role_id": $('#hdn_home_user_role_id').val()
+					},
                 success: function (data){
                     if(data.Clients != null)
                     {
