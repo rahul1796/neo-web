@@ -24,6 +24,7 @@ import pandas as pd
 import re
 import filter_tma_report
 import filter_tma_report_new
+import candidate_report
 from Models import DownloadDump
 from lib.ms_sql import MsSql
 from lib.postgre_sql import PostgreSql
@@ -1169,7 +1170,7 @@ class candidate_list(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             
-            print(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            #print(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
             return Candidate.candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 
 
@@ -4619,6 +4620,35 @@ class GetSubProjectsForUser(Resource):
             response={"SubProjects":Master.GetSubProjectsForuser(user_id)}
             return response
 api.add_resource(GetSubProjectsForUser,'/GetSubProjectsForUser')
+
+class candidate_download_report(Resource):
+    report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
+                candidate_id = request.form["candidate_id"]
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                status = request.form["status"]
+                customer = request.form["customer"]
+                project = request.form["project"]
+                sub_project = request.form["sub_project"]
+                region = request.form["region"]
+                center = request.form["center"]
+                center_type = request.form["center_type"]
+                
+                file_name='candidate_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
+                resp = candidate_report.create_report(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
+                
+                return resp
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                #print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(candidate_download_report,'/candidate_download_report')
 
 if __name__ == '__main__':    
     app.run(debug=True)

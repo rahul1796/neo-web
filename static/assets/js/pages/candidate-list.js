@@ -1,6 +1,7 @@
 var varTable;
 $(document).ready(function () {
     $('.dropdown-search-filter').select2();
+    $("#imgSpinner").hide();
     $("#tbl_candidate").dataTable().fnDestroy();
     
     LoadCenterType();
@@ -448,3 +449,112 @@ function CandidateIDDetails(Aadhar_No,    Identifier_Type,    Identity_Numbe)
     $('#txtIdenNumber').val(Identity_Numbe);
     $('#mdl_cand_identity').modal('show');
 }
+
+
+function DownloadTableBasedOnSearch(){
+    /*if($('#ddlCustomer').val()==''|| $('#ddlCustomer').val()==null){
+        alert("Please select a Customer.");
+    
+    }
+    else if($('#ddlCenter').val()==''|| $('#ddlCenter').val()==null){
+        alert("Please select a Center.");
+    
+    }
+    else if($('#ddlCourse').val()==''|| $('#ddlCourse').val()==null){
+        alert("Please select a Center.");
+    
+    }
+    */
+    if (0==9){
+    console.log(false)
+    }
+    else{
+        
+        $("#imgSpinner").show();
+        var URL=$('#hdn_web_url').val()+ "/candidate_download_report"
+        //window.location = URL + "?ActivityDate=2019-09-09"
+        $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: URL, 
+                    data: {
+                            //candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
+                            'candidate_id':0,
+                            'user_id':$('#hdn_home_user_id').val(),
+                            'user_role_id':$('#hdn_home_user_role_id').val(),
+                            'status':$('#ddlStatus').val().toString(),
+                            'customer':$('#ddlClient').val().toString(),
+                            'project': $('#ddlProject').val().toString(),
+                            'sub_project':$('#ddlSubProject').val().toString(),
+                            'region':$('#ddlRegion').val().toString(),
+                            'center':$('#ddlCenter').val().toString(),
+                            'center_type':$('#ddlCenterType').val().toString()
+
+                    },
+                    success: function(resp) 
+                    {
+
+                        $("#imgSpinner").hide();
+                        if (resp.Status){
+                            var varAnchor = document.getElementById('lnkDownload');
+                            varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
+                            
+                            try 
+                                { 
+                                    //in firefox
+                                    varAnchor.click();
+                                    return;
+                                } catch(ex) {}
+                                
+                                try 
+                                { 
+                                    // in chrome
+                                    if(document.createEvent) 
+                                    {
+                                        var e = document.createEvent('MouseEvents');
+                                        e.initEvent( 'click', true, true );
+                                        varAnchor.dispatchEvent(e);
+                                        return;
+                                    }
+                                } catch(ex) {}
+                                
+                                try 
+                                { 
+                                    // in IE
+                                    if(document.createEventObject) 
+                                    {
+                                         var evObj = document.createEventObject();
+                                         varAnchor.fireEvent("onclick", evObj);
+                                         return;
+                                    }
+                                } catch(ex) {}
+
+                        }
+                        else{
+                            alert(resp.Description)
+                            alert('Not success')
+                            $("#imgSpinner").hide();
+                            
+                        }
+                    },
+                    error:function()
+                    {
+                        $("#imgSpinner").hide();
+                    }
+                });
+        $("#imgSpinner").hide();
+    }
+    
+}
+
+function ForceDownload(varUrl, varFileName)
+        {
+            var link = document.createElement('a');
+            link.setAttribute('href', varUrl);
+            link.setAttribute('download', varFileName);
+            link.setAttribute('target', '_blank');
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
