@@ -131,3 +131,5 @@ class Report:
             
         return path
     
+    def GetECPReportData(user_id,user_role_id,from_date,to_date):
+        return Database.GetECPReportData(user_id,user_role_id,from_date,to_date)

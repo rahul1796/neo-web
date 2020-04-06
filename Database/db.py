@@ -3864,5 +3864,21 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
-        con.close()       
-        return response
+    
+    def GetECPReportData(user_id,user_role_id,from_date,to_date):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [reports].[sp_get_ecp_report_data ]  ?,?,?,?'
+        values = (user_id,user_role_id,from_date,to_date)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return {"Data":response}
