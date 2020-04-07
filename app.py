@@ -4673,14 +4673,31 @@ class GetECPReportData(Resource):
             try:
                 user_id=request.args.get('user_id',0,type=int)
                 user_role_id=request.args.get('user_role_id',0,type=int)
+                customer_ids=request.args.get('customer_ids','',type=str)
+                contract_ids=request.args.get('contract_ids','',type=str)
+                region_ids=request.args.get('region_ids','',type=str)
                 from_date=request.args.get('from_date','',type=str)
                 to_date=request.args.get('to_date','',type=str)
-                response = Report.GetECPReportData(user_id,user_role_id,from_date,to_date)
+                response = Report.GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date)
                 return response 
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(GetECPReportData,'/GetECPReportData')
 ###############################################################################
+
+class GetContractsBasedOnCustomer(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                customer_id=request.args.get('customer_id','',type=str)
+                response = Master.GetContractsBasedOnCustomer(user_id,user_role_id,customer_id)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetContractsBasedOnCustomer,'/GetContractsBasedOnCustomer')
 
 if __name__ == '__main__':    
     app.run(debug=True)

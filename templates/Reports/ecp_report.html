@@ -12,8 +12,125 @@
                 dateFormat:'d-M-Y',
                 minDate: '01.Apr.2019'
             }); 
-               
+            LoadCustomerdl();
+            LoadRegionddl();  
         });
+        function LoadCustomerdl(){
+            var URL=$('#hdn_web_url').val()+ "/GetALLClient"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id": $('#hdn_home_user_role_id').val()
+                },
+                success: function (data){
+                    if(data.Clients != null)
+                    {
+                        $('#ddlCustomer').empty();
+                        var count=data.Clients.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlRegion').append(new Option('ALL','-1'));
+                            for(var i=0;i<count;i++)
+                                $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                        // $('#ddlCustomer').append(new Option('No Customer','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+        function LoadRegionddl(){
+            var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id" : $('#hdn_home_user_role_id').val(),
+                    "user_region_id" : $('#hdn_user_region_id').val()
+                },
+
+                success: function (data){
+                    if(data.Regions != null)
+                    {
+                        $('#ddlRegion').empty();
+                        var count=data.Regions.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlRegion').append(new Option('ALL','-1'));
+                            for(var i=0;i<count;i++)
+                                $('#ddlRegion').append(new Option(data.Regions[i].Region_Name,data.Regions[i].Region_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                            $('#ddlRegion').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+        function LoadContract(){
+            var URL=$('#hdn_web_url').val()+ "/GetContractsBasedOnCustomer"  //"/GetALLProject_multiple"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                    "customer_id":$('#ddlCustomer').val().toString(),
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id": $('#hdn_home_user_role_id').val()
+                },
+                success: function (data){
+                    if(data.Contracts != null)
+                    {
+                        $('#ddlContract').empty();
+                        var count=data.Contracts.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlProject').append(new Option('ALL','-1'));  , 
+                            for(var i=0;i<count;i++)
+                                $('#ddlContract').append(new Option(data.Contracts[i].Contract_Name,data.Contracts[i].Contract_Id));
+                        }
+                        else
+                        {
+                        // $('#ddlContract').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(request, err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
         function LoadTableBasedOnSearch()
         {
             if($('#FromDate').val()=='' || $('#ToDate').val()=='')
@@ -32,6 +149,9 @@
                 data:{
                         "user_id": $('#hdn_home_user_id').val(),
                         "user_role_id" : $('#hdn_home_user_role_id').val(),
+                        "customer_ids":$('#ddlCustomer').val().toString(),
+                        "contract_ids":$('#ddlContract').val().toString(),
+                        "region_ids":$('#ddlRegion').val().toString(),
                         "from_date" : $('#FromDate').val(),
                         "to_date" : $('#ToDate').val()
                     },
@@ -88,6 +208,25 @@
     <div class="row">
         <div class="col-12">
             <div class="card-box">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label for="ddlCustomer" class="mr-2">Customer</label>
+                        <select class="form-control dropdown-search-filter" onchange="LoadContract();" id="ddlCustomer" multiple>
+                            <option selected="" value="">All</option>                            
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="ddlContract" class="mr-2">Contract</label>
+                        <select class="form-control dropdown-search-filter" id="ddlContract" multiple>
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="ddlRegion" class="mr-2">Region</label>
+                        <select class="form-control dropdown-search-filter" id="ddlRegion" multiple>
+                            <option selected="" value="">All</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-lg-3">
                         <label for="FromDate" class="mr-2">From Date</label>
