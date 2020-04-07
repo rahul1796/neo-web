@@ -3865,13 +3865,13 @@ SELECT					cb.name as candidate_name,
         con.close()
         return response
     
-    def GetECPReportData(user_id,user_role_id,from_date,to_date):
+    def GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec [reports].[sp_get_ecp_report_data ]  ?,?,?,?'
-        values = (user_id,user_role_id,from_date,to_date)
+        sql = 'exec [reports].[sp_get_ecp_report_data ]  ?,?,?,?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date)
         print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
@@ -3882,3 +3882,20 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return {"Data":response}
+    def GetContractsBasedOnCustomer(user_id,user_role_id,customer_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_contracts_based_on_customer]  ?,?,?'
+        values = (user_id,user_role_id,customer_id)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return {"Contracts":response}
