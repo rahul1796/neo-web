@@ -181,3 +181,5 @@ class Master:
 
     def GetSubProjectsForuser(user_id):
         return Database.GetSubProjectsForuser(user_id)
+    def GetContractsBasedOnCustomer(user_id,user_role_id,customer_id):
+        return Database.GetContractsBasedOnCustomer(user_id,user_role_id,customer_id)

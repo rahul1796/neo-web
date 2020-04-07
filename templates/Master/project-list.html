@@ -36,6 +36,11 @@
         $('#btn_create').show();
     else 
         $('#btn_create').hide();
+    if(role_id == 1)
+        $('#btn_create2').show();
+    else 
+        $('#btn_create2').hide();
+        
     LoadTable(); 
     if ('{{project_id}}'>0)
         GetSub_project('{{project_id}}')
@@ -327,7 +332,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-12" >                                        
-                                            <button style="float: right; margin-top: 30px;"  id="btn_create2" type="submit" class="btn btn-primary">Create SubProject</a> <!--  onclick="window.location.href = '/sub_project?id=1';" -->
+                                            <button style="float: right; margin-top: 30px; display: none"  id="btn_create2" type="submit" class="btn btn-primary">Create SubProject</a> <!--  onclick="window.location.href = '/sub_project?id=1';" -->
                                         </div>
                                     </div>
                                     

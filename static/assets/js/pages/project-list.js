@@ -438,6 +438,7 @@ function GetSub_project(Project_Id){
         datatype:"json",
         success: function (data){
             varHtml='';
+            var varButton='';
             $("#tblsub_project tbody").empty();
             if(!jQuery.isEmptyObject(data.sub_project))
             {   //alert(data.Customer_Name)
@@ -454,7 +455,9 @@ function GetSub_project(Project_Id){
                             varHtml+='<tr>';
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].S_No +'</td>';
                             console.log(data.sub_project[i].Sub_Project_Id)
-                            varHtml+='  <td style="text-align:center;">'+ '<a onclick="EditsubProjectDetail(\'' + data.sub_project[i].Sub_Project_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Project" class="fas fa-edit" ></i></a>' +'</td>';
+                            if($('#hdn_home_user_role_id').val()=='1' || $('#hdn_home_user_role_id').val()=='15')
+                                varButton='<a onclick="EditsubProjectDetail(\'' + data.sub_project[i].Sub_Project_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Project" class="fas fa-edit" ></i></a>';
+                            varHtml+='  <td style="text-align:center;">'+ varButton +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Sub_Project_Name +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Sub_Project_Code +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Center_Name +'</td>';
