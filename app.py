@@ -1162,6 +1162,11 @@ class candidate_list(Resource):
             center = request.form['center']
             user_id=request.form['user_id']
             user_role_id=request.form['user_role_id']
+            Contracts = request.form["Contracts"]
+            candidate_stage = request.form["candidate_stage"]
+            from_date = request.form["from_date"]
+            to_date = request.form["to_date"]
+            #print(Contracts, candidate_stage, from_date, to_date)
             
             start_index = request.form['start']
             page_length = request.form['length']
@@ -1171,7 +1176,7 @@ class candidate_list(Resource):
             draw=request.form['draw']
             
             #print(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-            return Candidate.candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Candidate.candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, Contracts, candidate_stage, from_date, to_date)
 
 
 api.add_resource(candidate_list, '/candidate_list')
@@ -4638,10 +4643,15 @@ class candidate_download_report(Resource):
                 region = request.form["region"]
                 center = request.form["center"]
                 center_type = request.form["center_type"]
+                Contracts = request.form["Contracts"]
+                candidate_stage = request.form["candidate_stage"]
+                from_date = request.form["from_date"]
+                to_date = request.form["to_date"]
+                #print(Contracts, candidate_stage, from_date, to_date)
                 
                 file_name='candidate_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
-                print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
-                resp = candidate_report.create_report(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
+                #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
+                resp = candidate_report.create_report(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name,Contracts, candidate_stage, from_date, to_date)
                 
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}

@@ -1,4 +1,4 @@
-def create_report(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name):
+def create_report(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name, Contracts, candidate_stage, from_date, to_date):
     '''from datetime import datetime
     start_time = datetime.now()
     
@@ -39,11 +39,23 @@ def create_report(candidate_id, user_id, user_role_id, status, customer, project
 
         cnxn=pyodbc.connect(config.conn_str) #
         curs = cnxn.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_download_list_new] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (candidate_id, customer, project, sub_project, region, center, center_type, status, user_id, user_role_id)
+        sql = 'exec [candidate_details].[sp_get_candidate_download_list_new] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (candidate_id, customer, project, sub_project, region, center, center_type, status, user_id, user_role_id, Contracts, candidate_stage, from_date, to_date)
         curs.execute(sql,(values))
 
-        columns = [column[0].title() for column in curs.description] 
+        #columns = [column[0].title() for column in curs.description]
+        columns =['REGION','Product','CUSTOMERNAME','CONTRACT ID','CONTRACT NAME','Sub Project ID','Sub Project Name',
+                  'CENTER','Center ID','CENTERTYPE','Channel Partner','State/Cluster','Trainer Name','Trainer Email',
+                  'BATCHCODE','BATCHSTARTDATE','BATCHENDDATE','Actual BATCHSTARTDATE','Actual BATCHENDDATE','ENROLLMENTID',
+                  'CANDIDATENAME','GENDER','CASTE','RELIGION','DATEOFBIRTH','GUARDIAN','MOBILE','Email ID','Candidate ADDRESS',
+                  'Candidate STATE','Candidate DISTRICT','Candidate PINCODE','EDUCATION','VOTERID','AADHAARNUMBER',
+                  'FAMILYINCOME','Source of Info','COURSE Name','QP Name','BATCHDURATION','CANDIDATESTATUS','ENROLLEDDATE',
+                  'DROPPEDDATE','DROPPEDREASON','BATCH STATUS','No of Day Training Attended','Training Attendance %',
+                  'Assessment Scheduled Date','Assessment Actual Date','Assessment Agency','Assessment Type','CERTIFICATION STATUS',
+                  'GRADE','SCORE','Assessment ATTENDANCE','ASSESSMENT UPLOADED DATE','EMPLOYER NAME','DESIGNATION','JOINED STATUS',
+                  'CTC','DOJ','OFFERLETTERUPLOADEDON','EMPLOYEMENT TYPE','Program Manager NAME','PROJECT STATUS','PRACTICE',
+                  'OJT Completed Date']
+
         data = curs.fetchall()
         data = list(map(lambda x:list(x), data))
         #print(len(data))
