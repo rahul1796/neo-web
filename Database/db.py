@@ -1088,15 +1088,15 @@ class Database:
         con.close()
         return h
 
-    def candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, Contracts, candidate_stage, from_date, to_date):
         content = {}
         d = []
         h={}
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?'
-        values = (candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?'
+        values = (candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,Contracts, candidate_stage, from_date, to_date)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
