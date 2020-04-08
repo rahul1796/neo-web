@@ -9,7 +9,7 @@
         <script type="text/javascript">
             $(document).ready(function(){
                 $(".date-picker").flatpickr();
-
+                $('.dropdown-search-filter').select2();
                 LoadCustomerdl();
                 Contractbycustomer(0);
                 LoadPracticeList();
@@ -34,7 +34,7 @@
                         url:URL,
                         success:function(data){
                            if(data!=null)
-                           {    
+                           {    console.log(data.ProjectDetail);
                                 $('#ProjectName').val(data.ProjectDetail.Project_Name);
                                 $('#ProjectCode').val(data.ProjectDetail.Project_Code);
                                 $('#ClientName').val(data.ProjectDetail.Customer_Id);
@@ -51,7 +51,8 @@
                                 $('#ActualStartDate').val(data.ProjectDetail.Actual_Start_Date);
                                 $('#ActualEndDate').val(data.ProjectDetail.Actual_End_Date);
                                 $('#ddlProjectManager').val(data.ProjectDetail.Project_Manager_Id);
-
+                                LoadCourses(data.ProjectDetail.Course_Ids);
+                                //$('#ddlCourse').val(data.ProjectDetail.Course_Ids);
                                if(data.ProjectDetail!="")
                                {
                                    
@@ -70,6 +71,10 @@
                             alert('error');
                         }
                     });
+                }
+                else
+                {
+                    LoadCourses('0');
                 }
             }); 
             function LoadProjectTypedl(){
@@ -421,7 +426,8 @@
                             "ActualStartDate" : $('#ActualStartDate').val(),
                             "ActualEndDate" : $('#ActualEndDate').val(),
                             "ProjectManager" : $('#ddlProjectManager').val(),
-                            "isactive" : $('#isactive').prop('checked')
+                            "isactive" : $('#isactive').prop('checked'),
+                            "course_ids" : $('#ddlCourse').val().toString()
                         },
                         success:function(data){
                             var message="",title="",icon="";
@@ -451,7 +457,43 @@
                         }
                     });
             }
-        
+            function LoadCourses(needed)
+            { 
+                var URL=$('#hdn_web_url').val()+ "/Get_All_Courses"
+                    $.ajax({
+                            type:"GET",
+                            url:URL,
+                            success:function(data){
+                            if(data.Courses != null)
+                            {   
+                                $('#ddlCourse').empty();
+                                var count=data.Courses.length;
+                                if( count> 0)
+                                {
+                                    for(var i=0;i<count;i++)
+                                        $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
+                                    if(needed!=''|| needed!='0')
+                                    {
+                                        $('#ddlCourse').val(needed.split(',')); 
+                                    }
+                                }
+                                else
+                                {
+                                    $('#ddlCourse').append(new Option('Choose Course',''));
+                                }
+                                
+                            }
+                        },
+                        error:function(err)
+                        {
+                            alert('Error! Please try again');
+                            return false;
+                        }
+                    });
+
+                    
+                    return false;
+                }
         </script>
                 <div class="container-fluid">
                     <form  action="javascript:add_popup_message();">
@@ -515,7 +557,7 @@
                                                 <label for="ClientName">Customer Name :</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="ClientName" class="form-control dropdown-search-filter" onchange="Contractbycustomer(0)" name="Customer_Name"  ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                                <select id="ClientName" class="form-control " onchange="Contractbycustomer(0)" name="Customer_Name"  ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
                                                     <option value="">Choose Customer Name</option>
                                                 </select>
                                             </div>
@@ -527,7 +569,7 @@
                                                 <label for="ContractName">Contract Name :</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="ContractName" class="form-control dropdown-search-filter" name="ContractName" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                                <select id="ContractName" class="form-control " name="ContractName" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
                                                     <option value="">Choose Contract Name</option>
                                                 </select>
                                             </div>
@@ -539,7 +581,7 @@
                                                     <label for="practice">Practice :</label>
                                                 </div>
                                                 <div class="col-lg-6">
-                                                    <select id="ddlPractice" class="form-control" name="PracticeId" ClientIdMode="static"  required="">
+                                                    <select id="ddlPractice" class="form-control " name="PracticeId" ClientIdMode="static"  required="">
                                                         <option value="">Choose Practice</option>
                                                     </select>
                                                 </div>
@@ -551,7 +593,7 @@
                                                     <label for="ddlBU">BU :</label>
                                                 </div>
                                                 <div class="col-lg-6">
-                                                    <select id="ddlBU" class="form-control" name="PracticeId" ClientIdMode="static"  required="">
+                                                    <select id="ddlBU" class="form-control " name="PracticeId" ClientIdMode="static"  required="">
                                                         <option value="">Choose BU</option>
                                                     </select>
                                                 </div>
@@ -563,7 +605,7 @@
                                                 <label for="ddlprojectgroup">Project Group :</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="ddlprojectgroup" class="form-control" name="PracticeId" ClientIdMode="static"  required="">
+                                                <select id="ddlprojectgroup" class="form-control " name="PracticeId" ClientIdMode="static"  required="">
                                                     <option value="">Choose Project Group</option>
                                                 </select>
                                             </div>
@@ -575,7 +617,7 @@
                                                 <label for="ddlProjectType">Project Type :</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="ddlProjectType" class="form-control" name="PracticeId" ClientIdMode="static"  required="">
+                                                <select id="ddlProjectType" class="form-control " name="PracticeId" ClientIdMode="static"  required="">
                                                     <option value="">Choose Project Type</option>
                                                 </select>
                                             </div>
@@ -587,7 +629,7 @@
                                                 <label for="ddlBlock">Block :</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="ddlBlock" class="form-control" name="PracticeId" ClientIdMode="static"  required="">
+                                                <select id="ddlBlock" class="form-control " name="PracticeId" ClientIdMode="static"  required="">
                                                     <option value="">Choose Block</option>
                                                 </select>
                                             </div>
@@ -599,7 +641,7 @@
                                                 <label for="ddlProduct">Product :</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="ddlProduct" class="form-control" name="PracticeId" ClientIdMode="static"  required="">
+                                                <select id="ddlProduct" class="form-control " name="PracticeId" ClientIdMode="static"  required="">
                                                     <option value="">Choose Product</option>
                                                 </select>
                                             </div>
@@ -611,12 +653,24 @@
                                                 <label for="ProjectManager">Project Manager</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="ddlProjectManager" class="form-control dropdown-search-filter" name="ddlProjectManager" ClientIdMode="static"  required="">
+                                                <select id="ddlProjectManager" class="form-control " name="ddlProjectManager" ClientIdMode="static"  required="">
                                                     <option value="">Choose Project Manager</option>
                                                 </select>
                                             </div>
                                         </div>
                                     </div> 
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ddlCourse">Course :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ddlCourse" class="form-control dropdown-search-filter" name="ddlCourse" ClientIdMode="static" multiple>
+                                                    <option value="">Choose Course</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="form-group row ">
                                             <div class="col-lg-6">
                                                     <label for="PlannedStartDate">Planned Start Date</label>
