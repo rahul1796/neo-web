@@ -2568,12 +2568,14 @@ class add_project_details(Resource):
             ActualStartDate=request.form['ActualStartDate']
             ActualEndDate=request.form['ActualEndDate']
             ProjectManager=request.form['ProjectManager']
-            
+            CourseIds=''
+            if 'course_ids' in request.form:
+                CourseIds=request.form['course_ids']
             
             user_id=g.user_id
             project_id=g.project_id
             isactive=request.form['isactive']
-            return Master.add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, ProjectManager, ActualEndDate, ActualStartDate, PlannedEndDate, PlannedStartDate, isactive, project_id, user_id)
+            return Master.add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, ProjectManager, ActualEndDate, ActualStartDate, PlannedEndDate, PlannedStartDate, isactive, project_id, user_id,CourseIds)
                     
 class client_all(Resource):
     @staticmethod
