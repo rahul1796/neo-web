@@ -156,6 +156,10 @@
                                 $('#ddlCenters').append(new Option('Choose Center',''));
                                 for(var i=0;i<count;i++)
                                     $('#ddlCenters').append(new Option(data.center[i].Center_Name,data.center[i].Center_Id));
+                                if (needed !=0)
+                                {
+                                    $('#ddlCenters').val(needed);
+                                }
                             }
                             else
                             {
@@ -170,10 +174,7 @@
                         return false;
                     }
                 });
-                if (needed !=0)
-                            {
-                                $('#ddlCenters').val(needed);
-                            }
+                
                 return false;
             }
 
