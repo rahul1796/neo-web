@@ -536,6 +536,7 @@ var Candidates = {};
         // }
         
         function add_popup_message(){
+			
             if(($('#StartTime').val() < $("#EndTime").val()) && ($('#ActualStartDate').val() <= $('#ActualEndDate').val()) && ($('#PlannedStartDate').val() <= $('#PlannedEndDate').val()))
             {
 				var centertype;
@@ -650,10 +651,10 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="BatchName">Batch Name</label>   <!-- * : -->
+                                <label for="BatchName">Batch External Code</label>   <!-- * : -->
                             </div>
                             <div class="col-lg-6">
-                                <input type="text" class="form-control" name="BatchName" id="BatchName"  ClientIdMode="static" required placeholder="Batch name">
+                                <input type="text" class="form-control" name="BatchName" id="BatchName"  ClientIdMode="static" placeholder="Batch External Code">
                             </div>
                         </div>
                     </div>
