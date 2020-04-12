@@ -1,7 +1,25 @@
 import pypyodbc as pyodbc
 #import pyodbc
 from .config import *
+#from Database import config
 import pandas as pd
+from datetime import datetime
+def to_xml(df, filename=None, mode='w'):
+    def row_to_xml(row):
+        xml = ['<candidate>']
+        for i, col_name in enumerate(row.index):
+            xml.append('  <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
+        xml.append('</candidate>')
+        return '\n'.join(xml)
+    res = '\n'.join(df.apply(row_to_xml, axis=1))
+    out = ['<data>',res,'</data>']
+    res = '\n'.join(out)
+    if filename is None:
+        return res
+    with open(filename, mode) as f:
+        f.write(res)
+
+pd.DataFrame.to_xml = to_xml
 
 class Database:
     def Login(email,passw):
@@ -3902,3 +3920,85 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return {"Contracts":response}
+
+    def check_password(username,password,app_version,device_model,imei_num,android_version):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "call users.sp_user_authentication_updated('{}','{}','{}','{}','{}','{}')".format(username,password,app_version,device_model,imei_num,android_version)
+        quer = "{"+ quer + "}"
+        curs.execute(quer)
+        data = curs.fetchall()
+        data = data[0]
+
+        if str.lower(data[0]) =='false':
+            return {'app_status':False, 'success': False, 'description': data[2]}
+        elif str.lower(data[0]) =='true':
+            if str.lower(data[1])=='false':
+                return {'success': False, 'description': data[2],'app_status':True}
+            elif str.lower(data[1])=='true':
+                return {'app_status':True, 'success': True, 'description': data[2], 'role_id':data[3],'user_id':data[4],'user_name':data[5],'user_email':data[6]}
+            else:
+                return {'success': False, 'description': 'stored procedure not return true/false','app_status':True}
+        else:
+            return {'success': False, 'description': 'stored procedure not return true/false','app_status':False}
+    
+    def otp_send_db(otp, mobile_no, app_name, flag):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "call [masters].[sp_mobile_otp_verification]('{}','{}',{},'{}')".format(mobile_no, otp, flag, app_name)
+        quer = "{"+ quer + "}"
+        curs.execute(quer)
+        data = curs.fetchall()[0]
+        return [data[0], data[2]]
+
+    def otp_verification_db(cls,otp, mobile_no, app_name):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "call [masters].[sp_to_verify_otp]('{}','{}','{}')".format(mobile_no, otp, app_name)
+        quer = "{"+ quer + "}"
+        curs.execute(quer)
+        data = curs.fetchall()[0]
+        return data[0]
+
+    
+    def get_candidate_list_updated(user_id,cand_stage,app_version):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "SELECT TOP (1) id FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        curs.execute(quer)
+        data=curs.fetchall()[0][0]
+        if app_version != data:
+            curs.close()
+            conn.close()
+            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            return out
+        if cand_stage==1:
+            sql = 'exec [candidate_details].[sp_get_candidate_list_stage_M]  ?, ?'
+            filenmae = 'candidate_list_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_M.xml'
+        elif cand_stage==2:
+            sql = 'exec [candidate_details].[sp_get_candidate_list_stage_R]  ?, ?'
+            filenmae = 'candidate_list_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_R.xml'
+        elif cand_stage==3:
+            sql = 'exec [candidate_details].[sp_get_candidate_list_stage_E]  ?, ?'
+            filenmae = 'candidate_list_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_E.xml'
+        else:
+            out = {'success': False, 'description': "incorrect stage", 'app_status':True}
+            return out
+        
+        values = (user_id,cand_stage)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        response = []
+        h={}
+        for row in curs:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        df = pd.DataFrame(response)
+        df = df.fillna('')
+
+        curs.close()
+        conn.close()
+        df.to_xml(candidate_xmlPath + filenmae)
+        out = {'success': False, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
+        return out
