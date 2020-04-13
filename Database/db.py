@@ -3966,7 +3966,8 @@ SELECT					cb.name as candidate_name,
         curs = conn.cursor()
         quer = "SELECT TOP (1) id FROM [masters].[tbl_mclg_app_version_history] order by id desc"
         curs.execute(quer)
-        data=curs.fetchall()[0][0]
+        data=curs.fetchall()
+        data = '' if data==[] else data[0][0]
         if app_version != data:
             curs.close()
             conn.close()
@@ -4000,5 +4001,5 @@ SELECT					cb.name as candidate_name,
         curs.close()
         conn.close()
         df.to_xml(candidate_xmlPath + filenmae)
-        out = {'success': False, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
+        out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
         return out

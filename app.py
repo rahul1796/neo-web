@@ -4845,7 +4845,7 @@ class get_candidate_list_updated(Resource):
             #user_id = 'NULL' if user_id==0 else user_id
             cand_stage = int(request.args['cand_stage'])
             #cand_stage = 'NULL' if cand_stage==0 else cand_stage
-            app_version = int(request.args['app_version'])
+            app_version = request.args['app_version']
             
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
                 out = Database.get_candidate_list_updated(user_id,cand_stage,app_version)
