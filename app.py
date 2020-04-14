@@ -28,6 +28,9 @@ import candidate_report
 from Models import DownloadDump
 from lib.ms_sql import MsSql
 from lib.postgre_sql import PostgreSql
+import urllib.request
+import urllib.parse
+import random
 
 #from lib.log import Log
 #from lib.log import log
@@ -4867,6 +4870,41 @@ def get_xml_file(path):
         filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathWeb)
     return send_file(filename)
 
+class submit_candidate_updated(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            client_id = str(request.form['client_id'])
+            client_key = str(request.form['client_key'])
+            
+            user_id = int(request.form['user_id'])
+            cand_stage = int(request.form['cand_stage'])
+            xml = str(request.form['xml'])
+            latitude = str(request.form['latitude'])
+            longitude = str(request.form['longitude'])
+            timestamp = str(request.form['timestamp'])
+            app_version = str(request.form['app_version'])
+            device_model = str(request.form['device_model'])
+            imei_num = str(request.form['imei_num'])
+            android_version = str(request.form['android_version'])
+
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                if cand_stage==1:
+                    out = Database.get_submit_candidate_mobi(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                elif cand_stage==2:
+                    out = Database.get_submit_candidate_reg(user_id, cand_stage, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                elif cand_stage==3:
+                    out = Database.get_submit_candidate_enr(user_id, cand_stage, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                else:
+                    out = {'success': False, 'description': "incorrect stage", 'app_status':True}
+                return jsonify(out)
+            
+            else:
+                res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
+                return jsonify(res)
+
+#Base URL + "/submit_candidate_updated" api will provide all the unzynched QP data as response
+api.add_resource(submit_candidate_updated, '/submit_candidate_updated')
 
 if __name__ == '__main__':    
     app.run(debug=True)
