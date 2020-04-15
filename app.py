@@ -767,7 +767,7 @@ api.add_resource(get_user_details, '/GetUserDetails')
 def batch_list_page():
     if g.user:
         status=request.args.get('status',-1,type=int)
-        if int(g.user_role) in [11,12,13,14,18]:
+        if int(g.user_role) in [12,13,18]:
             return render_template("Batch/home-batch-list.html")
         else:
             return render_template("Batch/batch-list.html", status=status)
