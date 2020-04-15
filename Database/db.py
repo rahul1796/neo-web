@@ -4034,7 +4034,7 @@ SELECT					cb.name as candidate_name,
             '''
             quer2='''
             insert into candidate_details.tbl_candidate_reg_enroll_details
-            (candidate_id,mother_tongue,occupation,average_annual_income,interested_course,product,candidate_photo,present_address_line1,permanaet_address_line1,created_on,created_by,is_active)
+            (candidate_id,mother_tongue,current_occupation,average_annual_income,interested_course,product,candidate_photo,present_address_line1,permanaet_address_line1,created_on,created_by,is_active)
             values
             '''
             quer3='''
