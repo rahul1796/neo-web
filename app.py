@@ -4892,9 +4892,9 @@ class submit_candidate_updated(Resource):
                 if cand_stage==1:
                     out = Database.get_submit_candidate_mobi(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 elif cand_stage==2:
-                    out = Database.get_submit_candidate_reg(user_id, cand_stage, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                    out = Database.get_submit_candidate_reg(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 elif cand_stage==3:
-                    out = Database.get_submit_candidate_enr(user_id, cand_stage, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                    out = Database.get_submit_candidate_enr(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 else:
                     out = {'success': False, 'description': "incorrect stage", 'app_status':True}
                 return jsonify(out)
