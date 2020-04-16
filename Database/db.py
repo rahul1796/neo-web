@@ -391,10 +391,11 @@ class Database:
         cur = con.cursor()
         sql = "exec	[masters].[sp_GetsubprojectDetails] ?"
         values = (glob_project_id,)
+        print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9].split(','),""+columns[10]+"":row[10].split(',')}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9].split(','),""+columns[10]+"":row[10].split(','),""+columns[11]+"":row[11]}
         cur.close()
         con.close()
         return h
@@ -828,7 +829,8 @@ class Database:
         cur = con.cursor()
         sql = 'exec [batches].[sp_get_batch_list] ?, ?, ?, ?, ?, ?, ?, ?'
         values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id)
-        cur.execute(sql,(values))
+        print(values)
+        cur.execute(sql,(values))        
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
@@ -3426,7 +3428,7 @@ SELECT					cb.name as candidate_name,
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2], ""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2], ""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[10]+"":row[10]}
             response.append(h)
 
         out = {'sub_project':response,'project_name':row[7],'project_code':row[8],'project_id':row[9]}
@@ -3902,3 +3904,164 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return {"Contracts":response}
+
+    def GetBillingMilestones():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[get_billing_milestones] '        
+        cur2.execute(sql)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    def GetUnitTypes():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[get_unit_types]  '        
+        cur2.execute(sql)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def SaveProjectBillingMilestones(json_string,project_id,user_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_store_project_milestone] ?, ?, ?'
+        values = (json_string,project_id,user_id)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[0]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop >0 :
+            msg="Saved Successfully"
+        else:
+            msg="Error"
+        return {"PopupMessage":msg,"RowCount":pop}
+    def GetProjectMilestones(project_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_project_milestones] ?'  
+        values=(project_id,)      
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def GetSubProjectCourseMilestones(sub_project_id,course_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_sub_project_course_milestones] ?,?'  
+        values=(sub_project_id,course_id)     
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def SaveSubProjectCourseMilestones(json_string,sub_project_id,user_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_store_sub_project_course_milestone] ?, ?, ?'
+        values = (json_string,sub_project_id,user_id)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[0]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop >0 :
+            msg="Saved Successfully"
+        else:
+            msg="Error"
+        return {"PopupMessage":msg,"RowCount":pop}
+    def GetCoursesBasedOnSubProject(sub_project_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_courses_based_on_sub_project]  ?'
+        values = (sub_project_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def GetCentersbasedOnSubProject(sub_project_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_centers_based_on_sub_project]  ?'
+        values = (sub_project_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def SaveSubProjectCourseCenterUnitPrice(json_string,primary_key_id,user_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_store_sub_project_course_center_unitrate]  ?, ?, ?'
+        values = (json_string,primary_key_id,user_id)
+        print(values)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[0]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop >0 :
+            msg="Saved Successfully"
+        else:
+            msg="Error"
+        return {"PopupMessage":msg,"RowCount":pop}
+    def GetSubProjectCourseCenterUnitRates(sub_project_id,primary_key):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec  [masters].[sp_get_sub_projects_course_center_unitrates]  ?,?'
+        values = (sub_project_id,primary_key)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response

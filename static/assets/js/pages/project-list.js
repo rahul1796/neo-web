@@ -461,6 +461,7 @@ function GetSub_project(Project_Id){
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Sub_Project_Name +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Sub_Project_Code +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Center_Name +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Courses +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].Start_Date +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].End_Date +'</td>';
                             varHtml+='</tr>';

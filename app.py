@@ -764,7 +764,7 @@ api.add_resource(get_user_details, '/GetUserDetails')
 def batch_list_page():
     if g.user:
         status=request.args.get('status',-1,type=int)
-        if int(g.user_role) in [11,12,13,14,18]:
+        if int(g.user_role) in [12,13,18]:
             return render_template("Batch/home-batch-list.html")
         else:
             return render_template("Batch/batch-list.html", status=status)
@@ -4700,6 +4700,121 @@ class GetContractsBasedOnCustomer(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(GetContractsBasedOnCustomer,'/GetContractsBasedOnCustomer')
+
+class GetBillingMilestones(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response={"BillingMilestones":Master.GetBillingMilestones()}
+            return response
+api.add_resource(GetBillingMilestones,'/GetBillingMilestones')
+
+class GetUnitTypes(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response={"UnitTypes":Master.GetUnitTypes()}
+            return response
+api.add_resource(GetUnitTypes,'/GetUnitTypes')
+
+class SaveProjectBillingMilestones(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':            
+            json_string=''
+            if 'JsonString' in request.form:
+                json_string=request.form["JsonString"] 
+            project_id=0
+            if 'project_id' in request.form:
+                project_id=request.form["project_id"]
+            user_id=0
+            if 'user_id' in request.form:
+                user_id=request.form["user_id"] 
+                           
+            return Master.SaveProjectBillingMilestones(json_string,project_id,user_id)
+api.add_resource(SaveProjectBillingMilestones,'/SaveProjectBillingMilestones')
+
+class GetProjectMilestones(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            project_id=request.args.get('project_id',0,type=int)
+            response={"MileStones":Master.GetProjectMilestones(project_id)}
+            return response
+api.add_resource(GetProjectMilestones,'/GetProjectMilestones')
+
+class GetSubProjectCourseMilestones(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sub_project_id=request.args.get('sub_project_id',0,type=int)
+            course_id=request.args.get('course_id',0,type=int)
+            response={"MileStones":Master.GetSubProjectCourseMilestones(sub_project_id,course_id)}
+            return response
+api.add_resource(GetSubProjectCourseMilestones,'/GetSubProjectCourseMilestones')
+
+class SaveSubProjectCourseMilestones(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':            
+            json_string=''
+            if 'JsonString' in request.form:
+                json_string=request.form["JsonString"] 
+            sub_project_id=0
+            if 'sub_project_id' in request.form:
+                sub_project_id=request.form["sub_project_id"]
+            user_id=0
+            if 'user_id' in request.form:
+                user_id=request.form["user_id"] 
+                           
+            return Master.SaveSubProjectCourseMilestones(json_string,sub_project_id,user_id)
+api.add_resource(SaveSubProjectCourseMilestones,'/SaveSubProjectCourseMilestones')
+
+class GetCoursesBasedOnSubProject(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sub_project_id=request.args.get('sub_project_id',0,type=int)
+            response={"Courses":Master.GetCoursesBasedOnSubProject(sub_project_id)}
+            return response
+api.add_resource(GetCoursesBasedOnSubProject,'/GetCoursesBasedOnSubProject')
+
+class GetCentersbasedOnSubProject(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sub_project_id=request.args.get('sub_project_id',0,type=int)
+            response={"Centers":Master.GetCentersbasedOnSubProject(sub_project_id)}
+            return response
+api.add_resource(GetCentersbasedOnSubProject,'/GetCentersbasedOnSubProject')
+
+class SaveSubProjectCourseCenterUnitPrice(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':            
+            json_string=''
+            if 'JsonString' in request.form:
+                json_string=request.form["JsonString"] 
+            primary_key_id=0
+            if 'primary_key_id' in request.form:
+                primary_key_id=request.form["primary_key_id"]
+            user_id=0
+            if 'user_id' in request.form:
+                user_id=request.form["user_id"] 
+                           
+            return Master.SaveSubProjectCourseCenterUnitPrice(json_string,primary_key_id,user_id)
+api.add_resource(SaveSubProjectCourseCenterUnitPrice,'/SaveSubProjectCourseCenterUnitPrice')
+
+class GetSubProjectCourseCenterUnitRates(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sub_project_id=request.args.get('sub_project_id',0,type=int)
+            primary_key=request.args.get('primary_key',0,type=int)
+            response={"Centers":Master.GetSubProjectCourseCenterUnitRates(sub_project_id,primary_key)}
+            return response
+api.add_resource(GetSubProjectCourseCenterUnitRates,'/GetSubProjectCourseCenterUnitRates')
+
 
 if __name__ == '__main__':    
     app.run(debug=True)

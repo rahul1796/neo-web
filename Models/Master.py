@@ -183,3 +183,23 @@ class Master:
         return Database.GetSubProjectsForuser(user_id)
     def GetContractsBasedOnCustomer(user_id,user_role_id,customer_id):
         return Database.GetContractsBasedOnCustomer(user_id,user_role_id,customer_id)
+    def GetBillingMilestones():
+        return Database.GetBillingMilestones()
+    def GetUnitTypes():
+        return Database.GetUnitTypes()
+    def SaveProjectBillingMilestones(json_string,project_id,user_id):
+        return Database.SaveProjectBillingMilestones(json_string,project_id,user_id)
+    def GetProjectMilestones(project_id):
+        return Database.GetProjectMilestones(project_id)
+    def GetSubProjectCourseMilestones(sub_project_id,course_id):
+        return Database.GetSubProjectCourseMilestones(sub_project_id,course_id)
+    def SaveSubProjectCourseMilestones(json_string,sub_project_id,user_id):
+        return Database.SaveSubProjectCourseMilestones(json_string,sub_project_id,user_id)
+    def GetCoursesBasedOnSubProject(sub_project_id):
+        return Database.GetCoursesBasedOnSubProject(sub_project_id)
+    def GetCentersbasedOnSubProject(sub_project_id):
+        return Database.GetCentersbasedOnSubProject(sub_project_id)
+    def SaveSubProjectCourseCenterUnitPrice(json_string,primary_key_id,user_id):
+        return Database.SaveSubProjectCourseCenterUnitPrice(json_string,primary_key_id,user_id)
+    def GetSubProjectCourseCenterUnitRates(sub_project_id,primary_key):
+        return Database.GetSubProjectCourseCenterUnitRates(sub_project_id,primary_key)
