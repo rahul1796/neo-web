@@ -35,7 +35,13 @@
                     <div class="row">
                         <div class="col-lg-3">
                             <label for="ddlClient" class="mr-2">Customer</label>
-                            <select class="form-control dropdown-search-filter" onchange="LoadProject();" id="ddlClient" multiple>
+                            <select class="form-control dropdown-search-filter" onchange="loadbasedonclient();" id="ddlClient" multiple>
+                                <!-- <option selected="" value="">All</option> -->
+                            </select>
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="ddlContract" class="mr-2">Contract</label>
+                            <select class="form-control dropdown-search-filter"  id="ddlContract" multiple> <!-- onchange="LoadContract();" -->>
                                 <!-- <option selected="" value="">All</option> -->
                             </select>
                         </div>
@@ -51,14 +57,14 @@
                                 <!-- <option selected="" value="">All</option> -->
                             </select>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-lg-3">
                             <label for="ddlRegion" class="mr-2">Region</label>
                             <select class="form-control dropdown-search-filter" onchange="LoadCenter();" id="ddlRegion" multiple>
                                 <!-- <option selected="" value="">All</option> -->
                             </select>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-lg-3">
                             <label for="ddlCenter" class="mr-2">Center</label>
                             <select class="form-control dropdown-search-filter" id="ddlCenter" multiple>
@@ -77,6 +83,24 @@
                                 <option value="1">Training Yet To Start</option>
                                 <option  value="2">Training In Progress</option>
                                 <option value="3">Training Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row"> 
+                        <div class="col-lg-3">
+                            <label for="FromDate" class="mr-2">From Date</label>
+                            <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
+                            onchange="Loadcandidatestatusddl();" ClientIdMode="static" placeholder="From Date">
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="ToDate" class="mr-2">To Date</label>
+                            <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
+                            onchange="Loadcandidatestatusddl();" ClientIdMode="static" placeholder="To Date">
+                        </div>
+                        <div class="col-lg-3" id="ddlstatus_div">
+                            <label for="ddlcandidateStage" class="mr-2">Candidate Stage</label>
+                            <select class="form-control dropdown-search-filter" id="ddlcandidateStage">
+                                <option selected="" value="">All</option>
                             </select>
                         </div>
                         <div class="col-lg-1" style="float: center; margin-top: 30px">

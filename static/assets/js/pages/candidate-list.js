@@ -1,9 +1,13 @@
 var varTable;
 $(document).ready(function () {
-    $('.dropdown-search-filter').select2();
     $("#imgSpinner").hide();
+    $('.dropdown-search-filter').select2();
+    $(".date-picker").flatpickr({
+        dateFormat:'d-M-Y',
+        minDate: '01.Apr.2019'
+    });
     $("#tbl_candidate").dataTable().fnDestroy();
-    
+    Loadcandidatestatusddl();
     LoadCenterType();
     LoadRegionddl();
     loadClient();
@@ -13,7 +17,21 @@ $(document).ready(function () {
     //LoadTable();
 });
 
-
+function Loadcandidatestatusddl(){
+    if (($('#FromDate').val()=='')|($('#ToDate').val()==''))
+    {   
+        $("#ddlstatus_div").hide();
+        $('#ddlcandidateStage').val("");
+    }
+    else
+    {
+        $("#ddlstatus_div").show();
+        $('#ddlcandidateStage').empty();
+        $('#ddlcandidateStage').append(new Option('Enrolled','1'));
+        $('#ddlcandidateStage').append(new Option('Certified','2'));
+        $('#ddlcandidateStage').append(new Option('Placed','3'));
+    }    
+}
 function LoadRegionddl(){
     var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
         $.ajax({
@@ -92,7 +110,51 @@ function loadClient(){
         }
     });
 }
+function loadbasedonclient()
+{
+    //alert($('#ddlClient').val().toString());
+    LoadContract();
+    LoadProject();
+}
+function LoadContract(){
 
+    var URL=$('#hdn_web_url').val()+ "/GetContractsBasedOnCustomer"  //"/GetALLProject_multiple"
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "customer_id":$('#ddlClient').val().toString(),
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
+        },
+        success: function (data){
+            if(data.Contracts != null)
+            {
+                $('#ddlContract').empty();
+                var count=data.Contracts.length;
+                if( count> 0)
+                {
+                    //$('#ddlProject').append(new Option('ALL','-1'));  , 
+                    for(var i=0;i<count;i++)
+                        $('#ddlContract').append(new Option(data.Contracts[i].Contract_Name,data.Contracts[i].Contract_Id));
+                }
+                else
+                {
+                // $('#ddlContract').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(request, err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
 function LoadCenterType()
 {       
     var URL=$('#hdn_web_url').val()+ "/AllCenterTypes"
@@ -278,7 +340,10 @@ function LoadTable()
                 d.region = $('#ddlRegion').val().toString();
                 d.center = $('#ddlCenter').val().toString();
                 d.center_type = $('#ddlCenterType').val().toString();
-				
+                d.Contracts = $('#ddlContract').val().toString();
+                d.candidate_stage = $('#ddlcandidateStage').val().toString();
+                d.from_date = $('#FromDate').val();
+                d.to_date = $('#ToDate').val();  
             },
             error: function (e) {
                 $("#tbl_candidate tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -452,6 +517,7 @@ function CandidateIDDetails(Aadhar_No,    Identifier_Type,    Identity_Numbe)
 
 
 function DownloadTableBasedOnSearch(){
+    $("#imgSpinner").show();
     /*if($('#ddlCustomer').val()==''|| $('#ddlCustomer').val()==null){
         alert("Please select a Customer.");
     
@@ -469,8 +535,6 @@ function DownloadTableBasedOnSearch(){
     console.log(false)
     }
     else{
-        
-        $("#imgSpinner").show();
         var URL=$('#hdn_web_url').val()+ "/candidate_download_report"
         //window.location = URL + "?ActivityDate=2019-09-09"
         $.ajax({
@@ -488,17 +552,20 @@ function DownloadTableBasedOnSearch(){
                             'sub_project':$('#ddlSubProject').val().toString(),
                             'region':$('#ddlRegion').val().toString(),
                             'center':$('#ddlCenter').val().toString(),
-                            'center_type':$('#ddlCenterType').val().toString()
+                            'center_type':$('#ddlCenterType').val().toString(),
+                            'Contracts' :$('#ddlContract').val().toString(),
+                            'candidate_stage':$('#ddlcandidateStage').val().toString(),
+                            'from_date' : $('#FromDate').val(),
+                            'to_date' : $('#ToDate').val()
 
                     },
                     success: function(resp) 
                     {
 
-                        $("#imgSpinner").hide();
                         if (resp.Status){
                             var varAnchor = document.getElementById('lnkDownload');
                             varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
-                            
+                            $("#imgSpinner").hide();
                             try 
                                 { 
                                     //in firefox
@@ -528,23 +595,23 @@ function DownloadTableBasedOnSearch(){
                                          return;
                                     }
                                 } catch(ex) {}
-
+                            
                         }
                         else{
-                            alert(resp.Description)
-                            alert('Not success')
+                            //alert(resp.Description)
+                            //alert('Not success')
                             $("#imgSpinner").hide();
                             
                         }
                     },
                     error:function()
                     {
-                        $("#imgSpinner").hide();
+                        //$("#imgSpinner").hide();
                     }
                 });
-        $("#imgSpinner").hide();
+        
     }
-    
+    //$("#imgSpinner").hide();
 }
 
 function ForceDownload(varUrl, varFileName)

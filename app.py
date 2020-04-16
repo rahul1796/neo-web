@@ -28,6 +28,9 @@ import candidate_report
 from Models import DownloadDump
 from lib.ms_sql import MsSql
 from lib.postgre_sql import PostgreSql
+import urllib.request
+import urllib.parse
+import random
 
 #from lib.log import Log
 #from lib.log import log
@@ -1162,6 +1165,11 @@ class candidate_list(Resource):
             center = request.form['center']
             user_id=request.form['user_id']
             user_role_id=request.form['user_role_id']
+            Contracts = request.form["Contracts"]
+            candidate_stage = request.form["candidate_stage"]
+            from_date = request.form["from_date"]
+            to_date = request.form["to_date"]
+            #print(Contracts, candidate_stage, from_date, to_date)
             
             start_index = request.form['start']
             page_length = request.form['length']
@@ -1171,7 +1179,7 @@ class candidate_list(Resource):
             draw=request.form['draw']
             
             #print(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-            return Candidate.candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Candidate.candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, Contracts, candidate_stage, from_date, to_date)
 
 
 api.add_resource(candidate_list, '/candidate_list')
@@ -4640,10 +4648,15 @@ class candidate_download_report(Resource):
                 region = request.form["region"]
                 center = request.form["center"]
                 center_type = request.form["center_type"]
+                Contracts = request.form["Contracts"]
+                candidate_stage = request.form["candidate_stage"]
+                from_date = request.form["from_date"]
+                to_date = request.form["to_date"]
+                #print(Contracts, candidate_stage, from_date, to_date)
                 
                 file_name='candidate_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
-                print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
-                resp = candidate_report.create_report(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
+                #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
+                resp = candidate_report.create_report(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name,Contracts, candidate_stage, from_date, to_date)
                 
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
@@ -4700,6 +4713,7 @@ class GetContractsBasedOnCustomer(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(GetContractsBasedOnCustomer,'/GetContractsBasedOnCustomer')
+
 
 class GetBillingMilestones(Resource):
     @staticmethod
@@ -4814,6 +4828,199 @@ class GetSubProjectCourseCenterUnitRates(Resource):
             response={"Centers":Master.GetSubProjectCourseCenterUnitRates(sub_project_id,primary_key)}
             return response
 api.add_resource(GetSubProjectCourseCenterUnitRates,'/GetSubProjectCourseCenterUnitRates')
+
+
+class check_user_pass(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            client_id = str(request.args['client_id'])
+            client_key = str(request.args['client_key'])
+            username = str(request.args['username'])
+            password = str(request.args['password'])
+            app_version = str(request.args['app_version'])
+            device_model = str(request.args['device_model'])
+            imei_num = str(request.args['imei_num'])
+            android_version = str(request.args['android_version'])
+
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                out = Database.check_password(username,password,app_version,device_model,imei_num,android_version)
+                    
+            #     if out[0]=='false':
+            #         res = {'success': False, 'description': out[1]}
+            #         return jsonify(res)
+            #     elif out[0]=='true' and out[2]!=7:
+            #         res = {'success': True, 'description': out[1], 'role_id':out[2],'user_id':out[3],'user_name':out[4],'center_details':out[5],'prac_course_list':out[6]}
+            #         return jsonify(res)
+            #     elif out[0]=='true' and out[2]==7:
+            #         res = {'success': True, 'description': out[1], 'role_id':out[2],'app_version_id':out[3],'app_version_code':out[4],'app_version_number':out[5],'app_version_description':out[6],'app_uploaded_date_time':out[7],'app_uploaded_by':out[8],'user_id':out[9],'user_name':out[10],'trainer_email':out[11]}
+            #         return jsonify(res)
+            #     else:
+            #         res = {'success': False, 'description': "some problem in db fetching",'app_status':False}
+            #         return jsonify(res)
+
+            else:
+                out = {'success': False, 'description': "client name and password not matching", 'app_status':True}
+            return jsonify(out)
+#Base URL + "/login" api will provide all the unzynched QP data as response
+api.add_resource(check_user_pass, '/login')
+
+class otp_send(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            client_id = str(request.form['client_id'])
+            client_key = str(request.form['client_key'])
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                try:
+                    flag = int(request.form['flag'])
+                    mobile_no = str(request.form['mobile_no'])
+                    app_name = str(request.form['app_name'])
+                    cand_name = str(request.form['cand_name'])
+                except Exception as e:
+                    res = {'success': False, 'description': "unable to read data " + str(e)}
+                    return jsonify(res)
+                otp = ''
+                for i in range(6):
+                    otp += str(random.randint(0,9))
+
+                out = Database.otp_send_db(otp, mobile_no, app_name, flag)
+
+                if out[0]==True:
+                    res = {'success': False, 'description': "Mobile number already registered"}
+                    return jsonify(res)
+                else:
+                    otp=out[1]
+                    def sendSMS(apikey, numbers, sender, message):
+                        data =  urllib.parse.urlencode({'apikey': apikey, 'numbers': numbers, 'message' : message, 'sender': sender})
+                        data = data.encode('utf-8')
+                        request = urllib.request.Request("https://api.textlocal.in/send/?")
+                        f = urllib.request.urlopen(request, data)
+                        fr = f.read()
+                        return(fr)
+
+                    resp =  sendSMS('vAHJXKhB9AY-bJF1Ozs3XkCW2uv6UYRiHShavkGySL', '91{}'.format(mobile_no), 'NEOLNS'.upper(), 'Hi {},\n\nThank you for registering with LabourNet.\nYour OTP is {}.\n\nThanks,\nNEO Teams.'.format(cand_name, otp))
+                    #print (resp)
+                    data = json.loads(resp.decode("utf-8"))
+                    if data['status'] == 'success':
+                        res = {'success': True, 'description': "OTP Sent Successfully"}
+                        return jsonify(res)
+                    else:
+                        res = {'success': False, 'description': data['errors'][0]['message']}
+                        return jsonify(res)
+
+            else:
+                res = {'success': False, 'description': "client name and password not matching"}
+                return jsonify(res)
+        else:
+            res = {'success': False, 'description': "Method is wrong"}
+            return jsonify(res)
+
+#Base URL + "/otp_send" api will provide all the unzynched QP data as response
+api.add_resource(otp_send, '/otp_send')
+
+class otp_verification(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            client_id = str(request.form['client_id'])
+            client_key = str(request.form['client_key'])
+
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                try:
+                    otp = str(request.form['otp'])
+                    mobile_no = str(request.form['mobile_no'])
+                    app_name = str(request.form['app_name'])
+                except Exception as e:
+                    res = {'success': False, 'description': "unable to read data " + str(e)}
+                    return jsonify(res)
+                out = Database.otp_verification_db(otp, mobile_no, app_name)
+
+                if out==True:
+                    res = {'success': True, 'description': "Mobile number verified successfully"}
+                else:
+                    res = {'success': False, 'description': "Mobile number verification failed"}
+                
+                return jsonify(res)   
+                
+            else:
+                res = {'success': False, 'description': "client name and password not matching"}
+                return jsonify(res)
+        else:
+            res = {'success': False, 'description': "Method is wrong"}
+            return jsonify(res)
+
+#Base URL + "/otp_verification" api will provide all the unzynched QP data as response
+api.add_resource(otp_verification, '/otp_verification')
+
+class get_candidate_list_updated(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            client_id = str(request.args['client_id'])
+            client_key = str(request.args['client_key'])
+            
+            user_id = int(request.args['user_id'])
+            #user_id = 'NULL' if user_id==0 else user_id
+            cand_stage = int(request.args['cand_stage'])
+            #cand_stage = 'NULL' if cand_stage==0 else cand_stage
+            app_version = request.args['app_version']
+            
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                out = Database.get_candidate_list_updated(user_id,cand_stage,app_version)
+                return jsonify(out)
+                
+            else:
+                res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
+                return jsonify(res)
+
+#Base URL + "/get_candidate_list" api will provide all the unzynched QP data as response
+api.add_resource(get_candidate_list_updated, '/get_candidate_list_updated')
+
+@app.route("/XML/<path:path>")
+def get_xml_file(path):
+    """Download a file."""
+    filename = r"{}{}".format(config.candidate_xmlPath,path)
+    #print(filename)
+    if not(os.path.exists(filename)):
+        filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathWeb)
+    return send_file(filename)
+
+class submit_candidate_updated(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            client_id = str(request.form['client_id'])
+            client_key = str(request.form['client_key'])
+            
+            user_id = int(request.form['user_id'])
+            cand_stage = int(request.form['cand_stage'])
+            xml = str(request.form['xml'])
+            latitude = str(request.form['latitude'])
+            longitude = str(request.form['longitude'])
+            timestamp = str(request.form['timestamp'])
+            app_version = str(request.form['app_version'])
+            device_model = str(request.form['device_model'])
+            imei_num = str(request.form['imei_num'])
+            android_version = str(request.form['android_version'])
+
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                if cand_stage==1:
+                    out = Database.get_submit_candidate_mobi(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                elif cand_stage==2:
+                    out = Database.get_submit_candidate_reg(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                elif cand_stage==3:
+                    out = Database.get_submit_candidate_enr(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                else:
+                    out = {'success': False, 'description': "incorrect stage", 'app_status':True}
+                return jsonify(out)
+            
+            else:
+                res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
+                return jsonify(res)
+
+#Base URL + "/submit_candidate_updated" api will provide all the unzynched QP data as response
+api.add_resource(submit_candidate_updated, '/submit_candidate_updated')
 
 
 if __name__ == '__main__':    

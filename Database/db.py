@@ -1,7 +1,28 @@
 import pypyodbc as pyodbc
 #import pyodbc
 from .config import *
+#from Database import config
 import pandas as pd
+from datetime import datetime
+import requests
+import xml.etree.ElementTree as ET
+
+def to_xml(df, filename=None, mode='w'):
+    def row_to_xml(row):
+        xml = ['<candidate>']
+        for i, col_name in enumerate(row.index):
+            xml.append('  <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
+        xml.append('</candidate>')
+        return '\n'.join(xml)
+    res = '\n'.join(df.apply(row_to_xml, axis=1))
+    out = ['<data>',res,'</data>']
+    res = '\n'.join(out)
+    if filename is None:
+        return res
+    with open(filename, mode) as f:
+        f.write(res)
+
+pd.DataFrame.to_xml = to_xml
 
 class Database:
     def Login(email,passw):
@@ -1093,15 +1114,15 @@ class Database:
         con.close()
         return h
 
-    def candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, Contracts, candidate_stage, from_date, to_date):
         content = {}
         d = []
         h={}
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?'
-        values = (candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?'
+        values = (candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,Contracts, candidate_stage, from_date, to_date)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -3905,6 +3926,7 @@ SELECT					cb.name as candidate_name,
         con.close()
         return {"Contracts":response}
 
+
     def GetBillingMilestones():
         response = []
         h={}
@@ -4065,3 +4087,243 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
+
+    def check_password(username,password,app_version,device_model,imei_num,android_version):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "call users.sp_user_authentication_updated('{}','{}','{}','{}','{}','{}')".format(username,password,app_version,device_model,imei_num,android_version)
+        quer = "{"+ quer + "}"
+        curs.execute(quer)
+        data = curs.fetchall()
+        data = data[0]
+
+        if str.lower(data[0]) =='false':
+            return {'app_status':False, 'success': False, 'description': data[2]}
+        elif str.lower(data[0]) =='true':
+            if str.lower(data[1])=='false':
+                return {'success': False, 'description': data[2],'app_status':True}
+            elif str.lower(data[1])=='true':
+                return {'app_status':True, 'success': True, 'description': data[2], 'role_id':data[3],'user_id':data[4],'user_name':data[5],'user_email':data[6]}
+            else:
+                return {'success': False, 'description': 'stored procedure not return true/false','app_status':True}
+        else:
+            return {'success': False, 'description': 'stored procedure not return true/false','app_status':False}
+    
+    def otp_send_db(otp, mobile_no, app_name, flag):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "call [masters].[sp_mobile_otp_verification]('{}','{}',{},'{}')".format(mobile_no, otp, flag, app_name)
+        quer = "{"+ quer + "}"
+        curs.execute(quer)
+        data = curs.fetchall()[0]
+        curs.commit()
+        curs.close()
+        conn.close()
+        return [data[0], data[2]]
+
+    def otp_verification_db(otp, mobile_no, app_name):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "call [masters].[sp_to_verify_otp]('{}','{}','{}')".format(mobile_no, otp, app_name)
+        quer = "{"+ quer + "}"
+        curs.execute(quer)
+        data = curs.fetchall()[0]
+        curs.commit()
+        curs.close()
+        conn.close()
+        return data[0]
+
+    def get_candidate_list_updated(user_id,cand_stage,app_version):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "SELECT TOP (1) id FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        curs.execute(quer)
+        data=curs.fetchall()
+        data = '' if data==[] else data[0][0]
+        if app_version < str(data):
+            curs.close()
+            conn.close()
+            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            return out
+        if cand_stage==1:
+            sql = 'exec [candidate_details].[sp_get_candidate_list_stage_M]  ?, ?'
+            filenmae = 'candidate_list_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_M.xml'
+        elif cand_stage==2:
+            sql = 'exec [candidate_details].[sp_get_candidate_list_stage_R]  ?, ?'
+            filenmae = 'candidate_list_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_R.xml'
+        elif cand_stage==3:
+            sql = 'exec [candidate_details].[sp_get_candidate_list_stage_E]  ?, ?'
+            filenmae = 'candidate_list_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_E.xml'
+        else:
+            out = {'success': False, 'description': "incorrect stage", 'app_status':True}
+            return out
+        
+        values = (user_id,cand_stage)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        response = []
+        h={}
+        for row in curs:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        df = pd.DataFrame(response)
+        df = df.fillna('')
+
+        curs.close()
+        conn.close()
+        df.to_xml(candidate_xmlPath + filenmae)
+        out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
+        return out
+
+    def get_submit_candidate_mobi(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "SELECT TOP (1) id FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        curs.execute(quer)
+        data=curs.fetchall()
+        data = '' if data==[] else data[0][0]
+        if app_version < str(data):
+            curs.close()
+            conn.close()
+            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            return out
+        
+        try:
+            quer1 = '''
+            insert into candidate_details.tbl_candidates
+            (isFresher, salutation, first_name, middle_name, last_name, date_of_birth, isDob, age,primary_contact_no, secondary_contact_no, email_id, gender,marital_status, caste, disability_status, religion, source_of_information, present_pincode,present_district, permanent_district,permanent_pincode,candidate_stage_id, candidate_status_id, created_on, created_by, is_active, insert_from,permanent_state,permanent_country,present_state, present_country)
+            OUTPUT inserted.candidate_id
+            values
+            '''
+            quer2='''
+            insert into candidate_details.tbl_candidate_reg_enroll_details
+            (candidate_id,mother_tongue,current_occupation,average_annual_income,interested_course,product,candidate_photo,present_address_line1,permanaet_address_line1,created_on,created_by,is_active)
+            values
+            '''
+            quer3='''
+            insert into candidate_details.tbl_candidate_reg_enroll_non_mandatory_details
+            (candidate_id,present_address_line2,present_village,present_panchayat,present_taluk_block,permanent_address_line2,permanent_village,permanent_panchayat,permanent_taluk_block,created_on,created_by,is_active)
+            values
+            '''
+            url = candidate_xml_weburl + xml
+            r = requests.get(url)
+            data = r.text
+            root = ET.fromstring(data)
+            out = []
+            for child in root:
+                data = child.attrib
+                out.append(data)
+                #quer1_a + = 
+                quer = "({},'{}','{}','{}','{}','{}',{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},1,'m','{}','{}','{}','{}'),".format(1 if data['isFresher']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],
+                            data['candDob'],1 if data['dobEntered']=='true' else 0,data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'], data['disableStatus'], data['candReligion'],
+                            data['candSource'], data['presPincode'],data['presDistrict'],data['permDistrict'],data['permPincode'],user_id,data['permState'],data['permCountry'] ,data['presState'],data['presCountry'])
+                quer1 += '\n'+quer
+            quer1 = quer1[:-1]+';'
+            curs.execute(quer1)
+            d = list(map(lambda x:x[0],curs.fetchall()))
+            curs.commit()
+
+            for i in range(len(d)):
+                quer2 += '\n' + "({},'{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(d[i],out[i]['motherTongue'],out[i]['candOccuptn'],out[i]['annualIncome'],out[i]['interestCourse'],out[i]['candProduct'],out[i]['candPic'],out[i]['presAddrOne'],out[i]['permAddrOne'],user_id)
+                quer3 += '\n' + "({},'{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(d[i],out[i]['presAddrTwo'],out[i]['presVillage'],out[i]['presPanchayat'],out[i]['presTaluk'],out[i]['permAddrTwo'],out[i]['permVillage'],out[i]['permPanchayat'],out[i]['permTaluk'],user_id)
+              
+            quer2 = quer2[:-1]+';'
+            quer3 = quer3[:-1]+';'
+            curs.execute(quer2 + '\n' + quer3)
+            curs.commit()
+            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
+        except Exception as e:
+            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+        finally:
+            curs.close()
+            conn.close()
+            return out
+    def get_submit_candidate_reg(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "SELECT TOP (1) id FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        curs.execute(quer)
+        data=curs.fetchall()
+        data = '' if data==[] else data[0][0]
+        if app_version < str(data):
+            curs.close()
+            conn.close()
+            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            return out
+        
+        try:
+            quer1 = '''
+            update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',candidate_stage_id=2,candidate_status_id=2,created_on=GETDATE(),created_by='{}',is_active=1 where candidate_id='{}';
+            '''
+            quer2='''
+            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type={},identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            '''
+
+            url = candidate_xml_weburl + xml
+            r = requests.get(url)
+            data = r.text
+            root = ET.fromstring(data)
+            query = ""
+            for child in root:
+                data = child.attrib
+                query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1 if data['dobEntered']=='true' else 0,data['yrsExp'],data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],user_id,data['cand_id'])
+                query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['aadhaarNo'],data['idType'],data['idNum'],data['idCopy'],data['empType'],data['prefJob'],data['relExp'],data['lastCtc'],data['prefLocation'],data['willTravel'],data['workShift'],data['bocwId'],data['expectCtc'],user_id,data['cand_id'])
+            
+            curs.execute(query)
+            curs.commit()
+
+            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
+        except Exception as e:
+            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+        finally:
+            curs.close()
+            conn.close()
+            return out
+            
+    def get_submit_candidate_enr(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "SELECT TOP (1) id FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        curs.execute(quer)
+        data=curs.fetchall()
+        data = '' if data==[] else data[0][0]
+        if app_version < str(data):
+            curs.close()
+            conn.close()
+            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            return out
+        
+        try:
+            quer1 = '''
+            update candidate_details.tbl_candidates set isFresher={},isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',is_active=1 where candidate_id='{}';
+            '''
+            quer2='''
+            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',present_address_line1='{}',permanaet_address_line1='{}',highest_qualification='{}',stream_specialization='{}',computer_knowledge='{}',technical_knowledge='{}',family_salutation='{}',member_name='{}',gender='{}',education_qualification='{}',relationship='{}',occupation='{}',average_household_income='{}',bank_name='{}',account_number='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            '''
+            quer3='''
+            update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set present_address_line2='{}',present_village='{}',present_panchayat='{}',present_taluk_block='{}',permanent_address_line2='{}',permanent_village='{}',permanent_panchayat='{}',permanent_taluk_block='{}',name_of_institute='{}',university='{}',year_of_pass='{}',percentage='{}',family_date_of_birth='{}',family_age='{}',family_primary_contact='{}',family_email_address='{}',branch_name='{}',branch_code='{}',account_type='{}',attachment_image_name='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            '''
+
+            url = candidate_xml_weburl + xml
+            r = requests.get(url)
+            data = r.text
+            root = ET.fromstring(data)
+            query = ""
+            for child in root:
+                data = child.attrib
+                query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,data['cand_id'])
+                query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['presAddrOne'],data['permAddrOne'],data['highQuali'],data['candStream'],data['compKnow'],data['techKnow'],data['memberSal'],data['memberName'],data['memberGender'],data['memberQuali'],data['memberRelation'],data['memberOccuptn'],data['houseIncome'],data['bankName'],data['accNum'],user_id,data['cand_id'])
+                query += '\n' + quer3.format(data['presAddrTwo'],data['presVillage'],data['presPanchayat'],data['presTaluk'],data['permAddrTwo'],data['permVillage'],data['permPanchayat'],data['permTaluk'],data['instiName'],data['university'],data['yrPass'],data['percentage'],data['memberDob'],data['memberAge'],data['memberContact'],data['memberEmail'],data['branchName'],data['ifscCode'],data['accType'],data['bankCopy'],user_id,data['cand_id'])
+
+            curs.execute(query)
+            curs.commit()
+
+            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
+        except Exception as e:
+            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+        finally:
+            curs.close()
+            conn.close()
+            return out
+
