@@ -6,293 +6,721 @@
         <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
 
         <!-- <script type="text/javascript" src="static/assets/libs/jquery/jquery.min.js"></script> -->
-        <script type="text/javascript">
-            $(document).ready(function(){
-                $(".date-picker").flatpickr();
-                $('.dropdown-search-filter').select2();
-                //alert('{{subproject_id}}')
-                LoadRegiondl();
-
-                document.getElementById("PlannedStartDate").disabled = false;
-                document.getElementById("PlannedEndDate").disabled = false;
-				//project_code, subproject_id
-                if('{{subproject_id}}' !=0)
-                {   
-                    document.getElementById("PlannedStartDate").disabled = true;
-                    document.getElementById("PlannedEndDate").disabled = true;
-
-                    var URL=$('#hdn_web_url').val()+ "/get_subproject_details";
-                    $.ajax({
-                        type:"GET",
-                        url:URL,
-                        success:function(data){
-                           if(data!=null)
-                           {    
-                            $('#ProjectName').val(data.SubProjectDetail.Sub_Project_Name);
-                            $('#ProjectCode').val(data.SubProjectDetail.Sub_Project_Code);
-                            $('#ddlRegion').val(data.SubProjectDetail.Region_Id);
-                            Statebyregion(data.SubProjectDetail.State_Id);
-                            Centerbystate(data.SubProjectDetail.Center_Ids);
-                            coursebycenter_project(data.SubProjectDetail.Course_Ids);
-                            $('#PlannedStartDate').val(data.SubProjectDetail.Planned_Start_Date);
-                            $('#PlannedEndDate').val(data.SubProjectDetail.Planned_End_Date);
-                            $('#ActualStartDate').val(data.SubProjectDetail.Actual_Start_Date);
-                            $('#ActualEndDate').val(data.SubProjectDetail.Actual_End_Date);
-                            if(data.SubProjectDetail.Is_Active)
-                                   {
-                                        $('#isactive').prop('checked',true);
-                                    }
-                                    else
-                                    {
-                                        $('#isactive').prop('checked',false);
-                                    }
-                              
-                           } 
-                        },
-                        error:function(x){
-                            alert('error');
-                        }
-                    });
-                }
-            }); 
-            
-            function LoadRegiondl(){
-            var URL=$('#hdn_web_url').val()+ "/Get_all_Region"
-                $.ajax({
-                type:"GET",
-                url:URL,
-                async:false,        
-                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                datatype:"json",
-                success: function (data){
-                    if(data.Region != null)
-                    {
-                        $('#ddlRegion').empty();
-                        var count=data.Region.length;
-                        if( count> 0)
-                        {
-                            $('#ddlRegion').append(new Option('Choose Region',''));
-                            for(var i=0;i<count;i++)
-                                $('#ddlRegion').append(new Option(data.Region[i].Region_Name, data.Region[i].Region_Id));
-                            //$('#ddlCourse').val('-1');
-                        }
-                        else
-                        {
-                            $('#ddlRegion').append(new Option('ALL','-1'));
-                        }
+<script type="text/javascript">
+var Centers;
+    $(document).ready(function(){
+        $(".date-picker").flatpickr();
+        $('.dropdown-search-filter').select2();
+        //alert('{{subproject_id}}')
+        $('#btnProjectInfo').hide();
+        $('#btnBillingMetric').show();
+        $('#divProjectInfo').show();
+        $('#divBillingMetrics').hide();
+        LoadRegiondl();
+        $.fn.serializeObject = function()
+        {
+            var o = {};
+            var a = this.serializeArray();
+            $.each(a, function() {
+                if (o[this.name] !== undefined) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
                     }
-                },
-                error:function(err)
-                {
-                    alert('Error while loading BU! Please try again');
-                    return false;
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = this.value || '';
                 }
             });
-            return false;
-            }
+            return o;
+        };
+
+        document.getElementById("PlannedStartDate").disabled = false;
+        document.getElementById("PlannedEndDate").disabled = false;
+        //project_code, subproject_id
+        if('{{subproject_id}}' !=0)
+        {   
+            $('#headProject').text("Sub Project Details");
+            $('#divBtns').show(); 
+            document.getElementById("PlannedStartDate").disabled = true;
+            document.getElementById("PlannedEndDate").disabled = true;
             
-            function Statebyregion(needed)
+            var URL=$('#hdn_web_url').val()+ "/get_subproject_details";
+            $.ajax({
+                type:"GET",
+                url:URL,
+                success:function(data){
+                    if(data!=null)
+                    {    
+                    $('#ProjectName').val(data.SubProjectDetail.Sub_Project_Name);
+                    $('#ProjectCode').val(data.SubProjectDetail.Sub_Project_Code);
+                    $('#ddlRegion').val(data.SubProjectDetail.Region_Id);
+                    Statebyregion(data.SubProjectDetail.State_Id);
+                    Centerbystate(data.SubProjectDetail.Center_Ids);
+                    coursebycenter_project(data.SubProjectDetail.Course_Ids);
+                    $('#PlannedStartDate').val(data.SubProjectDetail.Planned_Start_Date);
+                    $('#PlannedEndDate').val(data.SubProjectDetail.Planned_End_Date);
+                    $('#ActualStartDate').val(data.SubProjectDetail.Actual_Start_Date);
+                    $('#ActualEndDate').val(data.SubProjectDetail.Actual_End_Date);
+                    
+                    if(data.SubProjectDetail.Is_Active)
+                            {
+                                $('#isactive').prop('checked',true);
+                            }
+                            else
+                            {
+                                $('#isactive').prop('checked',false);
+                            }
+                        
+                    } 
+                    $('#hdn_sub_project_id').val(data.SubProjectDetail.Sub_Project_Id);
+                    //GetProjectMilestone();
+                },
+                error:function(x){
+                    alert('error');
+                }
+            });
+        }
+    }); 
+    
+    function LoadRegiondl(){
+    var URL=$('#hdn_web_url').val()+ "/Get_all_Region"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Region != null)
             {
-                
-                var URL=$('#hdn_web_url').val()+ "/all_states_based_on_region"
-                $.ajax({
-                    type:"GET",
-                    url:URL,
-                    async:false,
-                    beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                    datatype:"json",
-                    data:{
-                        "region_id": $('#ddlRegion').val()
-                    },
-                    success: function (data){
-                        if(data.state != null)
-                        {   
-                            $('#ddlState').empty();
-                            var count=data.state.length;
-                            if( count> 0)
-                            {
-                                $('#ddlState').append(new Option('Choose State',''));
-                                for(var i=0;i<count;i++)
-                                    $('#ddlState').append(new Option(data.state[i].State_Name,data.state[i].State_Id));
-                            }
-                            else
-                            {
-                                $('#ddlState').append(new Option('Choose State',''));
-                            }
-                            
-                        }
-                    },
-                    error:function(err)
-                    {
-                        alert('Error! Please try again');
-                        return false;
-                    }
-                });
-                if (needed !=0)
-                            {
-                                $('#ddlState').val(needed);
-                            }
-                return false;
+                $('#ddlRegion').empty();
+                var count=data.Region.length;
+                if( count> 0)
+                {
+                    $('#ddlRegion').append(new Option('Choose Region',''));
+                    for(var i=0;i<count;i++)
+                        $('#ddlRegion').append(new Option(data.Region[i].Region_Name, data.Region[i].Region_Id));
+                    //$('#ddlCourse').val('-1');
+                }
+                else
+                {
+                    $('#ddlRegion').append(new Option('ALL','-1'));
+                }
             }
-            function Centerbystate(needed)
-            { 
-                var URL=$('#hdn_web_url').val()+ "/all_center_based_on_state"
-                $.ajax({
-                    type:"GET",
-                    url:URL,
-                    async:false,
-                    beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                    datatype:"json",
-                    data:{
-                        "state_id": $('#ddlState').val()
-                    },
-                    success: function (data){
-                        if(data.center != null)
-                        {   
-                            $('#ddlCenters').empty();
-                            var count=data.center.length;
-                            if( count> 0)
-                            {
-                                $('#ddlCenters').append(new Option('Choose Center',''));
-                                for(var i=0;i<count;i++)
-                                    $('#ddlCenters').append(new Option(data.center[i].Center_Name,data.center[i].Center_Id));
-                                if (needed !=0)
-                                {
-                                    $('#ddlCenters').val(needed);
-                                }
-                            }
-                            else
-                            {
-                                $('#ddlCenters').append(new Option('Choose Center',''));
-                            }
-                            
-                        }
-                    },
-                    error:function(err)
-                    {
-                        alert('Error! Please try again');
-                        return false;
-                    }
-                });
-                
-                return false;
-            }
-
-            function coursebycenter_project(needed)
-            {   
-                var URL=$('#hdn_web_url').val()+ "/all_course_based_on_center"
-                $.ajax({
-                        type:"POST",
-                        url:URL,
-                        data:{
-                            "center_ids" : $('#ddlCenters').val().toString(),
-                            "project_code" : '{{project_code}}'
-                        },
-                        success:function(data){
-                        if(data.course != null)
-                        {   
-                            $('#ddlCourse').empty();
-                            var count=data.course.length;
-                            if( count> 0)
-                            {
-                                $('#ddlCourse').append(new Option('Choose Course',''));
-                                for(var i=0;i<count;i++)
-                                    $('#ddlCourse').append(new Option(data.course[i].Course_Name,data.course[i].Course_Id));
-								if (needed !=0)
-								{
-									$('#ddlCourse').val(needed);
-								}
-                            }
-                            else
-                            {
-                                $('#ddlCourse').append(new Option('Choose Course',''));
-                            }
-                            
-                        }
-                    },
-                    error:function(err)
-                    {
-                        alert('Error! Please try again');
-                        return false;
-                    }
-                });
-
-                
-                return false;
-            }
-            function add_popup_message(){
-                var URL=$('#hdn_web_url').val()+ "/add_subproject_details";
-                    $.ajax({
-                        type:"POST",
-                        url:URL,
-                        data:{
-                            "SubProjectName" : $('#ProjectName').val(),
-                            "SubProjectCode" : $('#ProjectCode').val(),
-                            "Region" : $('#ddlRegion').val(),
-                            "State" : $('#ddlState').val(),
-                            "Centers" : $('#ddlCenters').val().toString(),
-                            "Course" : $('#ddlCourse').val().toString(),
-                            "PlannedStartDate" : $('#PlannedStartDate').val(),
-                            "PlannedEndDate" : $('#PlannedEndDate').val(),
-                            "ActualStartDate" : $('#ActualStartDate').val(),
-                            "ActualEndDate" : $('#ActualEndDate').val(),
-                            "isactive" : $('#isactive').prop('checked')
-                        },
-                        success:function(data){
-                            var message="",title="",icon="";
-                    if(data.PopupMessage.client_flag==2){
-                        message=data.PopupMessage.message;
-                        title="Error";
-                        icon="error";
-                        
-                    }
-                    else{
-                        message=data.PopupMessage.message;
-                        title="Success";
-                        icon="success";
-                        
-                    }
-                    swal({  
-                                title:title,
-                                text:message,
-                                icon:icon,
-                                confirmButtonClass:"btn btn-confirm mt-2"
-                                }).then(function(){
-                                    window.location.href = '/after_popup_project';
-                                });
-                        //    alert("The Inserted/Upadated Id is "+data.PopupMessage.message);
-                        //    window.location.href="/after_popup"; 
-                        },
-                        error:function(x){
-                            alert('error');
-                        }
-                    });
-            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+    }
+    
+    function Statebyregion(needed)
+    {
         
-        </script>
+        var URL=$('#hdn_web_url').val()+ "/all_states_based_on_region"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "region_id": $('#ddlRegion').val()
+            },
+            success: function (data){
+                if(data.state != null)
+                {   
+                    $('#ddlState').empty();
+                    var count=data.state.length;
+                    if( count> 0)
+                    {
+                        $('#ddlState').append(new Option('Choose State',''));
+                        for(var i=0;i<count;i++)
+                            $('#ddlState').append(new Option(data.state[i].State_Name,data.state[i].State_Id));
+                    }
+                    else
+                    {
+                        $('#ddlState').append(new Option('Choose State',''));
+                    }
+                    
+                }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        if (needed !=0)
+                    {
+                        $('#ddlState').val(needed);
+                    }
+        return false;
+    }
+    function Centerbystate(needed)
+    { 
+        var URL=$('#hdn_web_url').val()+ "/all_center_based_on_state"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "state_id": $('#ddlState').val()
+            },
+            success: function (data){
+                if(data.center != null)
+                {   
+                    $('#ddlCenters').empty();
+                    var count=data.center.length;
+                    if( count> 0)
+                    {
+                        $('#ddlCenters').append(new Option('Choose Center',''));
+                        for(var i=0;i<count;i++)
+                            $('#ddlCenters').append(new Option(data.center[i].Center_Name,data.center[i].Center_Id));
+                        if (needed !=0)
+                        {
+                            $('#ddlCenters').val(needed);
+                        }
+                    }
+                    else
+                    {
+                        $('#ddlCenters').append(new Option('Choose Center',''));
+                    }
+                    
+                }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        
+        return false;
+    }
+
+    function coursebycenter_project(needed)
+    {   
+        var URL=$('#hdn_web_url').val()+ "/all_course_based_on_center"
+        $.ajax({
+                type:"POST",
+                url:URL,
+                data:{
+                    "center_ids" : $('#ddlCenters').val().toString(),
+                    "project_code" : '{{project_code}}'
+                },
+                success:function(data){
+                if(data.course != null)
+                {   
+                    $('#ddlCourse').empty();
+                    var count=data.course.length;
+                    if( count> 0)
+                    {
+                        $('#ddlCourse').append(new Option('Choose Course',''));
+                        for(var i=0;i<count;i++)
+                            $('#ddlCourse').append(new Option(data.course[i].Course_Name,data.course[i].Course_Id));
+                        if (needed !=0)
+                        {
+                            $('#ddlCourse').val(needed);
+                        }
+                    }
+                    else
+                    {
+                        $('#ddlCourse').append(new Option('Choose Course',''));
+                    }
+                    
+                }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+
+        
+        return false;
+    }
+    function add_popup_message(){
+        var URL=$('#hdn_web_url').val()+ "/add_subproject_details";
+            $.ajax({
+                type:"POST",
+                url:URL,
+                data:{
+                    "SubProjectName" : $('#ProjectName').val(),
+                    "SubProjectCode" : $('#ProjectCode').val(),
+                    "Region" : $('#ddlRegion').val(),
+                    "State" : $('#ddlState').val(),
+                    "Centers" : $('#ddlCenters').val().toString(),
+                    "Course" : $('#ddlCourse').val().toString(),
+                    "PlannedStartDate" : $('#PlannedStartDate').val(),
+                    "PlannedEndDate" : $('#PlannedEndDate').val(),
+                    "ActualStartDate" : $('#ActualStartDate').val(),
+                    "ActualEndDate" : $('#ActualEndDate').val(),
+                    "isactive" : $('#isactive').prop('checked')
+                },
+                success:function(data){
+                    var message="",title="",icon="";
+            if(data.PopupMessage.client_flag==2){
+                message=data.PopupMessage.message;
+                title="Error";
+                icon="error";
+                
+            }
+            else{
+                message=data.PopupMessage.message;
+                title="Success";
+                icon="success";
+                
+            }
+            swal({  
+                        title:title,
+                        text:message,
+                        icon:icon,
+                        confirmButtonClass:"btn btn-confirm mt-2"
+                        }).then(function(){
+                            window.location.href = '/after_popup_project';
+                        });
+                //    alert("The Inserted/Upadated Id is "+data.PopupMessage.message);
+                //    window.location.href="/after_popup"; 
+                },
+                error:function(x){
+                    alert('error');
+                }
+            });
+    }
+    function ShowProjectInfo()
+    {
+        $('#headProject').text("Sub Project Details");
+        $('#btnProjectInfo').hide();
+        $('#btnBillingMetric').show();
+        $('#divProjectInfo').show();
+        $('#divBillingMetrics').hide();
+    }
+    function ShowProjectBillingMetrics()
+    {
+        $('#headProject').text("Billing Metrics");
+        $('#btnProjectInfo').show();
+        $('#btnBillingMetric').hide();
+        $('#divProjectInfo').hide();
+        $('#divBillingMetrics').show();
+        //LoadBillingMilestones();
+        //LoadUnitTypes();
+        LoadSubProjectMilestones();
+        //GetCentersBasedOnSubProjects();
+    }
+    function GetSubProjectCourseMilestone(divId,CourseId)
+    {
+        var URL=$('#hdn_web_url').val()+ "/GetSubProjectCourseMilestones"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:
+            {   
+                "course_id":CourseId,
+                "sub_project_id":$('#hdn_sub_project_id').val()
+            },
+            success: function (data){
+                if(data.MileStones != null)
+                {
+                    varMilestones= data.MileStones;
+                    var count=data.MileStones.length;
+                    if( count> 0)
+                    {
+                        $('#'+divId).empty();
+                        var varHtml='';
+                            
+                            varHtml+='<div class="row">';
+                            varHtml+='  <div class="col-lg-2" >';
+                            varHtml+='      Milestone:';                                               
+                            varHtml+='  </div>';
+                            varHtml+='  <div class="col-lg-2" >'; 
+                            varHtml+='      Unit Type:';
+                            varHtml+='  </div>';
+                            varHtml+='  <div class="col-lg-2" >';     
+                            varHtml+='      Target:';      
+                            varHtml+='  </div>';
+                            varHtml+='  <div class="col-lg-2" >';  
+                            varHtml+='      Is center wise rate:';                 
+                            varHtml+='  </div>';
+                            varHtml+= '</div>';
+                            varHtml+='</br>';
+                        for(var i=0;i<count;i++)                                {
+                            let id=CourseId+'_'+ data.MileStones[i].Milestone_Id;
+                            let val=data.MileStones[i].Milestone;
+                            
+                            varHtml+='<div class="row">';
+                            varHtml+='  <div class="col-lg-2" id="milestone-container-'+id+'">';
+                            varHtml+='      <input type="text" placeholder="" readonly class="form-control" id="billing_milestone_'+id+'" name="milestone['+id+'][billing_milestone]" value='+val+' data-value='+data.MileStones[i].Milestone_Id+' >';                                               
+                            varHtml+='  </div>';
+                            varHtml+='  <div class="col-lg-2" id="unit-type-container-'+id+'">'; 
+                            varHtml+='      <input type="text" placeholder="" readonly class="form-control" id="unit_type_'+id+'" name="milestone['+id+'][unit_type]" value='+data.MileStones[i].Unit_Type_Name+' data-value='+data.MileStones[i].Unit_Type_Id+' >';
+                            varHtml+='  </div>';
+                            varHtml+='  <div class="col-lg-2" id="target-container-'+id+'">';     
+                            varHtml+='      <input type="number" required class="form-control"  id="target_'+id+'"  name="milestone['+id+'][target]" placeholder="Enter Target Vale" min="1" required="" value='+data.MileStones[i].Target_Value+'>';      
+                            varHtml+='  </div>';
+                            varHtml+='  <div class="col-lg-2" id="is-center-wise-container-'+id+'">';
+                            varHtml+='      <input type="checkbox" name="milestone['+id+'][is_center_wise_rate]" id="is_center_wise_rate_'+id+'"  data-value='+id+' onclick="toggleCheckbox(event)">';  
+                            varHtml+='  </div>';
+                              
+                            varHtml+='  <div class="col-lg-2" id="link-container-'+id+'">';
+                            varHtml+='      <a onclick="ShowCentersUnitValue(\''+data.MileStones[i].Map_Sub_Project_Stage_Id+'\',\''+CourseId+'\')"  style="color:blue;cursor:pointer" >Centers</a>';  
+                            varHtml+='  </div>';        
+                            varHtml+='  <div class="col-lg-2" id="unit-value-container-'+id+'">'; 
+                            varHtml+='      <input type="number" placeholder="Enter Unit Value" step=".01" class="form-control"  id="unit_value_'+id+'" name="'+id+'" value="'+data.MileStones[i].Unit_Rate+'">';
+                            varHtml+='  </div>';                        
+                            varHtml+= '</div>';                            
+                            varHtml+='</br>';
+                            console.log(id);
+
+                            $('#'+divId).append(varHtml);
+                            if (data.MileStones[i].Map_Sub_Project_Stage_Id==0)
+                            {
+                                $('#link-container-'+id).hide();
+                                $('#unit-value-container-'+id).hide();
+                            }
+                            else if(parseInt(data.MileStones[i].Is_Center_Wise_Rate_Defined)==1  )
+                            {
+                                $('#link-container-'+id).show();
+                                $('#unit-value-container-'+id).hide();
+                            }
+                            else
+                            {
+                                $('#unit-value-container-'+id).show();
+                                $('#link-container-'+id).hide();
+                            } 
+                            varHtml='';
+                            if(parseInt(data.MileStones[i].Is_Center_Wise_Rate_Defined)==1)
+                                $('#is_center_wise_rate_'+id).prop("checked",true);
+                            else 
+                                $('#is_center_wise_rate_'+id).prop("checked",false);
+
+                        }
+                            varHtml+='       <div style="float: right;">';
+                            varHtml+='          <button class="btn btn-primary" type="submit" >Save</button>';
+                            varHtml+='       </div>';
+                            
+                            //onclick=""
+                        $('#'+divId).append(varHtml);                        
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error while fetching milestone data');
+                return false;
+            }
+        });
+        return false;
+    }
+    function LoadSubProjectMilestones()
+    {
+        var URL=$('#hdn_web_url').val()+ "/GetCoursesBasedOnSubProject"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:
+            {
+                "sub_project_id":$('#hdn_sub_project_id').val()
+            },
+            success: function (data){
+                if(data.Courses != null)
+                {
+                    $('#divCourseCards').empty();
+                    var count=data.Courses.length;
+                    if( count> 0)
+                    {                        
+                        for(var i=0;i<count;i++)
+                        {
+                            var varHtml='';
+                            let id=data.Courses[i].Course_Id;
+                            let val=data.Courses[i].Course_Name;
+                            varHtml+='<div class="card" id='+id+'>'; 
+                            varHtml+='     <div class="card-body">';
+                            varHtml+='        <div class="card-widgets">';
+                            //varHtml+='            <!-- <a href="javascript:;" data-toggle="reload"><i class="mdi mdi-refresh"></i></a> -->';
+                            varHtml+='            <a data-toggle="collapse" href="#cardCollpase_'+id+'" role="button" aria-expanded="false" aria-controls="cardCollpase_'+id+'"><i class="mdi mdi-minus"></i></a>';
+                            varHtml+='        </div>';
+                            varHtml+='       <h5 class="card-title mb-0">'+val+'</h5>';
+                            varHtml+='<form id="formSPCourse_'+id+'" name="formSPCourse" data-parsley-validate="" action="javascript:SaveSubProjectCourseMilestone(\'cardCollpase_'+id+'\',\''+id+'\')">';
+                            varHtml+='        <div id="cardCollpase_'+id+'" class="collapse pt-3 show"> ' ;                          
+                            varHtml+='        </div>';
+                            varHtml+='</form>';
+                            varHtml+='    </div>';
+                            varHtml+=' </div>';                    
+                            $('#divCourseCards').append(varHtml);
+                            GetSubProjectCourseMilestone('cardCollpase_'+id,id);
+                        }
+                        $("#ddlCourse :selected").each(function(){              
+                            let id=$(this).val();
+                            let val=$(this).text();
+                        });
+                    }
+                    else
+                    {
+                        alert('No courses are mapped to this sub project.');
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error while loading courses! Please try again');
+                return false;
+            }
+        });
+        return false;        
+    }
+    function SaveSubProjectCourseMilestone(DivId,CourseId)
+    {
+        var varJson='';
+        $('#'+DivId).children('div').each(function(){ 
+            let milestone_id=-1,unit_type_id=-1,target_value=-1,is_center_wise=-1,unit_rate=-1;            
+            $(this).children('div').each(function(){
+                let id=$(this).attr("id"); 
+                if(id!=undefined)
+                {
+                    id=id.toString();
+                    switch(id.substring(0, id.lastIndexOf("-") + 1))
+                    {
+                        case 'milestone-container-':
+                            milestone_id=$('#'+id).children('input').attr("data-value");
+                            break;
+                        case 'unit-type-container-':
+                            unit_type_id=$('#'+id).children('input').attr("data-value");
+                            break;
+                        case 'target-container-':
+                            target_value=$('#'+id).children('input').val();
+                            break;
+                        case 'is-center-wise-container-':
+                       
+                            if($('#'+id).children('input').is(":checked"))
+                                is_center_wise=1;
+                            else
+                                is_center_wise=0;
+                            break;
+                        case 'unit-value-container-':
+                            unit_rate=$('#'+id).children('input').val();
+                            break;
+                    } 
+                }
+            });
+            if(milestone_id!=-1 & unit_type_id!=-1 & target_value!=-1 & is_center_wise!=-1 & unit_rate!=-1)
+                varJson+='{"course_id":'+CourseId+',"milestone_id":'+milestone_id+' ,"unit_type_id":'+unit_type_id+' ,"target_value" :'+target_value+' ,"is_center_wise" :'+is_center_wise+',"unit_rate" :'+unit_rate+'},';
+        });
+        varJson='[ ' + varJson.substring(0, varJson.length - 1) + ' ]';
+
+        console.log(varJson);
+        var URL=$('#hdn_web_url').val()+ "/SaveSubProjectCourseMilestones"
+        $.ajax({
+            type:"POST",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:
+                {       
+                    "JsonString":varJson,
+                    "sub_project_id":$('#hdn_sub_project_id').val(),
+                    "user_id": $('#hdn_home_user_id').val()
+                },
+            success: function (data){
+                swal({   title:data.PopupMessage,
+                            text:data.PopupMessage ,
+                            icon:"success",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                GetSubProjectCourseMilestone(DivId,CourseId);
+                            }
+                            );
+            },
+            error:function(err)
+            {
+                alert('Error while saving the data.');
+                return false;
+            }
+        });
+    }
+    function GetCentersBasedOnSubProjects()
+    {
+        var URL=$('#hdn_web_url').val()+ "/GetCentersbasedOnSubProject"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:
+            {
+                "sub_project_id":$('#hdn_sub_project_id').val()
+            },
+            success: function (data){
+                if(data.Centers != null)
+                {
+                    var count=data.Centers.length;
+                    Centers=data.Centers;
+                    console.log(Centers);
+                }
+            },
+            error:function(err)
+            {
+                alert('Error while loading Centers! Please try again');
+                return false;
+            }
+        });
+        return false; 
+    }
+    function ShowCentersUnitValue(TablePrimaryKeyId)
+    {
+        $('#hdn_primary_key_id').val(TablePrimaryKeyId);        
+        var URL=$('#hdn_web_url').val()+ "/GetSubProjectCourseCenterUnitRates"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:
+            {
+                "sub_project_id":$('#hdn_sub_project_id').val(),
+                "primary_key":TablePrimaryKeyId
+            },
+            success: function (data){
+                if(data.Centers != null)
+                {
+                    var varHtml='';
+                    let count=data.Centers.length;
+                    if (count>0)
+                    {   
+                        $('#divBody').empty();
+                        for(var i=0;i<count;i++)
+                        {
+                            let id=data.Centers[i].Center_Id;
+                            let val=data.Centers[i].Center_Name;
+                            varHtml+='<div class="row">';
+                            varHtml+='  <div class="col-lg-6" id="center-container-'+id+'">';
+                            varHtml+='      <input type="text" placeholder="" readonly class="form-control" id="'+id+'"  value="'+val+'" data-value='+id+' >';                                               
+                            varHtml+='  </div>';
+                            varHtml+='  <div class="col-lg-4" id="unit-value-container-'+id+'">'; 
+                            varHtml+='      <input type="number" placeholder="Enter Unit Value" step=".01" required class="form-control" min="1" id="unit_value_'+id+'" name="'+id+'" value="'+data.Centers[i].Unit_Rate+'">';
+                            varHtml+='  </div>';
+                            varHtml+='</div>';
+                            varHtml+='</br>';
+                        }
+                    }
+                    $('#divBody').append(varHtml);
+                    $('#mdl_Centes').modal('show');
+                }
+            },
+            error:function(err)
+            {
+                alert('Error while loading Centers! Please try again');
+                return false;
+            }
+        });
+        return false; 
+    }
+    function SaveSubProjectCenterUnitValues()
+    {
+        console.log(JSON.stringify($('#formCenterUnitValue').serializeObject()));
+        var URL=$('#hdn_web_url').val()+ "/SaveSubProjectCourseCenterUnitPrice"
+        $.ajax({
+            type:"POST",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:
+                {       
+                    "JsonString":JSON.stringify($('#formCenterUnitValue').serializeObject()),
+                    "primary_key_id":$('#hdn_primary_key_id').val(),
+                    "user_id": $('#hdn_home_user_id').val()
+                },
+            success: function (data){
+                swal({   title:data.PopupMessage,
+                            text:data.PopupMessage ,
+                            icon:"success",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                
+                                ShowProjectBillingMetrics();
+                                $('#mdl_Centes').modal('hide');
+                            }
+                            );
+            },
+            error:function(err)
+            {
+                alert('Error while saving the data.');
+                return false;
+            }
+        });
+    }
+    function toggleCheckbox(e)
+    {
+        let id = e.currentTarget.getAttribute('data-value');
+        console.log(e.currentTarget.getAttribute('id'));
+        if($('#'+e.currentTarget.getAttribute('id')).is(':checked'))
+        {
+            $('#link-container-'+id).show();
+            $('#unit-value-container-'+id).hide();
+        }
+        else
+        {
+            $('#link-container-'+id).hide();
+            $('#unit-value-container-'+id).show();
+        }
+    }
+
+</script>
                 <div class="container-fluid">
-                    <form  action="javascript:add_popup_message();">
+                    <input type="hidden" id="hdn_sub_project_id" name="hdn_sub_project_id" value="0">
                     <!-- start page title -->
                     <div class="row">
                         <div class="col-12">
                             <div class="page-title-box">
                                 <div class="page-title-right">
                                     <ol class="breadcrumb m-0">
-                                        <li class="breadcrumb-item"><a href="javascript: void(0);">LN</a></li>
+                                        <li class="breadcrumb-item"><a href="javascript: void(0);">NEO</a></li>
                                         <li class="breadcrumb-item"><a href="/project">Project</a></li>
                                         <li class="breadcrumb-item active">Add-Edit Sub Project</li>
                                     </ol>
                                 </div>
-                                <h4 class="page-title">Sub Project Details</h4>
+                                <!-- <h4 class="page-title">Sub Project Details</h4> -->
                             </div>
                         </div>
                     </div>     
                     <!-- end page title --> 
-    
-                    <div class="row">
+                    <div class="row" id="divBtns" style="display: none;">
+                        <div class="col-12">
+                            <div class="card-box">  
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h4 class="header-title" id="headProject"></h4>  
+                                    </div>                                   
+                                    <div class="col-md-6" style="text-align: right;">                                                               
+                                        <button type="button" class="btn btn-info btn-rounded" style="display: none;" id="btnProjectInfo" onclick="ShowProjectInfo();">Sub Project Info</button>
+                                        <button type="button" class="btn btn-success btn-rounded" style="display: none;" id="btnBillingMetric" onclick="ShowProjectBillingMetrics();">Billing Metrics</button>
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <form  action="javascript:add_popup_message();">
+                    <div class="row" id="divProjectInfo">
+                        
                         <div class="col-12">
                             <div class="card-box">
-                                <h4 class="header-title">Sub Project Details</h4>
+                                <!-- <h4 class="header-title">Sub Project Details</h4> -->
                                 <br/>
                                 <div class="alert alert-warning d-none fade show">
                                     <h4>Oh snap!</h4>
@@ -425,16 +853,69 @@
                                     <div class="form-group mb-0">
                                         <button class="btn btn-primary" type="submit">Save</button>
                                     </div>
-    
+                                    
                                 </form>
                             </div> <!-- end card-box-->
                         </div> <!-- end col-->
+                        
+                    </div>
+                    </form>
+                    <div class="row" id="divBillingMetrics" >
+                        <div class="col-lg-12" id="divCourseCards">
+                            
+                            <!-- <div class="card-box">
+                                
+                                <h4 class="header-title">Billing Metrics</h4>
+                                <br/>
+                                <form id="formBillingMetrics" data-parsley-validate="">
+                                    <div class="form-group">
+                                        <div class="row">
+                                           
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-2" id="milestone-container" >                                                   
+                                            </div>
+                                            <div class="col-lg-2" id="unit-type-container" >
+                                            </div>
+                                            <div class="col-lg-2" id="rr-unitrate-container" >
+                                            </div>
+                                            <div class="col-lg-2" id="target-value-container" >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div> -->
+                        </div>
                     </div>
                     <!-- end row-->
     
-                </form>
                 
                 </div> <!-- end container -->
+    
+                <div id="mdl_Centes" class="modal fade" role="dialog">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content ">
+                            <form id="formCenterUnitValue" name="formCenterUnitValue" data-parsley-validate="" action="javascript:SaveSubProjectCenterUnitValues()">	
+                                <input type="hidden" id="hdn_primary_key_id" name="" value="0">
+                            <div class="modal-header">
+                                <h4 class="modal-title" >Centers</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            </div>                    
+                            <div class="modal-body" id="divBody">                                
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary waves-effect" > Save</button>
+                                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+                                <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+        
+                </div><!--/.modal-->
         <script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>
         <script src="static/assets/libs/jquery-knob/jquery.knob.min.js"></script>
         <script src="static/assets/libs/jquery-sparkline/jquery.sparkline.min.js"></script>
