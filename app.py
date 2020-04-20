@@ -5022,6 +5022,7 @@ class submit_candidate_updated(Resource):
 #Base URL + "/submit_candidate_updated" api will provide all the unzynched QP data as response
 api.add_resource(submit_candidate_updated, '/submit_candidate_updated')
 
+
 class GetContractProjectTargets(Resource):
     @staticmethod
     def get():
@@ -5033,6 +5034,30 @@ class GetContractProjectTargets(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(GetContractProjectTargets,'/GetContractProjectTargets')
+
+class get_batch_list_updated(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            client_id = str(request.args['client_id'])
+            client_key = str(request.args['client_key'])
+            
+            user_id = int(request.args['user_id'])
+            
+            
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+
+                out = Database.get_batch_list_updated(user_id)
+                return jsonify(out)
+                
+            else:
+                res = {'success': False, 'description': "client name and password not matching"}
+                return jsonify(res)
+
+#Base URL + "/get_candidate_list" api will provide all the unzynched QP data as response
+api.add_resource(get_batch_list_updated, '/get_batch_list_updated')
+
+
 
 if __name__ == '__main__':    
     app.run(debug=True)
