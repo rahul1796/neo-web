@@ -53,13 +53,16 @@ class MsSql:
             query = "SELECT * FROM {};".format(table)
             for df in pd.read_sql(query, self.conn, chunksize=100 ** 4):
                 if 'EndTime' in df.columns:
-                    df = df.drop('EndTime', 1)
                     df = df.drop('StartTime', 1)
+                    df = df.drop('EndTime', 1)
+                    df = df.fillna("null")
                     #df = df.astype({"EndTime": str})
                 dict_data = df.reset_index().to_dict(orient='records')
                 data.append(dict_data)
             if not len(data):
                 column_dict = {column_name[i]: "" for i in range(0, len(column_name))}
+                column_dict.pop('StartTime', None)
+                column_dict.pop('EndTime', None)
                 data.append(column_dict)
             response = data
         except Exception as error:
