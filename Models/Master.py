@@ -203,3 +203,5 @@ class Master:
         return Database.SaveSubProjectCourseCenterUnitPrice(json_string,primary_key_id,user_id)
     def GetSubProjectCourseCenterUnitRates(sub_project_id,primary_key):
         return Database.GetSubProjectCourseCenterUnitRates(sub_project_id,primary_key)
+    def GetContractProjectTargets(contact_id):
+        return Database.GetContractProjectTargets(contact_id)
