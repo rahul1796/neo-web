@@ -38,8 +38,8 @@ class PostgreSql:
         try:
             data = []
             query = "SELECT * FROM {};".format(table)
-            for df in pd.read_sql(query, self.conn, chunksize=100 ** 4):
-                df = df.fillna('Na')
+            for df in pd.read_sql(query, self.conn, chunksize=100 ** 2):
+                df = df.fillna('null')
                 dict_data = df.reset_index().to_dict(orient='records')
                 data.append(dict_data)
             response = data
