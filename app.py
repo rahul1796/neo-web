@@ -5022,6 +5022,19 @@ class submit_candidate_updated(Resource):
 #Base URL + "/submit_candidate_updated" api will provide all the unzynched QP data as response
 api.add_resource(submit_candidate_updated, '/submit_candidate_updated')
 
+
+class GetContractProjectTargets(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                contact_id=request.args.get('ContractId',0,type=int)
+                response = {"Targets":Master.GetContractProjectTargets(contact_id)}
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetContractProjectTargets,'/GetContractProjectTargets')
+
 class get_batch_list_updated(Resource):
     @staticmethod
     def get():
@@ -5043,6 +5056,7 @@ class get_batch_list_updated(Resource):
 
 #Base URL + "/get_candidate_list" api will provide all the unzynched QP data as response
 api.add_resource(get_batch_list_updated, '/get_batch_list_updated')
+
 
 
 if __name__ == '__main__':    

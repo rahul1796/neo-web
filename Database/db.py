@@ -4,6 +4,7 @@ from .config import *
 #from Database import config
 import pandas as pd
 from datetime import datetime
+from flask import request
 import requests
 import xml.etree.ElementTree as ET
 
@@ -4380,3 +4381,19 @@ SELECT					cb.name as candidate_name,
         out = {'success': True, 'description': "Success", "batches":response}
         return out
 
+    def GetContractProjectTargets(contact_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec  [masters].[sp_get_contract_project_target_values]  ?'
+        values = (contact_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
