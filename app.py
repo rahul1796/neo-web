@@ -5060,6 +5060,6 @@ api.add_resource(get_batch_list_updated, '/get_batch_list_updated')
 
 
 if __name__ == '__main__':    
-    app.run(debug=True)
+    app.run()
 
-#app.run(debug=True)
+#app.run(debug=True)  debug=True

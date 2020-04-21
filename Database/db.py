@@ -4190,6 +4190,12 @@ SELECT					cb.name as candidate_name,
             return out
         
         try:
+            '''
+            insert into candidate_details.tbl_candidate_interventions
+            (candidate_id,intervention_category,created_on,created_by,is_active)
+            OUTPUT inserted.candidate_id
+            values
+            '''
             quer1 = '''
             insert into candidate_details.tbl_candidates
             (isFresher, salutation, first_name, middle_name, last_name, date_of_birth, isDob, age,primary_contact_no, secondary_contact_no, email_id, gender,marital_status, caste, disability_status, religion, source_of_information, present_pincode,present_district, permanent_district,permanent_pincode,candidate_stage_id, candidate_status_id, created_on, created_by, is_active, insert_from,permanent_state,permanent_country,present_state, present_country)
@@ -4304,21 +4310,46 @@ SELECT					cb.name as candidate_name,
             quer3='''
             update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set present_address_line2='{}',present_village='{}',present_panchayat='{}',present_taluk_block='{}',permanent_address_line2='{}',permanent_village='{}',permanent_panchayat='{}',permanent_taluk_block='{}',name_of_institute='{}',university='{}',year_of_pass='{}',percentage='{}',family_date_of_birth='{}',family_age='{}',family_primary_contact='{}',family_email_address='{}',branch_name='{}',branch_code='{}',account_type='{}',attachment_image_name='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
             '''
+            quer4='''
+            insert into candidate_details.tbl_candidate_interventions
+            (candidate_id,intervention_category,created_on,created_by,is_active)
+            OUTPUT inserted.candidate_intervention_id
+            values
+            '''
 
+            quer5='''
+            insert into candidate_details.tbl_map_candidate_intervention_skilling
+            (intervention_id, course_id, batch_id, intervention_value, created_on,created_by,is_active)
+            values
+            '''
             url = candidate_xml_weburl + xml
             r = requests.get(url)
             data = r.text
             root = ET.fromstring(data)
             query = ""
+            out=[]
             for child in root:
                 data = child.attrib
+                out.append(data['assign_batch'])
                 query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,data['cand_id'])
                 query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['presAddrOne'],data['permAddrOne'],data['highQuali'],data['candStream'],data['compKnow'],data['techKnow'],data['memberSal'],data['memberName'],data['memberGender'],data['memberQuali'],data['memberRelation'],data['memberOccuptn'],data['houseIncome'],data['bankName'],data['accNum'],user_id,data['cand_id'])
                 query += '\n' + quer3.format(data['presAddrTwo'],data['presVillage'],data['presPanchayat'],data['presTaluk'],data['permAddrTwo'],data['permVillage'],data['permPanchayat'],data['permTaluk'],data['instiName'],data['university'],data['yrPass'],data['percentage'],data['memberDob'],data['memberAge'],data['memberContact'],data['memberEmail'],data['branchName'],data['ifscCode'],data['accType'],data['bankCopy'],user_id,data['cand_id'])
 
+                quer = "({},'SAE',GETDATE(),{},1),".format(data['cand_id'],user_id)
+                quer4 += '\n'+quer
             curs.execute(query)
             curs.commit()
 
+            quer4 = quer4[:-1]+';'
+            curs.execute(quer4)
+            d = list(map(lambda x:x[0],curs.fetchall()))
+            curs.commit()
+            for i in range(len(d)):
+                quer5 += '\n' + "({},(select course_id from batches.tbl_batches where batch_id={}),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],out[i],out[i],user_id)
+            quer5 = quer5[:-1]+';'
+            curs.execute(quer5)
+            curs.commit()
+            
             out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
         except Exception as e:
             out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
@@ -4331,9 +4362,9 @@ SELECT					cb.name as candidate_name,
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
         quer = """
-        SELECT	distinct b.batch_id, b.batch_name, batch_code FROM [masters].[tbl_map_sub_project_user] as mspb inner join	batches.tbl_batches as b on b.sub_project_id=mspb.sub_project_id where mspb.user_id={}
+        SELECT	distinct b.batch_id, b.batch_name, batch_code FROM [masters].[tbl_map_sub_project_user] as mspb inner join	batches.tbl_batches as b on b.sub_project_id=mspb.sub_project_id where mspb.user_id={} and CONVERT(DATE, GETDATE(), 102) <= b.actual_end_date
         UNION
-        SELECT	distinct b.batch_id, b.batch_name, batch_code FROM [masters].[tbl_map_sub_project_user] as mspb inner join	batches.tbl_batches as b on b.co_funding_project_id=mspb.sub_project_id where mspb.user_id={}
+        SELECT	distinct b.batch_id, b.batch_name, batch_code FROM [masters].[tbl_map_sub_project_user] as mspb inner join	batches.tbl_batches as b on b.co_funding_project_id=mspb.sub_project_id where mspb.user_id={} and CONVERT(DATE, GETDATE(), 102) <= b.actual_end_date
         """.format(user_id,user_id)
         
         curs.execute(quer)
