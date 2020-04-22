@@ -56,7 +56,9 @@ class MsSql:
                     df = df.drop('StartTime', 1)
                     df = df.drop('EndTime', 1)
                     df = df.fillna("null")
-                    #df = df.astype({"EndTime": str})
+                    if table in config.REPLACE_EMPTY_STRING_TABLES:
+                        df = df.replace("", "null")
+                    
                 dict_data = df.reset_index().to_dict(orient='records')
                 data.append(dict_data)
             if not len(data):
