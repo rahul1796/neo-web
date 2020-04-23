@@ -173,7 +173,7 @@ var Candidates = {};
         }
 
         function LoadCourseList(needed,CenterId)
-        {
+        {console.log(CenterId);
             var URL=$('#hdn_web_url').val()+ "/All_Course_basedon_center"
             $.ajax({
                 type:"GET",
@@ -219,7 +219,7 @@ var Candidates = {};
             return false;
         }
         function LoadsubProject(needed,CenterId,CourseId)
-        {
+        {console.log(CenterId,CourseId);
             var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForCenter_Course"
             
             $.ajax({
@@ -701,7 +701,7 @@ var Candidates = {};
                                 <label for="CenterId">Center*:</label>
                             </div>
                             <div class="col-lg-6">
-                                <select id="ddlCenter" class="form-control dropdown-search-filter"  onchange="LoadCourseList('0')" name="CenterId" ClientIdMode="static" required=""> <!-- myfunction(this.value) -->>
+                                <select id="ddlCenter" class="form-control dropdown-search-filter"  onchange="LoadCourseList('0',this.value)" name="CenterId" ClientIdMode="static" required=""> <!-- myfunction(this.value) -->>
                                     <option value="">Center</option>
                                 </select>
                             </div> 
@@ -713,7 +713,7 @@ var Candidates = {};
                                 <label for="CourseId">Course*:</label>
                             </div>
                             <div class="col-lg-6">
-                                <select id="ddlCourse" class="form-control dropdown-search-filter" name="CourseId" onchange="LoadsubProject('0')" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                <select id="ddlCourse" class="form-control dropdown-search-filter" name="CourseId" onchange="LoadsubProject('0',$('#ddlCenter').val(),this.value)" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
                                     <option value="">Choose Course</option>
                                 </select>
                             </div>
