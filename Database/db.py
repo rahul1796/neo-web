@@ -4,7 +4,7 @@ from .config import *
 #from Database import config
 import pandas as pd
 from datetime import datetime
-from flask import request
+import requests 
 import xml.etree.ElementTree as ET
 
 def to_xml(df, filename=None, mode='w'):
