@@ -4381,13 +4381,13 @@ SELECT					cb.name as candidate_name,
         out = {'success': True, 'description': "Success", "batches":response}
         return out
 
-    def GetContractProjectTargets(contact_id):
+    def GetContractProjectTargets(contact_id,user_id,user_role_id,region_id):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec  [masters].[sp_get_contract_project_target_values]  ?'
-        values = (contact_id,)
+        sql = 'exec  [masters].[sp_get_contract_project_target_values]  ?,?,?,?'
+        values = (contact_id,user_id,user_role_id,region_id)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -4395,5 +4395,29 @@ SELECT					cb.name as candidate_name,
                 h[columns[i]]=row[i]           
             response.append(h.copy())
         cur2.close()
+        con.close()
+        return response
+
+    def sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project):
+        response = {}
+        d = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_sub_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
+        values = (user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,entity,customer,p_group,block,practice,bu,product,status,project)
+        print(values)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
+        response = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
         con.close()
         return response
