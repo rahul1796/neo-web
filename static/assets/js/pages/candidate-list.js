@@ -373,12 +373,7 @@ function LoadTable()
                     return varButtons;
                 }
             },
-            {       "visible":false, 
-                "data": function (row, type, val, meta) {
-                    var varButtons='<a onclick="CandidateFamilyDetails(\'' + row.Highest_Qualification+ '\',\'' + row.Stream_Specialization+ '\',\'' + row.Technical_Knowledge+ '\',\'' + row.Computer_Knowledge+ '\',\'' + row.Name_Of_Institute+ '\',\'' + row.University+ '\',\'' + row.Year_Of_Pass+ '\',\'' + row.Percentage+ '\',\'' + row.Employment_Type+ '\',\'' + row.Preferred_Job_Role+ '\',\'' + row.Relevant_Years_Of_Experience+ '\',\'' + row.Current_Last_Ctc+ '\',\'' + row.Preferred_Location+ '\',\'' + row.Willing_To_Travel+ '\',\'' + row.Willing_To_Work_In_Shifts+ '\',\'' + row.Expected_Ctc+ '\')"  style="color:blue;cursor:pointer" >Click Here</a>';
-                    return varButtons;
-                }
-            },
+            
             {      
                 "data": function (row, type, val, meta) {
                     var varButtons='<a onclick="CandidateIDDetails(\'' + row.Aadhar_No+ '\',\'' + row.Identifier_Type+ '\',\'' + row.Identity_Numbe+ '\')"  style="color:blue;cursor:pointer" >Click Here</a>';
@@ -394,47 +389,7 @@ function LoadTable()
 
     });
 }
-function EditCandidateDetail(CandidateId)
-{
-    $('#hdn_candidate_id').val(CandidateId);
-    $('#form1').submit();
-    
-}
-function LoadCourseddl()
-{
-    //alert("course_section");
-    var URL=$('#hdn_web_url').val()+ "/AllCourseList"
-    $.ajax({
-        type:"GET",
-        url:URL,
-        async:false,
-        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-        datatype:"json",
-        success: function (data){
-            if(data.Courses != null)
-            {
-                $('#ddlCourse').empty();
-                var count=data.Courses.length;
-                if( count> 0)
-                {
-                    $('#ddlCourse').append(new Option('Choose Course','-1'));
-                    for(var i=0;i<count;i++)
-                        $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
-                }
-                else
-                {
-                    $('#ddlCourse').append(new Option('Choose Course','-1'));
-                }
-            }
-        },
-        error:function(err)
-        {
-            alert('Error! Please try again');
-            return false;
-        }
-    });
-    return false;
-}
+
 
 function LoadTableBasedOnSearch(){
     
