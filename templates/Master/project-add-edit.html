@@ -614,6 +614,7 @@
     {
         let id=$('#ddlBillingMilestones').val();
         let val=$('#ddlBillingMilestones :selected').text();
+        console.log(val);
         if (id=='')
         {
             alert('Please select a value');
@@ -624,7 +625,7 @@
         varHtml+='<div class="form-group" id="div_milestone_'+id+'">';
         varHtml+='<div class="row">';
         varHtml+='  <div class="col-lg-2" id="milestone-container-'+id+'">';
-        varHtml+='      <input type="text" placeholder="" readonly class="form-control" id="billing_milestone_'+id+'" name="milestone['+id+'][billing_milestone]" value='+val+' data-value='+id+' >';                                               
+        varHtml+='      <input type="text" placeholder="" readonly class="form-control" id="billing_milestone_'+id+'" name="milestone['+id+'][billing_milestone]" value="'+val+'" data-value='+id+' >';                                               
         varHtml+='  </div>';
         varHtml+='  <div class="col-lg-2" id="unit-type-container-'+id+'">'; 
         varHtml+='      <select class="form-control" required="" id="unit_type_'+id+'" name="milestone['+id+'][unit_type]"></select>';                           
@@ -738,7 +739,7 @@
                             varHtml+='<div class="form-group" id="div_milestone_'+id+'">';
                             varHtml+='<div class="row">';
                             varHtml+='  <div class="col-lg-2" id="milestone-container-'+id+'">';
-                            varHtml+='      <input type="text" placeholder="" readonly class="form-control" id="billing_milestone_'+id+'" name="milestone['+id+'][billing_milestone]" value='+val+' data-value='+id+' >';                                               
+                            varHtml+='      <input type="text" placeholder="" readonly class="form-control" id="billing_milestone_'+id+'" name="milestone['+id+'][billing_milestone]" value="'+val+'" data-value='+id+' >';                                               
                             varHtml+='  </div>';
                             varHtml+='  <div class="col-lg-2" id="unit-type-container-'+id+'">'; 
                             varHtml+='      <select class="form-control" required="" id="unit_type_'+id+'" name="milestone['+id+'][unit_type]"></select>';                           

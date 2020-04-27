@@ -56,6 +56,11 @@ function LoadCustomerdl(){
                     for(var i=0;i<count;i++)
                         $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
                     //$('#ddlCourse').val('-1');
+                    if(CustomerId!='0')
+                    {
+                        $('#ddlCustomer').val(CustomerId);
+                        LoadProject();
+                    }
                 }
                 else
                 {
@@ -224,8 +229,7 @@ function LoadProductdl(){
                 {
                     
                     for(var i=0;i<count;i++)
-                        $('#ddlProduct').append(new Option(data.Product[i].Product_Name,data.Product[i].Product_Id));
-                        
+                        $('#ddlProduct').append(new Option(data.Product[i].Product_Name,data.Product[i].Product_Id));                    
                 }	
                 else  		
                 {
@@ -242,6 +246,48 @@ function LoadProductdl(){
     return false;
 }
 
+function LoadProject(){
+    var URL=$('#hdn_web_url').val()+ "/GetALLProject_multiple"  //"/GetALLProject_multiple"
+    $.ajax({
+        type:"POST",
+        url:URL,
+        async:false,
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "ClientId":$('#ddlCustomer').val().toString(),
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
+        },
+        success: function (data){
+            if(data.Projects != null)
+            {
+                $('#ddlProject').empty();
+                var count=data.Projects.length;
+                if( count> 0)
+                {
+                    //$('#ddlProject').append(new Option('ALL','-1'));  , 
+                    for(var i=0;i<count;i++)
+                        $('#ddlProject').append(new Option(data.Projects[i].Project_Name,data.Projects[i].Project_Id));
+                    if(ProjectId!='0') 
+                        $('#ddlProject').val(ProjectId);
+                }
+                else
+                {
+                   // $('#ddlProject').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(request, err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
+
 function LoadTable()
 {
     vartable1 = $("#tbl_projects").DataTable({
@@ -250,12 +296,12 @@ function LoadTable()
         "paging": true,
         "pageLength": 10,
         "sPaginationType": "full_numbers",
-        "scrollX": false,
+        "scrollX": true,
         "destroy": true,
         "processing": true,
         "language": { "processing": 'Loading..!' },
         "ajax": {
-            "url": $('#hdn_web_url').val()+ "/project_list",
+            "url": $('#hdn_web_url').val()+ "/sub_project_list",
             "type": "POST",
             "dataType": "json",
             "data": function (d) {
@@ -267,7 +313,7 @@ function LoadTable()
                 d.bu        = $('#ddlBU').val().toString();
                 d.product   = $('#ddlProduct').val().toString();
                 d.status    = $('#ddlStatus').val().toString();
-                
+                d.project   =$('#ddlProject').val().toString();
                 d.user_id =$('#hdn_home_user_id').val();
                 d.user_role_id = $('#hdn_home_user_role_id').val();
                 d.user_region_id=$('#hdn_user_region_id').val();
@@ -280,14 +326,10 @@ function LoadTable()
         "columns": [
             { "data": "S_No"},
             {"visible": ($('#hdn_home_user_role_id').val()=='1'||$('#hdn_home_user_role_id').val()=='15')?true:false,
-            // function (){
-            //     if($('#hdn_home_user_role_id').val()=='1')
-            //         return true;
-            //     else return false;
-            // },
+            
              "data": function (row, type, val, meta) {
                 var varButtons = ""; 
-                varButtons += '<a onclick="EditProjectDetail(\'' + row.Project_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Project" class="fas fa-edit" ></i></a>';
+                varButtons += '<a onclick="EditsubProjectDetail(\'' + row.Sub_Project_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Sub Project" class="fas fa-edit" ></i></a>';
                 return varButtons;
                 }
             },
@@ -306,20 +348,11 @@ function LoadTable()
                     return varButtons;
                     }
             },
-            {
-                "data": function (row, type, val, meta) {
-                    var varButtons = ""; 
-                    if(row.Project_Code=="")
-                        varButtons=row.Project_Code;
-                    else
-                    {
-                        varButtons += '<a onclick="GetSub_project(\'' + row.Project_Id + '\',\'' + row.Customer_Id + '\')"  style="color:blue;cursor:pointer" >' + row.Project_Code + '</a>';
-                    }
-                    
-                    return varButtons;
-                    }
-            },
+            
+            { "data": "Project_Code"},
             { "data": "Project_Name"},
+            { "data": "Sub_Project_Code"},
+            { "data": "Sub_Project_Name"},
             { "visible":true,
             "data": function (row, type, val, meta) {
                 var varButtons = ""; 
@@ -327,7 +360,7 @@ function LoadTable()
                     varButtons=row.Center_Count;
                 else
                 {
-                    varButtons += '<a onclick="GetCenters(\'' + row.Project_Id + '\',\''+row.Project_Name+ '\')"  style="color:blue;cursor:pointer" >' + row.Center_Count + '</a>';
+                    varButtons += '<a onclick="GetCenters(\'' + row.Sub_Project_Id + '\',\''+row.Sub_Project_Name+ '\')"  style="color:blue;cursor:pointer" >' + row.Center_Count + '</a>';
                 }
                 
                 return varButtons;
@@ -340,7 +373,7 @@ function LoadTable()
                     varButtons=row.Course_Count;
                 else
                 {
-                    varButtons += '<a onclick="GetCourses(\'' + row.Project_Id + '\',\''+row.Project_Name+ '\')"  style="color:blue;cursor:pointer" >' + row.Course_Count + '</a>';
+                    varButtons += '<a onclick="GetCourses(\'' + row.Sub_Project_Id + '\',\''+row.Sub_Project_Name+ '\')"  style="color:blue;cursor:pointer" >' + row.Course_Count + '</a>';
                 }
                 
                 return varButtons;
@@ -426,12 +459,7 @@ function GetCustomerList(Customer_Id){
     return false;
     
 } 
-function GetSub_project(Project_Id,CustomerId)
-{
-    let url="/sub_project?project_id="+Project_Id+"&customer_id="+CustomerId;
-    location.href=url;
-}
-function GetSub_project1(Project_Id){
+function GetSub_project(Project_Id){
     //alert(Project_Id)
     var URL=$('#hdn_web_url').val()+ "/Getsubprojectbyproject?Project_Id="+Project_Id;
     $.ajax({
@@ -459,7 +487,6 @@ function GetSub_project1(Project_Id){
                         {
                             varHtml+='<tr>';
                             varHtml+='  <td style="text-align:center;">'+ data.sub_project[i].S_No +'</td>';
-                            console.log(data.sub_project[i].Sub_Project_Id)
                             if($('#hdn_home_user_role_id').val()=='1' || $('#hdn_home_user_role_id').val()=='15')
                                 varButton='<a onclick="EditsubProjectDetail(\'' + data.sub_project[i].Sub_Project_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Project" class="fas fa-edit" ></i></a>';
                             varHtml+='  <td style="text-align:center;">'+ varButton +'</td>';
@@ -501,12 +528,12 @@ function GetSub_project1(Project_Id){
 function EditsubProjectDetail(SubProjectId)
 {
     $('#hdn_subproject_id').val(SubProjectId);
-    $('#form2').submit();
+    $('#form1').submit();
 }
-function GetCourses(ProjectId,ProjectName)
+function GetCourses(SubProjectId,SubProjectName)
 {
-    $('#HdCourse').text(ProjectName);
-    var URL=$('#hdn_web_url').val()+ "/GetCoursesForProject?project_id="+ProjectId;
+    $('#HdCourse').text(SubProjectName);
+    var URL=$('#hdn_web_url').val()+ "/GetCoursesBasedOnSubProject?sub_project_id="+SubProjectId;
     $.ajax({
         type:"GET",
         url:URL,
@@ -523,7 +550,6 @@ function GetCourses(ProjectId,ProjectName)
                     count=data.Courses.length;
                     if (count>0)
                     {   varHtml='';
-                        console.log(count);
                         for(var i=0;i<count;i++)
                         {
                             td_open= '  <td style="text-align:center;">' ;
@@ -566,10 +592,10 @@ function GetCourses(ProjectId,ProjectName)
     return false;
 }
 
-function GetCenters(ProjectId,ProjectName)
+function GetCenters(SubProjectId,SubProjectName)
 {
-    $('#headerCenter').text(ProjectName);
-    var URL=$('#hdn_web_url').val()+ "/GetCentersForProject?project_id="+ProjectId;
+    $('#headerCenter').text(SubProjectName);
+    var URL=$('#hdn_web_url').val()+ "/GetCentersbasedOnSubProject?sub_project_id="+SubProjectId;
     $.ajax({
         type:"GET",
         url:URL,
@@ -586,7 +612,6 @@ function GetCenters(ProjectId,ProjectName)
                     count=data.Centers.length;
                     if (count>0)
                     {   varHtml='';
-                        console.log(count);
                         for(var i=0;i<count;i++)
                         {
                             td_open= '  <td style="text-align:center;">' ;

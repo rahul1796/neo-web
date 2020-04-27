@@ -359,13 +359,13 @@ var Centers;
                             
                             varHtml+='<div class="row">';
                             varHtml+='  <div class="col-lg-2" id="milestone-container-'+id+'">';
-                            varHtml+='      <input type="text" placeholder="" readonly class="form-control" id="billing_milestone_'+id+'" name="milestone['+id+'][billing_milestone]" value='+val+' data-value='+data.MileStones[i].Milestone_Id+' >';                                               
+                            varHtml+='      <input type="text" placeholder="" readonly class="form-control" id="billing_milestone_'+id+'" name="milestone['+id+'][billing_milestone]" value="'+val+'" data-value='+data.MileStones[i].Milestone_Id+' >';                                               
                             varHtml+='  </div>';
                             varHtml+='  <div class="col-lg-2" id="unit-type-container-'+id+'">'; 
-                            varHtml+='      <input type="text" placeholder="" readonly class="form-control" id="unit_type_'+id+'" name="milestone['+id+'][unit_type]" value='+data.MileStones[i].Unit_Type_Name+' data-value='+data.MileStones[i].Unit_Type_Id+' >';
+                            varHtml+='      <input type="text" placeholder="" readonly class="form-control" id="unit_type_'+id+'" name="milestone['+id+'][unit_type]" value="'+data.MileStones[i].Unit_Type_Name+'" data-value='+data.MileStones[i].Unit_Type_Id+' >';
                             varHtml+='  </div>';
                             varHtml+='  <div class="col-lg-2" id="target-container-'+id+'">';     
-                            varHtml+='      <input type="number" required class="form-control"  id="target_'+id+'"  name="milestone['+id+'][target]" placeholder="Enter Target Vale" min="1" required="" value='+data.MileStones[i].Target_Value+'>';      
+                            varHtml+='      <input type="number" required class="form-control"  id="target_'+id+'"  name="milestone['+id+'][target]" placeholder="Enter Target Vale" min="1" required="" value="'+data.MileStones[i].Target_Value+'">';      
                             varHtml+='  </div>';
                             varHtml+='  <div class="col-lg-2" id="is-center-wise-container-'+id+'">';
                             varHtml+='      <input type="checkbox" name="milestone['+id+'][is_center_wise_rate]" id="is_center_wise_rate_'+id+'"  data-value='+id+' onclick="toggleCheckbox(event)">';  

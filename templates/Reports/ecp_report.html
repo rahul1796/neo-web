@@ -183,7 +183,7 @@
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].S_No +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].Region_Name +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].Customer_Name +'</td>';
-                                    let varLink='<a onclick="GetContractProjectTargets(\'' + data.Data[i].Contract_Id + '\',\'' + data.Data[i].Contract_Name + '\')"  style="color:blue;cursor:pointer" >' + data.Data[i].Contract_Name + '</a>';
+                                    let varLink='<a onclick="GetContractProjectTargets(\'' + data.Data[i].Region_Id + '\',\'' + data.Data[i].Contract_Id + '\',\'' + data.Data[i].Contract_Name + '\')"  style="color:blue;cursor:pointer" >' + data.Data[i].Contract_Name + '</a>';
                                     varHtml+='  <td style="text-align:center;">'+ varLink +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].Target_Enrolment +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].Target_Certification +'</td>';
@@ -224,9 +224,9 @@
                 }
             });
         }
-        function GetContractProjectTargets(ContractId,ContractName){
+        function GetContractProjectTargets(RegionId,ContractId,ContractName){
             $('#head').text(ContractName);
-            var URL=$('#hdn_web_url').val()+ "/GetContractProjectTargets?ContractId="+ContractId;
+            var URL=$('#hdn_web_url').val()+ "/GetContractProjectTargets";
             $.ajax({
                 type:"GET",
                 url:URL,
@@ -234,6 +234,12 @@
                 overflow:true,        
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
+                data:{
+                        "user_id": $('#hdn_home_user_id').val(),
+                        "user_role_id" : $('#hdn_home_user_role_id').val(),
+                        "contract_id":ContractId,
+                        "region_id":RegionId
+                },
                 success: function (data){
                     varHtml='';
                     var varButton='';
