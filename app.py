@@ -5230,7 +5230,7 @@ class upload_bulk_upload(Resource):
                     df= pd.read_excel(file_name,sheet_name='Mobilizer')
                     df = df.fillna('')
                     df['date_age']=df['Age*']+df['Date of Birth*'].astype(str)
-
+                    
                     schema = Schema([
                             #nan check column non mandate
                             Column('Candidate Photo',null_validation),
@@ -5284,7 +5284,8 @@ class upload_bulk_upload(Resource):
                     if len_error>0:
                         return {"Status":False, "message":"Uploaded Failed (fails to validate data)" }
                     else:
-                        return {"Status":True, "message":"Uploaded successfully" }
+                        out = Database.mobilization_web_inser(df,user_id)
+                        return out
                 else:
                     return {"Status":False, "message":"Wrong Candidate Stage" }
 

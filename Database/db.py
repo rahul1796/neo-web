@@ -4445,3 +4445,48 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return response
+    def mobilization_web_inser(df,user_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        try:
+            quer1 = '''
+            insert into candidate_details.tbl_candidates
+            (isFresher, salutation, first_name, middle_name, last_name, date_of_birth, isDob, age,primary_contact_no, secondary_contact_no, email_id, gender,marital_status, caste, disability_status, religion, source_of_information, present_pincode,present_district, permanent_district,permanent_pincode,candidate_stage_id, candidate_status_id, created_on, created_by, is_active, insert_from,permanent_state,permanent_country,present_state, present_country)
+            OUTPUT inserted.candidate_id
+            values
+            '''
+            quer2='''
+            insert into candidate_details.tbl_candidate_reg_enroll_details
+            (candidate_id,candidate_photo,present_address_line1,permanaet_address_line1,created_on,created_by,is_active)
+            values
+            '''
+            quer3='''
+            insert into candidate_details.tbl_candidate_reg_enroll_non_mandatory_details
+            (candidate_id,present_address_line2,present_village,present_panchayat,present_taluk_block,permanent_address_line2,permanent_village,permanent_panchayat,permanent_taluk_block,created_on,created_by,is_active)
+            values
+            '''
+            df['Date of Birth*'] = df['Date of Birth*'].astype(str)
+            out = df.values.tolist()
+            for row in out:
+                quer = "({},'{}','{}','{}','{}','{}',{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},1,'w',{},'{}',{},'{}'),".format(1 if row[0]=='Fresher' else 0,row[2],row[3],row[4],row[5],row[6],
+                        1 if row[7]=='' else 0,row[7] if row[7]!='' else 0,row[8],row[9],row[10],row[11],row[12],row[13],row[14],row[15],row[16],row[24],row[22],row[31],row[33],user_id,"(select state_id from masters.tbl_states where state_name like trim('{}'))".format(row[23]),
+                        '1',"(select state_id from masters.tbl_states where state_name like trim('{}'))".format(row[32]),'1')
+                quer1 += '\n'+quer
+            quer1 = quer1[:-1]+';'
+            cur.execute(quer1)
+            d = list(map(lambda x:x[0],cur.fetchall()))
+            cur.commit()
+            for i in range(len(d)):
+                quer2 += '\n' + "({},'{}','{}','{}',GETDATE(),{},1),".format(d[i],out[i][1],out[i][17],out[i][26],user_id)
+                quer3 += '\n' + "({},'{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(d[i],out[i][18],out[i][19],out[i][20],out[i][21],out[i][27],out[i][28],out[i][29],out[i][30],user_id)
+            quer2 = quer2[:-1]+';'
+            quer3 = quer3[:-1]+';'
+            cur.execute(quer2 + '\n' + quer3)
+            cur.commit()
+            out = {'Status': True, 'message': "Submitted Successfully"}
+        except Exception as e:
+            out = {'Status': False, 'message': "error: "+str(e)}
+        finally:
+            cur.close()
+            con.close()
+            return out
