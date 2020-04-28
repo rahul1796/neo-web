@@ -17,6 +17,7 @@ var Centers;
         $('#divProjectInfo').show();
         $('#divBillingMetrics').hide();
         LoadRegiondl();
+        
         $.fn.serializeObject = function()
         {
             var o = {};
@@ -54,6 +55,8 @@ var Centers;
                     $('#ProjectName').val(data.SubProjectDetail.Sub_Project_Name);
                     $('#ProjectCode').val(data.SubProjectDetail.Sub_Project_Code);
                     $('#ddlRegion').val(data.SubProjectDetail.Region_Id);
+                    LoadProject(data.SubProjectDetail.Project_Id);
+                    //$('#ddlProject').val();
                     Statebyregion(data.SubProjectDetail.State_Id);
                     Centerbystate(data.SubProjectDetail.Center_Ids);
                     coursebycenter_project(data.SubProjectDetail.Course_Ids);
@@ -79,6 +82,10 @@ var Centers;
                     alert('error');
                 }
             });
+        }
+        else
+        {
+            LoadProject('0');
         }
     }); 
     
@@ -116,7 +123,46 @@ var Centers;
     });
     return false;
     }
-    
+    function LoadProject(ProjectId){
+        var URL=$('#hdn_web_url').val()+ "/GetALLProject_multiple"
+        $.ajax({
+            type:"POST",
+            url:URL,
+            async:false,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "ClientId":'-1',
+                "user_id": 1,
+                "user_role_id": 1
+            },
+            success: function (data){
+                if(data.Projects != null)
+                {
+                    $('#ddlProject').empty();
+                    var count=data.Projects.length;
+                    if( count> 0)
+                    {
+                        $('#ddlProject').append(new Option('Choose Project','')); 
+                        for(var i=0;i<count;i++)
+                            $('#ddlProject').append(new Option(data.Projects[i].Project_Name,data.Projects[i].Project_Id));
+                        if(ProjectId!='0')
+                        $('#ddlProject').val(ProjectId);
+                    }
+                    else
+                    {
+                    // $('#ddlProject').append(new Option('ALL','-1'));
+                    }
+                }
+            },
+            error:function(request, err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
     function Statebyregion(needed)
     {
         
@@ -212,7 +258,7 @@ var Centers;
                 url:URL,
                 data:{
                     "center_ids" : $('#ddlCenters').val().toString(),
-                    "project_code" : '{{project_code}}'
+                    "project_code" : $('#ddlProject').val()
                 },
                 success:function(data){
                 if(data.course != null)
@@ -262,7 +308,8 @@ var Centers;
                     "PlannedEndDate" : $('#PlannedEndDate').val(),
                     "ActualStartDate" : $('#ActualStartDate').val(),
                     "ActualEndDate" : $('#ActualEndDate').val(),
-                    "isactive" : $('#isactive').prop('checked')
+                    "isactive" : $('#isactive').prop('checked'),
+                    "project_id" : $('#ddlProject').val()
                 },
                 success:function(data){
                     var message="",title="",icon="";
@@ -691,7 +738,7 @@ var Centers;
                                 <div class="page-title-right">
                                     <ol class="breadcrumb m-0">
                                         <li class="breadcrumb-item"><a href="javascript: void(0);">NEO</a></li>
-                                        <li class="breadcrumb-item"><a href="/project">Project</a></li>
+                                        <li class="breadcrumb-item"><a href="/sub_project">Sub Project</a></li>
                                         <li class="breadcrumb-item active">Add-Edit Sub Project</li>
                                     </ol>
                                 </div>
@@ -754,6 +801,19 @@ var Centers;
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ddlProject">Project*:</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select class="form-control dropdown-search-filter" required id="ddlProject" onchange="coursebycenter_project(0)">
+                                                    <option selected="" value="">All</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-lg-6">
