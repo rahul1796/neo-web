@@ -25,7 +25,7 @@ def create_report(candidate_id, user_id, user_role_id, status, customer, project
         return({'Description':'Module Error', 'Status':False})
 
     try:
-        name_withpath = config.neo_report_file_path + file_name
+        name_withpath = config.neo_report_file_path + 'report file/'+ file_name
         
         writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
         workbook  = writer.book

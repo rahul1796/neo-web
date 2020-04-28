@@ -5277,11 +5277,11 @@ class upload_bulk_upload(Resource):
                     errors = schema.validate(df)
                     errors_index_rows = [e.row for e in errors]
 
-                    pd.DataFrame({'col':errors}).to_csv('errors.csv')
-                    df_clean = df.drop(index=errors_index_rows)
-                    df_clean.to_csv('clean_data.csv',index=None)
+                    #df_clean = df.drop(index=errors_index_rows)
+                    #df_clean.to_csv('clean_data.csv',index=None)
                     len_error = len(errors_index_rows)
                     if len_error>0:
+                        pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv')
                         return {"Status":False, "message":"Uploaded Failed (fails to validate data)" }
                     else:
                         out = Database.mobilization_web_inser(df,user_id)
