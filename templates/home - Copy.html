@@ -36,7 +36,6 @@
         <script type="text/javascript">
             $(document).ready(function(){
                 var goto = '{{html}}';
-                goto=goto.replace("&amp;","&");
                 if('{{values}}'!= "")
                 {
                     // $('#usernamelbl').val('{{values[0]}}');
@@ -50,13 +49,36 @@
             {
                 var role_id=parseInt($('#hdn_home_user_role_id').val());
                 
+
+                // $('#Home').show();
+                // $('#Master_Menu').show();
+                // $('#AnchorCenters').show();
+                // $('#AnchorCenterType').show();
+                // $('#AnchorCenterCategory').show();
+                // $('#Org_menu').show();
+                // $('#AnchorRoles').show();
+                // $('#AnchorUsers').show();
+                // $('#Content_Menu').show();
+                // $('#Batch_Menu').show();
+                // $('#Candidate_Menu').show();
+                
+                // $('#TMA_content').show();
+                // $('#TMA_batch_Menu').show();
+                // $('#TMA_report_Menu').show();
+                // $('#MCL_report_Menu').show();
+                // $('#Mobilization_report_Menu').show();
+                
+                // $('#CoomplianceReport').show();               
+                // $('#Trainer_Menu').show();                
+                // if(goto !="")
+                //     $("#box").load(goto);
+                
                 switch(role_id)
 				{   
                     case 1:             //Admin
                         $('#Home').show();
-						$('#Mobilization_Menu').show();
                         $('#Candidate_Menu').show();
-                        //$('#Batch_Menu').show();
+                        $('#Batch_Menu').show();
                         $('#Assessment_Menu').show();
                         $('#Content_Menu').show();
                             $('#AnchorSectors').show();
@@ -65,10 +87,7 @@
                         $('#Master_Menu').show();
                             $('#AnchorClients').show();
                             $('#AnchorContracts').show();
-                            $('#Project_Menu').show();    
-                                $('#AnchorProjects').show();  
-                                $('#AnchorSubProjects').show();   
-                                $('#AnchorBatch').show();
+                            $('#AnchorProjects').show();
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').show();
@@ -82,8 +101,8 @@
                         break;
                     case 19:            //Sales
                         $('#Home').show();
-						$('#Mobilization_Menu').hide();
                         $('#Candidate_Menu').hide();
+                        $('#Batch_Menu').hide();
                         $('#Assessment_Menu').hide();
                         $('#Content_Menu').show();
                             $('#AnchorSectors').show();
@@ -92,10 +111,7 @@
                         $('#Master_Menu').show();
                             $('#AnchorClients').show();
                             $('#AnchorContracts').show();
-                            $('#Project_Menu').show();    
-                                $('#AnchorProjects').show();  
-                                $('#AnchorSubProjects').show();   
-                                $('#AnchorBatch').hide();
+                            $('#AnchorProjects').show();
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').hide();
                             $('#AnchorTrainers').hide();
@@ -109,8 +125,8 @@
                         break;
                     case 23:            //PMO
                         $('#Home').show();
-						$('#Mobilization_Menu').hide();
                         $('#Candidate_Menu').show();
+                        $('#Batch_Menu').show();
                         $('#Assessment_Menu').show();
                         $('#Content_Menu').show();
                             $('#AnchorSectors').show();
@@ -119,10 +135,7 @@
                         $('#Master_Menu').show();
                             $('#AnchorClients').show();
                             $('#AnchorContracts').show();
-                            $('#Project_Menu').show();    
-                                $('#AnchorProjects').show();  
-                                $('#AnchorSubProjects').show();   
-                                $('#AnchorBatch').show();
+                            $('#AnchorProjects').show();
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').show();
@@ -136,8 +149,8 @@
                         break;
                     case 15:            //PMT
                         $('#Home').show();
-						$('#Mobilization_Menu').hide();
                         $('#Candidate_Menu').show();
+                        $('#Batch_Menu').show();
                         $('#Assessment_Menu').show();
                         $('#Content_Menu').show();
                             $('#AnchorSectors').hide();
@@ -146,10 +159,7 @@
                         $('#Master_Menu').show();
                             $('#AnchorClients').show();
                             $('#AnchorContracts').show();
-                            $('#Project_Menu').show();    
-                                $('#AnchorProjects').show();  
-                                $('#AnchorSubProjects').show();   
-                                $('#AnchorBatch').show();
+                            $('#AnchorProjects').show();
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').show();
@@ -162,8 +172,8 @@
                         break;
                     case 11:            //COO
                         $('#Home').show();
-						$('#Mobilization_Menu').hide();
                         $('#Candidate_Menu').show();
+                        $('#Batch_Menu').show();
                         $('#Assessment_Menu').show();
                         $('#Content_Menu').show();
                             $('#AnchorSectors').show();
@@ -172,10 +182,7 @@
                         $('#Master_Menu').show();
                             $('#AnchorClients').show();
                             $('#AnchorContracts').show();
-                            $('#Project_Menu').show();    
-                                $('#AnchorProjects').show();  
-                                $('#AnchorSubProjects').show();   
-                                $('#AnchorBatch').show();
+                            $('#AnchorProjects').show();
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').show();
@@ -188,8 +195,8 @@
                         break;
                     case 14:            //Territory Manager
                         $('#Home').show();
-						$('#Mobilization_Menu').hide();
                         $('#Candidate_Menu').show();
+                        $('#Batch_Menu').hide();
                         $('#Assessment_Menu').show();
                         $('#Content_Menu').show();
                             $('#AnchorSectors').show();
@@ -198,24 +205,21 @@
                         $('#Master_Menu').show();
                             $('#AnchorClients').hide();
                             $('#AnchorContracts').hide();
-                            $('#Project_Menu').show();    
-                                $('#AnchorProjects').show();  
-                                $('#AnchorSubProjects').show();   
-                                $('#AnchorBatch').hide();
+                            $('#AnchorProjects').show();
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').show();
                         $('#Insight_Menu').show();
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
-                        $('#Report_Menu').show();
+                        $('#Report_Menu').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
                     case 5:             //Center Manager
                         $('#Home').show();
-						$('#Mobilization_Menu').show();
                         $('#Candidate_Menu').show();
+                        $('#Batch_Menu').show();
                         $('#Assessment_Menu').show();
                         $('#Content_Menu').show();
                             $('#AnchorSectors').hide();
@@ -224,24 +228,21 @@
                         $('#Master_Menu').show();
                             $('#AnchorClients').hide();
                             $('#AnchorContracts').hide();
-                            $('#Project_Menu').show();    
-                                $('#AnchorProjects').show();  
-                                $('#AnchorSubProjects').show();   
-                                $('#AnchorBatch').show();
+                            $('#AnchorProjects').show();
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').show();
                         $('#Insight_Menu').hide();
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
-                        $('#Report_Menu').show();
+                        $('#Report_Menu').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
                     case 2:             //Mobilizer
                         $('#Home').show();
-						$('#Mobilization_Menu').show();
                         $('#Candidate_Menu').show();
+                        $('#Batch_Menu').show();
                         $('#Assessment_Menu').hide();
                         $('#Content_Menu').hide();
                             $('#AnchorSectors').hide();
@@ -250,10 +251,7 @@
                         $('#Master_Menu').hide();
                             $('#AnchorClients').hide();
                             $('#AnchorContracts').hide();
-                            $('#Project_Menu').show();    
-                                $('#AnchorProjects').hide();  
-                                $('#AnchorSubProjects').hide();   
-                                $('#AnchorBatch').show();
+                            $('#AnchorProjects').hide();
                             $('#AnchorCenters').hide();
                             $('#AnchorUsers').hide();
                             $('#AnchorTrainers').hide();
@@ -266,8 +264,8 @@
                         break;
                     case 24:            //Counsellor
                         $('#Home').show();
-						$('#Mobilization_Menu').show();
                         $('#Candidate_Menu').show();
+                        $('#Batch_Menu').show();
                         $('#Assessment_Menu').hide();
                         $('#Content_Menu').hide();
                             $('#AnchorSectors').hide();
@@ -276,10 +274,7 @@
                         $('#Master_Menu').hide();
                             $('#AnchorClients').hide();
                             $('#AnchorContracts').hide();
-                            $('#Project_Menu').show();    
-                                $('#AnchorProjects').hide();  
-                                $('#AnchorSubProjects').hide();   
-                                $('#AnchorBatch').show();
+                            $('#AnchorProjects').hide();
                             $('#AnchorCenters').hide();
                             $('#AnchorUsers').hide();
                             $('#AnchorTrainers').hide();
@@ -292,8 +287,8 @@
                         break;
                     case 7:             //Trainer
                         $('#Home').show();
-						$('#Mobilization_Menu').hide();
                         $('#Candidate_Menu').hide();
+                        $('#Batch_Menu').show();
                         $('#Assessment_Menu').hide();
                         $('#Content_Menu').show();
                             $('#AnchorSectors').hide();
@@ -302,10 +297,7 @@
                         $('#Master_Menu').hide();
                             $('#AnchorClients').hide();
                             $('#AnchorContracts').hide();
-                            $('#Project_Menu').show();    
-                                $('#AnchorProjects').hide();  
-                                $('#AnchorSubProjects').hide();   
-                                $('#AnchorBatch').show();
+                            $('#AnchorProjects').hide();
                             $('#AnchorCenters').hide();
                             $('#AnchorUsers').hide();
                             $('#AnchorTrainers').hide();
@@ -318,8 +310,8 @@
                         break;
                     case 21:            //Placemet Officer
                         $('#Home').show();
-						$('#Mobilization_Menu').hide();
                         $('#Candidate_Menu').hide();
+                        $('#Batch_Menu').hide();
                         $('#Assessment_Menu').hide();
                         $('#Content_Menu').hide();
                             $('#AnchorSectors').hide();
@@ -328,10 +320,7 @@
                         $('#Master_Menu').show();
                             $('#AnchorClients').show();
                             $('#AnchorContracts').hide();
-                            $('#Project_Menu').show();    
-                                $('#AnchorProjects').show();  
-                                $('#AnchorSubProjects').show();   
-                                $('#AnchorBatch').hide();
+                            $('#AnchorProjects').show();
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').show();
@@ -344,8 +333,8 @@
                         break;
                     case 16:            //Content
                         $('#Home').show();
-						$('#Mobilization_Menu').hide();
                         $('#Candidate_Menu').show();
+                        $('#Batch_Menu').show();
                         $('#Assessment_Menu').show();
                         $('#Content_Menu').hide();
                             $('#AnchorSectors').hide();
@@ -354,10 +343,7 @@
                         $('#Master_Menu').show();
                             $('#AnchorClients').show();
                             $('#AnchorContracts').show();
-                            $('#Project_Menu').show();    
-                                $('#AnchorProjects').show();  
-                                $('#AnchorSubProjects').show();   
-                                $('#AnchorBatch').show();
+                            $('#AnchorProjects').show();
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').hide();
@@ -451,17 +437,13 @@
 							<li class="has-submenu active" id="Home">
                                 <a href="/home" class="active"> <i class="ti-home"></i>Home<div class="button"></div></a>
                             </li>
-							<li class="has-submenu active" id="Mobilization_Menu">
-                                <a id="AnchorMobilization" href="/mobilization"  class="active"> <i class="fe-edit-2"></i>Mobilization<div class="button"></div></a>
+                            <li class="has-submenu active" id="Mobilization_Menu">
+                                <a id="AnchorAssessment" href="/mobilization"  class="active"> <i class="fe-edit-2"></i>Mobilization<div class="button"></div></a>
                             </li>
-							<!-- <li class="has-submenu active" id="Batch_Menu">
-                                <a id="AnchorBatch" href="/batch"  class="active"> <i class="fe-tag"></i>Batch<div class="button"></div></a>
-                            </li> -->
                             <li class="has-submenu active" id="Assessment_Menu">
                                 <a id="AnchorAssessment" href="/assessment"  class="active"> <i class="fe-edit-2"></i>Assessment<div class="button"></div></a>
                             </li>
-
-							<li class="has-submenu active"  id="Report_Menu"  >
+                            <li class="has-submenu active"  id="Report_Menu"  >
                                 <a href="#" class="active">
                                     <i class="fe-airplay"></i>Report <div class="arrow-down"></div></a>
                                 <ul class="submenu"> 
@@ -529,7 +511,7 @@
                                     </li>
                                 </ul>
                             </li>
-							<li class="has-submenu active" id="Master_Menu">
+                            <li class="has-submenu active" id="Master_Menu">
                                 <a href="#" class="active">
                                     <i class="fe-anchor"></i>Master <div class="arrow-down"></div></a>
                                 <ul class="submenu">
@@ -539,25 +521,14 @@
                                     <li id="Client_Menu">
                                         <a id="AnchorClients"  href="/client" >Customers</a>
                                     </li>
-                                    <li class="has-submenu" id="Project_Menu" >
-                                        <a href="#">Projects <div class="arrow-down"></div></a>
-                                        <ul class="submenu"> 
-                                            <li >
-                                                <a href="/project" id="AnchorProjects" class="active">Main Projects<div class="button"></div></a>
-                                            </li>
-                                            <li id="SubProject_Menu">
-                                                <a href="/sub_project" id="AnchorSubProjects" class="active">Sub Projects<div class="button"></div></a>
-                                            </li>
-                                            <li id="Batch_Menu">
-                                                <a href="/batch" id="AnchorBatch" class="active"> Batches<div class="button"></div></a>
-                                            </li>                                            
-                                        </ul>
+                                    <li id="Project_Menu">
+                                        <a id="AnchorProjects"  href="/project">Projects</a>
                                     </li>
                                     <li id="Center_Menu">
                                         <a id="AnchorCenters" href="/center">Centers</a>
                                     </li>
-                                    <li class="has-submenu" id="Content_Menu">
-                                        <a href="#"> Content <div class="arrow-down"></div></a>
+                                    <li class="has-submenu active" id="Content_Menu">
+                                        <a href="#" class="active"> <i class="fe-briefcase"></i>Content <div class="arrow-down"></div></a>
                                         <ul class="submenu">
                                             <li id="Sector_Menu">
                                                 <a id="AnchorSectors"  href="/sector" >Sectors</a>
@@ -601,8 +572,16 @@
                                     </li>
                                 </ul>
                             </li>
+
+                            
+
+							<!--li class="has-submenu active" id="Batch_Menu">
+                                <a id="AnchorBatch" href="/batch"  class="active"> <i class="fe-tag"></i>Batch<div class="button"></div></a>
+                            </li>
+                            
+							-->
 							
-                            </ul>
+                        </ul>
                         <!-- End navigation menu -->
                     <!-- </ul> -->
                         <div class="clearfix"></div>
