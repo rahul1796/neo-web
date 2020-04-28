@@ -4579,6 +4579,28 @@ class sales_Department_user(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(sales_Department_user,'/sales_Department_user')
+#################################################################################
+
+@app.route("/sub_project_list_page")
+def sub_project_list_page():
+    if g.user:
+        project_id=request.args.get('project_id',0,type=int)
+        customer_id=request.args.get('customer_id',0,type=int)
+        print(project_id)
+        return render_template("Master/sub-project-list.html",project_id=project_id,customer_id=customer_id)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/sub_project")
+def sub_project():
+    if g.user:
+        project_id=request.args.get('project_id',0,type=int)
+        customer_id=request.args.get('customer_id',0,type=int) 
+        print(project_id)
+        html_str="sub_project_list_page?project_id=" + str(project_id)+"&customer_id="+ str(customer_id)
+        return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
 
 @app.route("/subproject_add_edit")
 def subproject_add_edit():
@@ -4597,6 +4619,56 @@ def assign_subproject_add_edit_to_home():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+class sub_project_list(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            entity = request.form['entity']
+            customer = request.form['customer']
+            p_group = request.form['p_group']
+            block = request.form['block']
+            practice = request.form['practice']
+            bu = request.form['bu']
+            product = request.form['product']
+            status = request.form['status']            
+            user_id = request.form['user_id']
+            user_role_id = request.form['user_role_id'] 
+            user_region_id = request.form['user_region_id']
+            project=request.form['project']
+            start_index = request.form['start']
+            page_length = request.form['length']
+            search_value = request.form['search[value]']
+            order_by_column_position = request.form['order[0][column]']
+            order_by_column_direction = request.form['order[0][dir]']
+            draw=request.form['draw']
+            print(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+            return Master.sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project)
+api.add_resource(sub_project_list, '/sub_project_list')
+
+class add_subproject_details(Resource):
+    @staticmethod
+    def post():
+        
+        if request.method == 'POST':
+            SubProjectName=request.form['SubProjectName']
+            SubProjectCode=request.form['SubProjectCode']
+            Region=request.form['Region']
+            State=request.form['State']
+            Centers=request.form['Centers']
+            Course=request.form['Course']
+            PlannedStartDate=request.form['PlannedStartDate']
+            PlannedEndDate=request.form['PlannedEndDate']
+            ActualStartDate=request.form['ActualStartDate']
+            ActualEndDate=request.form['ActualEndDate']
+            
+            user_id=g.user_id
+            subproject_id=g.subproject_id
+            project_code = g.project_code       
+            isactive=request.form['isactive']
+            return Master.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive)
+api.add_resource(add_subproject_details,'/add_subproject_details')
+
+#############################################################################
 class all_states_based_on_region(Resource):
     @staticmethod
     def get():
@@ -4630,28 +4702,7 @@ class all_course_based_on_center(Resource):
             return Database.Getcoursebasedoncenter_db(center_ids,project_code)
 api.add_resource(all_course_based_on_center,'/all_course_based_on_center')
 
-class add_subproject_details(Resource):
-    @staticmethod
-    def post():
-        
-        if request.method == 'POST':
-            SubProjectName=request.form['SubProjectName']
-            SubProjectCode=request.form['SubProjectCode']
-            Region=request.form['Region']
-            State=request.form['State']
-            Centers=request.form['Centers']
-            Course=request.form['Course']
-            PlannedStartDate=request.form['PlannedStartDate']
-            PlannedEndDate=request.form['PlannedEndDate']
-            ActualStartDate=request.form['ActualStartDate']
-            ActualEndDate=request.form['ActualEndDate']
-            
-            user_id=g.user_id
-            subproject_id=g.subproject_id
-            project_code = g.project_code       
-            isactive=request.form['isactive']
-            return Master.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive)
-api.add_resource(add_subproject_details,'/add_subproject_details')
+
 
 @app.route("/SqlServerApi", defaults={"param": None})
 @app.route("/SqlServerApi/<string:param>", methods=["GET"])
@@ -5074,9 +5125,13 @@ class GetContractProjectTargets(Resource):
     def get():
         if request.method=='GET':
             try:
-                contact_id=request.args.get('ContractId',0,type=int)
-                response = {"Targets":Master.GetContractProjectTargets(contact_id)}
-                return response
+                contact_id=request.args.get('contract_id',0,type=int)
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                region_id=request.args.get('region_id',0,type=int)
+                   
+                response = {"Targets":Master.GetContractProjectTargets(contact_id,user_id,user_role_id,region_id)}
+                return response 
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(GetContractProjectTargets,'/GetContractProjectTargets')

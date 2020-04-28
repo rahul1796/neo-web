@@ -1,4 +1,3 @@
-<link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/libs/bootstrap-colorpicker/bootstrap-colorpicker.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/libs/clockpicker/bootstrap-clockpicker.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" />
@@ -7,9 +6,7 @@
 <script type="text/javascript">
 var Candidates = {};
     $(document).ready(function(){
-        // $('.dropdown-search-filter').select2({
-        //         placeholder:''
-        //     });
+         $('.dropdown-search-filter').select2();
         $(".date-picker").flatpickr();             
         $(".time-picker").flatpickr({
             enableTime: !0,
@@ -24,12 +21,8 @@ var Candidates = {};
             minDate: "today"
         });
 
-        LoadProductList();
-        LoadCenterList();
-        LoadCourseList('0');
-        LoadsubProject('0');
-        LoadCoFunding('0');
-        TrainersBasedOnUsers();
+        
+        
 
         document.getElementById("PlannedStartDate").disabled = false;
         document.getElementById("PlannedEndDate").disabled = false;
@@ -49,16 +42,13 @@ var Candidates = {};
                     {
                         if(data.BatchDetail!="")
                         {   
-                            $('#BatchName').val(data.BatchDetail.Batch_Name);
-                            //$('#BatchCode').val(data.BatchDetail.Batch_Code);
-                            $('#ddlProduct').val(data.BatchDetail.Product_Id);
-                            $('#ddlCenter').val(data.BatchDetail.Center_Id);
-                            LoadCourseList(data.BatchDetail.Course_Id);
-                            LoadsubProject(data.BatchDetail.Sub_Project_Id);
+                            $('#BatchName').val(data.BatchDetail.Batch_Name);                            
+                            LoadProductList(data.BatchDetail.Product_Id);
+                            LoadCenterList(data.BatchDetail.Center_Id);
+                            LoadCourseList(data.BatchDetail.Course_Id,data.BatchDetail.Center_Id);
+                            LoadsubProject(data.BatchDetail.Sub_Project_Id,data.BatchDetail.Center_Id,data.BatchDetail.Course_Id);
                             LoadCoFunding(data.BatchDetail.Co_Funding_Project_Id);
-                            // alert(data.BatchDetail.Sub_Project_Id);
-                            // alert(data.BatchDetail.Course_Id);
-                            $('#ddlTrainer').val(data.BatchDetail.Trainer_Id);
+                            TrainersBasedOnUsers(data.BatchDetail.Trainer_Id);
                             $('#PlannedStartDate').val(data.BatchDetail.Planned_Start_Date);
                             $('#PlannedEndDate').val(data.BatchDetail.Planned_End_Date);
                             $('#ActualStartDate').val(data.BatchDetail.Actual_Start_Date);
@@ -73,6 +63,13 @@ var Candidates = {};
                             {
                                 $('#isactive').prop('checked',false);
                             }
+                            // alert(data.BatchDetail.Sub_Project_Id);
+                            // alert(data.BatchDetail.Course_Id);
+                            //$('#ddlTrainer').val();
+                            //$('#BatchCode').val(data.BatchDetail.Batch_Code);
+                            //$('#ddlProduct').val(data.BatchDetail.Product_Id);
+                            //$('#ddlProduct').select2('val',data.BatchDetail.Product_Id);
+                            //$('#ddlCenter').val();
                         }
                     } 
                 },
@@ -81,7 +78,15 @@ var Candidates = {};
                 }
             });
         }
-        
+        else
+        {
+            LoadProductList('0');
+            LoadCenterList('0');
+            LoadCourseList('0','');
+            LoadsubProject('0','','');
+            LoadCoFunding('0');
+            TrainersBasedOnUsers('0');
+        }
     });
 
         function myfunction(valuereceived)
@@ -89,7 +94,7 @@ var Candidates = {};
             TrainersBasedOnUsers(valuereceived,0);
             CenterManagerBasedOnUsers(valuereceived),0;
         }
-        function LoadProductList()
+        function LoadProductList(needed)
         {
             var URL=$('#hdn_web_url').val()+ "/Get_all_Product"
             $.ajax({
@@ -108,6 +113,9 @@ var Candidates = {};
                             $('#ddlProduct').append(new Option('Choose Product',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlProduct').append(new Option(data.Product[i].Product_Name,data.Product[i].Product_Id));
+                        
+                            if(needed!='' & needed!='0')
+                                $('#ddlProduct').val(needed);
                         }
                         else
                         {
@@ -123,7 +131,7 @@ var Candidates = {};
             });
             return false;
         }
-        function LoadCenterList()
+        function LoadCenterList(needed)
         {
             var URL=$('#hdn_web_url').val()+ "/Get_all_Center"
             $.ajax({
@@ -146,6 +154,8 @@ var Candidates = {};
                             $('#ddlCenter').append(new Option('Choose Center',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlCenter').append(new Option(data.Center[i].Center_Name,data.Center[i].Center_Id));
+                            if(needed!='' & needed!='0')
+                                $('#ddlCenter').val(needed);
                         }
                         else
                         {
@@ -162,8 +172,8 @@ var Candidates = {};
             return false;
         }
 
-        function LoadCourseList(needed)
-        {
+        function LoadCourseList(needed,CenterId)
+        {console.log(CenterId);
             var URL=$('#hdn_web_url').val()+ "/All_Course_basedon_center"
             $.ajax({
                 type:"GET",
@@ -172,7 +182,7 @@ var Candidates = {};
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
                 data:{
-                        "Center_id": $('#ddlCenter').val(),
+                        "Center_id": CenterId,
                         "user_id": $('#hdn_home_user_id').val(),
                         "user_role_id": $('#hdn_home_user_role_id').val()
                     },
@@ -208,8 +218,8 @@ var Candidates = {};
             
             return false;
         }
-        function LoadsubProject(needed)
-        {
+        function LoadsubProject(needed,CenterId,CourseId)
+        {console.log(CenterId,CourseId);
             var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForCenter_Course"
             
             $.ajax({
@@ -219,8 +229,8 @@ var Candidates = {};
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
                 data:{
-                        "center_id": $('#ddlCenter').val(),
-                        "course_id": $('#ddlCourse').val(),
+                        "center_id": CenterId,
+                        "course_id": CourseId,
                         "sub_project_id": '0',
                         "user_id": $('#hdn_home_user_id').val(),
                         "user_role_id": $('#hdn_home_user_role_id').val()
@@ -242,7 +252,7 @@ var Candidates = {};
                         }
                         else
                         {
-                            $('#ddlSubProject').append(new Option('Choose Sub Project','0'));
+                            $('#ddlSubProject').append(new Option('Choose Sub Project',''));
                         }
                     }
                 },
@@ -390,7 +400,7 @@ var Candidates = {};
         //     return false;
         // }
 
-        function TrainersBasedOnUsers()
+        function TrainersBasedOnUsers(needed)
         {
             var URL=$('#hdn_web_url').val()+ "/TrainersBasedOnCenter"
             $.ajax({
@@ -412,6 +422,11 @@ var Candidates = {};
                             $('#ddlTrainer').append(new Option('Choose Trainer',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlTrainer').append(new Option(data.Trainers[i].User_Name,data.Trainers[i].User_Id));
+                        
+                            if (needed !='0' & needed!='')
+                                {
+                                    $('#ddlTrainer').val(needed);
+                                }
                         }
                         else
                         {
@@ -651,7 +666,7 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="BatchName">Batch External Code</label>   <!-- * : -->
+                                <label for="BatchName">Batch External Code:</label>   <!-- * : -->
                             </div>
                             <div class="col-lg-6">
                                 <input type="text" class="form-control" name="BatchName" id="BatchName"  ClientIdMode="static" placeholder="Batch External Code">
@@ -671,7 +686,7 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="ProductId">Product</label>
+                                <label for="ProductId">Product*:</label>
                             </div>
                             <div class="col-lg-6">
                                 <select id="ddlProduct" class="form-control dropdown-search-filter" name="ProductId" required=""> <!-- ClientIdMode="static" required="" -->>
@@ -683,10 +698,10 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="CenterId">Center :</label>
+                                <label for="CenterId">Center*:</label>
                             </div>
                             <div class="col-lg-6">
-                                <select id="ddlCenter" class="form-control dropdown-search-filter"  onchange="LoadCourseList('0')" name="CenterId" ClientIdMode="static" required=""> <!-- myfunction(this.value) -->>
+                                <select id="ddlCenter" class="form-control dropdown-search-filter"  onchange="LoadCourseList('0',this.value)" name="CenterId" ClientIdMode="static" required=""> <!-- myfunction(this.value) -->>
                                     <option value="">Center</option>
                                 </select>
                             </div> 
@@ -695,10 +710,10 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="CourseId">Course</label>
+                                <label for="CourseId">Course*:</label>
                             </div>
                             <div class="col-lg-6">
-                                <select id="ddlCourse" class="form-control dropdown-search-filter" name="CourseId" onchange="LoadsubProject('0')" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                <select id="ddlCourse" class="form-control dropdown-search-filter" name="CourseId" onchange="LoadsubProject('0',$('#ddlCenter').val(),this.value)" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
                                     <option value="">Choose Course</option>
                                 </select>
                             </div>
@@ -707,7 +722,7 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="SubProjectId">Sub Project</label>
+                                <label for="SubProjectId">Sub Project*:</label>
                             </div>
                             <div class="col-lg-6">
                                 <select id="ddlSubProject" class="form-control dropdown-search-filter" name="SubProjectId" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
@@ -719,7 +734,7 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="CoFundingprojectId">Co Funding Sub Project</label>
+                                <label for="CoFundingprojectId">Co Funding Sub Project:</label>
                             </div>
                             <div class="col-lg-6">
                                 <select id="ddlCofunding" class="form-control dropdown-search-filter" name="CoFundingprojectId" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
@@ -732,7 +747,7 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="TrainerId">Trainer</label>
+                                <label for="TrainerId">Trainer*:</label>
                             </div>
                             <div class="col-lg-6">
                                 <select id="ddlTrainer" class="form-control dropdown-search-filter" name="TrainerId" ClientIdMode="static"  required="">
@@ -743,7 +758,7 @@ var Candidates = {};
                     </div>
                     <div class="form-group row ">
                             <div class="col-lg-6">
-                                    <label for="PlannedStartDate">Planned Start Date</label>
+                                    <label for="PlannedStartDate">Planned Start Date*:</label>
                                 </div>
                                 <div class="col-lg-6">
                             <input type="text" id="PlannedStartDate" name="PlannedStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required="">
@@ -751,7 +766,7 @@ var Candidates = {};
                     </div>
                     <div class="form-group row ">
                             <div class="col-lg-6">
-                                    <label for="PlannedEndDate">Planned End Date</label>
+                                    <label for="PlannedEndDate">Planned End Date*:</label>
                                 </div>
                                 <div class="col-lg-6">
                             <input type="text" id="PlannedEndDate" name="PlannedEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date" required="">
@@ -759,7 +774,7 @@ var Candidates = {};
                     </div>
                     <div class="form-group row ">
                             <div class="col-lg-6">
-                                    <label for="ActualStartDate">Actual Start Date</label>
+                                    <label for="ActualStartDate">Actual Start Date:</label>
                                 </div>
                                 <div class="col-lg-6">
                             <input type="text" id="ActualStartDate" name="ActualStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required="">
@@ -767,7 +782,7 @@ var Candidates = {};
                     </div>
                     <div class="form-group row ">
                             <div class="col-lg-6">
-                                    <label for="ActualEndDate">Actual End Date</label>
+                                    <label for="ActualEndDate">Actual End Date:</label>
                                 </div>
                                 <div class="col-lg-6">
                             <input type="text" id="ActualEndDate" name="ActualEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date" required="">
@@ -775,7 +790,7 @@ var Candidates = {};
                     </div>
                     <div class="form-group row ">
                             <div class="col-lg-6">
-                                    <label for="StartTime">Start Time</label>
+                                    <label for="StartTime">Start Time:</label>
                                 </div>
                                 <div class="col-lg-6">
                             <input type="text" id="StartTime" name="StartTime" class="form-control time-picker" ClientIdMode="static" placeholder="Start Time" required="">
@@ -783,7 +798,7 @@ var Candidates = {};
                     </div>
                     <div class="form-group row ">
                             <div class="col-lg-6">
-                                    <label for="EndTime">End Time</label>
+                                    <label for="EndTime">End Time:</label>
                                 </div>
                                 <div class="col-lg-6">
                             <input type="text" id="EndTime" name="EndTime" class="form-control time-picker" ClientIdMode="static" placeholder="End Time" required="">
@@ -792,7 +807,7 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label>Is Active</label>
+                                <label>Is Active:</label>
                             </div>
                             <div class="col-lg-6">
                                 <div class="checkbox checkbox-pink mb-0">
@@ -832,7 +847,6 @@ var Candidates = {};
 </div> <!-- end container -->
     <!-- end wrapper -->
 
-<script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>  
 <script src="static/assets/libs/bootstrap-colorpicker/bootstrap-colorpicker.min.js"></script>
 <script src="static/assets/libs/clockpicker/bootstrap-clockpicker.min.js"></script>
 <script src="static/assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
