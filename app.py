@@ -2574,7 +2574,7 @@ def assign_project_add_edit_to_home():
 @app.route("/after_popup_project")
 def after_popup_project():
     if g.user:
-        return render_template("home.html",values=g.User_detail_with_ids,html="project")
+        return render_template("home.html",values=g.User_detail_with_ids,html="sub_project")
     else:
         return render_template("login.html",error="Session Time Out!!")
 
@@ -4663,7 +4663,7 @@ class add_subproject_details(Resource):
             
             user_id=g.user_id
             subproject_id=g.subproject_id
-            project_code = g.project_code       
+            project_code = request.form['project_id']      
             isactive=request.form['isactive']
             return Master.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive)
 api.add_resource(add_subproject_details,'/add_subproject_details')
@@ -5277,11 +5277,11 @@ class upload_bulk_upload(Resource):
                     errors = schema.validate(df)
                     errors_index_rows = [e.row for e in errors]
 
-                    pd.DataFrame({'col':errors}).to_csv('errors.csv')
-                    df_clean = df.drop(index=errors_index_rows)
-                    df_clean.to_csv('clean_data.csv',index=None)
+                    #df_clean = df.drop(index=errors_index_rows)
+                    #df_clean.to_csv('clean_data.csv',index=None)
                     len_error = len(errors_index_rows)
                     if len_error>0:
+                        pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv')
                         return {"Status":False, "message":"Uploaded Failed (fails to validate data)" }
                     else:
                         out = Database.mobilization_web_inser(df,user_id)
