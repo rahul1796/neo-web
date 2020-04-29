@@ -9,9 +9,13 @@ import requests
 import xml.etree.ElementTree as ET
 
 def to_xml(df, filename=None, mode='w'):
-    df1=df[['Candidate_Id','Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On']]
-    df2=df.drop(['Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On'],axis=1)
-    df2.drop_duplicates(subset ="Candidate_Id",inplace=True)
+    if len(df)>0:
+        df1=df[['Candidate_Id','Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On']]
+        df2=df.drop(['Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On'],axis=1)
+        df2.drop_duplicates(subset ="Candidate_Id",inplace=True)
+    else:
+        df1=None
+        df2=None
 
     def nested_row_to_xml(row):
         xml = ['      <status>']
@@ -31,8 +35,10 @@ def to_xml(df, filename=None, mode='w'):
         xml.append('    </statushistory>')
         xml.append('  </candidate>')
         return '\n'.join(xml)
+    res=''
+    if len(df)>0:
+        res = '\n'.join(df2.apply(row_to_xml, axis=1))
     
-    res = '\n'.join(df2.apply(row_to_xml, axis=1))
     out = ['<data>',res,'</data>']
     res = '\n'.join(out)
     if filename is None:
