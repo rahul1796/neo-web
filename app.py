@@ -4252,6 +4252,19 @@ def sales_dashboard():
         return render_template("home.html",values=g.User_detail_with_ids,html="sales_dashboard_page")
     else:
         return render_template("login.html",error="Session Time Out!!")
+@app.route("/Jobs_Dashboard_page")
+def Jobs_Dashboard_page():
+    if g.user:
+        return render_template("Report-powerbi/Jobs Dashboard.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/Placement_Dashboard")
+def Placement_Dashboard():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="Jobs_Dashboard_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
 
 class get_user_details_new(Resource):
     @staticmethod
