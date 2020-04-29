@@ -9,13 +9,30 @@ import requests
 import xml.etree.ElementTree as ET
 
 def to_xml(df, filename=None, mode='w'):
-    def row_to_xml(row):
-        xml = ['<candidate>']
+    df1=df[['Candidate_Id','Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On']]
+    df2=df.drop(['Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On'],axis=1)
+    df2.drop_duplicates(subset ="Candidate_Id",inplace=True)
+
+    def nested_row_to_xml(row):
+        xml = ['      <status>']
         for i, col_name in enumerate(row.index):
-            xml.append('  <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
-        xml.append('</candidate>')
+            xml.append('        <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
+        xml.append('      </status>')
         return '\n'.join(xml)
-    res = '\n'.join(df.apply(row_to_xml, axis=1))
+
+    def row_to_xml(row):
+        xml = ['  <candidate>']
+        for i, col_name in enumerate(row.index):
+            xml.append('    <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
+        df3=df1.loc[(df1['Candidate_Id'] == row['Candidate_Id']) & (df1['Activity_Status_Id']>0)]
+        #print(df3.dtypes)
+        xml.append('    <statushistory>')
+        xml.append('\n'.join(df3.apply(nested_row_to_xml, axis=1)))
+        xml.append('    </statushistory>')
+        xml.append('  </candidate>')
+        return '\n'.join(xml)
+    
+    res = '\n'.join(df2.apply(row_to_xml, axis=1))
     out = ['<data>',res,'</data>']
     res = '\n'.join(out)
     if filename is None:
@@ -4414,6 +4431,8 @@ SELECT					cb.name as candidate_name,
         sql = 'exec  [masters].[sp_get_contract_project_target_values]  ?,?,?,?'
         values = (contact_id,user_id,user_role_id,region_id)
         cur2.execute(sql,(values))
+        #   print(cur2.fetchall())
+        print(cur2)
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
             for i in range(len(columns)):
@@ -4491,3 +4510,16 @@ SELECT					cb.name as candidate_name,
             cur.close()
             con.close()
             return out
+    def SaveCandidateActivityStatus(json_string,user_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[candidate_details].[sp_store_sub_candidate_activity_status]  ?, ?,?,?,?,?,?,?,?'
+        values = (json_string,user_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version)
+        cur.execute(sql,(values))
+        for row in cur:
+            success=row[0]
+            description=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        return {"success":success,"description":description}
