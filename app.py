@@ -5294,6 +5294,41 @@ class upload_bulk_upload(Resource):
              
 api.add_resource(upload_bulk_upload,'/upload_bulk_upload')
 
+
+class SaveCandidateActivityStatus(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            client_id = str(request.form['client_id'])
+            client_key = str(request.form['client_key'])
+
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                try:
+                    json_string=''
+                    if 'JsonString' in request.form:
+                        json_string=request.form["JsonString"] 
+                    user_id=0
+                    if 'user_id' in request.form:
+                        user_id=request.form["user_id"] 
+                    latitude = str(request.form['latitude'])
+                    longitude = str(request.form['longitude'])
+                    timestamp = str(request.form['timestamp'])
+                    app_version = str(request.form['app_version'])
+                    device_model = str(request.form['device_model'])
+                    imei_num = str(request.form['imei_num'])
+                    android_version = str(request.form['android_version'])
+                    return Master.SaveCandidateActivityStatus(json_string,user_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version)
+                except Exception as e:
+                    res = {'success': False, 'description': "unable to read data " + str(e)}
+                    return jsonify(res)
+            else:
+                res = {'success': False, 'description': "client name and password not matching"}
+                return jsonify(res)
+        else:
+            res = {'success': False, 'description': "Method is wrong"}
+            return jsonify(res)  
+api.add_resource(SaveCandidateActivityStatus,'/SaveCandidateActivityStatus')
+
 if __name__ == '__main__':    
     app.run(debug=True)
 
