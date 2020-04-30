@@ -4312,7 +4312,7 @@ SELECT					cb.name as candidate_name,
             update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',candidate_stage_id=2,candidate_status_id=2,created_on=GETDATE(),created_by='{}',is_active=1 where candidate_id='{}';
             '''
             quer2='''
-            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type={},identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type={},identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',created_by='{}',aadhar_image_name='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
             '''
 
             url = candidate_xml_weburl + xml
@@ -4322,8 +4322,11 @@ SELECT					cb.name as candidate_name,
             query = ""
             for child in root:
                 data = child.attrib
+                aadhar_image_name=''
+                if 'aadhar_image_name' in data:
+                    aadhar_image_name=data['aadhar_image_name']
                 query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1 if data['dobEntered']=='true' else 0,data['yrsExp'],data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],user_id,data['cand_id'])
-                query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['aadhaarNo'],data['idType'],data['idNum'],data['idCopy'],data['empType'],data['prefJob'],data['relExp'],data['lastCtc'],data['prefLocation'],data['willTravel'],data['workShift'],data['bocwId'],data['expectCtc'],user_id,data['cand_id'])
+                query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['aadhaarNo'],data['idType'],data['idNum'],data['idCopy'],data['empType'],data['prefJob'],data['relExp'],data['lastCtc'],data['prefLocation'],data['willTravel'],data['workShift'],data['bocwId'],data['expectCtc'],user_id,aadhar_image_name,data['cand_id'])
             
             curs.execute(query)
             curs.commit()
