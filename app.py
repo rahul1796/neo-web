@@ -1017,12 +1017,12 @@ class add_edit_map_candidate_batch(Resource):
 class drop_edit_map_candidate_batch(Resource):
     @staticmethod
     def post():
-        candidate_ids=request.form['candidate_ids']
+        skilling_ids=request.form['skilling_ids']
         batch_id=request.form['batch_id']
         course_id=request.form['course_id']
-        user_id= g.user_id
+        user_id= request.form['user_id']
         drop_remark = request.form['drop_remark']
-        return Batch.drop_edit_candidate_batch(str(candidate_ids),batch_id,course_id,user_id,drop_remark)
+        return Batch.drop_edit_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark)
 
 
 api.add_resource(batch_list, '/batch_list')
