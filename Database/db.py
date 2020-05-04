@@ -961,6 +961,18 @@ class Database:
         cur2.close()
         con.close()
         return trainers
+    def GetTrainersBasedOnSubProject(sub_project_id):
+        trainers = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        cur2.execute("EXEC [masters].[sp_get_trainer_based_on_sub_project] @sub_project_id="+str(sub_project_id))
+        columns = [column[0].title() for column in cur2.description]
+        for r in cur2:
+            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            trainers.append(h)
+        cur2.close()
+        con.close()
+        return trainers
     def GetCenterManagerBasedOnCenter(center_id):
         centermanager = []
         con = pyodbc.connect(conn_str)
@@ -3344,6 +3356,7 @@ SELECT					cb.name as candidate_name,
             response.append(h.copy())
         cur2.close()
         con.close()
+        print(response)
         return response
         con.close()       
         return response

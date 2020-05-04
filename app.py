@@ -910,6 +910,14 @@ class trainers_based_on_center(Resource):
             center_id=request.form['center_id']
             return Batch.AllTrainersOnCenter(center_id)
 
+class trainers_based_on_sub_project(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            sub_project_id=request.form['sub_project_id']
+            print(sub_project_id)
+            return Batch.AllTrainersOnSubProject(sub_project_id)
+
 class center_manager_based_on_center(Resource):
     @staticmethod
     def post():
@@ -985,6 +993,7 @@ api.add_resource(get_batch_details, '/GetBatchDetails')
 api.add_resource(all_course_list, '/AllCourseList')
 api.add_resource(centers_based_on_course, '/CentersBasedOnCourse')
 api.add_resource(trainers_based_on_center, '/TrainersBasedOnCenter')
+api.add_resource(trainers_based_on_sub_project, '/TrainersBasedOnSubProject')
 api.add_resource(center_manager_based_on_center, '/CenterManagerBasedOnCenter')
 api.add_resource(candidates_based_on_course,'/ALLCandidatesBasedOnCourse')
 api.add_resource(candidates_maped_in_batch,'/ALLCandidatesMapedInBatch')
