@@ -33,9 +33,6 @@ class Batch:
     def add_edit_candidate_batch(candidate_ids,batch_id,course_id,user_id):
         popupMessage = {"PopupMessage": Database.add_edit_map_candidate_batch(candidate_ids,batch_id,course_id,user_id)}
         return popupMessage
-    def drop_edit_candidate_batch(candidate_ids,batch_id,course_id,user_id,drop_remark):
-        if len(candidate_ids)==0:
-            popupMessage = {"PopupMessage": {"message":"Please select at least one candidate to dropout"}}
-        else:
-            popupMessage = {"PopupMessage": Database.drop_edit_map_candidate_batch(candidate_ids,batch_id,course_id,user_id,drop_remark)}
+    def drop_edit_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark):
+        popupMessage = {"PopupMessage": Database.drop_edit_map_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark)}
         return popupMessage
