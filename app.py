@@ -4775,6 +4775,7 @@ class candidate_download_report(Resource):
                 
                 file_name='candidate_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
                 #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
+
                 resp = candidate_report.create_report(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name,Contracts, candidate_stage, from_date, to_date)
                 
                 return resp
@@ -5198,15 +5199,18 @@ def mobilization():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
-class mobilized_list_updated(Resource):
+class registered_list_updated(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
             candidate_id=request.form['candidate_id']
             region_ids=request.form['region_ids']
             state_ids = request.form["state_ids"]
-            MinAge = request.form["MinAge"]
-            MaxAge = request.form["MaxAge"]
+            Pincode = request.form["Pincode"]
+            ToDate = request.form["ToDate"]
+            FromDate = request.form["FromDate"]
+            created_by = request.form["created_by"]
+            
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
             
@@ -5217,8 +5221,8 @@ class mobilized_list_updated(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             
-            return Candidate.mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-api.add_resource(mobilized_list_updated, '/mobilized_list_updated')
+            return Candidate.registered_list(candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+api.add_resource(registered_list_updated, '/registered_list_updated')
 
 class DownloadMobTemplate(Resource):
     report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
@@ -5235,7 +5239,6 @@ class DownloadMobTemplate(Resource):
                 #print(str(e))
                 return {"exceptione":str(e)}
 api.add_resource(DownloadMobTemplate,'/DownloadMobTemplate')
-
 
 class upload_bulk_upload(Resource):
     @staticmethod
@@ -5308,7 +5311,92 @@ class upload_bulk_upload(Resource):
                     else:
                         out = Database.mobilization_web_inser(df,user_id)
                         return out
+
+                elif cand_stage==str(2):
+                    df= pd.read_excel(file_name,sheet_name='Registration')
+                    df = df.fillna('')
+                    df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
+                    df['ids']=df['Aadhar No*'].astype(str)+df['Identity number*'].astype(str)
+                    schema = Schema([
+                            #nan check column non mandate
+                            Column('Candidate_id',null_validation),
+                            Column('Candidate Photo',null_validation),
+                            Column('Middle Name',null_validation),
+                            Column('Last Name',null_validation),
+                            Column('Secondary Contact  No',null_validation),
+                            Column('Email id',null_validation),
+                            Column('Present Panchayat',null_validation),
+                            Column('Present Taluk/Block',null_validation),
+                            Column('Present Address line1',null_validation),
+                            Column('Present Address line2',null_validation),
+                            Column('Present Village',null_validation),
+                            Column('Permanent Address line1',null_validation),
+                            Column('Permanent Address line2',null_validation),
+                            Column('Permanent Village',null_validation),
+                            Column('Permanent Panchayat',null_validation),
+                            Column('Permanent Taluk/Block',null_validation),
+                            #str+null check
+                            Column('Fresher/Experienced?*',str_validation + null_validation),
+                            Column('Salutation*',str_validation + null_validation),
+                            Column('First Name*',str_validation + null_validation),
+                            Column('Gender*',str_validation + null_validation),
+                            Column('Marital Status*',str_validation + null_validation),
+                            Column('Caste*',str_validation + null_validation),
+                            Column('Disability Status*',str_validation + null_validation),
+                            Column('Religion*',str_validation + null_validation),
+                            Column('Mother Tongue*',str_validation + null_validation),
+                            Column('Occupation*',str_validation + null_validation),
+                            Column('Average annual income*',str_validation + null_validation),
+                            Column('Source of Information*',str_validation + null_validation),
+                            Column('Interested Course*',str_validation + null_validation),
+                            Column('Product*',str_validation + null_validation),
+                            Column('Present District*',str_validation + null_validation),
+                            Column('Present State*',str_validation + null_validation),
+                            Column('Present Country*',str_validation + null_validation),
+                            Column('Permanent District*',str_validation + null_validation),
+                            Column('Permanent State*',str_validation + null_validation),
+                            Column('Permanent Country*',str_validation + null_validation),
+                            Column('Document copy*',str_validation + null_validation),
+                            Column('Employment Type*',str_validation + null_validation),
+                            Column('Preferred Job Role*',str_validation + null_validation),
+                            Column('Years Of Experience*',str_validation + null_validation),
+                            Column('Relevant Years of Experience*',str_validation + null_validation),
+                            Column('Current/Last CTC*',str_validation + null_validation),
+                            Column('Preferred Location*',str_validation + null_validation),
+                            Column('Willing to travel?*',str_validation + null_validation),
+                            Column('Willing to work in shifts?*',str_validation + null_validation),
+                            Column('BOCW Registration Id*',str_validation + null_validation),
+                            Column('Expected CTC*',str_validation + null_validation),
+                            #pincode check
+                            Column('Present Pincode*',pincode_validation + null_validation),
+                            Column('Permanent Pincode*',pincode_validation + null_validation),
+                            #mobile number check
+                            Column('Primary contact  No*',mob_validation + null_validation),
+                            #date of birth and age pass(null check)
+                            Column('Date of Birth*',null_validation),
+                            Column('Age*',null_validation),
+                            Column('date_age',dob_validation),
+                            #ID Validation pass(null check)
+                            Column('Aadhar No*',null_validation),
+                            Column('Identifier Type*',null_validation),
+                            Column('Identity number*',null_validation),
+                            Column('ids',str_validation+null_validation)
+                            ])
+                    errors = schema.validate(df)
+                    errors_index_rows = [e.row for e in errors]
+
+                    #df_clean = df.drop(index=errors_index_rows)
+                    #df_clean.to_csv('clean_data.csv',index=None)
+                    len_error = len(errors_index_rows)
+                    if len_error>0:
+                        pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv')
+                        return {"Status":False, "message":"Uploaded Failed (fails to validate data)" }
+                    else:
+                        out = Database.registration_web_inser(df,user_id)
+                        return out
+                
                 else:
+
                     return {"Status":False, "message":"Wrong Candidate Stage" }
 
             except Exception as e:
@@ -5316,6 +5404,67 @@ class upload_bulk_upload(Resource):
              
 api.add_resource(upload_bulk_upload,'/upload_bulk_upload')
 
+
+@app.route("/registration_list_page")
+def registration_list_page():
+    if g.user:
+        #status=request.args.get('status',-1,type=int)
+        return render_template("Candidate/registration_list.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
+@app.route("/registration")
+def registration():
+    if g.user:
+        #status=request.args.get('status',-1,type=int) 
+        html_str="registration_list_page"    #?status=" + str(status)
+        return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class AllCreatedByBasedOnUser(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                UserId=request.args.get('user_id',0,type=int)
+                UserRoleId=request.args.get('user_role_id',0,type=int)
+                
+                response=Database.AllCreatedByBasedOnUser(UserId,UserRoleId)
+                return {'CreatedBy':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(AllCreatedByBasedOnUser,'/AllCreatedByBasedOnUser')
+
+class DownloadRegTemplate(Resource):
+    report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                candidate_ids = request.form["candidate_ids"]
+                file_name='Master_reg_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                data = Database.download_selected_registration_candidate(candidate_ids,file_name)
+                if len(data[0])==0:
+                    return {'Description':'candidates not available', 'Status':False}
+                else:
+                    df = pd.read_excel(config.bulk_upload_path +'Master_Registration.xlsx')
+                    col = df.columns.to_list()
+                    d={}
+                    for i in range(len(data)):
+                        for j in range(len(col)):
+                            d[col[j]]=data[i][j]
+                        df = df.append(d,ignore_index=True)
+                    df.to_excel(config.bulk_upload_path + file_name,sheet_name='Registration',index=False)
+                    return {'Description':'Downloaded Template', 'Status':True, 'filename':file_name}
+                
+            except Exception as e:
+                return {'Description':'Error: '+str(e), 'Status':False}
+api.add_resource(DownloadRegTemplate,'/DownloadRegTemplate')
 
 class SaveCandidateActivityStatus(Resource):
     @staticmethod
@@ -5350,6 +5499,7 @@ class SaveCandidateActivityStatus(Resource):
             res = {'success': False, 'description': "Method is wrong"}
             return jsonify(res)  
 api.add_resource(SaveCandidateActivityStatus,'/SaveCandidateActivityStatus')
+
 
 if __name__ == '__main__':    
     app.run(debug=True)
