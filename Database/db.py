@@ -7,6 +7,8 @@ from datetime import datetime
 from flask import request
 import requests
 import xml.etree.ElementTree as ET
+import requests
+
 
 def to_xml(df, filename=None, mode='w'):
     if len(df)>0:
@@ -4453,6 +4455,7 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
+<<<<<<< Updated upstream
 
     def sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project):
         response = {}
@@ -4535,3 +4538,5 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return {"success":success,"description":description}
+=======
+>>>>>>> Stashed changes
