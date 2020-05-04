@@ -5457,7 +5457,6 @@ class DownloadRegTemplate(Resource):
                 return {'Description':'Error: '+str(e), 'Status':False}
 api.add_resource(DownloadRegTemplate,'/DownloadRegTemplate')
 
-
 if __name__ == '__main__':    
     app.run(debug=True)
 
