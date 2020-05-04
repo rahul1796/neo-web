@@ -5242,7 +5242,7 @@ class upload_bulk_upload(Resource):
                 if cand_stage==str(1):
                     df= pd.read_excel(file_name,sheet_name='Mobilizer')
                     df = df.fillna('')
-                    df['date_age']=df['Age*']+df['Date of Birth*'].astype(str)
+                    df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
                     
                     schema = Schema([
                             #nan check column non mandate
