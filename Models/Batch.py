@@ -10,6 +10,7 @@ class Batch:
         return popupMessage
     def get_batch(batch_id):
         indi_batch={"BatchDetail":Database.get_batch_details(batch_id)}
+        #print(indi_batch)
         return indi_batch
     def AllCourse():
         course_f={"Courses":Database.GetCourse()}
@@ -19,6 +20,11 @@ class Batch:
         return centers_f
     def AllTrainersOnCenter(center_id):
         trainers_f={"Trainers":Database.GetTrainersBasedOnCenter(center_id)}
+        return trainers_f
+    def AllTrainersOnSubProject(SubProject_Id):
+        print(SubProject_Id)
+        trainers_f={"Trainers":Database.GetTrainersBasedOnSubProject(SubProject_Id)}
+        print(trainers_f)
         return trainers_f
     def AllCenterManagerOnCenter(center_id):
         centermanager_f={"CenterManager":Database.GetCenterManagerBasedOnCenter(center_id)}
