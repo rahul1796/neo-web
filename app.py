@@ -957,6 +957,14 @@ class trainers_based_on_center(Resource):
             center_id=request.form['center_id']
             return Batch.AllTrainersOnCenter(center_id)
 
+class trainers_based_on_sub_project(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            sub_project_id=request.form['sub_project_id']
+            print(sub_project_id)
+            return Batch.AllTrainersOnSubProject(sub_project_id)
+
 class center_manager_based_on_center(Resource):
     @staticmethod
     def post():
@@ -1017,12 +1025,12 @@ class add_edit_map_candidate_batch(Resource):
 class drop_edit_map_candidate_batch(Resource):
     @staticmethod
     def post():
-        candidate_ids=request.form['candidate_ids']
+        skilling_ids=request.form['skilling_ids']
         batch_id=request.form['batch_id']
         course_id=request.form['course_id']
-        user_id= g.user_id
+        user_id= request.form['user_id']
         drop_remark = request.form['drop_remark']
-        return Batch.drop_edit_candidate_batch(str(candidate_ids),batch_id,course_id,user_id,drop_remark)
+        return Batch.drop_edit_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark)
 
 
 api.add_resource(batch_list, '/batch_list')
@@ -1032,6 +1040,7 @@ api.add_resource(get_batch_details, '/GetBatchDetails')
 api.add_resource(all_course_list, '/AllCourseList')
 api.add_resource(centers_based_on_course, '/CentersBasedOnCourse')
 api.add_resource(trainers_based_on_center, '/TrainersBasedOnCenter')
+api.add_resource(trainers_based_on_sub_project, '/TrainersBasedOnSubProject')
 api.add_resource(center_manager_based_on_center, '/CenterManagerBasedOnCenter')
 api.add_resource(candidates_based_on_course,'/ALLCandidatesBasedOnCourse')
 api.add_resource(candidates_maped_in_batch,'/ALLCandidatesMapedInBatch')
@@ -5231,7 +5240,6 @@ class DownloadMobTemplate(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(DownloadMobTemplate,'/DownloadMobTemplate')
 
-
 class upload_bulk_upload(Resource):
     @staticmethod
     def post():
@@ -5396,6 +5404,7 @@ class upload_bulk_upload(Resource):
              
 api.add_resource(upload_bulk_upload,'/upload_bulk_upload')
 
+
 @app.route("/registration_list_page")
 def registration_list_page():
     if g.user:
@@ -5456,6 +5465,41 @@ class DownloadRegTemplate(Resource):
             except Exception as e:
                 return {'Description':'Error: '+str(e), 'Status':False}
 api.add_resource(DownloadRegTemplate,'/DownloadRegTemplate')
+
+class SaveCandidateActivityStatus(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            client_id = str(request.form['client_id'])
+            client_key = str(request.form['client_key'])
+
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                try:
+                    json_string=''
+                    if 'JsonString' in request.form:
+                        json_string=request.form["JsonString"] 
+                    user_id=0
+                    if 'user_id' in request.form:
+                        user_id=request.form["user_id"] 
+                    latitude = str(request.form['latitude'])
+                    longitude = str(request.form['longitude'])
+                    timestamp = str(request.form['timestamp'])
+                    app_version = str(request.form['app_version'])
+                    device_model = str(request.form['device_model'])
+                    imei_num = str(request.form['imei_num'])
+                    android_version = str(request.form['android_version'])
+                    return Master.SaveCandidateActivityStatus(json_string,user_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version)
+                except Exception as e:
+                    res = {'success': False, 'description': "unable to read data " + str(e)}
+                    return jsonify(res)
+            else:
+                res = {'success': False, 'description': "client name and password not matching"}
+                return jsonify(res)
+        else:
+            res = {'success': False, 'description': "Method is wrong"}
+            return jsonify(res)  
+api.add_resource(SaveCandidateActivityStatus,'/SaveCandidateActivityStatus')
+
 
 if __name__ == '__main__':    
     app.run(debug=True)

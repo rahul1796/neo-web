@@ -7,15 +7,40 @@ from datetime import datetime
 from flask import request
 import requests
 import xml.etree.ElementTree as ET
+import requests
+
 
 def to_xml(df, filename=None, mode='w'):
-    def row_to_xml(row):
-        xml = ['<candidate>']
+    if len(df)>0:
+        df1=df[['Candidate_Id','Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On']]
+        df2=df.drop(['Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On'],axis=1)
+        df2.drop_duplicates(subset ="Candidate_Id",inplace=True)
+    else:
+        df1=None
+        df2=None
+
+    def nested_row_to_xml(row):
+        xml = ['      <status>']
         for i, col_name in enumerate(row.index):
-            xml.append('  <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
-        xml.append('</candidate>')
+            xml.append('        <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
+        xml.append('      </status>')
         return '\n'.join(xml)
-    res = '\n'.join(df.apply(row_to_xml, axis=1))
+
+    def row_to_xml(row):
+        xml = ['  <candidate>']
+        for i, col_name in enumerate(row.index):
+            xml.append('    <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
+        df3=df1.loc[(df1['Candidate_Id'] == row['Candidate_Id']) & (df1['Activity_Status_Id']>0)]
+        #print(df3.dtypes)
+        xml.append('    <statushistory>')
+        xml.append('\n'.join(df3.apply(nested_row_to_xml, axis=1)))
+        xml.append('    </statushistory>')
+        xml.append('  </candidate>')
+        return '\n'.join(xml)
+    res=''
+    if len(df)>0:
+        res = '\n'.join(df2.apply(row_to_xml, axis=1))
+    
     out = ['<data>',res,'</data>']
     res = '\n'.join(out)
     if filename is None:
@@ -961,6 +986,18 @@ class Database:
         cur2.close()
         con.close()
         return trainers
+    def GetTrainersBasedOnSubProject(sub_project_id):
+        trainers = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        cur2.execute("EXEC [masters].[sp_get_trainer_based_on_sub_project] @sub_project_id="+str(sub_project_id))
+        columns = [column[0].title() for column in cur2.description]
+        for r in cur2:
+            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            trainers.append(h)
+        cur2.close()
+        con.close()
+        return trainers
     def GetCenterManagerBasedOnCenter(center_id):
         centermanager = []
         con = pyodbc.connect(conn_str)
@@ -1045,11 +1082,11 @@ class Database:
             msg={"message":"Candidate Mapping"}
         return msg
 
-    def drop_edit_map_candidate_batch(candidate_ids,batch_id,course_id,user_id,drop_remark):
+    def drop_edit_map_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec	[candidate_details].[drop_edit_map_candidate_batch] ?, ?, ?, ?, ?'
-        values = (candidate_ids,batch_id,course_id,user_id,drop_remark)
+        values = (skilling_ids,batch_id,course_id,user_id,drop_remark)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -1057,7 +1094,7 @@ class Database:
         cur.close()
         con.close()
         if pop ==1:
-            msg={"message":"Candidate Dropout"}
+            msg={"message":"Candidate(s) Dropped"}
         else:
             msg={"message":"Error fetching batch data for Droping"}
         return msg
@@ -3394,6 +3431,7 @@ SELECT					cb.name as candidate_name,
             response.append(h.copy())
         cur2.close()
         con.close()
+        print(response)
         return response
         con.close()       
         return response
@@ -3914,13 +3952,16 @@ SELECT					cb.name as candidate_name,
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
+        h={}
         sql = 'exec [masters].[sp_Getcandidatebybatch]  ?'
         values = (batch_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
-            response.append(h)
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+            response.append(h.copy())
         out = {"candidates":response,"batch_name":row[7],"center_name":row[8]}
         cur.close()
         con.close()       
@@ -4315,7 +4356,7 @@ SELECT					cb.name as candidate_name,
             update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',candidate_stage_id=2,candidate_status_id=2,created_on=GETDATE(),created_by='{}',is_active=1 where candidate_id='{}';
             '''
             quer2='''
-            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type={},identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type={},identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',created_by='{}',aadhar_image_name='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
             '''
 
             url = candidate_xml_weburl + xml
@@ -4325,8 +4366,11 @@ SELECT					cb.name as candidate_name,
             query = ""
             for child in root:
                 data = child.attrib
+                aadhar_image_name=''
+                if 'aadhar_image_name' in data:
+                    aadhar_image_name=data['aadhar_image_name']
                 query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1 if data['dobEntered']=='true' else 0,data['yrsExp'],data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],user_id,data['cand_id'])
-                query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['aadhaarNo'],data['idType'],data['idNum'],data['idCopy'],data['empType'],data['prefJob'],data['relExp'],data['lastCtc'],data['prefLocation'],data['willTravel'],data['workShift'],data['bocwId'],data['expectCtc'],user_id,data['cand_id'])
+                query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['aadhaarNo'],data['idType'],data['idNum'],data['idCopy'],data['empType'],data['prefJob'],data['relExp'],data['lastCtc'],data['prefLocation'],data['willTravel'],data['workShift'],data['bocwId'],data['expectCtc'],user_id,aadhar_image_name,data['cand_id'])
             
             curs.execute(query)
             curs.commit()
@@ -4440,6 +4484,8 @@ SELECT					cb.name as candidate_name,
         sql = 'exec  [masters].[sp_get_contract_project_target_values]  ?,?,?,?'
         values = (contact_id,user_id,user_role_id,region_id)
         cur2.execute(sql,(values))
+        #   print(cur2.fetchall())
+        print(cur2)
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
             for i in range(len(columns)):
@@ -4583,3 +4629,17 @@ SELECT					cb.name as candidate_name,
             cur.close()
             con.close()
             return out
+          
+    def SaveCandidateActivityStatus(json_string,user_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[candidate_details].[sp_store_sub_candidate_activity_status]  ?, ?,?,?,?,?,?,?,?'
+        values = (json_string,user_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version)
+        cur.execute(sql,(values))
+        for row in cur:
+            success=row[0]
+            description=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        return {"success":success,"description":description}
