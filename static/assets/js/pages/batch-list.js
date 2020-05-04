@@ -539,18 +539,39 @@ $('.center').show();
 
 }
 function save(){
-    if(flag == 'drop' ){
-        if($('#txtremark').val()!=''){
-            add_drop_message();
-        }
-        else{
-            $('#con_close_modal').modal('show');
-        }
-        
+    if($('#txtremark').val()=='')
+    {
+        alert('Please enter reason.');
     }
-    else if(flag=='map'){
-        //alert(flag)
-        add_map_message();
+    else
+    {
+        var URL=$('#hdn_web_url').val()+ "/drop_edit_candidate_batch";
+            $.ajax({
+                type:"POST",
+                url:URL,
+                data:{
+                    "course_id": 0,
+                    "skilling_ids": $('#hdn_mdl_skilling_id').val(),
+                    "batch_id": $('#hdn_mdl_batch_id').val(),
+                    "drop_remark": $('#txtremark').val(),
+                    "user_id":$('#hdn_home_user_id').val()
+                },
+                success:function(data){
+                    swal({   
+                        title:data.PopupMessage.message,
+                        text:data.PopupMessage.message+" Successfully !!",
+                        icon:"success",
+                        confirmButtonClass:"btn btn-confirm mt-2"
+                        }).then(function(){
+                            window.location.href = '/batch';
+                        });
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
     }
 }
 function add_map_message(){
@@ -571,11 +592,6 @@ function add_map_message(){
                     "batch_id": Batch
                 },
                 success:function(data){
-                    // var table = $('#tbl_candidate');
-                    
-                    // swal({
-                    //     html: table
-                    // }).then(function(){
                     swal({   
                         title:data.PopupMessage.message,
                         text:data.PopupMessage.message+" Done Successfully !!",
@@ -584,9 +600,6 @@ function add_map_message(){
                         }).then(function(){
                             window.location.href = '/after_popup_batch';
                         });
-                //    alert("The Inserted/Upadated Id is "+data.PopupMessage.message);
-                //    window.location.href="/after_popup"; 
-                // })
                 },
                 error:function(err)
                 {
@@ -605,8 +618,6 @@ function add_map_message(){
         cands=cands.substring(0,cands.length-1)
 	
         var URL=$('#hdn_web_url').val()+ "/drop_edit_candidate_batch";
-        //alert(Course + ',' + Batch +',' + $('#txtremark').val())
-            //alert($('#ddlCourse').val());
                 $.ajax({
                     type:"POST",
                     url:URL,
@@ -617,11 +628,6 @@ function add_map_message(){
                         "drop_remark": $('#txtremark').val()
                     },
                     success:function(data){
-                        // var table = $('#tbl_candidate');
-                        
-                        // swal({
-                        //     html: table
-                        // }).then(function(){
                         swal({   
                             title:data.PopupMessage.message,
                             text:data.PopupMessage.message+" Done Successfully !!",
@@ -630,9 +636,6 @@ function add_map_message(){
                             }).then(function(){
                                 window.location.href = '/after_popup_batch';
                             });
-                    //    alert("The Inserted/Upadated Id is "+data.PopupMessage.message);
-                    //    window.location.href="/after_popup"; 
-                    // })
                     },
                     error:function(err)
                     {
@@ -779,6 +782,7 @@ function add_map_message(){
 
         function GetCandidate_Detail(batch_id){
             //alert(Project_Id)
+            $('#con_close_modal').modal('hide');
             var URL=$('#hdn_web_url').val()+ "/Getcandidatebybatch?batch_id="+batch_id;
             $.ajax({
                 type:"GET",
@@ -803,7 +807,9 @@ function add_map_message(){
                                 {
                                     varHtml+='<tr>';
                                     varHtml+='  <td style="text-align:center;">'+ data.candidates[i].S_No +'</td>';
+                                    varHtml += '<td style="text-align:center;"><input id="addedchk_'+data.candidates[i].Skilling_Id+'" name="checkcase" type="checkbox" value="'+data.candidates[i].Skilling_Id+'" ></td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Candidate_Name +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Intervention_Value +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Date_Of_Birth +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Gender +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Marital_Status +'</td>';
@@ -815,18 +821,19 @@ function add_map_message(){
                             }
                             $("#tblcandidate_details tbody").append(varHtml);
                             $("#tblcandidate_details").DataTable();
-                            $('#tr_candidate_detail').modal('show');
+                            $('#tr_candidate_detail').modal('show');                            
+                            $('#hdn_mdl_batch_id').val(batch_id);
                         }
                         else
                     {
-                        varHtml='<tr><td colspan="3" style="text-align:center;">No records found</td></tr>'
+                        varHtml='<tr><td colspan="9" style="text-align:center;">No records found</td></tr>'
                         $("#tblcandidate_details tbody").append(varHtml);
                         $('#tr_candidate_detail').modal('show');
                     }
                     }
                     else
                     {
-                        varHtml='<tr><td colspan="3" style="text-align:center;">No records found</td></tr>'
+                        varHtml='<tr><td colspan="9" style="text-align:center;">No records found</td></tr>'
                         $("#tblcandidate_details tbody").append(varHtml);
                         $('#tr_candidate_detail').modal('show');
                     }   
@@ -902,3 +909,25 @@ function add_map_message(){
             });
             return false;
         } 
+    function DropCandidates()
+    {
+        var cands='';
+        $('[name=checkcase]:checked').each(function () {
+            cands+= $(this).val()+',';
+        });
+        cands=cands.substring(0,cands.length-1)
+        if (cands=='')
+        {
+            alert('Select at least one candidate to drop.');
+        }
+        else
+        {
+            $('#hdn_mdl_skilling_id').val(cands);
+            $('#tr_candidate_detail').modal('hide');
+            $('#con_close_modal').modal('show');
+        }
+    }
+    function back()
+    {
+        GetCandidate_Detail($('#hdn_mdl_batch_id').val());
+    }

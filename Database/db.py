@@ -1068,11 +1068,11 @@ class Database:
             msg={"message":"Candidate Mapping"}
         return msg
 
-    def drop_edit_map_candidate_batch(candidate_ids,batch_id,course_id,user_id,drop_remark):
+    def drop_edit_map_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec	[candidate_details].[drop_edit_map_candidate_batch] ?, ?, ?, ?, ?'
-        values = (candidate_ids,batch_id,course_id,user_id,drop_remark)
+        values = (skilling_ids,batch_id,course_id,user_id,drop_remark)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -1080,7 +1080,7 @@ class Database:
         cur.close()
         con.close()
         if pop ==1:
-            msg={"message":"Candidate Dropout"}
+            msg={"message":"Candidate(s) Dropped"}
         else:
             msg={"message":"Error fetching batch data for Droping"}
         return msg
@@ -3911,13 +3911,16 @@ SELECT					cb.name as candidate_name,
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
+        h={}
         sql = 'exec [masters].[sp_Getcandidatebybatch]  ?'
         values = (batch_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
-            response.append(h)
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+            response.append(h.copy())
         out = {"candidates":response,"batch_name":row[7],"center_name":row[8]}
         cur.close()
         con.close()       
