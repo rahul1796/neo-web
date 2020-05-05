@@ -1208,8 +1208,30 @@ class Database:
         cur = con.cursor()
         sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_R] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
         values = (candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
-        print(values)
-        print(sql)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):                
+                h[columns[i]]=row[i] if row[i]!=None else 'NA'
+            d.append(h.copy())            
+        content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        return content
+    
+    def enrolled_list(candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        content = {}
+        d = []
+        h={}
+        
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_E] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -4619,7 +4641,7 @@ SELECT					cb.name as candidate_name,
                 query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],user_id,row[0])
                 query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[23],row[32],user_id,row[0])
                 query += '\n' + quer3.format(row[24],row[25],row[26],row[27],row[33],row[34],row[35],row[36],user_id,row[0])
-            print(query)
+            
             cur.execute(query)
             cur.commit()
             out = {'Status': True, 'message': "Submitted Successfully"}
@@ -4629,7 +4651,75 @@ SELECT					cb.name as candidate_name,
             cur.close()
             con.close()
             return out
-          
+    
+    def enrollment_web_inser(df,user_id):
+        try:
+            conn = pyodbc.connect(conn_str)
+            curs = conn.cursor()
+
+            df['Date of Birth*'] = df['Date of Birth*'].astype(str)
+            out = df.values.tolist()
+            quer1 = '''
+            update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',is_active=1 where candidate_id='{}';
+            '''
+            quer2='''
+            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',present_address_line1='{}',permanaet_address_line1='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where identification_name='{}'),identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',highest_qualification='{}',stream_specialization='{}',computer_knowledge='{}',technical_knowledge='{}',family_salutation='{}',member_name='{}',gender='{}',education_qualification='{}',relationship='{}',occupation='{}',average_household_income='{}',bank_name='{}',account_number='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            '''
+            quer3='''
+            update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set present_address_line2='{}',present_village='{}',present_panchayat='{}',present_taluk_block='{}',permanent_address_line2='{}',permanent_village='{}',permanent_panchayat='{}',permanent_taluk_block='{}',name_of_institute='{}',university='{}',year_of_pass='{}',percentage='{}',family_date_of_birth='{}',family_age='{}',family_primary_contact='{}',family_email_address='{}',branch_name='{}',branch_code='{}',account_type='{}',attachment_image_name='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            '''
+            quer4='''
+            insert into candidate_details.tbl_candidate_interventions
+            (candidate_id,intervention_category,created_on,created_by,is_active)
+            OUTPUT inserted.candidate_intervention_id
+            values
+            '''
+            quer5='''
+            insert into candidate_details.tbl_map_candidate_intervention_skilling
+            (intervention_id, course_id, batch_id, intervention_value, created_on,created_by,is_active)
+            values
+            '''
+            quer6='''
+            update	candidate_details.tbl_map_candidate_intervention_skilling set batch_id='{}' where intervention_id='{}'
+            '''
+            query = ""
+            b=[]
+            for row in out:
+                que = '''select candidate_intervention_id from candidate_details.tbl_candidate_interventions where candidate_id='{}' '''.format(row[0])
+                curs.execute(que)
+                intervention_id = curs.fetchall()
+                if intervention_id!=[]:
+                    query += quer6.format(row[80],intervention_id[0][0])
+                else:
+                    b.append(row[80])
+                    quer4 += '\n' + "({},'SAE',GETDATE(),{},1),".format(row[0],user_id)
+                
+                query += '\n' + quer1.format(1 if str(row[1]).lower()=='Fresher' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],user_id,row[0])
+                query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[23],row[32],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[55],row[56],row[61],row[62],row[63],row[64],row[69],row[70],row[71],row[72],row[73],row[74],row[78],user_id,row[0])
+                query += '\n' + quer3.format(row[24],row[25],row[26],row[27],row[33],row[34],row[35],row[36],row[57],row[58],row[59],row[60],row[65],row[66],row[67],row[68],row[75],row[76],row[77],row[79],user_id,row[0])
+            
+            curs.execute(query)
+            curs.commit()
+            
+            quer4 = quer4[:-1]+';'
+            curs.execute(quer4)
+            d = list(map(lambda x:x[0],curs.fetchall()))
+            
+            curs.commit()
+            for i in range(len(d)):
+                quer5 += '\n' + "({},(select course_id from batches.tbl_batches where batch_id={}),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],b[i],b[i],user_id)
+            quer5 = quer5[:-1]+';'
+            curs.execute(quer5)
+            curs.commit()
+
+            out = {'Status': True, 'message': "Submitted Successfully"}
+        except Exception as e:
+            out = {'Status': False, 'message': "error: "+str(e)}
+        finally:
+            curs.close()
+            conn.close()
+            return out
+
     def SaveCandidateActivityStatus(json_string,user_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -4643,6 +4733,21 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return {"success":success,"description":description}
+
+
+    def download_selected_enrolled_candidate(candidate_ids,filename):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[candidate_details].[sp_get_candidate_download_new_E] ?'
+        values = (candidate_ids,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        data = list(map(lambda x:list(x),cur.fetchall()))
+        cur.close()
+        con.close()
+        return data
 
     def get_center_details(center_id):
         con = pyodbc.connect(conn_str)
@@ -4659,4 +4764,3 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return h
-

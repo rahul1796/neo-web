@@ -40,7 +40,7 @@ import requests
 def check_str(st):
     try:
         st = str(st)
-        return re.match(r"[A-Za-z0-9!@#$%&\*\.\,\+-_\s]+",st).group()==st
+        return re.match(r"[A-Za-z0-9!@#$%&|\*\.\,\+-_\s\\]+",st).group()==st
     except:
         return False
 
@@ -5393,15 +5393,120 @@ class upload_bulk_upload(Resource):
                         out = Database.registration_web_inser(df,user_id)
                         return out
                 
-                else:
+                elif cand_stage==str(3):
+                    df= pd.read_excel(file_name,sheet_name='Enrollment')
+                    df = df.fillna('')
+                    df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
+                    df['ids']=df['Aadhar No*'].astype(str)+df['Identity number*'].astype(str)
+                    schema = Schema([
+                            #nan check column non mandate
+                            Column('Candidate_id',null_validation),
+                            Column('Middle Name',null_validation),
+                            Column('Last Name',null_validation),
+                            Column('Secondary Contact  No',null_validation),
+                            Column('Email id',null_validation),
+                            Column('Present Panchayat',null_validation),
+                            Column('Present Taluk/Block',null_validation),
+                            Column('Present Address line2',null_validation),
+                            Column('Present Village',null_validation),
+                            Column('Permanent Address line2',null_validation),
+                            Column('Permanent Village',null_validation),
+                            Column('Permanent Panchayat',null_validation),
+                            Column('Permanent Taluk/Block',null_validation),
+                            Column('Name of Institute',null_validation),
+                            Column('University',null_validation),
+                            Column('Year Of Pass',null_validation),
+                            Column('Percentage',null_validation),
+                            Column('Date Of birth',null_validation),
+                            Column('Age',null_validation),
+                            Column('Primary contact',null_validation),
+                            Column('Email Address',null_validation),
+                            Column('Occupation',null_validation),
+                            Column('Branch Name',null_validation),
+                            Column('Branch Code',null_validation),
+                            Column('Account type',null_validation),
+                            Column('Attachment',null_validation),
+                            #str+null check
+                            Column('Fresher/Experienced?*',str_validation + null_validation),
+                            Column('Candidate Photo*',str_validation + null_validation),
+                            Column('Salutation*',str_validation + null_validation),
+                            Column('First Name*',str_validation + null_validation),
+                            Column('Gender*',str_validation + null_validation),
+                            Column('Marital Status*',str_validation + null_validation),
+                            Column('Caste*',str_validation + null_validation),
+                            Column('Disability Status*',str_validation + null_validation),
+                            Column('Religion*',str_validation + null_validation),
+                            Column('Mother Tongue*',str_validation + null_validation),
+                            Column('Occupation*',str_validation + null_validation),
+                            Column('Average annual income*',str_validation + null_validation),
+                            Column('Source of Information*',str_validation + null_validation),
+                            Column('Interested Course*',str_validation + null_validation),
+                            Column('Product*',str_validation + null_validation),
+                            Column('Present Address line1*',str_validation + null_validation),
+                            Column('Present District*',str_validation + null_validation),
+                            Column('Present State*',str_validation + null_validation),
+                            Column('Present Country*',str_validation + null_validation),
+                            Column('Permanent Address line1*',str_validation + null_validation),
+                            Column('Permanent District*',str_validation + null_validation),
+                            Column('Permanent State*',str_validation + null_validation),
+                            Column('Permanent Country*',str_validation + null_validation),
+                            Column('Document copy*',str_validation + null_validation),
+                            Column('Employment Type*',str_validation + null_validation),
+                            Column('Preferred Job Role*',str_validation + null_validation),
+                            Column('Years Of Experience*',str_validation + null_validation),
+                            Column('Relevant Years of Experience*',str_validation + null_validation),
+                            Column('Current/Last CTC*',str_validation + null_validation),
+                            Column('Preferred Location*',str_validation + null_validation),
+                            Column('Willing to travel?*',str_validation + null_validation),
+                            Column('Willing to work in shifts?*',str_validation + null_validation),
+                            Column('BOCW Registration Id*',str_validation + null_validation),
+                            Column('Expected CTC*',str_validation + null_validation),
+                            Column('Highest Qualification*',str_validation + null_validation),
+                            Column('Stream/Specialization*',str_validation + null_validation),
+                            Column('Computer Knowledge*',str_validation + null_validation),
+                            Column('Technical Knowledge*',str_validation + null_validation),
+                            Column('family_Salutation*',str_validation + null_validation),
+                            Column('Member Name*',str_validation + null_validation),
+                            Column('family_Gender*',str_validation + null_validation),
+                            Column('Education Qualification*',str_validation + null_validation),
+                            Column('Relationship*',str_validation + null_validation),
+                            Column('Average Household Income*',str_validation + null_validation),
+                            Column('Bank Name*',str_validation + null_validation),
+                            Column('Account Number*',str_validation + null_validation),
+                            Column('batch_id*',str_validation + null_validation),
+                            #pincode check
+                            Column('Present Pincode*',pincode_validation + null_validation),
+                            Column('Permanent Pincode*',pincode_validation + null_validation),
+                            #mobile number check
+                            Column('Primary contact  No*',mob_validation + null_validation),
+                            #date of birth and age pass(null check)
+                            Column('Date of Birth*',null_validation),
+                            Column('Age*',null_validation),
+                            Column('date_age',dob_validation),
+                            #ID Validation pass(null check)
+                            Column('Aadhar No*',null_validation),
+                            Column('Identifier Type*',null_validation),
+                            Column('Identity number*',null_validation),
+                            Column('ids',str_validation+null_validation)
+                            ])
+                    errors = schema.validate(df)
+                    errors_index_rows = [e.row for e in errors]
 
+                    len_error = len(errors_index_rows)
+                    if len_error>0:
+                        pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv')
+                        return {"Status":False, "message":"Uploaded Failed (fails to validate data)" }
+                    else:
+                        out = Database.enrollment_web_inser(df,user_id)
+                        return out
+                
+                else:
                     return {"Status":False, "message":"Wrong Candidate Stage" }
 
             except Exception as e:
                  return {"Status":False, "message":"Unable to upload " + str(e)}  
              
 api.add_resource(upload_bulk_upload,'/upload_bulk_upload')
-
 
 @app.route("/registration_list_page")
 def registration_list_page():
@@ -5410,7 +5515,6 @@ def registration_list_page():
         return render_template("Candidate/registration_list.html")
     else:
         return render_template("login.html",error="Session Time Out!!")
-
 
 @app.route("/registration")
 def registration():
@@ -5497,6 +5601,74 @@ class SaveCandidateActivityStatus(Resource):
             res = {'success': False, 'description': "Method is wrong"}
             return jsonify(res)  
 api.add_resource(SaveCandidateActivityStatus,'/SaveCandidateActivityStatus')
+
+@app.route("/enrollment_list_page")
+def enrollment_list_page():
+    if g.user:
+        #status=request.args.get('status',-1,type=int)
+        return render_template("Candidate/enrollment_list.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/enrollment")
+def enrollment():
+    if g.user:
+        #status=request.args.get('status',-1,type=int) 
+        html_str="enrollment_list_page"    #?status=" + str(status)
+        return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class enrolled_list_updated(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            candidate_id=request.form['candidate_id']
+            region_ids=request.form['region_ids']
+            state_ids = request.form["state_ids"]
+            Pincode = request.form["Pincode"]
+            ToDate = request.form["ToDate"]
+            FromDate = request.form["FromDate"]
+            created_by = request.form["created_by"]
+            
+            user_id = request.form["user_id"]
+            user_role_id = request.form["user_role_id"]
+            
+            start_index = request.form['start']
+            page_length = request.form['length']
+            search_value = request.form['search[value]']
+            order_by_column_position = request.form['order[0][column]']
+            order_by_column_direction = request.form['order[0][dir]']
+            draw=request.form['draw']
+            
+            return Candidate.enrolled_list(candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+api.add_resource(enrolled_list_updated, '/enrolled_list_updated')
+
+class DownloadEnrTemplate(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                candidate_ids = request.form["candidate_ids"]
+                file_name='Master_enr_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                data = Database.download_selected_enrolled_candidate(candidate_ids,file_name)
+                if len(data[0])==0:
+                    return {'Description':'candidates not available', 'Status':False}
+                else:
+                    df = pd.read_excel(config.bulk_upload_path +'Master_Enrollment.xlsx')
+                    col = df.columns.to_list()
+                    d={}
+                    for i in range(len(data)):
+                        for j in range(len(col)):
+                            d[col[j]]=data[i][j]
+                        df = df.append(d,ignore_index=True)
+                    df.to_excel(config.bulk_upload_path + file_name,sheet_name='Enrollment',index=False)
+                    return {'Description':'Downloaded Template', 'Status':True, 'filename':file_name}
+            except Exception as e:
+                return {'Description':'Error: '+str(e), 'Status':False}
+api.add_resource(DownloadEnrTemplate,'/DownloadEnrTemplate')
 
 
 if __name__ == '__main__':    
