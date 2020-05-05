@@ -231,7 +231,14 @@ function LoadTable()
 
         "columns": [
             { "data": "S_No"},
+            {"visible": ($('#hdn_home_user_role_id').val()=='1'||$('#hdn_home_user_role_id').val()=='15')?true:false,
             
+             "data": function (row, type, val, meta) {
+                var varButtons = ""; 
+                varButtons += '<a onclick="EditCenterDetail(\'' + row.Center_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Center" class="fas fa-edit" ></i></a>';
+                return varButtons;
+                }
+            },
             { "data": "Center_Code" },
             { "data": "Center_Name" },
             { "data": "Center_Type_Name"},
