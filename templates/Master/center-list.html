@@ -20,8 +20,8 @@
                 placeholder:''
             });
             role_id=parseInt($('#hdn_home_user_role_id').val());
-            //if(role_id == 1 || role_id==15)
-            //    $('#btn_create').hide();
+            if(role_id == 1 || role_id==15)
+                $('#btn_create').hide();
             $('#ddlStatus').empty();
             $('#ddlStatus').append(new Option('All','-1'));
             $('#ddlStatus').append(new Option('Active','1'));
@@ -114,6 +114,9 @@
                                         <button style="margin-top: 30px; display: none;" type="button" class="btn btn-primary waves-effect waves-light submit" 
                                         onclick="Download()">Download</button>
                                     </div>
+                                    <div class="col-lg-9" >
+                                        <button style="margin-top: 30px;float: right;" type="submit" class="btn btn-primary waves-effect waves-light submit">Create Center</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -135,7 +138,8 @@
                                         <table id="tbl_centers" class="table dt-responsive wrap" >
                                             <thead>
                                                 <tr>
-                                                    <th>S.No</th>                                               
+                                                    <th>S.No</th>     
+                                                    <th>Actions</th>                                            
                                                     <th>Center Code</th>
                                                     <th>Center Name</th>
                                                     <th>Center Type</th>

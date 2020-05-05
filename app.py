@@ -317,21 +317,19 @@ class add_center_details(Resource):
             is_active=request.form['isactive']
             center_id=request.form['CenterId']
             center_type_id=request.form['CenterType']
-            center_category_id=request.form['CenterCategory']
-            bu_id=request.form['BUId']
-            region_id=request.form['RegionId']
-            cluster_id=request.form['ClusterId']
             country_id=request.form['CenterCountry']
             satet_id=request.form['CenterState']
-            district_id=request.form['CenterDistrict']
             location_name=request.form['LocationName']
-            return Master.add_center(center_name,user_id,is_active,center_id,center_type_id,center_category_id,bu_id,region_id,cluster_id,country_id,satet_id,district_id,location_name)
+            address=request.form['Address']
+            pinCode=request.form['PinCode']
+            District=request.form['District']
+            return Master.add_center(center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pinCode,District)
 
 class get_center_details(Resource):
     @staticmethod
     def get():
         if request.method == 'GET':
-            return jsonify(Master.AllCenters(g.center_id))
+            return jsonify(Master.get_center_details(g.center_id))
 
 class get_all_BU(Resource):
     @staticmethod
