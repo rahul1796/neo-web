@@ -2,10 +2,11 @@ var varTable;
 var varTable1;
 var flag = "";
 var role_id;
+
 function UploadFileData()
 {   $("#imgSpinner1").show();
     var form_data = new FormData($('#formUpload')[0]);
-    form_data.append('cand_stage',1);
+    form_data.append('cand_stage',3);
     form_data.append('user_id',$('#hdn_home_user_id_modal').val());
     form_data.append('user_role_id',$('#hdn_home_user_role_id_modal').val());
     $.ajax({
@@ -35,7 +36,7 @@ function UploadFileData()
                             icon:icon,
                             confirmButtonClass:"btn btn-confirm mt-2"
                             }).then(function(){
-                                window.location.href = '/mobilization';
+                                window.location.href = '/enrollment';
                             }); 
             
                     
@@ -48,7 +49,7 @@ function UploadFileData()
                     icon:"error",
                     confirmButtonClass:"btn btn-confirm mt-2"
                     }).then(function(){
-                        window.location.href = '/mobilization';
+                        window.location.href = '/enrollment';
                     }); 
                
             }
@@ -59,6 +60,45 @@ function Uploadfile(){
     $('#hdn_home_user_id_modal').val($('#hdn_home_user_id').val());
     $('#hdn_home_user_role_id_modal').val($('#hdn_home_user_role_id').val());
     $('#mdl_bulkupload_candidate').modal('show');
+}
+function Loadcreatedbyddl(){
+    var URL=$('#hdn_web_url').val()+ "/AllCreatedByBasedOnUser"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id" : $('#hdn_home_user_role_id').val()
+        },
+
+        success: function (data){
+            if(data.CreatedBy != null)
+            {
+                $('#ddlcreated_by').empty();
+                var count=data.CreatedBy.length;
+                if( count> 0)
+                {
+                    //$('#ddlRegion').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlcreated_by').append(new Option(data.CreatedBy[i].User_Name,data.CreatedBy[i].User_Id));
+                    //$('#ddlCourse').val('-1');
+                }
+                else
+                {
+                    $('#ddlcreated_by').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
 }
 function LoadRegionddl(){
     var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
@@ -154,7 +194,7 @@ function LoadTable()
         "processing": true,
         "language": { "processing": 'Loading..!' },
         "ajax": {
-            "url": $('#hdn_web_url').val()+ "/mobilized_list_updated",
+            "url": $('#hdn_web_url').val()+ "/enrolled_list_updated",
             "type": "POST",
             "dataType": "json",
             "data": function (d) {
@@ -163,8 +203,10 @@ function LoadTable()
                 d.user_role_id  = $('#hdn_home_user_role_id').val();
                 d.region_ids = $('#ddlRegion').val().toString();
                 d.state_ids = $('#ddlState').val().toString();
-                d.MinAge  = $('#MinAge').val();
-                d.MaxAge  = $('#MaxAge').val();
+                d.Pincode = $('#Pincode').val().toString();
+                d.created_by  = $('#ddlcreated_by').val().toString();
+                d.FromDate  = $('#FromDate').val();
+                d.ToDate  = $('#ToDate').val();
             },
             error: function (e) {
                 $("#tbl_candidate tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -173,6 +215,14 @@ function LoadTable()
         },
         "columns": [
             { "data": "S_No"},
+            {
+                "data": function (row, type, val, meta) {
+                    var varButtons = "";
+                        varButtons += '<input id="addedchk" name="checkcase" type="checkbox" value="'+row.Candidate_Id+'" >';
+                    return varButtons;
+                }
+            },
+
             { "data": function (row, type, val, meta) {
                 varButtons = '<a onclick="CandidateBasicDetails(\'' + row.First_Name + '\',\'' + row.Middle_Name + '\',\'' + row.Last_Name + '\',\'' + row.Salutation + '\',\'' + row.Date_Of_Birth+ '\',\'' + row.Age+ '\',\'' + row.Gender+ '\',\'' + row.Marital_Status+ '\',\'' + row.Caste+ '\',\'' + row.Disability_Status+ '\',\'' + row.Religion + '\')"  style="color:blue;cursor:pointer" >'+row.First_Name+'</a>';
                 return varButtons;
@@ -241,14 +291,22 @@ function CandidateContactDetails(primary_contact,SecondaryContact,Email,PresnetA
     $('#mdl_cand_contact').modal('show');
 }
 
-function DownloadMobTemplate(){
+function DownloadEnrTemplate(){
     $("#imgSpinner").show();
+    var cands='';
+    //alert(flag)
+    $('[name=checkcase]:checked').each(function () {
+        cands+= $(this).val()+',';
+    });
+    cands=cands.substring(0,cands.length-1)
     
-    if (0==9){
-    console.log(false)
+    if ((cands.toString().length)==0)
+    {
+        alert('Please select candidates:')
+        $("#imgSpinner").hide();
     }
     else{
-        var URL=$('#hdn_web_url').val()+ "/DownloadMobTemplate"
+        var URL=$('#hdn_web_url').val()+ "/DownloadEnrTemplate"
         //window.location = URL + "?ActivityDate=2019-09-09"
         $.ajax({
                     type: "POST",
@@ -258,7 +316,8 @@ function DownloadMobTemplate(){
                             //candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
                             
                             'user_id':$('#hdn_home_user_id').val(),
-                            'user_role_id':$('#hdn_home_user_role_id').val()
+                            'user_role_id':$('#hdn_home_user_role_id').val(),
+                            'candidate_ids':cands.toString()
                     },
                     success: function(resp) 
                     {
