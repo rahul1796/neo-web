@@ -1,6 +1,7 @@
 from flask import Flask,render_template,request,redirect,url_for,session,g,jsonify,send_file
 from flask_restful import Resource
 from flask_restful import Api
+from flask_cors import CORS
 #from flask_session import Session
 from Models import Content,Assessments,DownloadAssessmentResult
 from Models import Master
@@ -83,7 +84,7 @@ dob_validation = [CustomElementValidation(lambda d: check_dob(d), 'either date o
 #from lib.log import log
 
 app = Flask(__name__)
-
+CORS(app)
 api = Api(app)
 app.config["SESSION_PERMANENT"] = True
 app.secret_key = config.secret_key
