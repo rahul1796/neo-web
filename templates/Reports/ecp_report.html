@@ -178,7 +178,7 @@
                             {
                                 for(var i=0;i<count;i++)
                                 {
-                                    
+                                
                                     varHtml+='<tr>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].S_No +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].Region_Name +'</td>';
@@ -195,7 +195,7 @@
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].Certified_Filtered +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].Placed_Filtered +'</td>';
                                     varHtml+='</tr>';
-                                }                        
+                                }
                             }
                             $("#tbl_list tbody").append(varHtml);
                             $("#tbl_list").DataTable({
@@ -231,14 +231,18 @@
                 type:"GET",
                 url:URL,
                 async:false,
-                overflow:true,        
+                //overflow-x: scroll,
+                //overflow:true,        
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
                 data:{
                         "user_id": $('#hdn_home_user_id').val(),
                         "user_role_id" : $('#hdn_home_user_role_id').val(),
                         "contract_id":ContractId,
-                        "region_id":RegionId
+                        "region_id":RegionId,
+                        "from_date" : $('#FromDate').val(),
+                        "to_date" : $('#ToDate').val()
+
                 },
                 success: function (data){
                     varHtml='';
@@ -261,17 +265,26 @@
                                 varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Sub_Project_Name +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Course_Code +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Course_Name +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Enrolment +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Certification +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Target_Enrolment +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Target_Certification +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Target_Placement +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Enrolled +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Certified +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Placement +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Enrolled_Filtered +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Certified_Filtered +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Placed_Filtered +'</td>';
                                 varHtml+='</tr>';
                             }
-                            
                         }
                         $("#tbl_targets tbody").append(varHtml);
                         $('#mdl_SubProjects').modal('show');
                         $("#tbl_targets").DataTable({
-                           // "scrollX": true,
+                                "overflow-x": scroll,
+                                // "sScrollX": "100%",
+                                // "sScrollXInner": "110%",
+                                // "bScrollCollapse": true,
+                                "scrollX": true,
                                 drawCallback: function(){
                                             $('#tbl_targets_paginate ul.pagination').addClass("pagination-rounded");
                                         }
@@ -391,20 +404,32 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>                    
             <div class="modal-body">
-                <table id="tbl_targets" class="table table-bordered dt-responsive wrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                <table id="tbl_targets" class="table table-bordered wrap dataTable no-footer" style="margin-left: 0px !important; margin-right: 10px !important;"> <!-- table-bordered dt-responsive wrap style="border-color: lightgray;width:100% !important;font-size: 12px;"   cellpadding="0" cellspacing="0" width="100%" -->
                     <thead>
                         <tr style="background-color: #f5f6f8;">
-                            <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
-                            <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Code</th>
-                            <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Name</th>
-                            <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Code</th>
-                            <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Name</th>
-                            <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Code</th>
-                            <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Name</th>
-                            <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Enrolment</th>
-                            <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Certification</th>
-                            <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Placement</th>
+                            <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                            <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Code</th>
+                            <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Name</th>
+                            <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Code</th>
+                            <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Name</th>
+                            <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Code</th>
+                            <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Name</th>
+                            <th  colspan="3" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Targets</th>
+                            <th  colspan="3" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Actuals (Contract Till Date)</th>
+                            <th  colspan="3" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Actuals</th>
                         </tr>
+                        <tr style="background-color: #f5f6f8;">
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Enrolled</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Certified</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Placement</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Enrolled</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Certified</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Placement</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Enrolled</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Certified</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Placement</th>
+                        </tr>
+
                     </thead>
                     <tbody>
 

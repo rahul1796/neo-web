@@ -203,8 +203,8 @@ class Master:
         return Database.SaveSubProjectCourseCenterUnitPrice(json_string,primary_key_id,user_id)
     def GetSubProjectCourseCenterUnitRates(sub_project_id,primary_key):
         return Database.GetSubProjectCourseCenterUnitRates(sub_project_id,primary_key)
-    def GetContractProjectTargets(contact_id,user_id,user_role_id,region_id):
-        return Database.GetContractProjectTargets(contact_id,user_id,user_role_id,region_id)
+    def GetContractProjectTargets(contact_id,user_id,user_role_id,region_id,from_date,to_date):
+        return Database.GetContractProjectTargets(contact_id,user_id,user_role_id,region_id,from_date,to_date)
     
     def sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project):
         return Database.sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project)

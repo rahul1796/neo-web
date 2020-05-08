@@ -5150,8 +5150,10 @@ class GetContractProjectTargets(Resource):
                 user_id=request.args.get('user_id',0,type=int)
                 user_role_id=request.args.get('user_role_id',0,type=int)
                 region_id=request.args.get('region_id',0,type=int)
+                from_date=request.args.get('from_date','',type=str)
+                to_date=request.args.get('to_date','',type=str)
                    
-                response = {"Targets":Master.GetContractProjectTargets(contact_id,user_id,user_role_id,region_id)}
+                response = {"Targets":Master.GetContractProjectTargets(contact_id,user_id,user_role_id,region_id,from_date,to_date)}
                 return response 
             except Exception as e:
                 return {'exception':str(e)}

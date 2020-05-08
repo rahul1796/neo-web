@@ -4005,7 +4005,7 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
-    
+
     def GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date):
         response = []
         h={}
@@ -4498,13 +4498,13 @@ SELECT					cb.name as candidate_name,
         out = {'success': True, 'description': "Success", "batches":response}
         return out
 
-    def GetContractProjectTargets(contact_id,user_id,user_role_id,region_id):
+    def GetContractProjectTargets(contact_id,user_id,user_role_id,region_id,from_date,to_date):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec  [masters].[sp_get_contract_project_target_values]  ?,?,?,?'
-        values = (contact_id,user_id,user_role_id,region_id)
+        sql = 'exec  [masters].[sp_get_contract_project_target_values]  ?,?,?,?,?,?'
+        values = (contact_id,user_id,user_role_id,region_id,from_date,to_date)
         cur2.execute(sql,(values))
         #   print(cur2.fetchall())
         print(cur2)
