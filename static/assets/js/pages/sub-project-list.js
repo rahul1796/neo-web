@@ -286,8 +286,90 @@ function LoadProject(){
     });
     return false;
 }
-
-
+function LoadUsers(){
+    $('#trainer_type').css('display', 'none');
+    if($('#ddlUserRole').val()== 7)
+    {
+        //$('#trainer_type').visible = true;
+        $('#trainer_type').css('display', 'block');
+        LoadTrainerType();
+        return;
+    }    
+    
+    var URL=$('#hdn_web_url').val()+ "/GetUsersBasedOnRole?user_role_id="+$('#ddlUserRole').val()  
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Users != null)
+            {
+                $('#ddlUsers').empty();
+                var count=data.Users.length;
+                if( count> 0)
+                {
+                     for(var i=0;i<count;i++)
+                        $('#ddlUsers').append(new Option(data.Users[i].User_Name,data.Users[i].User_Id));
+                   
+                }
+                else
+                {
+                   // $('#ddlProject').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(request, err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+function LoadTrainerType(){
+    $('#ddlTrainerType').empty();
+    $('#ddlTrainerType').append(new Option("All Trainers",0));
+    $('#ddlTrainerType').append(new Option("Internal Trainers",1));
+    $('#ddlTrainerType').append(new Option("External Trainers",2));
+}
+function LoadTrainers(){
+    
+    var URL=$('#hdn_web_url').val()+ "/GetTrainersBasedOnType?trainer_flag="+$('#ddlTrainerType').val()
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Users != null)
+            {
+                $('#ddlUsers').empty();
+                var count=data.Users.length;
+                if( count> 0)
+                {
+                     for(var i=0;i<count;i++)
+                        $('#ddlUsers').append(new Option(data.Users[i].User_Name,data.Users[i].User_Id));
+                   
+                }
+                else
+                {
+                   // $('#ddlProject').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(request, err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
 function LoadTable()
 {
     vartable1 = $("#tbl_projects").DataTable({
@@ -374,6 +456,19 @@ function LoadTable()
                 else
                 {
                     varButtons += '<a onclick="GetCourses(\'' + row.Sub_Project_Id + '\',\''+row.Sub_Project_Name+ '\')"  style="color:blue;cursor:pointer" >' + row.Course_Count + '</a>';
+                }
+                
+                return varButtons;
+                }
+            },
+            { "visible":true,
+            "data": function (row, type, val, meta) {
+                var varButtons = ""; 
+                if(row.Users_Count=="")
+                    varButtons += '<a onclick="AddUserForSubProject(\'' + row.Sub_Project_Id + '\',\'' + row.Sub_Project_Name +  '\')" class="btn" style="margin-left: -16px;cursor:pointer;color: blue;" >' + row.Users_Count + '</a>';
+                else
+                {
+                    varButtons += '<a onclick="GetUsers(\'' + row.Sub_Project_Id + '\',\''+row.Sub_Project_Name+ '\')"  style="color:blue;cursor:pointer" >' + row.Users_Count + '</a>';
                 }
                 
                 return varButtons;
@@ -530,6 +625,21 @@ function EditsubProjectDetail(SubProjectId)
     $('#hdn_subproject_id').val(SubProjectId);
     $('#form1').submit();
 }
+function AddUserForSubProject(SubProjectId,SubProjectName)
+{
+    $('#hdn_sub_project_name').val(SubProjectName);
+    $('#hdn_sub_project_id').val(SubProjectId);
+    $("#ddlUserRole").select2({ width: '400px' });
+    $("#ddlUsers").select2({ width: '400px' });
+    $("#ddlTrainerType").select2({ width: '400px' });
+    $('#HdProject').text(SubProjectName);
+    $('#divUsersList').modal('hide');
+    $('#trainer_type').css('display', 'none');
+    $('#hdn_sub_project_id').val(SubProjectId);
+    $('#ddlUsers').empty();
+    LoadUserRole();
+   
+}
 function GetCourses(SubProjectId,SubProjectName)
 {
     $('#HdCourse').text(SubProjectName);
@@ -592,6 +702,258 @@ function GetCourses(SubProjectId,SubProjectName)
     return false;
 }
 
+function GetUsers(SubProjectId,SubProjectName)
+{
+    $('#hdn_sub_project_name').val(SubProjectName);
+    $('#hdn_sub_project_id').val(SubProjectId);
+    $('#HdUsers').text(SubProjectName);
+    var varAddButton='';
+    var varRemButton='';
+    var URL=$('#hdn_web_url').val()+ "/GetUsersBasedOnSubProject?sub_project_id="+SubProjectId;
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            varHtml='';
+            $("#tbl_proj_Users").dataTable().fnDestroy();
+            $("#tbl_proj_Users tbody").empty();
+            if(!jQuery.isEmptyObject(data))
+            {   if (data.Users != null){
+                    count=data.Users.length;
+                    if (count>0)
+                    {   varHtml='';
+                        for(var i=0;i<count;i++)
+                        {
+                            td_open= '  <td style="text-align:center;">' ;
+                            td_close=   '</td>';       
+                            varHtml+='<tr>';
+                            if($('#hdn_home_user_role_id').val()=='1' || $('#hdn_home_user_role_id').val()=='15')
+                            {
+                                varAddButton='<a onclick="AddUserForSubProject(\'' + data.Users[i].Sub_Project_Id + '\',\'' + SubProjectName +  '\')" class="btn" style="cursor:pointer" ><i title="Tag Users" class="fas fa-edit" ></i></a>';
+                                varRemButton='<a onclick="GetUserListForSubProject(\'' + data.Users[i].Sub_Project_Id + '\')" class="btn" style="cursor:pointer" ><i title="Untag Users" class="fas fa-cut" ></i></a>';
+                            }
+                            varHtml+='  <td style="text-align:center;">'+ varAddButton +" "+varRemButton+'</td>';   
+                            varHtml+='  <td style="text-align:center;">'+ data.Users[i].Pmt +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Users[i].Coo +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Users[i].Cm +'</td>';                    
+                            varHtml+='  <td style="text-align:center;">'+ data.Users[i].Tm +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Users[i].Mob +'</td>';  
+                            varHtml+='  <td style="text-align:center;">'+ data.Users[i].Tr +'</td>';     
+                            varHtml+='</tr>';                            
+                        }
+                        $("#tbl_proj_Users tbody").append(varHtml);
+                            $("#tbl_proj_Users").DataTable();
+                            $('#divUsersList').modal('show');
+                            varHtml='';
+                    }
+                    else
+                    {
+                        varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                        $("#tbl_proj_Users tbody").append(varHtml);
+                        $('#divUsersList').modal('show');
+                    } 
+                    
+                }
+            }
+            else
+            {
+                varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                $("#tbl_proj_Users tbody").append(varHtml);
+                $('#divUsersList').modal('show');
+            }   
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+function UntagUsers()
+{
+    var users='';
+    $('[name=checkcase]:checked').each(function () {
+        users+= $(this).val()+',';
+    });
+    users=users.substring(0,users.length-1)
+    if (users=='')
+    {
+        alert('Select at least one user to untag.');
+    }
+    else
+    {
+       var URL=$('#hdn_web_url').val()+ "/untag_users_from_sub_project";
+            $.ajax({
+                type:"POST",
+                url:URL,
+                data:{
+                    "user_ids": users,
+                    "sub_project_id": $('#hdn_sub_project_id').val()
+                },
+                success:function(data){
+                    swal({   
+                        title:data.PopupMessage.message,
+                        text:data.PopupMessage.message+" !!",
+                        icon:"success",
+                        confirmButtonClass:"btn btn-confirm mt-2"
+                        }).then(function(){
+                            $('#divUsersListForUntag').modal('hide');
+                            GetUsers($('#hdn_sub_project_id').val(),$('#hdn_sub_project_name').val());
+                           //window.location.href = '/sub_project';                          
+                        });
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+    }
+}
+function TagUsers()
+{
+    if ($('#ddlUsers').val()=='')
+    {
+        alert('Select at least one user to untag.');
+    }
+    else
+    {
+       var URL=$('#hdn_web_url').val()+ "/tag_users_from_sub_project";
+            $.ajax({
+                type:"POST",
+                url:URL,
+                data:{
+                    "user_id": $('#ddlUsers').val(),
+                    "sub_project_id": $('#hdn_sub_project_id').val()
+                },
+                success:function(data){
+                    swal({   
+                        title:data.PopupMessage.message,
+                        text:data.PopupMessage.message+"!!",
+                        icon:"success",
+                        confirmButtonClass:"btn btn-confirm mt-2"
+                        }).then(function(){
+                            $('#divUsersTag').modal('hide');
+                            GetUsers($('#hdn_sub_project_id').val(),$('#hdn_sub_project_name').val())
+                           //window.location.href = '/sub_project';                          
+                        });
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+    }
+}
+
+function refresh()
+{
+    window.location.href = '/sub_project';  
+}
+function LoadUserRole(){
+    var URL=$('#hdn_web_url').val()+ "/GetUserRole"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.UserRole != null)
+            {
+                $('#ddlUserRole').empty();
+                var count=data.UserRole.length;
+                if( count> 0)
+                {
+                    $('#divUsersTag').modal('show');
+                    $('#ddlUserRole').append(new Option("ALL",0));
+                    for(var i=0;i<count;i++)
+                        $('#ddlUserRole').append(new Option(data.UserRole[i].User_Role_Name,data.UserRole[i].User_Role_Id));
+                    //$('#ddlCourse').val('-1');
+                }
+                else
+                { 
+                    $('#divUsersTag').modal('show');
+                    $('#ddlUserRole').append(new Option('No User Role','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            $('#divUsersTag').modal('hide');
+            alert('Error while loading UserRole! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+function GetUserListForSubProject(SubProjectId)
+{
+    $('#hdn_sub_project_id').val(SubProjectId);
+    $('#divUsersList').modal('hide');
+    var URL=$('#hdn_web_url').val()+ "/GetUserListForSubProject?sub_project_id="+SubProjectId;
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            varHtml='';
+            $("#tbl_Users").dataTable().fnDestroy();
+            $("#tbl_Users tbody").empty();
+            if(!jQuery.isEmptyObject(data))
+            {   if (data.Users != null){
+                    count=data.Users.length;
+                    if (count>0)
+                    {   varHtml='';
+                        for(var i=0;i<count;i++)
+                        {
+                            td_open= '  <td style="text-align:center;">' ;
+                            td_close=   '</td>';       
+                            varHtml+='<tr>';
+                            varHtml += '<td style="text-align:center;"><input id="addedchk_'+data.Users[i].Userid+'" name="checkcase" type="checkbox" value="'+data.Users[i].Userid+'" ></td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Users[i].Username +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Users[i].Email +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Users[i].Role +'</td>';
+                            varHtml+='</tr>';                            
+                        }
+                        $("#tbl_Users tbody").append(varHtml);
+                            $("#tbl_Users").DataTable();
+                            $('#divUsersListForUntag').modal('show');
+                            varHtml='';
+                    }
+                    else
+                    {
+                        varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                        $("#tbl_Users tbody").append(varHtml);
+                        $('#divUsersListForUntag').modal('show');
+                    } 
+                    
+                }
+            }
+            else
+            {
+                varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                $("#tbl_proj_Users tbody").append(varHtml);
+                $('#divUsersList').modal('show');
+            }   
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again jkggg');
+            return false;
+        }
+    });
+    return false;
+}
 function GetCenters(SubProjectId,SubProjectName)
 {
     $('#headerCenter').text(SubProjectName);

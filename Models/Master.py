@@ -197,8 +197,18 @@ class Master:
         return Database.SaveSubProjectCourseMilestones(json_string,sub_project_id,user_id)
     def GetCoursesBasedOnSubProject(sub_project_id):
         return Database.GetCoursesBasedOnSubProject(sub_project_id)
+    def GetUsersBasedOnSubProject(sub_project_id):
+        return Database.GetUsersBasedOnSubProject(sub_project_id)
+    def GetUserListForSubProject(sub_project_id):
+        return Database.GetUserListForSubProject(sub_project_id)
     def GetCentersbasedOnSubProject(sub_project_id):
         return Database.GetCentersbasedOnSubProject(sub_project_id)
+    def GetTrainersBasedOnType(trainer_flag):
+        return Database.GetTrainersBasedOnType(trainer_flag)
+    def GetUsersBasedOnRole(user_role_id):
+        return Database.GetUsersBasedOnRole(user_role_id)
+    def GetUserRole():
+        return Database.GetUserRole()
     def SaveSubProjectCourseCenterUnitPrice(json_string,primary_key_id,user_id):
         return Database.SaveSubProjectCourseCenterUnitPrice(json_string,primary_key_id,user_id)
     def GetSubProjectCourseCenterUnitRates(sub_project_id,primary_key):
@@ -213,3 +223,9 @@ class Master:
     def get_center_details(center_id):
         indi_project={"CenterDetail":Database.get_center_details(center_id)}
         return indi_project
+    def untag_users_from_sub_project(user_ids,sub_project_id):
+        popupMessage = {"PopupMessage": Database.untag_users_from_sub_project(user_ids,sub_project_id)}
+        return popupMessage
+    def tag_users_from_sub_project(user_id,sub_project_id,tagged_by):
+        popupMessage = {"PopupMessage": Database.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)}
+        return popupMessage
