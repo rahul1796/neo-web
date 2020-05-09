@@ -1030,7 +1030,19 @@ class drop_edit_map_candidate_batch(Resource):
         user_id= request.form['user_id']
         drop_remark = request.form['drop_remark']
         return Batch.drop_edit_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark)
-
+class untag_users_from_sub_project(Resource):
+    @staticmethod
+    def post():
+        user_ids=request.form['user_ids']
+        sub_project_id=request.form['sub_project_id']
+        return Master.untag_users_from_sub_project(user_ids,sub_project_id)
+class tag_users_from_sub_project(Resource):
+    @staticmethod
+    def post():
+        user_id=request.form['user_id']
+        sub_project_id=request.form['sub_project_id']
+        tagged_by= session['user_id']
+        return Master.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)
 
 api.add_resource(batch_list, '/batch_list')
 api.add_resource(batch_list_updated, '/batch_list_updated')
@@ -1045,6 +1057,8 @@ api.add_resource(candidates_based_on_course,'/ALLCandidatesBasedOnCourse')
 api.add_resource(candidates_maped_in_batch,'/ALLCandidatesMapedInBatch')
 api.add_resource(add_edit_map_candidate_batch,'/add_edit_map_candidate_batch')
 api.add_resource(drop_edit_map_candidate_batch,'/drop_edit_candidate_batch')
+api.add_resource(untag_users_from_sub_project,'/untag_users_from_sub_project')
+api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
 ####################################################################################################
 
@@ -4912,6 +4926,23 @@ class GetCoursesBasedOnSubProject(Resource):
             return response
 api.add_resource(GetCoursesBasedOnSubProject,'/GetCoursesBasedOnSubProject')
 
+class GetUsersBasedOnSubProject(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sub_project_id=request.args.get('sub_project_id',0,type=int)
+            response={"Users":Master.GetUsersBasedOnSubProject(sub_project_id)}
+            return response
+api.add_resource(GetUsersBasedOnSubProject,'/GetUsersBasedOnSubProject')
+
+class GetUserListForSubProject(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sub_project_id=request.args.get('sub_project_id',0,type=int)
+            response={"Users":Master.GetUserListForSubProject(sub_project_id)}
+            return response
+api.add_resource(GetUserListForSubProject,'/GetUserListForSubProject')
 class GetCentersbasedOnSubProject(Resource):
     @staticmethod
     def get():
@@ -4920,6 +4951,34 @@ class GetCentersbasedOnSubProject(Resource):
             response={"Centers":Master.GetCentersbasedOnSubProject(sub_project_id)}
             return response
 api.add_resource(GetCentersbasedOnSubProject,'/GetCentersbasedOnSubProject')
+
+class GetTrainersBasedOnType(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            trainer_flag=request.args.get('trainer_flag',0,type=int)
+            response={"Users":Master.GetTrainersBasedOnType(trainer_flag)}
+            return response
+api.add_resource(GetTrainersBasedOnType,'/GetTrainersBasedOnType')
+
+class GetUsersBasedOnRole(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            user_role_id=request.args.get('user_role_id',0,type=int)
+            print(user_role_id)
+            response={"Users":Master.GetUsersBasedOnRole(user_role_id)}
+            print(response)
+            return response
+api.add_resource(GetUsersBasedOnRole,'/GetUsersBasedOnRole')
+
+class GetUserRole(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response={"UserRole":Master.GetUserRole()}
+            return response
+api.add_resource(GetUserRole,'/GetUserRole')
 
 class SaveSubProjectCourseCenterUnitPrice(Resource):
     @staticmethod
@@ -5540,6 +5599,7 @@ class AllCreatedByBasedOnUser(Resource):
                 return {'exception':str(e)}
 
 api.add_resource(AllCreatedByBasedOnUser,'/AllCreatedByBasedOnUser')
+
 
 class DownloadRegTemplate(Resource):
     report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
