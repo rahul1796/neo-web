@@ -74,6 +74,7 @@
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').show();
                         $('#Insight_Menu').show();
                             $('#AnchorSalesDashboard').show();
                             $('#AnchorOperationDashboard').show();
@@ -103,6 +104,7 @@
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').hide();
                             $('#AnchorTrainers').hide();
+                            $('#AnchorPartnerss').hide();
                         $('#Insight_Menu').show();
                             $('#AnchorSalesDashboard').show();
                             $('#AnchorOperationDashboard').show();
@@ -132,6 +134,7 @@
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').hide();
                         $('#Insight_Menu').show();
                             $('#AnchorSalesDashboard').show();
                             $('#AnchorOperationDashboard').show();
@@ -161,6 +164,7 @@
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').hide();
                         $('#Insight_Menu').hide();
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
@@ -189,6 +193,7 @@
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').hide();
                         $('#Insight_Menu').show();
                             $('#AnchorSalesDashboard').show();
                             $('#AnchorOperationDashboard').show();
@@ -217,6 +222,7 @@
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').hide();
                         $('#Insight_Menu').show();
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
@@ -245,6 +251,7 @@
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').hide();
                         $('#Insight_Menu').hide();
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
@@ -273,6 +280,7 @@
                             $('#AnchorCenters').hide();
                             $('#AnchorUsers').hide();
                             $('#AnchorTrainers').hide();
+                            $('#AnchorPartnerss').hide();
                         $('#Insight_Menu').hide();
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
@@ -301,6 +309,7 @@
                             $('#AnchorCenters').hide();
                             $('#AnchorUsers').hide();
                             $('#AnchorTrainers').hide();
+                            $('#AnchorPartnerss').hide();
                         $('#Insight_Menu').hide();
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
@@ -329,6 +338,7 @@
                             $('#AnchorCenters').hide();
                             $('#AnchorUsers').hide();
                             $('#AnchorTrainers').hide();
+                            $('#AnchorPartnerss').hide();
                         $('#Insight_Menu').hide();
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
@@ -357,6 +367,7 @@
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').hide();
                         $('#Insight_Menu').hide();
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
@@ -385,12 +396,45 @@
                             $('#AnchorCenters').show();
                             $('#AnchorUsers').show();
                             $('#AnchorTrainers').hide();
+                            $('#AnchorPartnerss').hide();
                         $('#Insight_Menu').hide();
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
                         $('#My_Projects_Menu').hide();
                         $('#Report_Menu').hide();
                         if(goto !="")
+                            $("#box").load(goto);
+                        break;
+                    case 25:             //Assessment Partner
+                        $('#Home').hide();
+						$('#Mobilization_Menu').hide();
+                        $('#Registration_Menu').hide();
+                        $('#Enrollment_Menu').hide();
+                        $('#Candidate_Menu').hide();
+                        //$('#Batch_Menu').show();
+                        $('#Assessment_Menu').show();
+                        $('#Content_Menu').hide();
+                            $('#AnchorSectors').hide();
+                            $('#AnchorQP').hide();
+                            $('#AnchorCourses').hide();
+                        $('#Master_Menu').hide();
+                            $('#AnchorClients').hide();
+                            $('#AnchorContracts').hide();
+                            $('#Project_Menu').hide();    
+                                $('#AnchorProjects').hide();  
+                                $('#AnchorSubProjects').hide();   
+                                $('#AnchorBatch').hide();
+                            $('#AnchorCenters').hide();
+                            $('#AnchorUsers').hide();
+                            $('#AnchorTrainers').hide();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').hide();
+                            $('#AnchorSalesDashboard').hide();
+                            $('#AnchorOperationDashboard').hide();
+                        $('#My_Projects_Menu').hide();
+                        $('#Report_Menu').hide();
+                        console.log(goto);
+                        if(goto !="" && goto!="dashboard")
                             $("#box").load(goto);
                         break;
                 }
@@ -615,7 +659,9 @@
                                     <li id="Trainer_Menu">
                                         <a id="AnchorTrainers" href="/trainer">Trainers</a>
                                     </li>
-
+                                    <li id="Partner_Menu">
+                                        <a id="AnchorPartnerss"  href="/partner" >Partners</a>
+                                    </li>
 
 
                                     <li id="Practicce_Menu" style="display: none">

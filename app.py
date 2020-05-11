@@ -3,12 +3,7 @@ from flask_restful import Resource
 from flask_restful import Api
 from flask_cors import CORS
 #from flask_session import Session
-from Models import Content,Assessments,DownloadAssessmentResult
-from Models import Master
-from Models import UsersM
-from Models import Batch
-from Models import Candidate
-from Models import Report
+from Models import *
 from Database import config
 from Database import Database
 import sent_mail
@@ -200,7 +195,8 @@ def before_request():
         g.project_code=session['project_code']
     if 'subproject_id' in session.keys():
         g.subproject_id=session['subproject_id']
-    
+    if 'partner_id' in session.keys():
+        g.partner_id = session['partner_id']
     
 
 #home_API's
@@ -253,7 +249,7 @@ def login():
                 config.displaymsg="Please contact admin because this user is inactive."
                 return redirect(url_for('index'))
             else:
-                config.displaymsg="Unknown error"
+                config.displaymsg="wrong"
                 return redirect(url_for('index'))
             
         else:
@@ -961,7 +957,6 @@ class trainers_based_on_sub_project(Resource):
     def post():
         if request.method == 'POST':
             sub_project_id=request.form['sub_project_id']
-            print(sub_project_id)
             return Batch.AllTrainersOnSubProject(sub_project_id)
 
 class center_manager_based_on_center(Resource):
@@ -4454,13 +4449,17 @@ class ScheduleAssessment(Resource):
             user_id=request.form['user_id']
             requested_date=request.form['requested_date']
             scheduled_date=request.form['scheduled_date']
+            assessment_date=request.form['assessment_date']
             assessment_type_id=request.form['assessment_type_id']
             assessment_agency_id=request.form['assessment_agency_id']
             assessment_id=request.form['assessment_id']
-            return Assessments.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_type_id,assessment_agency_id,assessment_id)
+            partner_id=request.form['partner_id']
+            current_stage_id=request.form['current_stage_id']
+            return Assessments.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id)
 api.add_resource(ScheduleAssessment,'/ScheduleAssessment')
 
 api.add_resource(DownloadAssessmentResult,'/DownloadAssessmentResult')
+api.add_resource(DownloadAssessmentResultUploadTemplate,'/DownloadAssessmentResultUploadTemplate')
 ################################################################################################################
 @app.route("/PostgreSqlServerApi", defaults={"param": None})
 @app.route("/PostgreSqlServerApi/<string:param>", methods=["GET"])
@@ -5671,6 +5670,170 @@ class DownloadEnrTemplate(Resource):
                 return {'Description':'Error: '+str(e), 'Status':False}
 api.add_resource(DownloadEnrTemplate,'/DownloadEnrTemplate')
 
+####################################################################################################
+#Partner_API's
+
+@app.route("/partner_list_page")
+def partner_list_page():
+    if g.user:
+        return render_template("Master/partner-list.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
+@app.route("/partner")
+def partner():
+    if g.user: 
+        html_str="partner_list_page"
+        return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/partner_add_edit")
+def partner_add_edit():
+    if g.user:
+        return render_template("Master/partner-add-edit.html",partner_id=g.partner_id)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/assign_partner_add_edit_to_home", methods=['GET','POST'])
+def assign_partner_add_edit_to_home():
+    
+    session['partner_id']=request.form['hdn_partner_id']
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="partner_add_edit")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class GetPartnerTypes(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            return Master.GetPartnerTypes()
+api.add_resource(GetPartnerTypes,'/GetPartnerTypes')
+
+class partner_list(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            partner_type_ids = request.form['partner_type_ids']
+            start_index = request.form['start']
+            page_length = request.form['length']
+            search_value = request.form['search[value]']
+            order_by_column_position = request.form['order[0][column]']
+            order_by_column_direction = request.form['order[0][dir]']
+            draw=request.form['draw']
+            return Master.partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+api.add_resource(partner_list,'/partner_list')
+
+class add_partner_details(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            partner_name=request.form['PartnerName']
+            user_id=g.user_id
+            is_active=request.form['isactive']
+            partner_type_id=request.form['ddlPartnerTypes']
+            address=request.form['Address']
+            partner_id=request.form['PartnerId']
+            return Master.add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id)
+api.add_resource(add_partner_details,'/add_partner_details')
+
+@app.route("/after_popup_partner")
+def after_popup_partner():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="partner")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class get_partner_details(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            partner_id=request.args.get('partner_id',-1,type=int)
+            return jsonify(Master.get_partner_details(partner_id))
+api.add_resource(get_partner_details, '/get_partner_details')
+
+class GetPartnerUsers(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            partner_id=request.args.get('partner_id',0,type=int)
+            response=Master.GetPartnerUsers(partner_id)
+            return response
+api.add_resource(GetPartnerUsers,'/GetPartnerUsers')
+
+class add_edit_partner_user(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            UserName=request.form['UserName']
+            user_id=g.user_id
+            is_active=request.form['isactive']
+            Email=request.form['Email']
+            Mobile=request.form['Mobile']
+            PartnerId=request.form['PartnerId']
+            PartnerUserId=request.form['PartnerUserId']
+            return Master.add_edit_partner_user(UserName,user_id,is_active,Email,int(Mobile),PartnerId,PartnerUserId)
+api.add_resource(add_edit_partner_user,'/add_edit_partner_user')
+###############################################################################
+
+class GetPartners(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Master.GetPartners()
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetPartners,'/GetPartners')
+
+class upload_assessment_result(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                f = request.files['filename']
+                assessment_id =request.form['assessment_id']
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                batch_id = request.form["batch_id"]
+                stage_id = request.form["stage_id"]
+                file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
+                f.save(file_name)
+
+                df= pd.read_excel(file_name,sheet_name='Template')
+                df = df.fillna('')
+                schema = Schema([
+                        #str+null check
+                        Column('Enrolment_No',str_validation + null_validation),
+                        Column('First_Name',str_validation + null_validation),
+                        Column('Middle_Name'),
+                        Column('Last_Name'),
+                        Column('Batch_Code',str_validation + null_validation),
+                        Column('Assessment_Type',str_validation + null_validation),
+                        Column('Assessment_Date',str_validation + null_validation),
+                        Column('Attendance(Absent_Present)',str_validation + null_validation),
+                        Column('Score',str_validation + null_validation),
+                        Column('Grade',str_validation + null_validation),
+                        Column('Status(Certified_Notcertified)',str_validation + null_validation)
+                        ])
+                errors = schema.validate(df)
+                errors_index_rows = [e.row for e in errors]
+                len_error = len(errors_index_rows)
+                if len_error>0:
+                    pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename+'_' + 'errors.csv')
+                    return {"Status":False, "message":"Uploaded Failed (fails to validate data)" }
+                else:
+                    out = Database.upload_assessment_result(df,user_id,assessment_id,batch_id,stage_id)
+                    return out
+
+
+            except Exception as e:
+                 return {"Status":False, "message":"Unable to upload " + str(e)}  
+             
+api.add_resource(upload_assessment_result,'/upload_assessment_result')
 
 if __name__ == '__main__':    
     app.run(debug=True)

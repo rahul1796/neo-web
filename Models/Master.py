@@ -213,3 +213,20 @@ class Master:
     def get_center_details(center_id):
         indi_project={"CenterDetail":Database.get_center_details(center_id)}
         return indi_project
+    def GetPartnerTypes():
+        response={"PartnerTypes":Database.GetPartnerTypes()}
+        return response
+    def partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        return Database.partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id):
+        popupMessage = {"PopupMessage": Database.add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id)}
+        return popupMessage
+    def get_partner_details(partner_id):
+        return {"PartnerDetail":Database.get_partner_details(partner_id)}
+    def GetPartnerUsers(partner_id):
+        return {"PartnerUsers":Database.GetPartnerUsers(partner_id)}
+    def add_edit_partner_user(UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId):
+        popupMessage = {"PopupMessage": Database.add_edit_partner_user(UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId)}
+        return popupMessage
+    def GetPartners():
+        return {'Partners':Database.GetPartners()}

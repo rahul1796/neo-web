@@ -767,15 +767,21 @@ function add_map_message(){
                             {   var txt=''
                                 varHtml+='<tr>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].S_No +'</td>';
-                                txt='<a onclick="DownloadAssessmentResult(\'' + data.Assessments[i].Assessment_Id + '\')" class="btn" style="cursor:pointer" ><i title="Download Assessment Result" class="fe-download" ></i></a>';
-                                txt+='<a onclick="EditAssessmentDetails(\'' + data.Assessments[i].Assessment_Id + '\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Assessment Detail" class="fe-edit-1" ></i></a>';
+                                if(data.Assessments[i].Assessment_Stage_Id==4) // Assessment Result Uploaded
+                                    txt+='<a onclick="DownloadAssessmentResult(\'' + data.Assessments[i].Assessment_Id + '\')" class="user-btn" style="cursor:pointer" ><i title="Download Assessment Result" class="fe-download" ></i></a>';
+                                txt+='<a onclick="EditAssessmentDetails(\'' + data.Assessments[i].Assessment_Id + '\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Edit Assessment Detail" class="fe-edit-1" ></i></a>';
+                                if (data.Assessments[i].Assessment_Stage_Id>=3)
+                                    txt+='<a onclick="UploadResult(\'' + data.Assessments[i].Assessment_Id + '\',\'' + data.Assessments[i].Batch_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Batch_Code + '\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Upload Result" class="fe-upload" ></i></a>';
                                 varHtml+='  <td style="text-align:center;">'+ txt +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Batch_Code +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Requested_Date +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Requested_On +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Scheduled_Date +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Date +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Types_Name +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Agency_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Partner_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Stage_Name +'</td>';
                                 varHtml+='</tr>';
 
                             }                        
@@ -809,19 +815,55 @@ function add_map_message(){
         LoadAssessmentTypes();
         LoadAssessmentAgency();
         $('#TxtRequestedDate').val('');
+        $('#DivScheduleDate').hide();
+        $('#DivAssessmentDate').hide();
         $('#TxtScheduledDate').val('');
+        $('#TxtAssessmnetDate').val('');
         $('#hdn_batch_assessment_id').val(BatchId);
+        $('#ddlAssessmentType').attr('disabled', false);
+        $('#ddlAssessmentAgency').attr('disabled', false);
+        $('#ddlPartner').attr('disabled', false);
+        $('#TxtRequestedDate').attr('disabled', false);
         $('#mdl_create_batch_assessments').modal('show');
     }
-    function EditAssessmentDetails(AssessmentId,ReqDate,SchDate,AssessmentTypeId,AssessmentAgencyId)
+    function EditAssessmentDetails(AssessmentId,ReqDate,SchDate,AssessmentTypeId,AssessmentAgencyId,StageId,PartnerId,AssessmentDate)
     {
         LoadAssessmentTypes();
         LoadAssessmentAgency();
         $('#TxtRequestedDate').val(ReqDate);
-        $('#TxtScheduledDate').val(SchDate);
+        $('#TxtScheduledDate').val(SchDate!='NA'?SchDate:'');
+        $('#TxtAssessmnetDate').val(AssessmentDate!='NA'?AssessmentDate:'');
         $('#ddlAssessmentType').val(AssessmentTypeId);
-        $('#ddlAssessmentAgency').val(AssessmentAgencyId);
+        $('#ddlAssessmentAgency').val(AssessmentAgencyId).trigger('change');
         $('#hdn_assessment_id').val(AssessmentId);
+        $('#hdn_current_stage_id').val(StageId);
+        $('#ddlPartner').val(PartnerId);
+
+        $('#ddlAssessmentType').prop('disabled', 'disabled');
+        $('#ddlAssessmentAgency').prop('disabled', 'disabled');
+        $('#ddlPartner').prop('disabled', 'disabled');
+        $('#TxtRequestedDate').prop('disabled', 'disabled');
+
+        if (StageId==1)
+        {
+            $('#DivScheduleDate').show();
+            $('#DivAssessmentDate').hide();
+        }
+        else if (StageId==2)
+        {
+            $('#TxtScheduledDate').prop('disabled', 'disabled'); 
+            $('#DivScheduleDate').show();
+            $('#DivAssessmentDate').show();           
+        }
+        else
+        {
+            $('#TxtScheduledDate').prop('disabled', 'disabled');   
+            $('#TxtAssessmnetDate').prop('disabled', 'disabled');   
+        }
+
+            
+        
+        
         $('#mdl_batch_assessments').modal('hide');
         $('#mdl_create_batch_assessments').modal('show');
     }
@@ -890,9 +932,28 @@ function add_map_message(){
         });
     }
     function ScheduleAssessment()
-    {   
-        if($('#TxtRequestedDate').val()=='')
+    {   console.log($('#ddlPartner').val());
+        if($('#ddlAssessmentAgency').val()=='2' & $('#ddlPartner').val()=='')
+        {
+            alert("Please select partner.");
+            return false;
+        }
+        else if($('#TxtRequestedDate').val()=='')
+        {
             alert("Please enter requested date.");
+            return false;
+        }
+        else if($('#hdn_current_stage_id').val()=="1" & $('#TxtScheduledDate').val()=='')
+        {
+            alert("Please enter scheduled date.");
+            return false;
+        }
+        else if($('#hdn_current_stage_id').val()=="2" & $('#TxtAssessmnetDate').val()=='')
+        {
+            alert("Please enter assessment date.");
+            return false;
+        }
+
         console.log($('#hdn_batch_assessment_id').val(),$('#ddlAssessmentType').val(),$('#TxtRequestedDate').val(),$('#TxtScheduledDate').val(),$('#ddlAssessmentAgency').val());
         var URL=$('#hdn_web_url').val()+ "/ScheduleAssessment";
             $.ajax({
@@ -903,9 +964,12 @@ function add_map_message(){
                     "user_id" : $('#hdn_home_user_id').val(),
                     "requested_date" : $('#TxtRequestedDate').val(),
                     "scheduled_date" : $('#TxtScheduledDate').val(),
+                    "assessment_date" : $('#TxtAssessmnetDate').val(),
                     "assessment_agency_id" : $('#ddlAssessmentAgency').val(),
                     "assessment_type_id" : $('#ddlAssessmentType').val(),
-                    "assessment_id" : $('#hdn_assessment_id').val()
+                    "assessment_id" : $('#hdn_assessment_id').val(),
+                    "partner_id" : $('#ddlPartner').val(),
+                    "current_stage_id" : $('#hdn_current_stage_id').val()
                 },
                 success:function(data){
                     var message="",title="",icon="";
@@ -959,4 +1023,175 @@ function add_map_message(){
                 alert('Error while downloading Report. ');
             }
         });        
+    }
+    function AgencyOnChange(AgencyId)
+    {
+        LoadPartner();
+        if (AgencyId==2)
+        {
+            $('#DivPartner').show();
+            $('#ddlPartner').prop('Required');
+        }
+        else
+        {
+            $('#DivPartner').hide();
+            $('#ddlPartner').removeProp('Required');
+        }
+        
+    }
+    function LoadPartner()
+    {
+        var URL=$('#hdn_web_url').val()+ "/GetPartners"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                if(data.Partners != null)
+                {
+                    $('#ddlPartner').empty();
+                    var count=data.Partners.length;
+                    $('#ddlPartner').append(new Option('Select',''));
+                    if( count> 0)
+                    {
+                        for(var i=0;i<count;i++)
+                            if(data.Partners[i].Partner_Type_Id==2)
+                            $('#ddlPartner').append(new Option(data.Partners[i].Partner_Name,data.Partners[i].Partner_Id));
+                    }
+                    else
+                    {
+                        $('#ddlPartner').append(new Option('ALL','-1'));
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error loading partners! Please try again');
+                return false;
+            }
+        });
+    }
+
+    function OpenAssessmentList()
+    {
+        $('#mdl_batch_assessments').modal('show');
+    }
+
+    function UploadResult(AssessmentId,BatchId,StageId,BatchCode,ReqDate,SchDate,AssessDate)
+    {
+        
+        $('#HduploadFile').text(BatchCode);
+        $('#imgSpinner1').hide();
+
+        $('#TxtReqDate').val(ReqDate);
+        $('#TxtSchDate').val(SchDate);
+        $('#TxtAssessDate').val(AssessDate);
+        $('#hdn_upl_assessment_id').val(AssessmentId);
+        $('#hdn_upl_batch_id').val(BatchId);
+        $('#hdn_upl_stage_id').val(StageId);
+
+        $('#hdn_home_user_id_modal').val($('#hdn_home_user_id').val());
+        $('#hdn_home_user_role_id_modal').val($('#hdn_home_user_role_id').val());
+        $('#mdl_batch_assessments').modal('hide');
+        $('#mdl_candidate_result_upload').modal('show');
+        $('#myFile').val('');
+    }
+    function DownloadResultTemplate(AssessmentId,BatchId,StageId)
+    {
+        console.log(AssessmentId,BatchId,StageId);
+        var URL=$('#hdn_web_url').val()+ "/DownloadAssessmentResultUploadTemplate";            
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{  
+                     "AssessmentId":AssessmentId,
+                     "BatchId":BatchId
+            },
+            success:function(data){
+                if(data!=null)
+                {                       
+                    window.location=data.FilePath+data.FileName;
+                    //$('#divLoader').hide();
+                }                    
+            },
+            error:function(x){
+                alert('Error while downloading Report. ');
+            }
+        }); 
+    }
+
+    function UploadFileData()
+    {
+        
+        if ($('#myFile').get(0).files.length === 0) {
+            console.log("No files selected.");
+        }
+        else
+        {
+            var fileExtension = ['xlsx']
+            if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                alert("Formats allowed are : "+fileExtension.join(', '));
+                return false;
+            }
+            else
+            {
+                $("#imgSpinner1").show();
+                var form_data = new FormData($('#formUpload')[0]);
+                form_data.append('user_id',$('#hdn_home_user_id_modal').val());
+                form_data.append('user_role_id',$('#hdn_home_user_role_id_modal').val());
+                form_data.append('assessment_id',$('#hdn_upl_assessment_id').val());
+                form_data.append('batch_id',$('#hdn_upl_batch_id').val());
+                form_data.append('stage_id',$('#hdn_upl_stage_id').val());
+                $.ajax({
+                    type: 'POST',
+                    url: $('#hdn_web_url').val()+ "/upload_assessment_result",
+                    enctype: 'multipart/form-data',
+                    data: form_data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success: function(data) 
+                    {
+                        var message="",title="",icon="";
+                        if(data.Status){
+                            message=data.message;
+                            title="Success";
+                            icon="success";
+                        }
+                        else{
+                            message=data.message;
+                            title="Error";
+                            icon="error";
+                        }
+                        swal({   
+                                    title:title,
+                                    text:message,
+                                    icon:icon,
+                                    confirmButtonClass:"btn btn-confirm mt-2"
+                                    }).then(function(){
+                                        window.location.href = '/assessment';
+                                    }); 
+                    
+                            
+                    },
+                    error:function(err)
+                    {
+                        swal({   
+                            title:"Error",
+                            text:'Error! Please try again',
+                            icon:"error",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                window.location.href = '/assessment';
+                            }); 
+                       
+                    }
+                });
+            }
+        }
     }

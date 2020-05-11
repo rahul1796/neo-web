@@ -901,7 +901,7 @@ class Database:
         sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
 
         values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids) #
-
+        print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -3760,26 +3760,30 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return out
-    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_type_id,assessment_agency_id,assessment_id):
-        response=[]
-        h={}
-        con = pyodbc.connect(conn_str)
-        cur = con.cursor()
-        sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?'
-        values = (batch_id,user_id,requested_date,scheduled_date,assessment_type_id,assessment_agency_id,assessment_id)
-        cur.execute(sql,(values))
-        columns = [column[0].title() for column in cur.description]
-        for row in cur:
-            pop=row[0]
-
-        cur.commit()
-        cur.close()
-        con.close() 
-        if pop>0:
-            out={"message":"Assessment Scheduled Successfully","success":1,"assessment_id":pop}
-        else:
-            out={"message":"Error scheduling assessment","success":0,"assessment_id":pop}
-        return out
+    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id):
+        try:
+            response=[]
+            h={}
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?,?,?,?'
+            values = (batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id)
+            print(values)
+            cur.execute(sql,(values))
+            columns = [column[0].title() for column in cur.description]
+            for row in cur:
+                pop=row[0]
+                msg=row[1]
+            cur.commit()
+            cur.close()
+            con.close() 
+            if pop>0:
+                out={"message":msg,"success":1,"assessment_id":pop}
+            else:
+                out={"message":"Error scheduling assessment","success":0,"assessment_id":pop}
+            return out
+        except Exception as e:
+            return {"message":"Error changing assessment stage","success":0,"assessment_id":0}
     def GetAssessmentCandidateResults(AssessmentId):
         try:
             col=[]
@@ -4423,10 +4427,10 @@ SELECT					cb.name as candidate_name,
             update candidate_details.tbl_candidates set isFresher={},isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',is_active=1 where candidate_id='{}';
             '''
             quer2='''
-            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',present_address_line1='{}',permanaet_address_line1='{}',highest_qualification='{}',stream_specialization='{}',computer_knowledge='{}',technical_knowledge='{}',family_salutation='{}',member_name='{}',gender='{}',education_qualification='{}',relationship='{}',occupation='{}',average_household_income='{}',bank_name='{}',account_number='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',present_address_line1='{}',permanaet_address_line1='{}',highest_qualification='{}',stream_specialization='{}',computer_knowledge='{}',technical_knowledge='{}',average_household_income='{}',bank_name='{}',account_number='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
             '''
             quer3='''
-            update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set present_address_line2='{}',present_village='{}',present_panchayat='{}',present_taluk_block='{}',permanent_address_line2='{}',permanent_village='{}',permanent_panchayat='{}',permanent_taluk_block='{}',name_of_institute='{}',university='{}',year_of_pass='{}',percentage='{}',family_date_of_birth='{}',family_age='{}',family_primary_contact='{}',family_email_address='{}',branch_name='{}',branch_code='{}',account_type='{}',attachment_image_name='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set present_address_line2='{}',present_village='{}',present_panchayat='{}',present_taluk_block='{}',permanent_address_line2='{}',permanent_village='{}',permanent_panchayat='{}',permanent_taluk_block='{}',name_of_institute='{}',university='{}',year_of_pass='{}',percentage='{}',branch_name='{}',branch_code='{}',account_type='{}',attachment_image_name='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
             '''
             quer4='''
             insert into candidate_details.tbl_candidate_interventions
@@ -4440,21 +4444,45 @@ SELECT					cb.name as candidate_name,
             (intervention_id, course_id, batch_id, intervention_value, created_on,created_by,is_active)
             values
             '''
+
+            quer6='''
+            INSERT INTO [candidate_details].[tbl_candidate_family_details]
+                ([candidate_id]
+                ,[salutation]
+                ,[name]
+                ,[family_date_of_birth]
+                ,[family_age]
+                ,[family_primary_contact]
+                ,[family_email_address]
+                ,[gender]
+                ,[relationship]
+                ,[education_qualification]
+                ,[current_occupation]
+                ,[created_by]
+                ,[created_on]
+                ,[is_active])
+            VALUES
+            '''
             url = candidate_xml_weburl + xml
             r = requests.get(url)
             data = r.text
             root = ET.fromstring(data)
             query = ""
+            fam_query=""
             out=[]
             for child in root:
                 data = child.attrib
                 out.append(data['assign_batch'])
                 query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,data['cand_id'])
-                query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['presAddrOne'],data['permAddrOne'],data['highQuali'],data['candStream'],data['compKnow'],data['techKnow'],data['memberSal'],data['memberName'],data['memberGender'],data['memberQuali'],data['memberRelation'],data['memberOccuptn'],data['houseIncome'],data['bankName'],data['accNum'],user_id,data['cand_id'])
-                query += '\n' + quer3.format(data['presAddrTwo'],data['presVillage'],data['presPanchayat'],data['presTaluk'],data['permAddrTwo'],data['permVillage'],data['permPanchayat'],data['permTaluk'],data['instiName'],data['university'],data['yrPass'],data['percentage'],data['memberDob'],data['memberAge'],data['memberContact'],data['memberEmail'],data['branchName'],data['ifscCode'],data['accType'],data['bankCopy'],user_id,data['cand_id'])
+                query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['presAddrOne'],data['permAddrOne'],data['highQuali'],data['candStream'],data['compKnow'],data['techKnow'],data['houseIncome'],data['bankName'],data['accNum'],user_id,data['cand_id'])
+                query += '\n' + quer3.format(data['presAddrTwo'],data['presVillage'],data['presPanchayat'],data['presTaluk'],data['permAddrTwo'],data['permVillage'],data['permPanchayat'],data['permTaluk'],data['instiName'],data['university'],data['yrPass'],data['percentage'],data['branchName'],data['ifscCode'],data['accType'],data['bankCopy'],user_id,data['cand_id'])
 
                 quer = "({},'SAE',GETDATE(),{},1),".format(data['cand_id'],user_id)
                 quer4 += '\n'+quer
+                
+                for fam in child.findall('family_details'):
+                    dt=fam.attrib
+                    fam_query+="({},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',{},GETDATE(),1),".format(data['cand_id'],dt['memberSal'],dt['memberName'],dt['memberDob'],dt['memberAge'],dt['memberContact'],dt['memberEmail'],dt['memberGender'],dt['memberRelation'],dt['memberQuali'],dt['memberOccuptn'],user_id)
             curs.execute(query)
             curs.commit()
 
@@ -4468,6 +4496,11 @@ SELECT					cb.name as candidate_name,
             curs.execute(quer5)
             curs.commit()
             
+            if fam_query!="":
+                quer6 += fam_query[:-1]+';'
+                curs.execute(quer6)
+                curs.commit()
+
             out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
         except Exception as e:
             out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
@@ -4764,3 +4797,172 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return h
+
+    def GetPartnerTypes():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        cur2.execute("exec [masters].[sp_get_partner_types]")
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        response = {}
+        d = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_partner_list] ?, ?, ?, ?, ?, ?'
+        values = (partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        print(values)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
+        response = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        return response
+    def add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_add_edit_partner] ?, ?, ?, ?, ?, ?'
+        values = (partner_name,user_id,is_active,partner_type_id,address,partner_id)
+        #print(values)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated"}
+        else:
+            msg={"message":"Created"}
+        return msg
+    def get_partner_details(partner_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        h={}
+        sql = "[masters].[sp_get_partner_details] ?"
+        values = (partner_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+        cur.close()
+        con.close()
+        return h
+    def GetPartnerUsers(partner_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_partner_users]  ?'
+        values = (partner_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+        con.close()       
+        return response
+    def add_edit_partner_user(UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[users].[sp_add_edit_partner_user] ?, ?, ?, ?, ?, ?,?'
+        values = (UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId)
+        print(values)
+        #print(values)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated"}
+        else:
+            msg={"message":"Created"}
+        return msg
+    def GetPartners():
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_partners]'
+        #values = (BatchId,)
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = response
+        cur.commit()
+        cur.close()
+        con.close()       
+        return out
+    def GetAssessmentCandidateResultUploadTemplate(AssessmentId,BatchId):
+        try:
+            col=[]
+            response={}
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            sql = 'exec [assessments].[sp_get_candidate_result_upload_template_data] ?,?'
+            values=(AssessmentId,BatchId)            
+            cur.execute(sql,(values))
+            col = [column[0].title() for column in cur.description]
+            data=cur.fetchall()   
+            out = []
+            for i in data:
+                out.append(list(i))        
+            df=pd.DataFrame(out)       
+            cur.close()
+            con.close()
+            response= {"columns":col,"data":df}
+            return response
+        except Exception as e:
+            print(str(e))
+        return out
+    def upload_assessment_result(df,user_id,assessment_id,batch_id,stage_id):
+        try:            
+            print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            json_str=df.to_json(orient='records')
+            sql = 'exec	[assessments].[sp_upload_assessment_result]  ?,?, ?, ?,?'
+            values = (json_str,user_id,assessment_id,batch_id,stage_id)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop >0 :
+                Status=True
+                msg="Uploaded Successfully"
+            else:
+                msg="Error"
+                Status=False
+            return {"Status":Status,'message':msg}
+        except Exception as e:
+            print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
