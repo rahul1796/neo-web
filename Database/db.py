@@ -898,9 +898,11 @@ class Database:
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
+
         sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?'
 
         values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
+
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -3790,26 +3792,30 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return out
-    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_type_id,assessment_agency_id,assessment_id):
-        response=[]
-        h={}
-        con = pyodbc.connect(conn_str)
-        cur = con.cursor()
-        sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?'
-        values = (batch_id,user_id,requested_date,scheduled_date,assessment_type_id,assessment_agency_id,assessment_id)
-        cur.execute(sql,(values))
-        columns = [column[0].title() for column in cur.description]
-        for row in cur:
-            pop=row[0]
-
-        cur.commit()
-        cur.close()
-        con.close() 
-        if pop>0:
-            out={"message":"Assessment Scheduled Successfully","success":1,"assessment_id":pop}
-        else:
-            out={"message":"Error scheduling assessment","success":0,"assessment_id":pop}
-        return out
+    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id):
+        try:
+            response=[]
+            h={}
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?,?,?,?'
+            values = (batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id)
+            print(values)
+            cur.execute(sql,(values))
+            columns = [column[0].title() for column in cur.description]
+            for row in cur:
+                pop=row[0]
+                msg=row[1]
+            cur.commit()
+            cur.close()
+            con.close() 
+            if pop>0:
+                out={"message":msg,"success":1,"assessment_id":pop}
+            else:
+                out={"message":"Error scheduling assessment","success":0,"assessment_id":pop}
+            return out
+        except Exception as e:
+            return {"message":"Error changing assessment stage","success":0,"assessment_id":0}
     def GetAssessmentCandidateResults(AssessmentId):
         try:
             col=[]
@@ -4910,3 +4916,172 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return h
+
+    def GetPartnerTypes():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        cur2.execute("exec [masters].[sp_get_partner_types]")
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        response = {}
+        d = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_partner_list] ?, ?, ?, ?, ?, ?'
+        values = (partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        print(values)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
+        response = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        return response
+    def add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_add_edit_partner] ?, ?, ?, ?, ?, ?'
+        values = (partner_name,user_id,is_active,partner_type_id,address,partner_id)
+        #print(values)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated"}
+        else:
+            msg={"message":"Created"}
+        return msg
+    def get_partner_details(partner_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        h={}
+        sql = "[masters].[sp_get_partner_details] ?"
+        values = (partner_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+        cur.close()
+        con.close()
+        return h
+    def GetPartnerUsers(partner_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_partner_users]  ?'
+        values = (partner_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+        con.close()       
+        return response
+    def add_edit_partner_user(UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[users].[sp_add_edit_partner_user] ?, ?, ?, ?, ?, ?,?'
+        values = (UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId)
+        print(values)
+        #print(values)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated"}
+        else:
+            msg={"message":"Created"}
+        return msg
+    def GetPartners():
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_partners]'
+        #values = (BatchId,)
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = response
+        cur.commit()
+        cur.close()
+        con.close()       
+        return out
+    def GetAssessmentCandidateResultUploadTemplate(AssessmentId,BatchId):
+        try:
+            col=[]
+            response={}
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            sql = 'exec [assessments].[sp_get_candidate_result_upload_template_data] ?,?'
+            values=(AssessmentId,BatchId)            
+            cur.execute(sql,(values))
+            col = [column[0].title() for column in cur.description]
+            data=cur.fetchall()   
+            out = []
+            for i in data:
+                out.append(list(i))        
+            df=pd.DataFrame(out)       
+            cur.close()
+            con.close()
+            response= {"columns":col,"data":df}
+            return response
+        except Exception as e:
+            print(str(e))
+        return out
+    def upload_assessment_result(df,user_id,assessment_id,batch_id,stage_id):
+        try:            
+            print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            json_str=df.to_json(orient='records')
+            sql = 'exec	[assessments].[sp_upload_assessment_result]  ?,?, ?, ?,?'
+            values = (json_str,user_id,assessment_id,batch_id,stage_id)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop >0 :
+                Status=True
+                msg="Uploaded Successfully"
+            else:
+                msg="Error"
+                Status=False
+            return {"Status":Status,'message':msg}
+        except Exception as e:
+            print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}

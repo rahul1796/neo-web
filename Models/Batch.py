@@ -22,9 +22,7 @@ class Batch:
         trainers_f={"Trainers":Database.GetTrainersBasedOnCenter(center_id)}
         return trainers_f
     def AllTrainersOnSubProject(SubProject_Id):
-        print(SubProject_Id)
         trainers_f={"Trainers":Database.GetTrainersBasedOnSubProject(SubProject_Id)}
-        print(trainers_f)
         return trainers_f
     def AllCenterManagerOnCenter(center_id):
         centermanager_f={"CenterManager":Database.GetCenterManagerBasedOnCenter(center_id)}
