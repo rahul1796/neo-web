@@ -16,7 +16,6 @@ $(document).ready(function () {
         $('#btn_create').hide();
     //LoadTable();
 });
-
 function Loadcandidatestatusddl(){
     if (($('#FromDate').val()=='')|($('#ToDate').val()==''))
     {   

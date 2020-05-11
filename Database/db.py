@@ -528,7 +528,7 @@ class Database:
         bu = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'SELECT * FROM [masters].[tbl_bu] where is_active=1;'
+        sql = 'SELECT bu_id, bu_name FROM [masters].[tbl_bu] where is_active=1;'
         cur.execute(sql)
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -891,17 +891,16 @@ class Database:
         con.close()
         return content
         
-    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU):
+    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
         #print(status, customer, project, course, region, center)
         content = {}
         d = []
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
+        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?'
 
-        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids) #
-
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"

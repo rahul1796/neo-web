@@ -25,6 +25,8 @@ import re
 import filter_tma_report
 import filter_tma_report_new
 import candidate_report
+import batch_report
+import ecp_report_down
 from Models import DownloadDump
 from lib.ms_sql import MsSql
 from lib.postgre_sql import PostgreSql
@@ -886,6 +888,11 @@ class batch_list_updated(Resource):
             region = request.form['region']
             center = request.form['center']
             center_type = request.form['center_type']
+            Planned_actual = request.form['Planned_actual']
+            StartFromDate = request.form['StartFromDate']
+            StartToDate = request.form['StartToDate']
+            EndFromDate = request.form['EndFromDate']
+            EndToDate = request.form['EndToDate']
             status = request.form['status']
             #print('before hi')
             BU=''
@@ -901,8 +908,10 @@ class batch_list_updated(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
+
+            #print(order_by_column_position)
             
-            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU)
+            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
 
 class add_batch_details(Resource):
     @staticmethod
@@ -5672,6 +5681,66 @@ class DownloadEnrTemplate(Resource):
                 return {'Description':'Error: '+str(e), 'Status':False}
 api.add_resource(DownloadEnrTemplate,'/DownloadEnrTemplate')
 
+class batch_download_report(Resource):
+    report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
+                batch_id = request.form["batch_id"]
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                status = request.form["status"]
+                customer = request.form["customer"]
+                project = request.form["project"]
+                sub_project = request.form["sub_project"]
+                region = request.form["region"]
+                center = request.form["center"]
+                center_type = request.form["center_type"]
+                BU = request.form["BU"]
+                Planned_actual = request.form["Planned_actual"]
+                StartFromDate = request.form["StartFromDate"]
+                StartToDate = request.form["StartToDate"]
+                EndFromDate = request.form["EndFromDate"]
+                EndToDate = request.form["EndToDate"]
+                file_name='batch_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
+                
+                resp = batch_report.create_report(batch_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate, file_name)
+                
+                return resp
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                #print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(batch_download_report,'/batch_download_report')
+
+class GetECPReportDonload(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            #try:
+                #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
+                
+            user_id = request.form["user_id"]
+            user_role_id = request.form["user_role_id"]
+            customer_ids = request.form["customer_ids"]
+            contract_ids = request.form["contract_ids"]
+            region_ids = request.form["region_ids"]
+            from_date = request.form["from_date"]
+            to_date = request.form["to_date"]
+            file_name='ecp_report_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
+            
+            resp = ecp_report_down.create_report(user_id, user_role_id, customer_ids, contract_ids, region_ids, from_date, to_date, file_name)
+            
+            return resp
+            #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            # except Exception as e:
+            #     #print(str(e))
+            #     return {"exceptione":str(e)}
+api.add_resource(GetECPReportDonload,'/GetECPReportDonload')
 
 if __name__ == '__main__':    
     app.run(debug=True)

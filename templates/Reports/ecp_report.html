@@ -6,6 +6,7 @@
 <script type="text/javascript">
     var Candidates = {};
         $(document).ready(function(){  
+            $("#imgSpinner").hide();
             const months = ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];     
             $("#tbl_list").dataTable().fnDestroy();                
             $('.dropdown-search-filter').select2();
@@ -227,12 +228,20 @@
         function GetContractProjectTargets(RegionId,ContractId,ContractName){
             $('#head').text(ContractName);
             var URL=$('#hdn_web_url').val()+ "/GetContractProjectTargets";
+
+             $("#tbl_targets").dataTable().fnDestroy();
+             $("#tbl_targets tbody").empty();
+
             $.ajax({
                 type:"GET",
                 url:URL,
                 async:false,
-                //overflow-x: scroll,
-                //overflow:true,        
+                'overflow-x': scroll,
+                overflow:true,  
+                "scrollX": true,  
+                drawCallback: function(){
+                                            $('#tbl_targets_paginate ul.pagination').addClass("pagination-rounded");
+                                        },    
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
                 data:{
@@ -247,11 +256,9 @@
                 success: function (data){
                     varHtml='';
                     var varButton='';
-                    $("#tbl_targets").dataTable().fnDestroy();
-                    $("#tbl_targets tbody").empty();
+                   
                     if(!jQuery.isEmptyObject(data.Targets))
-                    {   
-                       
+                    {                          
                         var count=data.Targets.length;
                         if( count> 0)
                         {
@@ -278,18 +285,19 @@
                             }
                         }
                         $("#tbl_targets tbody").append(varHtml);
-                        $('#mdl_SubProjects').modal('show');
-                        $("#tbl_targets").DataTable({
-                                "overflow-x": scroll,
-                                // "sScrollX": "100%",
-                                // "sScrollXInner": "110%",
-                                // "bScrollCollapse": true,
-                                "scrollX": true,
-                                drawCallback: function(){
-                                            $('#tbl_targets_paginate ul.pagination').addClass("pagination-rounded");
-                                        }
+                        //$('#mdl_SubProjects').modal('show');
+                        var varTable = $("#tbl_targets").DataTable({
+                                 "scrollX": true,
+                                 drawCallback: function(){
+                                             $('#tbl_targets_paginate ul.pagination').addClass("pagination-rounded");
+                                 }
                         });
+                        //$('#tbl_targets_paginate ul.pagination').addClass("pagination-rounded");
+                        //varTable.order.listener('#sorter', 1);
+
                         
+                        $('#mdl_SubProjects').modal('show');  
+                        $('#tbl_targets').find('th:nth-child(2)').click();                      
                     }
                     else
                     {
@@ -304,8 +312,97 @@
                     return false;
                 }
             });
+
             return false;
         }
+        
+    function DownloadTableBasedOnSearch(){
+        $("#imgSpinner").show();
+        // from candidate
+        if (0==9){
+        console.log(false)
+        }
+        else{
+            var URL=$('#hdn_web_url').val()+ "/GetECPReportDonload"
+            $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: URL, 
+                        data: {
+                            "user_id": $('#hdn_home_user_id').val(),
+                            "user_role_id" : $('#hdn_home_user_role_id').val(),
+                            "customer_ids":$('#ddlCustomer').val().toString(),
+                            "contract_ids":$('#ddlContract').val().toString(),
+                            "region_ids":$('#ddlRegion').val().toString(),
+                            "from_date" : $('#FromDate').val(),
+                            "to_date" : $('#ToDate').val()
+                        },
+                        success: function(resp) 
+                        {
+    
+                            if (resp.Status){
+                                var varAnchor = document.getElementById('lnkDownload');
+                                varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
+                                $("#imgSpinner").hide();
+                                try 
+                                    { 
+                                        //in firefox
+                                        varAnchor.click();
+                                        return;
+                                    } catch(ex) {}
+                                    
+                                    try 
+                                    { 
+                                        // in chrome
+                                        if(document.createEvent) 
+                                        {
+                                            var e = document.createEvent('MouseEvents');
+                                            e.initEvent( 'click', true, true );
+                                            varAnchor.dispatchEvent(e);
+                                            return;
+                                        }
+                                    } catch(ex) {}
+                                    
+                                    try 
+                                    { 
+                                        // in IE
+                                        if(document.createEventObject) 
+                                        {
+                                             var evObj = document.createEventObject();
+                                             varAnchor.fireEvent("onclick", evObj);
+                                             return;
+                                        }
+                                    } catch(ex) {}
+                                
+                            }
+                            else{
+                                console.log(resp)
+                                //alert('Not success')
+                                $("#imgSpinner").hide();
+                                
+                            }
+                        },
+                        error:function()
+                        {
+                            //$("#imgSpinner").hide();
+                        }
+                    });
+            
+        }
+        //$("#imgSpinner").hide();
+    }
+    
+    function ForceDownload(varUrl, varFileName)
+            {
+                var link = document.createElement('a');
+                link.setAttribute('href', varUrl);
+                link.setAttribute('download', varFileName);
+                link.setAttribute('target', '_blank');
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
 </script>
    
 </br>
@@ -343,9 +440,19 @@
                         <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
                         ClientIdMode="static" placeholder="To Date">
                     </div>
-                    <div class="col-lg-3" >
+                    <div class="col-lg-1" >
                         <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" 
                                 onclick="LoadTableBasedOnSearch()">Search</button>
+                    </div>
+                    <div class="form-group col-lg-2">                                         
+                        <a class="btn btn-primary" style="float: right; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
+                        <a id="lnkDownload" style="display:none;"></a>
+                    </div>
+                    <div class="form-group col-lg-3">
+                        <div id="imgSpinner">
+                            <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-block;"/>
+                            <label style="display:inline-block;">Please wait while downloading report...</label>
+                        </div> 
                     </div>
                 </div>
             </div>
