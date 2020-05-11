@@ -21,6 +21,9 @@ import re
 import filter_tma_report
 import filter_tma_report_new
 import candidate_report
+import batch_report
+import ecp_report_down
+import batch_candidate_download
 from Models import DownloadDump
 from lib.ms_sql import MsSql
 from lib.postgre_sql import PostgreSql
@@ -883,6 +886,11 @@ class batch_list_updated(Resource):
             region = request.form['region']
             center = request.form['center']
             center_type = request.form['center_type']
+            Planned_actual = request.form['Planned_actual']
+            StartFromDate = request.form['StartFromDate']
+            StartToDate = request.form['StartToDate']
+            EndFromDate = request.form['EndFromDate']
+            EndToDate = request.form['EndToDate']
             status = request.form['status']
             #print('before hi')
             BU=''
@@ -898,8 +906,10 @@ class batch_list_updated(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
+
+            #print(order_by_column_position)
             
-            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU)
+            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
 
 class add_batch_details(Resource):
     @staticmethod
@@ -1025,7 +1035,19 @@ class drop_edit_map_candidate_batch(Resource):
         user_id= request.form['user_id']
         drop_remark = request.form['drop_remark']
         return Batch.drop_edit_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark)
-
+class untag_users_from_sub_project(Resource):
+    @staticmethod
+    def post():
+        user_ids=request.form['user_ids']
+        sub_project_id=request.form['sub_project_id']
+        return Master.untag_users_from_sub_project(user_ids,sub_project_id)
+class tag_users_from_sub_project(Resource):
+    @staticmethod
+    def post():
+        user_id=request.form['user_id']
+        sub_project_id=request.form['sub_project_id']
+        tagged_by= session['user_id']
+        return Master.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)
 
 api.add_resource(batch_list, '/batch_list')
 api.add_resource(batch_list_updated, '/batch_list_updated')
@@ -1040,6 +1062,8 @@ api.add_resource(candidates_based_on_course,'/ALLCandidatesBasedOnCourse')
 api.add_resource(candidates_maped_in_batch,'/ALLCandidatesMapedInBatch')
 api.add_resource(add_edit_map_candidate_batch,'/add_edit_map_candidate_batch')
 api.add_resource(drop_edit_map_candidate_batch,'/drop_edit_candidate_batch')
+api.add_resource(untag_users_from_sub_project,'/untag_users_from_sub_project')
+api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
 ####################################################################################################
 
@@ -4911,6 +4935,23 @@ class GetCoursesBasedOnSubProject(Resource):
             return response
 api.add_resource(GetCoursesBasedOnSubProject,'/GetCoursesBasedOnSubProject')
 
+class GetUsersBasedOnSubProject(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sub_project_id=request.args.get('sub_project_id',0,type=int)
+            response={"Users":Master.GetUsersBasedOnSubProject(sub_project_id)}
+            return response
+api.add_resource(GetUsersBasedOnSubProject,'/GetUsersBasedOnSubProject')
+
+class GetUserListForSubProject(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sub_project_id=request.args.get('sub_project_id',0,type=int)
+            response={"Users":Master.GetUserListForSubProject(sub_project_id)}
+            return response
+api.add_resource(GetUserListForSubProject,'/GetUserListForSubProject')
 class GetCentersbasedOnSubProject(Resource):
     @staticmethod
     def get():
@@ -4919,6 +4960,34 @@ class GetCentersbasedOnSubProject(Resource):
             response={"Centers":Master.GetCentersbasedOnSubProject(sub_project_id)}
             return response
 api.add_resource(GetCentersbasedOnSubProject,'/GetCentersbasedOnSubProject')
+
+class GetTrainersBasedOnType(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            trainer_flag=request.args.get('trainer_flag',0,type=int)
+            response={"Users":Master.GetTrainersBasedOnType(trainer_flag)}
+            return response
+api.add_resource(GetTrainersBasedOnType,'/GetTrainersBasedOnType')
+
+class GetUsersBasedOnRole(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            user_role_id=request.args.get('user_role_id',0,type=int)
+            print(user_role_id)
+            response={"Users":Master.GetUsersBasedOnRole(user_role_id)}
+            print(response)
+            return response
+api.add_resource(GetUsersBasedOnRole,'/GetUsersBasedOnRole')
+
+class GetUserRole(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response={"UserRole":Master.GetUserRole()}
+            return response
+api.add_resource(GetUserRole,'/GetUserRole')
 
 class SaveSubProjectCourseCenterUnitPrice(Resource):
     @staticmethod
@@ -5150,8 +5219,10 @@ class GetContractProjectTargets(Resource):
                 user_id=request.args.get('user_id',0,type=int)
                 user_role_id=request.args.get('user_role_id',0,type=int)
                 region_id=request.args.get('region_id',0,type=int)
+                from_date=request.args.get('from_date','',type=str)
+                to_date=request.args.get('to_date','',type=str)
                    
-                response = {"Targets":Master.GetContractProjectTargets(contact_id,user_id,user_role_id,region_id)}
+                response = {"Targets":Master.GetContractProjectTargets(contact_id,user_id,user_role_id,region_id,from_date,to_date)}
                 return response 
             except Exception as e:
                 return {'exception':str(e)}
@@ -5540,6 +5611,7 @@ class AllCreatedByBasedOnUser(Resource):
 
 api.add_resource(AllCreatedByBasedOnUser,'/AllCreatedByBasedOnUser')
 
+
 class DownloadRegTemplate(Resource):
     report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
     @staticmethod
@@ -5835,7 +5907,78 @@ class upload_assessment_result(Resource):
              
 api.add_resource(upload_assessment_result,'/upload_assessment_result')
 
+class batch_download_report(Resource):
+    report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
+                batch_id = request.form["batch_id"]
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                status = request.form["status"]
+                customer = request.form["customer"]
+                project = request.form["project"]
+                sub_project = request.form["sub_project"]
+                region = request.form["region"]
+                center = request.form["center"]
+                center_type = request.form["center_type"]
+                BU = request.form["BU"]
+                Planned_actual = request.form["Planned_actual"]
+                StartFromDate = request.form["StartFromDate"]
+                StartToDate = request.form["StartToDate"]
+                EndFromDate = request.form["EndFromDate"]
+                EndToDate = request.form["EndToDate"]
+                file_name='batch_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
+                
+                resp = batch_report.create_report(batch_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate, file_name)
+                
+                return resp
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                #print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(batch_download_report,'/batch_download_report')
+
+
+class GetECPReportDonload(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            #try:
+                #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
+                
+            user_id = request.form["user_id"]
+            user_role_id = request.form["user_role_id"]
+            customer_ids = request.form["customer_ids"]
+            contract_ids = request.form["contract_ids"]
+            region_ids = request.form["region_ids"]
+            from_date = request.form["from_date"]
+            to_date = request.form["to_date"]
+            file_name='ecp_report_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
+            
+            resp = ecp_report_down.create_report(user_id, user_role_id, customer_ids, contract_ids, region_ids, from_date, to_date, file_name)
+            
+            return resp
+            #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            # except Exception as e:
+            #     #print(str(e))
+            #     return {"exceptione":str(e)}
+api.add_resource(GetECPReportDonload,'/GetECPReportDonload')
+
+class batchcandidate_download_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            batch_id = request.form["batch_id"]
+            file_name='batch_candidate_report_'+batch_id +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            
+            resp = batch_candidate_download.create_report(batch_id, file_name)
+            return resp
+
+api.add_resource(batchcandidate_download_report,'/batchcandidate_download_report')
 if __name__ == '__main__':    
     app.run(debug=True)
-
-#app.run(debug=True)  

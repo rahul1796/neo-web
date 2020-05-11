@@ -528,7 +528,7 @@ class Database:
         bu = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'SELECT * FROM [masters].[tbl_bu] where is_active=1;'
+        sql = 'SELECT bu_id, bu_name FROM [masters].[tbl_bu] where is_active=1;'
         cur.execute(sql)
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -891,17 +891,18 @@ class Database:
         con.close()
         return content
         
-    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU):
+    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
         #print(status, customer, project, course, region, center)
         content = {}
         d = []
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
 
-        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids) #
-        print(values)
+        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?'
+
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
+
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -1098,7 +1099,38 @@ class Database:
         else:
             msg={"message":"Error fetching batch data for Droping"}
         return msg
-
+    def untag_users_from_sub_project(user_ids,sub_project_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[untag_users_from_sub_project] ?, ?'
+        values = (user_ids,sub_project_id)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"User Untagged"}
+        else:
+            msg={"message":"Error in untagging"}
+        return msg
+    def tag_users_from_sub_project(user_id,sub_project_id,tagged_by):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[tag_users_from_sub_project] ?, ?, ?'
+        values = (user_id,sub_project_id,tagged_by)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"User tagged"}
+        else:
+            msg={"message":"Error in tagging"}
+        return msg
     def qp_list(user_id,user_role_id,qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors):
         content = {}
         d = []
@@ -3453,7 +3485,7 @@ SELECT					cb.name as candidate_name,
             response.append(h.copy())
         cur2.close()
         con.close()
-        print(response)
+        #print(response)
         return response
         con.close()       
         return response
@@ -3984,11 +4016,11 @@ SELECT					cb.name as candidate_name,
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            for i in range(len(columns)):
+            for i in range(len(columns)-4):
                 h[columns[i]]=row[i]
             #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
             response.append(h.copy())
-        out = {"candidates":response,"batch_name":row[7],"center_name":row[8]}
+        out = {"candidates":response,"batch_name":row[9],"center_name":row[10],"course_name":row[11]}
         cur.close()
         con.close()       
         return out
@@ -4009,7 +4041,7 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
-    
+
     def GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date):
         response = []
         h={}
@@ -4157,6 +4189,44 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
+    def GetUsersBasedOnSubProject(sub_project_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_users_based_on_sub_project]  ?'
+        values = (sub_project_id,)
+        cur2.execute(sql,(values))
+        #print(values)
+        #print(cur2.description)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        #print(response)
+        return response
+    def GetUserListForSubProject(sub_project_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_user_list_for_sub_project]  ?'
+        values = (sub_project_id,)
+        cur2.execute(sql,(values))
+        #print(values)
+        #print(cur2.description)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        #print(response)
+        return response
     def GetCentersbasedOnSubProject(sub_project_id):
         response = []
         h={}
@@ -4173,12 +4243,62 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
+    def GetTrainersBasedOnType(trainer_flag):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_trainers_based_on_type]  ?'
+        values = (trainer_flag,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def GetUsersBasedOnRole(user_role_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_users_based_on_role]  ?'
+        values = (user_role_id,)
+        #print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        #print(response)
+        return response
+    def GetUserRole():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_user_roles_for_sub_project_tagging] '
+        cur2.execute(sql)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        #print(response)
+        return response
     def SaveSubProjectCourseCenterUnitPrice(json_string,primary_key_id,user_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec	[masters].[sp_store_sub_project_course_center_unitrate]  ?, ?, ?'
         values = (json_string,primary_key_id,user_id)
-        print(values)
+        #print(values)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[0]
@@ -4531,16 +4651,16 @@ SELECT					cb.name as candidate_name,
         out = {'success': True, 'description': "Success", "batches":response}
         return out
 
-    def GetContractProjectTargets(contact_id,user_id,user_role_id,region_id):
+    def GetContractProjectTargets(contact_id,user_id,user_role_id,region_id,from_date,to_date):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec  [masters].[sp_get_contract_project_target_values]  ?,?,?,?'
-        values = (contact_id,user_id,user_role_id,region_id)
+        sql = 'exec  [masters].[sp_get_contract_project_target_values]  ?,?,?,?,?,?'
+        values = (contact_id,user_id,user_role_id,region_id,from_date,to_date)
         cur2.execute(sql,(values))
         #   print(cur2.fetchall())
-        print(cur2)
+        #print(cur2)
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
             for i in range(len(columns)):
@@ -4558,7 +4678,6 @@ SELECT					cb.name as candidate_name,
         cur = con.cursor()
         sql = 'exec [masters].[sp_get_sub_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
         values = (user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,entity,customer,p_group,block,practice,bu,product,status,project)
-        print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
