@@ -28,6 +28,7 @@ import filter_tma_report_new
 import candidate_report
 import batch_report
 import ecp_report_down
+import batch_candidate_download
 from Models import DownloadDump
 from lib.ms_sql import MsSql
 from lib.postgre_sql import PostgreSql
@@ -5803,7 +5804,16 @@ class GetECPReportDonload(Resource):
             #     return {"exceptione":str(e)}
 api.add_resource(GetECPReportDonload,'/GetECPReportDonload')
 
+class batchcandidate_download_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            batch_id = request.form["batch_id"]
+            file_name='batch_candidate_report_'+batch_id +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            
+            resp = batch_candidate_download.create_report(batch_id, file_name)
+            return resp
+
+api.add_resource(batchcandidate_download_report,'/batchcandidate_download_report')
 if __name__ == '__main__':    
     app.run(debug=True)
-
-#app.run(debug=True)  
