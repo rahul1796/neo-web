@@ -2,6 +2,9 @@ var varTable;
 var varTable1;
 var flag = "";
 var role_id;
+function showdates(){
+    $('#filter_date_box').show();
+}
 
 function LoadRegionddl(){
     var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
@@ -84,7 +87,7 @@ function loadClient(){
 }
 
 function loadBU(){
-    var URL=$('#hdn_web_url').val()+ "/Get_all_BU"
+    var URL=$('#hdn_web_url').val()+ "/Get_all_BU" 
     $.ajax({
         type:"GET",
         url:URL,
@@ -262,6 +265,11 @@ function LoadTable()
                 d.region = $('#ddlRegion').val().toString();
                 d.center = $('#ddlCenter').val().toString();
                 d.center_type = $('#ddlCenterType').val().toString();
+                d.Planned_actual = $('#Planned_actual').val().toString();
+                d.StartFromDate = $('#StartFromDate').val().toString();
+                d.StartToDate = $('#StartToDate').val().toString();
+                d.EndFromDate = $('#EndFromDate').val().toString();
+                d.EndToDate = $('#EndToDate').val().toString();
                 d.BU =  $('#ddlBU').val().toString();
             },
             error: function (e) {
@@ -286,8 +294,9 @@ function LoadTable()
                 return varButtons;
                 }
             },
-            { "data": "Batch_Name" },
             { "data": "Batch_Code"},
+            { "data": "Start_Date" },
+            { "data": "End_Date" },
             {
                 "data": function (row, type, val, meta) {
                     var varButtons = ""; 
@@ -307,8 +316,6 @@ function LoadTable()
                     return varButtons;
                     }
             },
-            //{ "data": "Candidate_Count"},
-            { "data": "Product_Name" },
             {
                 "data": function (row, type, val, meta) {
                     var varButtons = ""; 
@@ -346,6 +353,9 @@ function LoadTable()
                     return varButtons;
                     }
             },
+            { "data": "Status"},
+            { "data": "Batch_Name" },
+            { "data": "Product_Name" },
             { "data": "Sub_Project_Name" },
             {
                 "data": function (row, type, val, meta) {
@@ -368,16 +378,25 @@ function LoadTable()
             },
             //{ "data": "Trainer_Email" },
             { "data": "Center_Manager_Email" },
-            { "data": "Start_Date" },
-            { "data": "End_Date" },
+            
             { "data": "Start_Time"},
-            { "data": "End_Time"},
-            { "data": "Status"}
+            { "data": "End_Time"}
+            
         ],
+        'columnDefs': [ {
+
+            'targets': [1,3,4], /* column index */
+    
+            'orderable': false, /* true or false */
+    
+         }],
+        //"scrollX": true,
+
         drawCallback: function(){
-            $('#tbl_batchs_paginate ul.pagination').addClass("pagination-rounded");
-        }
-    });
+            $('#tbl_list_paginate ul.pagination').addClass("pagination-rounded");
+            }
+        });
+        
 }
 function EditBatchDetail(BatchId)
 {
@@ -931,3 +950,114 @@ function add_map_message(){
     {
         GetCandidate_Detail($('#hdn_mdl_batch_id').val());
     }
+
+    function DownloadTableBasedOnSearch(){
+        $("#imgSpinner").show();
+        /*if($('#ddlCustomer').val()==''|| $('#ddlCustomer').val()==null){
+            alert("Please select a Customer.");
+        
+        }
+        else if($('#ddlCenter').val()==''|| $('#ddlCenter').val()==null){
+            alert("Please select a Center.");
+        
+        }
+        else if($('#ddlCourse').val()==''|| $('#ddlCourse').val()==null){
+            alert("Please select a Center.");
+        
+        }
+        */
+        if (0==9){
+        console.log(false)
+        }
+        else{
+            var URL=$('#hdn_web_url').val()+ "/batch_download_report"
+            //window.location = URL + "?ActivityDate=2019-09-09"
+            $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: URL, 
+                        data: {
+                                'batch_id':0,
+                                'user_id':$('#hdn_home_user_id').val(),
+                                'user_role_id':$('#hdn_home_user_role_id').val(),
+                                'status':$('#ddlStatus').val().toString(),
+                                'customer':$('#ddlClient').val().toString(),
+                                'project': $('#ddlProject').val().toString(),
+                                'sub_project':$('#ddlSubProject').val().toString(),
+                                'region':$('#ddlRegion').val().toString(),
+                                'center':$('#ddlCenter').val().toString(),
+                                'center_type':$('#ddlCenterType').val().toString(),
+                                'BU':$('#ddlBU').val().toString(),
+                                'Planned_actual' :$('#Planned_actual').val().toString(),
+                                'StartFromDate' :$('#StartFromDate').val().toString(),
+                                'EndFromDate' :$('#EndFromDate').val().toString(),
+                                'EndToDate' :$('#EndToDate').val().toString(),
+                                'StartToDate' :$('#StartToDate').val().toString()
+    
+                        },
+                        success: function(resp) 
+                        {
+    
+                            if (resp.Status){
+                                var varAnchor = document.getElementById('lnkDownload');
+                                varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
+                                $("#imgSpinner").hide();
+                                try 
+                                    { 
+                                        //in firefox
+                                        varAnchor.click();
+                                        return;
+                                    } catch(ex) {}
+                                    
+                                    try 
+                                    { 
+                                        // in chrome
+                                        if(document.createEvent) 
+                                        {
+                                            var e = document.createEvent('MouseEvents');
+                                            e.initEvent( 'click', true, true );
+                                            varAnchor.dispatchEvent(e);
+                                            return;
+                                        }
+                                    } catch(ex) {}
+                                    
+                                    try 
+                                    { 
+                                        // in IE
+                                        if(document.createEventObject) 
+                                        {
+                                             var evObj = document.createEventObject();
+                                             varAnchor.fireEvent("onclick", evObj);
+                                             return;
+                                        }
+                                    } catch(ex) {}
+                                
+                            }
+                            else{
+                                //alert(resp.Description)
+                                //alert('Not success')
+                                $("#imgSpinner").hide();
+                                
+                            }
+                        },
+                        error:function()
+                        {
+                            //$("#imgSpinner").hide();
+                        }
+                    });
+            
+        }
+        //$("#imgSpinner").hide();
+    }
+    
+    function ForceDownload(varUrl, varFileName)
+            {
+                var link = document.createElement('a');
+                link.setAttribute('href', varUrl);
+                link.setAttribute('download', varFileName);
+                link.setAttribute('target', '_blank');
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
