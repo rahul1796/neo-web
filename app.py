@@ -886,13 +886,27 @@ class batch_list_updated(Resource):
             region = request.form['region']
             center = request.form['center']
             center_type = request.form['center_type']
-            Planned_actual = request.form['Planned_actual']
-            StartFromDate = request.form['StartFromDate']
-            StartToDate = request.form['StartToDate']
-            EndFromDate = request.form['EndFromDate']
-            EndToDate = request.form['EndToDate']
+            # Planned_actual = request.form['Planned_actual']
+            # StartFromDate = request.form['StartFromDate']
+            # StartToDate = request.form['StartToDate']
+            # EndFromDate = request.form['EndFromDate']
+            # EndToDate = request.form['EndToDate']
             status = request.form['status']
-            #print('before hi')
+            Planned_actual=''
+            if 'Planned_actual' in request.form:
+                Planned_actual = request.form['Planned_actual']
+            StartFromDate=''
+            if 'StartFromDate' in request.form:
+                StartFromDate = request.form['StartFromDate']
+            StartToDate=''
+            if 'StartToDate' in request.form:
+                StartToDate = request.form['StartToDate']
+            EndFromDate=''
+            if 'EndFromDate' in request.form:
+                EndFromDate = request.form['EndFromDate']
+            EndToDate=''
+            if 'EndToDate' in request.form:
+                EndToDate = request.form['EndToDate']
             BU=''
             if 'BU' in request.form:
                 BU = request.form['BU']            
