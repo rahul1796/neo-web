@@ -213,8 +213,8 @@ class Master:
         return Database.SaveSubProjectCourseCenterUnitPrice(json_string,primary_key_id,user_id)
     def GetSubProjectCourseCenterUnitRates(sub_project_id,primary_key):
         return Database.GetSubProjectCourseCenterUnitRates(sub_project_id,primary_key)
-    def GetContractProjectTargets(contact_id,user_id,user_role_id,region_id):
-        return Database.GetContractProjectTargets(contact_id,user_id,user_role_id,region_id)
+    def GetContractProjectTargets(contact_id,user_id,user_role_id,region_id,from_date,to_date):
+        return Database.GetContractProjectTargets(contact_id,user_id,user_role_id,region_id,from_date,to_date)
     
     def sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project):
         return Database.sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project)
@@ -223,9 +223,29 @@ class Master:
     def get_center_details(center_id):
         indi_project={"CenterDetail":Database.get_center_details(center_id)}
         return indi_project
+
+    def GetPartnerTypes():
+        response={"PartnerTypes":Database.GetPartnerTypes()}
+        return response
+    def partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        return Database.partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id):
+        popupMessage = {"PopupMessage": Database.add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id)}
+        return popupMessage
+    def get_partner_details(partner_id):
+        return {"PartnerDetail":Database.get_partner_details(partner_id)}
+    def GetPartnerUsers(partner_id):
+        return {"PartnerUsers":Database.GetPartnerUsers(partner_id)}
+    def add_edit_partner_user(UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId):
+        popupMessage = {"PopupMessage": Database.add_edit_partner_user(UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId)}
+        return popupMessage
+    def GetPartners():
+        return {'Partners':Database.GetPartners()}
+
     def untag_users_from_sub_project(user_ids,sub_project_id):
         popupMessage = {"PopupMessage": Database.untag_users_from_sub_project(user_ids,sub_project_id)}
         return popupMessage
     def tag_users_from_sub_project(user_id,sub_project_id,tagged_by):
         popupMessage = {"PopupMessage": Database.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)}
         return popupMessage
+

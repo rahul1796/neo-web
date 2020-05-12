@@ -2,8 +2,8 @@ from Database import Database
 class Batch:
     def batch_list(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id):
         return Database.batch_list(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id)
-    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center,center_type,course_ids, BU):
-        return Database.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU)
+    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center,center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
+        return Database.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
     
     def add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id):
         popupMessage = {"PopupMessage": Database.add_batch_details(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id)}
@@ -22,9 +22,7 @@ class Batch:
         trainers_f={"Trainers":Database.GetTrainersBasedOnCenter(center_id)}
         return trainers_f
     def AllTrainersOnSubProject(SubProject_Id):
-        print(SubProject_Id)
         trainers_f={"Trainers":Database.GetTrainersBasedOnSubProject(SubProject_Id)}
-        print(trainers_f)
         return trainers_f
     def AllCenterManagerOnCenter(center_id):
         centermanager_f={"CenterManager":Database.GetCenterManagerBasedOnCenter(center_id)}

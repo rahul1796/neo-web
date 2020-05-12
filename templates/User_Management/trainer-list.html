@@ -576,14 +576,12 @@ function LoadClusterddl(){
 	<div class="row">
         <div class="col-12">
             <div class="card-box">
-                <form id="DownloadReport" action="javascript:DownloadReport();" name="DownloadReport" method="POST">
-                    
+                <form id="DownloadReport" action="/assign_External_treiner_add_edit" method="POST">
 					<div class="row">
                         <div class="col-lg-3">
                             <label for="ddlentity" class="mr-2">Entity</label>
                             <select class="form-control dropdown-search-filter" id="ddlentity" multiple>
                                 <option selected="" value="">All</option>
-                                
                             </select>
                         </div> 
                         <div class="col-lg-3">
@@ -630,6 +628,9 @@ function LoadClusterddl(){
                         
                         <div class="col-lg-1" >
                             <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+                        </div>
+                        <div class="col-lg-4" >                                        
+                             <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-success">Create External Trainer</a>
                         </div>
                         <div class="col-lg-1" >
                             <!-- <button class="btn btn-primary" type="submit" >Download Report</button> -->
