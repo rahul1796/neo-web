@@ -1,13 +1,9 @@
 from flask import Flask,render_template,request,redirect,url_for,session,g,jsonify,send_file
 from flask_restful import Resource
 from flask_restful import Api
+from flask_cors import CORS
 #from flask_session import Session
-from Models import Content,Assessments,DownloadAssessmentResult
-from Models import Master
-from Models import UsersM
-from Models import Batch
-from Models import Candidate
-from Models import Report
+from Models import *
 from Database import config
 from Database import Database
 import sent_mail
@@ -86,7 +82,7 @@ dob_validation = [CustomElementValidation(lambda d: check_dob(d), 'either date o
 #from lib.log import log
 
 app = Flask(__name__)
-
+CORS(app)
 api = Api(app)
 app.config["SESSION_PERMANENT"] = True
 app.secret_key = config.secret_key
@@ -202,7 +198,8 @@ def before_request():
         g.project_code=session['project_code']
     if 'subproject_id' in session.keys():
         g.subproject_id=session['subproject_id']
-    
+    if 'partner_id' in session.keys():
+        g.partner_id = session['partner_id']
     
 
 #home_API's
@@ -255,7 +252,7 @@ def login():
                 config.displaymsg="Please contact admin because this user is inactive."
                 return redirect(url_for('index'))
             else:
-                config.displaymsg="Unknown error"
+                config.displaymsg="wrong"
                 return redirect(url_for('index'))
             
         else:
@@ -889,13 +886,27 @@ class batch_list_updated(Resource):
             region = request.form['region']
             center = request.form['center']
             center_type = request.form['center_type']
-            Planned_actual = request.form['Planned_actual']
-            StartFromDate = request.form['StartFromDate']
-            StartToDate = request.form['StartToDate']
-            EndFromDate = request.form['EndFromDate']
-            EndToDate = request.form['EndToDate']
+            # Planned_actual = request.form['Planned_actual']
+            # StartFromDate = request.form['StartFromDate']
+            # StartToDate = request.form['StartToDate']
+            # EndFromDate = request.form['EndFromDate']
+            # EndToDate = request.form['EndToDate']
             status = request.form['status']
-            #print('before hi')
+            Planned_actual=''
+            if 'Planned_actual' in request.form:
+                Planned_actual = request.form['Planned_actual']
+            StartFromDate=''
+            if 'StartFromDate' in request.form:
+                StartFromDate = request.form['StartFromDate']
+            StartToDate=''
+            if 'StartToDate' in request.form:
+                StartToDate = request.form['StartToDate']
+            EndFromDate=''
+            if 'EndFromDate' in request.form:
+                EndFromDate = request.form['EndFromDate']
+            EndToDate=''
+            if 'EndToDate' in request.form:
+                EndToDate = request.form['EndToDate']
             BU=''
             if 'BU' in request.form:
                 BU = request.form['BU']            
@@ -970,7 +981,6 @@ class trainers_based_on_sub_project(Resource):
     def post():
         if request.method == 'POST':
             sub_project_id=request.form['sub_project_id']
-            print(sub_project_id)
             return Batch.AllTrainersOnSubProject(sub_project_id)
 
 class center_manager_based_on_center(Resource):
@@ -1039,7 +1049,19 @@ class drop_edit_map_candidate_batch(Resource):
         user_id= request.form['user_id']
         drop_remark = request.form['drop_remark']
         return Batch.drop_edit_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark)
-
+class untag_users_from_sub_project(Resource):
+    @staticmethod
+    def post():
+        user_ids=request.form['user_ids']
+        sub_project_id=request.form['sub_project_id']
+        return Master.untag_users_from_sub_project(user_ids,sub_project_id)
+class tag_users_from_sub_project(Resource):
+    @staticmethod
+    def post():
+        user_id=request.form['user_id']
+        sub_project_id=request.form['sub_project_id']
+        tagged_by= session['user_id']
+        return Master.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)
 
 api.add_resource(batch_list, '/batch_list')
 api.add_resource(batch_list_updated, '/batch_list_updated')
@@ -1054,6 +1076,8 @@ api.add_resource(candidates_based_on_course,'/ALLCandidatesBasedOnCourse')
 api.add_resource(candidates_maped_in_batch,'/ALLCandidatesMapedInBatch')
 api.add_resource(add_edit_map_candidate_batch,'/add_edit_map_candidate_batch')
 api.add_resource(drop_edit_map_candidate_batch,'/drop_edit_candidate_batch')
+api.add_resource(untag_users_from_sub_project,'/untag_users_from_sub_project')
+api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
 ####################################################################################################
 
@@ -4463,13 +4487,17 @@ class ScheduleAssessment(Resource):
             user_id=request.form['user_id']
             requested_date=request.form['requested_date']
             scheduled_date=request.form['scheduled_date']
+            assessment_date=request.form['assessment_date']
             assessment_type_id=request.form['assessment_type_id']
             assessment_agency_id=request.form['assessment_agency_id']
             assessment_id=request.form['assessment_id']
-            return Assessments.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_type_id,assessment_agency_id,assessment_id)
+            partner_id=request.form['partner_id']
+            current_stage_id=request.form['current_stage_id']
+            return Assessments.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id)
 api.add_resource(ScheduleAssessment,'/ScheduleAssessment')
 
 api.add_resource(DownloadAssessmentResult,'/DownloadAssessmentResult')
+api.add_resource(DownloadAssessmentResultUploadTemplate,'/DownloadAssessmentResultUploadTemplate')
 ################################################################################################################
 @app.route("/PostgreSqlServerApi", defaults={"param": None})
 @app.route("/PostgreSqlServerApi/<string:param>", methods=["GET"])
@@ -4921,6 +4949,23 @@ class GetCoursesBasedOnSubProject(Resource):
             return response
 api.add_resource(GetCoursesBasedOnSubProject,'/GetCoursesBasedOnSubProject')
 
+class GetUsersBasedOnSubProject(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sub_project_id=request.args.get('sub_project_id',0,type=int)
+            response={"Users":Master.GetUsersBasedOnSubProject(sub_project_id)}
+            return response
+api.add_resource(GetUsersBasedOnSubProject,'/GetUsersBasedOnSubProject')
+
+class GetUserListForSubProject(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sub_project_id=request.args.get('sub_project_id',0,type=int)
+            response={"Users":Master.GetUserListForSubProject(sub_project_id)}
+            return response
+api.add_resource(GetUserListForSubProject,'/GetUserListForSubProject')
 class GetCentersbasedOnSubProject(Resource):
     @staticmethod
     def get():
@@ -4929,6 +4974,34 @@ class GetCentersbasedOnSubProject(Resource):
             response={"Centers":Master.GetCentersbasedOnSubProject(sub_project_id)}
             return response
 api.add_resource(GetCentersbasedOnSubProject,'/GetCentersbasedOnSubProject')
+
+class GetTrainersBasedOnType(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            trainer_flag=request.args.get('trainer_flag',0,type=int)
+            response={"Users":Master.GetTrainersBasedOnType(trainer_flag)}
+            return response
+api.add_resource(GetTrainersBasedOnType,'/GetTrainersBasedOnType')
+
+class GetUsersBasedOnRole(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            user_role_id=request.args.get('user_role_id',0,type=int)
+            print(user_role_id)
+            response={"Users":Master.GetUsersBasedOnRole(user_role_id)}
+            print(response)
+            return response
+api.add_resource(GetUsersBasedOnRole,'/GetUsersBasedOnRole')
+
+class GetUserRole(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response={"UserRole":Master.GetUserRole()}
+            return response
+api.add_resource(GetUserRole,'/GetUserRole')
 
 class SaveSubProjectCourseCenterUnitPrice(Resource):
     @staticmethod
@@ -5552,6 +5625,7 @@ class AllCreatedByBasedOnUser(Resource):
 
 api.add_resource(AllCreatedByBasedOnUser,'/AllCreatedByBasedOnUser')
 
+
 class DownloadRegTemplate(Resource):
     report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
     @staticmethod
@@ -5682,6 +5756,171 @@ class DownloadEnrTemplate(Resource):
                 return {'Description':'Error: '+str(e), 'Status':False}
 api.add_resource(DownloadEnrTemplate,'/DownloadEnrTemplate')
 
+####################################################################################################
+#Partner_API's
+
+@app.route("/partner_list_page")
+def partner_list_page():
+    if g.user:
+        return render_template("Master/partner-list.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
+@app.route("/partner")
+def partner():
+    if g.user: 
+        html_str="partner_list_page"
+        return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/partner_add_edit")
+def partner_add_edit():
+    if g.user:
+        return render_template("Master/partner-add-edit.html",partner_id=g.partner_id)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/assign_partner_add_edit_to_home", methods=['GET','POST'])
+def assign_partner_add_edit_to_home():
+    
+    session['partner_id']=request.form['hdn_partner_id']
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="partner_add_edit")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class GetPartnerTypes(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            return Master.GetPartnerTypes()
+api.add_resource(GetPartnerTypes,'/GetPartnerTypes')
+
+class partner_list(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            partner_type_ids = request.form['partner_type_ids']
+            start_index = request.form['start']
+            page_length = request.form['length']
+            search_value = request.form['search[value]']
+            order_by_column_position = request.form['order[0][column]']
+            order_by_column_direction = request.form['order[0][dir]']
+            draw=request.form['draw']
+            return Master.partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+api.add_resource(partner_list,'/partner_list')
+
+class add_partner_details(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            partner_name=request.form['PartnerName']
+            user_id=g.user_id
+            is_active=request.form['isactive']
+            partner_type_id=request.form['ddlPartnerTypes']
+            address=request.form['Address']
+            partner_id=request.form['PartnerId']
+            return Master.add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id)
+api.add_resource(add_partner_details,'/add_partner_details')
+
+@app.route("/after_popup_partner")
+def after_popup_partner():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="partner")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class get_partner_details(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            partner_id=request.args.get('partner_id',-1,type=int)
+            return jsonify(Master.get_partner_details(partner_id))
+api.add_resource(get_partner_details, '/get_partner_details')
+
+class GetPartnerUsers(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            partner_id=request.args.get('partner_id',0,type=int)
+            response=Master.GetPartnerUsers(partner_id)
+            return response
+api.add_resource(GetPartnerUsers,'/GetPartnerUsers')
+
+class add_edit_partner_user(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            UserName=request.form['UserName']
+            user_id=g.user_id
+            is_active=request.form['isactive']
+            Email=request.form['Email']
+            Mobile=request.form['Mobile']
+            PartnerId=request.form['PartnerId']
+            PartnerUserId=request.form['PartnerUserId']
+            return Master.add_edit_partner_user(UserName,user_id,is_active,Email,int(Mobile),PartnerId,PartnerUserId)
+api.add_resource(add_edit_partner_user,'/add_edit_partner_user')
+###############################################################################
+
+class GetPartners(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Master.GetPartners()
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetPartners,'/GetPartners')
+
+class upload_assessment_result(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                f = request.files['filename']
+                assessment_id =request.form['assessment_id']
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                batch_id = request.form["batch_id"]
+                stage_id = request.form["stage_id"]
+                file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
+                f.save(file_name)
+
+                df= pd.read_excel(file_name,sheet_name='Template')
+                df = df.fillna('')
+                schema = Schema([
+                        #str+null check
+                        Column('Enrolment_No',str_validation + null_validation),
+                        Column('First_Name',str_validation + null_validation),
+                        Column('Middle_Name'),
+                        Column('Last_Name'),
+                        Column('Batch_Code',str_validation + null_validation),
+                        Column('Assessment_Type',str_validation + null_validation),
+                        Column('Assessment_Date',str_validation + null_validation),
+                        Column('Attendance(Absent_Present)',str_validation + null_validation),
+                        Column('Score',str_validation + null_validation),
+                        Column('Grade',str_validation + null_validation),
+                        Column('Status(Certified_Notcertified)',str_validation + null_validation)
+                        ])
+                errors = schema.validate(df)
+                errors_index_rows = [e.row for e in errors]
+                len_error = len(errors_index_rows)
+                if len_error>0:
+                    pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename+'_' + 'errors.csv')
+                    return {"Status":False, "message":"Uploaded Failed (fails to validate data)" }
+                else:
+                    out = Database.upload_assessment_result(df,user_id,assessment_id,batch_id,stage_id)
+                    return out
+
+
+            except Exception as e:
+                 return {"Status":False, "message":"Unable to upload " + str(e)}  
+             
+api.add_resource(upload_assessment_result,'/upload_assessment_result')
+
 class batch_download_report(Resource):
     report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
     @staticmethod
@@ -5716,6 +5955,7 @@ class batch_download_report(Resource):
                 #print(str(e))
                 return {"exceptione":str(e)}
 api.add_resource(batch_download_report,'/batch_download_report')
+
 
 class GetECPReportDonload(Resource):
     @staticmethod

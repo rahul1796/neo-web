@@ -12,8 +12,32 @@ class Assessments:
         return Database.GetAssessmentTypes()
     def GetAssessmentAgency():
         return Database.GetAssessmentAgency()
-    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_type_id,assessment_agency_id,assessment_id):
-        return Database.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_type_id,assessment_agency_id,assessment_id)
+    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id):
+        return Database.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id)
+
+class DownloadAssessmentResultUploadTemplate(Resource):
+    DownloadPath=config.DownloadcandidateResultPathLocal
+    report_name = config.AssessmentCandidateResultUploadTemplate+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"   
+
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                AssessmentId=request.args.get('AssessmentId',0,type=int)
+                BatchId=request.args.get('BatchId',0,type=int)
+                r=re.compile(config.DumpFileName + ".*")
+                lst=os.listdir(DownloadAssessmentResultUploadTemplate.DownloadPath)
+                newlist = list(filter(r.match, lst))
+                for i in newlist:
+                    os.remove( DownloadAssessmentResultUploadTemplate.DownloadPath + i)
+                path = '{}{}'.format(DownloadAssessmentResultUploadTemplate.DownloadPath,DownloadAssessmentResultUploadTemplate.report_name)
+                response=Database.GetAssessmentCandidateResultUploadTemplate(AssessmentId,BatchId)
+                res=DownloadAssessmentResult.CreateExcelForDump(response,path,'Template')
+                ImagePath=config.DownloadcandidateResultPathWeb
+                return {'FileName':DownloadAssessmentResultUploadTemplate.report_name,'FilePath':ImagePath}
+            except Exception as e:
+                print(str(e))
+                return {"exception":str(e),"File":"HI"}
 
 class DownloadAssessmentResult(Resource):
     DownloadPath=config.DownloadcandidateResultPathLocal
@@ -24,7 +48,7 @@ class DownloadAssessmentResult(Resource):
         if request.method=='GET':
             try:
                 AssessmentId=request.args.get('AssessmentId',0,type=int)
-                r=re.compile(config.DumpFileName + ".*")
+                r=re.compile(config.AssessmentCandidateResult + ".*")
                 lst=os.listdir(DownloadAssessmentResult.DownloadPath)
                 newlist = list(filter(r.match, lst))
                 for i in newlist:
@@ -63,7 +87,7 @@ class DownloadAssessmentResult(Resource):
             for j in range(len(Response['data'])) : 
                 for k in range(len(Response['columns'])):
                     if Response['data'].iloc[j,k] is None:
-                        worksheet.write(j+1,k ,'NA',write_format)
+                        worksheet.write(j+1,k ,'',write_format)
                     else:
                         worksheet.write(j+1,k ,Response['data'].iloc[j,k],write_format)
                                                     

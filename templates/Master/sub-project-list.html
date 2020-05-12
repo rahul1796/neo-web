@@ -186,6 +186,7 @@ GetSub_project('{{project_id}}')
                                            <th>Sub Project Name</th>
                                            <th>Center</th>
                                            <th>Course</th>
+                                           <th>Users</th>
                                            <th>Group</th>
                                            <th>Type</th>
                                            <th>Block</th>
@@ -331,8 +332,128 @@ GetSub_project('{{project_id}}')
            </div>
        </div>
    </div>
-</div><!--/.modal-->  
+</div><!--/.modal--> 
 
+<div id="divUsersList" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title" id="HdUsers"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <table id="tbl_proj_Users" class="table table-bordered dt-responsive wrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                    <thead>                        
+                        <tr style="background-color: #f5f6f8;">
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Actions</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">PMT</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">COO</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Manager</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Cluster Manager</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Mobilizer</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Trainer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+ 
+                    </tbody>
+                </table>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="refresh()">Close</button>
+            </div>
+        </div>
+    </div>
+ </div>
+ <div id="divUsersListForUntag" class="modal fade" role="dialog">
+    <input type="hidden" id="hdn_sub_project_id" name="hdn_sub_project_id" value="0">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title" id="HdUsers"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <table id="tbl_Users" class="table table-bordered dt-responsive wrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                    <thead>                        
+                        <tr style="background-color: #f5f6f8;">
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;"></th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Name</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Email</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Role</th>
+                              </tr>
+                    </thead>
+                    <tbody>
+ 
+                    </tbody>
+                </table>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" onclick="UntagUsers()">Untag</button>
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+ </div>
+ <div id="divUsersTag" class="modal fade" role="dialog">
+    <input type="hidden" id="hdn_sub_project_id" name="hdn_sub_project_id" value="0">
+    <input type="hidden" id="hdn_sub_project_name" name="hdn_sub_project_name" value="0">
+    <input type="hidden" id="hdn_user_id" name="hdn_user_id" value="0">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title" id="HdProject"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12">
+                    <div class="card-box">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <label for="ddlUserRole">User Role*:</label>
+                                </div>
+                                <div class="col-lg-8" >
+                                    <select id="ddlUserRole" class="form-control dropdown-search-filter"  onchange="LoadUsers()" name="ddlUserRole" ClientIdMode="static" required=""> <!-- myfunction(this.value) -->>
+                                       
+                                    </select>
+                                </div> 
+                            </div>
+                        </div>
+                        <div class="form-group" id ="trainer_type" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <label for="ddlTrainerType">Trainer Type*:</label>
+                                </div>
+                                <div class="col-lg-8" >
+                                    <select id="ddlTrainerType" class="form-control dropdown-search-filter"  onchange="LoadTrainers()" name="ddlTrainerType" ClientIdMode="static" required=""> <!-- myfunction(this.value) -->>
+                                       
+                                    </select>
+                                </div> 
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <label for="ddlUsers">Users*:</label>
+                                </div>
+                                <div class="col-lg-8" >
+                                    <select id="ddlUsers" class="form-control dropdown-search-filter"  onchange="LoadCourseList()" name="ddlUser" ClientIdMode="static" required=""> <!-- myfunction(this.value) -->>
+                                    
+                                    </select>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" onclick="TagUsers()">Tag</button>
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+ </div>
 <div id="mdl_Centes" class="modal fade" role="dialog">
    <div class="modal-dialog modal-xl">
        <div class="modal-content ">
