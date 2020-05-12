@@ -832,16 +832,33 @@ function TagUsers()
                     "sub_project_id": $('#hdn_sub_project_id').val()
                 },
                 success:function(data){
-                    swal({   
-                        title:data.PopupMessage.message,
-                        text:data.PopupMessage.message+"!!",
-                        icon:"success",
-                        confirmButtonClass:"btn btn-confirm mt-2"
-                        }).then(function(){
-                            $('#divUsersTag').modal('hide');
-                            GetUsers($('#hdn_sub_project_id').val(),$('#hdn_sub_project_name').val())
-                           //window.location.href = '/sub_project';                          
-                        });
+                    if(data.PopupMessage.message =="User tagged")
+                    {
+                        swal({   
+                            title:data.PopupMessage.message,
+                            text:data.PopupMessage.message+"!!",
+                            icon:"success",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                $('#divUsersTag').modal('hide');
+                                GetUsers($('#hdn_sub_project_id').val(),$('#hdn_sub_project_name').val())
+                            //window.location.href = '/sub_project';                          
+                            });
+
+                    }
+                    else{
+                        swal({   
+                            title:data.PopupMessage.message,
+                            text:"User is already Tagged!",
+                            icon:"error",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                $('#divUsersTag').modal('hide');
+                                GetUsers($('#hdn_sub_project_id').val(),$('#hdn_sub_project_name').val())
+                            //window.location.href = '/sub_project';                          
+                            });
+                    }
+                        
                 },
                 error:function(err)
                 {
