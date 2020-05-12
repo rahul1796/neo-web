@@ -5994,7 +5994,50 @@ class batchcandidate_download_report(Resource):
             
             resp = batch_candidate_download.create_report(batch_id, file_name)
             return resp
-
 api.add_resource(batchcandidate_download_report,'/batchcandidate_download_report')
+
+class GetALLTrainingPartner(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            return jsonify(Database.GetALLTrainingPartnerdb())
+api.add_resource(GetALLTrainingPartner,'/GetALLTrainingPartner')
+
+class add_external_trainer_details(Resource):
+    @staticmethod
+    def post():
+        try:
+            if request.method == 'POST':
+                first_name=request.form['FirstName']
+                last_name=request.form['LastName']
+                email=request.form['Email']
+                mobile=request.form['MobileNumber']
+                trainer_tyoe=request.form['trainer_tyoe']
+                Partner=request.form['Partner']
+
+                is_active=request.form['isactive']
+                created_id=g.user_id
+                
+                return UsersM.add_ex_treiner(first_name, last_name, email, mobile, trainer_tyoe, Partner, is_active, created_id)
+        except Exception as e:
+            msg={"message":str(e), "UserId": 0}
+            return {"PopupMessage": msg}
+api.add_resource(add_external_trainer_details,'/add_external_trainer_details')
+
+@app.route("/External_treiner_add_edit")
+def External_treiner_add_edit():
+    if g.user:
+        return render_template("User_Management/externer_trainer-add-edit.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/assign_External_treiner_add_edit", methods=['GET','POST'])
+def assign_External_treiner_add_edit():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="External_treiner_add_edit")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
 if __name__ == '__main__':    
     app.run(debug=True)

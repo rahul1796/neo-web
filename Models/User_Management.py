@@ -21,4 +21,7 @@ class UsersM:
         return indi_user
     def trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids):
         return Database.trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids)
+    def add_ex_treiner(first_name, last_name, email, mobile, trainer_tyoe, Partner, is_active, created_id):
+        popupMessage = {"PopupMessage": Database.add_ex_triner_details(first_name, last_name, email, mobile, trainer_tyoe, Partner, is_active, created_id)}
+        return popupMessage
     
