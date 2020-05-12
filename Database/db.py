@@ -5085,3 +5085,46 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
+            
+    def GetALLTrainingPartnerdb():
+        try:            
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            sql = 'select partner_id, partner_name from masters.tbl_partners where partner_type_id=1 and is_active=1'
+            cur.execute(sql)
+            columns = [column[0].title() for column in cur.description]
+            d=[]
+            h={}
+            for row in cur:
+                for i in range(len(columns)):
+                    h[columns[i]]=row[i]
+                d.append(h.copy())
+            cur.commit()
+            cur.close()
+            con.close()
+            return d
+        except Exception as e:
+            print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+
+    def add_ex_triner_details(first_name, last_name, email, mobile, trainer_tyoe, Partner, is_active, created_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[users].[sp_add_edit_ex_treiner] ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (first_name, last_name, email, mobile, trainer_tyoe, Partner, is_active, created_id)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+            UserId=row[0]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated" , "UserId": UserId}
+        else: 
+            if pop==0:
+                msg={"message":"Created", "UserId": UserId}
+            else:
+                if pop==2:
+                    msg={"message":"User with the email id already exists", "UserId": UserId}
+        return msg
