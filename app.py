@@ -21,6 +21,7 @@ import re
 import filter_tma_report
 import filter_tma_report_new
 import candidate_report
+import user_subproject_download
 import batch_report
 import ecp_report_down
 import batch_candidate_download
@@ -1269,8 +1270,49 @@ class candidate_list(Resource):
             #print(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
             return Candidate.candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, Contracts, candidate_stage, from_date, to_date)
 
+class user_sub_project_list(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            sub_project = request.form['sub_project']
+            project = request.form['project']
+            region = request.form['region']
+            customer = request.form['customer']
+            user_id=request.form['user_id']
+            user_role_id=request.form['user_role_id']
+            employee_status=request.form['user_status']
+            sub_project_status=request.form['sub_project_status']
+
+           #print(Contracts, candidate_stage, from_date, to_date)
+            start_index = request.form['start']
+            page_length = request.form['length']
+            search_value = request.form['search[value]']
+            order_by_column_position = request.form['order[0][column]']
+            order_by_column_direction = request.form['order[0][dir]']
+            draw=request.form['draw']
+            
+            return Report.user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+
+class user_sub_project_list_download(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            sub_project = request.form['sub_project']
+            project = request.form['project']
+            region = request.form['region']
+            customer = request.form['customer']
+            user_id=request.form['user_id']
+            user_role_id=request.form['user_role_id']
+            employee_status=request.form['user_status']
+            sub_project_status=request.form['sub_project_status']
+            file_name='user_sub_project_report.xlsx'
+            
+            resp = user_subproject_download.create_report(sub_project,project,region,customer,user_id,user_role_id,employee_status,sub_project_status,file_name)
+            return resp       
 
 api.add_resource(candidate_list, '/candidate_list')
+api.add_resource(user_sub_project_list, '/user_sub_project_list')
+api.add_resource(user_sub_project_list_download, '/user_sub_project_list_download')
 api.add_resource(get_project_basedon_client_multiple,'/GetALLProject_multiple')
 api.add_resource(get_project_basedon_client,'/GetALLProject')
 api.add_resource(get_cand_course_basedon_proj, '/get_cand_course_basedon_proj')
@@ -3812,6 +3854,7 @@ def get_tma_file(path):
     """Download a file."""
     filename = r"{}{}".format(config.neo_report_file_path,path)
     if not(os.path.exists(filename)):
+        print(filename)
         filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathWeb)
     return send_file(filename)
 
@@ -5761,6 +5804,21 @@ api.add_resource(DownloadEnrTemplate,'/DownloadEnrTemplate')
 ####################################################################################################
 #Partner_API's
 
+@app.route("/user_sub_project_report")
+def user_sub_project_report():
+    if g.user:
+        return render_template("Reports/user_sub_project_report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/user_sub_project")
+def user_sub_project():
+    if g.user:
+        #status=request.args.get('status',-1,type=int) 
+        html_str="user_sub_project_report"    #?status=" + str(status)
+        return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
 @app.route("/partner_list_page")
 def partner_list_page():
     if g.user:
@@ -5776,6 +5834,7 @@ def partner():
         return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
     else:
         return render_template("login.html",error="Session Time Out!!")
+
 
 @app.route("/partner_add_edit")
 def partner_add_edit():

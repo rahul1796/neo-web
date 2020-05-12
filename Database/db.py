@@ -4,10 +4,12 @@ from .config import *
 #from Database import config
 import pandas as pd
 from datetime import datetime
-from flask import request
+from flask import request,make_response
 import requests
 import xml.etree.ElementTree as ET
 import requests
+import io
+import csv
 
 
 def to_xml(df, filename=None, mode='w'):
@@ -1207,6 +1209,32 @@ class Database:
         cur.close()
         con.close()
         return content
+    def user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        content = {}
+        d = []
+        h={}
+        
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [reports].[sp_get_user_sub_project_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        print(values)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):                
+                h[columns[i]]=row[i] if row[i]!=None else 'NA'
+            d.append(h.copy())            
+        content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        print(d)
+        return content
+           
     def mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
