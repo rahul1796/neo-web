@@ -2805,7 +2805,8 @@ class trainer_list(Resource):
             entity_ids= request.form['entity_ids']
             project_ids= request.form['project_ids']
             sector_ids= request.form['sector_ids']
-            return UsersM.trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id, centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids)
+            TrainerType= request.form['TrainerType']
+            return UsersM.trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id, centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids,TrainerType)
 
 api.add_resource(trainer_list, '/trainer_list')
 
