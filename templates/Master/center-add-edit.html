@@ -20,8 +20,14 @@
                             if(data.CenterDetail!="")
                             {
                                 $('#CenterName').val(data.CenterDetail.Center_Name);
-                                $('#ddlCenterType').val(data.CenterDetail.Center_Type_Id);
-                                
+                                $('#ddlCenterType').val(data.CenterDetail.Center_Type_Id)
+                                if (data.CenterDetail.Center_Type_Id==4)
+                                {
+                                    $('#DivPartner').show();
+                                    LoadPartner();
+                                    $('#ddlPartner').attr('Required','');
+                                    $('#ddlPartner').val(data.CenterDetail.Partner_Id);
+                                }
                                 $('#ddlCenterCountry').val(data.CenterDetail.Country_Id);
                                 GetStateddl($('#ddlCenterCountry').val(),data.CenterDetail.State_Id);
                                 GetDistrictddl($('#ddlCenterState').val(),data.CenterDetail.District_Id);
@@ -32,6 +38,7 @@
                                     $('#isactive').prop('checked',true);
                                 else
                                     $('#isactive').prop('checked',false);
+                                
                             }
                         } 
                     },
@@ -241,7 +248,7 @@
             return false;
         }
         function add_popup_message(){
-            if($("#TxtPinCode").val().length!=6)
+            if($("#TxtPinCode").val().length>0 & $("#TxtPinCode").val().length!=6)
             {
                 alert('Enter a valid Pin Code.');
                 return false;
@@ -260,7 +267,8 @@
                         "Address":$("#TxtAddress").val(),
                         "PinCode":$("#TxtPinCode").val(),
                         "District":$("#ddlCenterDistrict").val(),
-                        "CenterId":'{{center_id}}'
+                        "CenterId":'{{center_id}}',
+                        "PartnerId":$('#ddlPartner').val()
                     },
                     success:function(data){
                         swal({   title:data.PopupMessage.message,
@@ -279,7 +287,54 @@
                     }
                 });
         }
-
+        function CenterTypeOnChange(CentertypeId)
+        {
+            if(parseInt(CentertypeId)==4)
+            {
+                $('#DivPartner').show();
+                LoadPartner();
+                $('#ddlPartner').attr('Required','');
+            }
+            else
+            {
+                $('#DivPartner').hide();
+                $('#ddlPartner').removeAttr('Required','');
+            }
+        }
+        function LoadPartner()
+        {
+            var URL=$('#hdn_web_url').val()+ "/GetPartners"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.Partners != null)
+                    {
+                        $('#ddlPartner').empty();
+                        var count=data.Partners.length;
+                        $('#ddlPartner').append(new Option('Select',''));
+                        if( count> 0)
+                        {
+                            for(var i=0;i<count;i++)
+                                if(data.Partners[i].Partner_Type_Id==1)
+                                $('#ddlPartner').append(new Option(data.Partners[i].Partner_Name,data.Partners[i].Partner_Id));
+                        }
+                        else
+                        {
+                            $('#ddlPartner').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error loading partners! Please try again');
+                    return false;
+                }
+            });
+        }
     </script>
     <div class="container-fluid">
         <form action="javascript:add_popup_message();">
@@ -333,13 +388,24 @@
                                     <label for="ddlCenterType">Center Type *:</label>
                                 </div>
                                 <div class="col-lg-6">
-                                    <select id="ddlCenterType" class="form-control" name="CenterType" ClientIdMode="static" required="">
+                                    <select id="ddlCenterType" class="form-control" name="CenterType" ClientIdMode="static" required="" onchange="CenterTypeOnChange(this.value)">
                                         <option value="">Choose Center Type</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
-                        
+                        <div class="form-group" id="DivPartner" style="display: none;">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <label for="ddlPartner">Partner *:</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <select id="ddlPartner" class="form-control" name="ddlPartner" ClientIdMode="static" >
+                                        <option value="">Choose Partner</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-lg-6">

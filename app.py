@@ -323,7 +323,8 @@ class add_center_details(Resource):
             address=request.form['Address']
             pinCode=request.form['PinCode']
             District=request.form['District']
-            return Master.add_center(center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pinCode,District)
+            partner_id=request.form['PartnerId']
+            return Master.add_center(center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pinCode,District,partner_id)
 
 class get_center_details(Resource):
     @staticmethod
