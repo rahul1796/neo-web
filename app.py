@@ -21,6 +21,7 @@ import re
 import filter_tma_report
 import filter_tma_report_new
 import candidate_report
+import user_subproject_download
 import batch_report
 import ecp_report_down
 import batch_candidate_download
@@ -1270,8 +1271,49 @@ class candidate_list(Resource):
             #print(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
             return Candidate.candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, Contracts, candidate_stage, from_date, to_date)
 
+class user_sub_project_list(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            sub_project = request.form['sub_project']
+            project = request.form['project']
+            region = request.form['region']
+            customer = request.form['customer']
+            user_id=request.form['user_id']
+            user_role_id=request.form['user_role_id']
+            employee_status=request.form['user_status']
+            sub_project_status=request.form['sub_project_status']
+
+           #print(Contracts, candidate_stage, from_date, to_date)
+            start_index = request.form['start']
+            page_length = request.form['length']
+            search_value = request.form['search[value]']
+            order_by_column_position = request.form['order[0][column]']
+            order_by_column_direction = request.form['order[0][dir]']
+            draw=request.form['draw']
+            
+            return Report.user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+
+class user_sub_project_list_download(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            sub_project = request.form['sub_project']
+            project = request.form['project']
+            region = request.form['region']
+            customer = request.form['customer']
+            user_id=request.form['user_id']
+            user_role_id=request.form['user_role_id']
+            employee_status=request.form['user_status']
+            sub_project_status=request.form['sub_project_status']
+            file_name='user_sub_project_report.xlsx'
+            
+            resp = user_subproject_download.create_report(sub_project,project,region,customer,user_id,user_role_id,employee_status,sub_project_status,file_name)
+            return resp       
 
 api.add_resource(candidate_list, '/candidate_list')
+api.add_resource(user_sub_project_list, '/user_sub_project_list')
+api.add_resource(user_sub_project_list_download, '/user_sub_project_list_download')
 api.add_resource(get_project_basedon_client_multiple,'/GetALLProject_multiple')
 api.add_resource(get_project_basedon_client,'/GetALLProject')
 api.add_resource(get_cand_course_basedon_proj, '/get_cand_course_basedon_proj')
@@ -2806,7 +2848,8 @@ class trainer_list(Resource):
             entity_ids= request.form['entity_ids']
             project_ids= request.form['project_ids']
             sector_ids= request.form['sector_ids']
-            return UsersM.trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id, centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids)
+            TrainerType= request.form['TrainerType']
+            return UsersM.trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id, centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids,TrainerType)
 
 api.add_resource(trainer_list, '/trainer_list')
 
@@ -3813,6 +3856,7 @@ def get_tma_file(path):
     """Download a file."""
     filename = r"{}{}".format(config.neo_report_file_path,path)
     if not(os.path.exists(filename)):
+        print(filename)
         filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathWeb)
     return send_file(filename)
 
@@ -5512,9 +5556,11 @@ class upload_bulk_upload(Resource):
                             Column('Branch Code',null_validation),
                             Column('Account type',null_validation),
                             Column('Attachment',null_validation),
+                            Column('Candidate Photo*',null_validation),
+                            Column('Document copy*',null_validation),
                             #str+null check
                             Column('Fresher/Experienced?*',str_validation + null_validation),
-                            Column('Candidate Photo*',str_validation + null_validation),
+                            #Column('Candidate Photo*',str_validation + null_validation),
                             Column('Salutation*',str_validation + null_validation),
                             Column('First Name*',str_validation + null_validation),
                             Column('Gender*',str_validation + null_validation),
@@ -5536,7 +5582,7 @@ class upload_bulk_upload(Resource):
                             Column('Permanent District*',str_validation + null_validation),
                             Column('Permanent State*',str_validation + null_validation),
                             Column('Permanent Country*',str_validation + null_validation),
-                            Column('Document copy*',str_validation + null_validation),
+                            #Column('Document copy*',str_validation + null_validation),
                             Column('Employment Type*',str_validation + null_validation),
                             Column('Preferred Job Role*',str_validation + null_validation),
                             Column('Years Of Experience*',str_validation + null_validation),
@@ -5760,6 +5806,21 @@ api.add_resource(DownloadEnrTemplate,'/DownloadEnrTemplate')
 ####################################################################################################
 #Partner_API's
 
+@app.route("/user_sub_project_report")
+def user_sub_project_report():
+    if g.user:
+        return render_template("Reports/user_sub_project_report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/user_sub_project")
+def user_sub_project():
+    if g.user:
+        #status=request.args.get('status',-1,type=int) 
+        html_str="user_sub_project_report"    #?status=" + str(status)
+        return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
 @app.route("/partner_list_page")
 def partner_list_page():
     if g.user:
@@ -5775,6 +5836,7 @@ def partner():
         return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
     else:
         return render_template("login.html",error="Session Time Out!!")
+
 
 @app.route("/partner_add_edit")
 def partner_add_edit():
@@ -5993,10 +6055,7 @@ class batchcandidate_download_report(Resource):
             
             resp = batch_candidate_download.create_report(batch_id, file_name)
             return resp
-
 api.add_resource(batchcandidate_download_report,'/batchcandidate_download_report')
-
-
 
 #################################################################################################################################
 #ECP REPORT PAGE
@@ -6081,6 +6140,49 @@ class DownloadBatchReport(Resource):
 
 api.add_resource(DownloadBatchReport,'/DownloadBatchReport')
 ###############################################################################
+
+class GetALLTrainingPartner(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            return jsonify(Database.GetALLTrainingPartnerdb())
+api.add_resource(GetALLTrainingPartner,'/GetALLTrainingPartner')
+
+class add_external_trainer_details(Resource):
+    @staticmethod
+    def post():
+        try:
+            if request.method == 'POST':
+                first_name=request.form['FirstName']
+                last_name=request.form['LastName']
+                email=request.form['Email']
+                mobile=request.form['MobileNumber']
+                trainer_tyoe=request.form['trainer_tyoe']
+                Partner=request.form['Partner']
+
+                is_active=request.form['isactive']
+                created_id=g.user_id
+                
+                return UsersM.add_ex_treiner(first_name, last_name, email, mobile, trainer_tyoe, Partner, is_active, created_id)
+        except Exception as e:
+            msg={"message":str(e), "UserId": 0}
+            return {"PopupMessage": msg}
+api.add_resource(add_external_trainer_details,'/add_external_trainer_details')
+
+@app.route("/External_treiner_add_edit")
+def External_treiner_add_edit():
+    if g.user:
+        return render_template("User_Management/externer_trainer-add-edit.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/assign_External_treiner_add_edit", methods=['GET','POST'])
+def assign_External_treiner_add_edit():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="External_treiner_add_edit")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
 
 if __name__ == '__main__':    
     app.run(debug=True)
