@@ -6057,6 +6057,90 @@ class batchcandidate_download_report(Resource):
             return resp
 api.add_resource(batchcandidate_download_report,'/batchcandidate_download_report')
 
+#################################################################################################################################
+#ECP REPORT PAGE
+@app.route("/qp_wise_report_page")
+def qp_wise_report_page():
+    if g.user:
+        return render_template("Reports/qp-wise-report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/qp_wise_report")
+def qp_wise_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="qp_wise_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class GetQpWiseReportData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                customer_ids=request.args.get('customer_ids','',type=str)
+                contract_ids=request.args.get('contract_ids','',type=str)
+                from_date=request.args.get('from_date','',type=str)
+                to_date=request.args.get('to_date','',type=str)
+                response = Report.GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetQpWiseReportData,'/GetQpWiseReportData')
+
+class GetQpWiseRegionLevelData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                customer_ids=request.args.get('customer_ids','',type=str)
+                contract_ids=request.args.get('contract_ids','',type=str)
+                from_date=request.args.get('from_date','',type=str)
+                to_date=request.args.get('to_date','',type=str)
+                qp_id=request.args.get('qp_id',0,type=int)
+                response = Report.GetQpWiseRegionLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetQpWiseRegionLevelData,'/GetQpWiseRegionLevelData')
+
+class GetQpWiseRegionWiseBatchLevelData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                customer_ids=request.args.get('customer_ids','',type=str)
+                contract_ids=request.args.get('contract_ids','',type=str)
+                from_date=request.args.get('from_date','',type=str)
+                to_date=request.args.get('to_date','',type=str)
+                qp_id=request.args.get('qp_id',0,type=int)
+                region_id=request.args.get('region_id',0,type=int)
+                response = Report.GetQpWiseRegionWiseBatchLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id,region_id)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetQpWiseRegionWiseBatchLevelData,'/GetQpWiseRegionWiseBatchLevelData')
+
+class DownloadBatchReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            user_id = request.form["user_id"]
+            user_role_id = request.form["user_role_id"]
+            customer_ids = request.form["customer_ids"]
+            contract_ids = request.form["contract_ids"]
+            resp = Report.DownloadBatchReport(user_id,user_role_id,customer_ids,contract_ids)            
+            return resp
+
+api.add_resource(DownloadBatchReport,'/DownloadBatchReport')
+###############################################################################
+
 class GetALLTrainingPartner(Resource):
     @staticmethod
     def get():
