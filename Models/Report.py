@@ -1,6 +1,8 @@
 from Database import Database
 from Database import config
-import xlsxwriter
+from datetime import datetime
+import pandas as pd
+import xlsxwriter,re,os
 
 class Report:
     def AllRegionsBasedOnUser(UserId,UserRoleId,UserRegionId):
@@ -133,3 +135,67 @@ class Report:
     
     def GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date):
         return Database.GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date)
+    def GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+        return {"Data":Database.GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)}
+    def GetQpWiseRegionLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id):
+        return {"Data":Database.GetQpWiseRegionLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id)}
+    def GetQpWiseRegionWiseBatchLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id,region_id):
+        res=Database.GetQpWiseRegionWiseBatchLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id,region_id)
+        return {"Data":res['response']}
+    
+    def DownloadBatchReport(user_id,user_role_id,customer_ids,contract_ids):
+        try:
+            DownloadPath=config.neo_report_file_path+'report file/'
+            report_name = config.BatchReportFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
+            r=re.compile(config.BatchReportFileName + ".*")
+            lst=os.listdir(DownloadPath)
+            newlist = list(filter(r.match, lst))
+            for i in newlist:
+                os.remove( DownloadPath + i)
+            path = '{}{}'.format(DownloadPath,report_name)
+            response=Database.GetQpWiseRegionWiseBatchLevelData(user_id,user_role_id,customer_ids,contract_ids,'','',0,0)
+            df=pd.DataFrame(response['response'])
+            df=df[['Region_Name', 'Qp_Name','Center_Name','Batch_Code','Actual_Start_Date','Actual_End_Date','Enrolled','Dropped','Certified','In_Training','Placement']]
+            columns=['Region Name', 'Qp Name','Center Name','Batch Code','Actual Start Date','Actual End Date','Enrolled','Dropped','Certified','In_Training','Placement']
+            temp={"data":df,"columns":columns}
+            res=Report.CreateExcel(temp,path,'Batches')
+            if res['success']:
+                return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
+            else:
+                return {"success":False,"msg":res['msg']}
+        except Exception as e:
+            return {"success":False,"msg":str(e)}
+
+    def CreateExcel(Response,file_path,sheet_name):
+        try:
+            workbook = xlsxwriter.Workbook(file_path)
+            
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'align': 'top',
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+
+            write_format = workbook.add_format({
+                'border': 1,
+                'align': 'top',
+                'valign': 'top'})
+
+            worksheet = workbook.add_worksheet(sheet_name)
+            #print(worksheet.name)
+            for i in range(len(Response['columns'])):
+                worksheet.write(0,i ,Response['columns'][i], header_format)   
+            for j in range(len(Response['data'])) : 
+                for k in range(len(Response['columns'])):
+                    if Response['data'].iloc[j,k] is None:
+                        worksheet.write(j+1,k ,'',write_format)
+                    else:
+                        worksheet.write(j+1,k ,Response['data'].iloc[j,k],write_format)
+                                                    
+            workbook.close()
+            return {"success":True}
+        except Exception as e:
+            print(str(e))
+            return {"success":False,"msg":str(e)}
