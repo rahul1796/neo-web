@@ -246,7 +246,7 @@ function LoadTable()
         "paging": true,
         "pageLength": 10,
         "sPaginationType": "full_numbers",
-        "scrollX": true,
+        //"scrollX": true,
         "destroy": true,
         "processing": true,
         "language": { "processing": 'Loading..!' },
@@ -393,7 +393,7 @@ function LoadTable()
         //"scrollX": true,
 
         drawCallback: function(){
-            $('#tbl_list_paginate ul.pagination').addClass("pagination-rounded");
+            $('#tbl_batchs_paginate ul.pagination').addClass("pagination-rounded");
             }
         });
         

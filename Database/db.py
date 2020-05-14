@@ -4,10 +4,12 @@ from .config import *
 #from Database import config
 import pandas as pd
 from datetime import datetime
-from flask import request
+from flask import request,make_response
 import requests
 import xml.etree.ElementTree as ET
 import requests
+import io
+import csv
 
 
 def to_xml(df, filename=None, mode='w'):
@@ -800,15 +802,15 @@ class Database:
         cur.close()
         con.close()
         return content
-    def trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids):
+    def trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids,TrainerType):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [users].[sp_get_trainer_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?'
-        values = (user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids)
+        sql = 'exec [users].[sp_get_trainer_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?'
+        values = (user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids,TrainerType)
         cur.execute(sql,(values))
-        print(values)
+        #print(values)
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
@@ -1207,6 +1209,32 @@ class Database:
         cur.close()
         con.close()
         return content
+    def user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        content = {}
+        d = []
+        h={}
+        
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [reports].[sp_get_user_sub_project_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        print(values)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):                
+                h[columns[i]]=row[i] if row[i]!=None else 'NA'
+            d.append(h.copy())            
+        content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        print(d)
+        return content
+           
     def mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
@@ -5085,6 +5113,7 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
+
     def GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
         response = []
         h={}
@@ -5136,3 +5165,48 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return {"response":response,"columns":columns}
+
+            
+    def GetALLTrainingPartnerdb():
+        try:            
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            sql = 'select partner_id, partner_name from masters.tbl_partners where partner_type_id=1 and is_active=1'
+            cur.execute(sql)
+            columns = [column[0].title() for column in cur.description]
+            d=[]
+            h={}
+            for row in cur:
+                for i in range(len(columns)):
+                    h[columns[i]]=row[i]
+                d.append(h.copy())
+            cur.commit()
+            cur.close()
+            con.close()
+            return d
+        except Exception as e:
+            print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+
+    def add_ex_triner_details(first_name, last_name, email, mobile, trainer_tyoe, Partner, is_active, created_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[users].[sp_add_edit_ex_treiner] ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (first_name, last_name, email, mobile, trainer_tyoe, Partner, is_active, created_id)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+            UserId=row[0]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated" , "UserId": UserId}
+        else: 
+            if pop==0:
+                msg={"message":"Created", "UserId": UserId}
+            else:
+                if pop==2:
+                    msg={"message":"User with the email id already exists", "UserId": UserId}
+        return msg
+
