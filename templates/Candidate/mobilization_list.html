@@ -106,11 +106,11 @@
                                     </div>
                                     <div class="col-lg-3">
                                         <label for="MinAge">Min Age</label>
-                                        <input type="number" step="1.0" class="form-control" name="MinAge" id="MinAge"  placeholder="Min Age"> <!--required-->
+                                        <input type="number" step="1.0" min="0" class="form-control" name="MinAge" id="MinAge"  placeholder="Min Age"> <!--required-->
                                     </div>
                                     <div class="col-lg-3">
                                         <label for="MaxAge">Max Age</label>
-                                        <input type="number" step="1.0" class="form-control" name="MaxAge" id="MaxAge" placeholder="Max Age"> <!--required-->
+                                        <input type="number" step="1.0" min="0" class="form-control" name="MaxAge" id="MaxAge" placeholder="Max Age"> <!--required-->
                                     </div>
                                 </div>
 
@@ -529,7 +529,7 @@
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                     </div>
                     <div class="modal-body">
-                        <input type="file" id="myFile" name="filename">
+                        <input type="file" id="myFile" name="filename" required>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-primary waves-effect" type="submit" >Submit</button>
