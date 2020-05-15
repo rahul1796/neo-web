@@ -5965,7 +5965,7 @@ class upload_assessment_result(Resource):
                         Column('First_Name',str_validation + null_validation),
                         Column('Middle_Name'),
                         Column('Last_Name'),
-                        Column('Batch_Code',str_validation + null_validation),
+                        Column('Batch_Code',null_validation),
                         Column('Assessment_Type',str_validation + null_validation),
                         Column('Assessment_Date',str_validation + null_validation),
                         Column('Attendance(Absent_Present)',str_validation + null_validation),
