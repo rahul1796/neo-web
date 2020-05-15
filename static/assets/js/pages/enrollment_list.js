@@ -26,13 +26,22 @@ function UploadFileData()
                     icon="success";
                 }
                 else{
-                    message=data.message;
-                    title="Error";
-                    icon="error";
+                    if (data.message=="Validation_Error"){
+                        message=data.error;
+                        title="Error";
+                        icon="error";
+                    }
+                    else {
+                        message=data.message;
+                        title="Error";
+                        icon="error";
+                    }
                 }
+                var span = document.createElement("span");
+                span.innerHTML = message;
                 swal({   
                             title:title,
-                            text:message,
+                            content: span,
                             icon:icon,
                             confirmButtonClass:"btn btn-confirm mt-2"
                             }).then(function(){

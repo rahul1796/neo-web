@@ -25,13 +25,22 @@ function UploadFileData()
                     icon="success";
                 }
                 else{
-                    message=data.message;
-                    title="Error";
-                    icon="error";
+                    if (data.message=="Validation_Error"){
+                        message=data.error;
+                        title="Error";
+                        icon="error";
+                    }
+                    else {
+                        message=data.message;
+                        title="Error";
+                        icon="error";
+                    }
                 }
+                var span = document.createElement("span");
+                span.innerHTML = message;
                 swal({   
                             title:title,
-                            text:message,
+                            content: span,
                             icon:icon,
                             confirmButtonClass:"btn btn-confirm mt-2"
                             }).then(function(){
@@ -193,9 +202,13 @@ function LoadTable()
     });
 }
 function LoadTableBasedOnSearch(){
-    //alert($('#ddlRegion').val().toString() + $('#ddlState').val().toString() + $('#MinAge').val() + $('#MaxAge').val())
-    $("#tbl_candidate").dataTable().fnDestroy();
-    LoadTable(); 
+    if (($('#MinAge').val()<0)||($('#MaxAge').val()<0)){
+        alert('Age cant be negative')
+    }
+    else{
+        $("#tbl_candidate").dataTable().fnDestroy();
+        LoadTable(); 
+    }
 }
 function CandidateBasicDetails(FirstName,MiddleName,LastName,Salutation,Dob,Age,gender,MaritalStatus,Caste,Disability,religion)
 {

@@ -5337,6 +5337,8 @@ class upload_bulk_upload(Resource):
                 f.save(file_name)
                 if cand_stage==str(1):
                     df= pd.read_excel(file_name,sheet_name='Mobilizer')
+                    if df.values.tolist() == []:
+                        return {"Status":False, "message":"Please fill all the mandatory fileds to uplaod the file" }
                     df = df.fillna('')
                     df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
                     
@@ -5390,8 +5392,9 @@ class upload_bulk_upload(Resource):
                     #df_clean.to_csv('clean_data.csv',index=None)
                     len_error = len(errors_index_rows)
                     if len_error>0:
-                        pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv')
-                        return {"Status":False, "message":"Uploaded Failed (fails to validate data)" }
+                        file_name = str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv'
+                        pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                        return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
                     else:
                         out = Database.mobilization_web_inser(df,user_id)
                         return out
@@ -5419,6 +5422,8 @@ class upload_bulk_upload(Resource):
                             Column('Permanent Village',null_validation),
                             Column('Permanent Panchayat',null_validation),
                             Column('Permanent Taluk/Block',null_validation),
+                            Column('Document copy*',null_validation),
+                            Column('BOCW Registration Id*',null_validation),
                             #str+null check
                             Column('Fresher/Experienced?*',str_validation + null_validation),
                             Column('Salutation*',str_validation + null_validation),
@@ -5439,8 +5444,7 @@ class upload_bulk_upload(Resource):
                             Column('Present Country*',str_validation + null_validation),
                             Column('Permanent District*',str_validation + null_validation),
                             Column('Permanent State*',str_validation + null_validation),
-                            Column('Permanent Country*',str_validation + null_validation),
-                            Column('Document copy*',str_validation + null_validation),
+                            Column('Permanent Country*',str_validation + null_validation),                            
                             Column('Employment Type*',str_validation + null_validation),
                             Column('Preferred Job Role*',str_validation + null_validation),
                             Column('Years Of Experience*',str_validation + null_validation),
@@ -5449,7 +5453,6 @@ class upload_bulk_upload(Resource):
                             Column('Preferred Location*',str_validation + null_validation),
                             Column('Willing to travel?*',str_validation + null_validation),
                             Column('Willing to work in shifts?*',str_validation + null_validation),
-                            Column('BOCW Registration Id*',str_validation + null_validation),
                             Column('Expected CTC*',str_validation + null_validation),
                             #pincode check
                             Column('Present Pincode*',pincode_validation + null_validation),
@@ -5473,8 +5476,9 @@ class upload_bulk_upload(Resource):
                     #df_clean.to_csv('clean_data.csv',index=None)
                     len_error = len(errors_index_rows)
                     if len_error>0:
-                        pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv')
-                        return {"Status":False, "message":"Uploaded Failed (fails to validate data)" }
+                        file_name = str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv'
+                        pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                        return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
                     else:
                         out = Database.registration_web_inser(df,user_id)
                         return out
@@ -5514,6 +5518,9 @@ class upload_bulk_upload(Resource):
                             Column('Attachment',null_validation),
                             Column('Candidate Photo*',null_validation),
                             Column('Document copy*',null_validation),
+                            Column('Bank Name*',null_validation),
+                            Column('Account Number*',null_validation),
+                            Column('BOCW Registration Id*',null_validation),
                             #str+null check
                             Column('Fresher/Experienced?*',str_validation + null_validation),
                             #Column('Candidate Photo*',str_validation + null_validation),
@@ -5547,7 +5554,6 @@ class upload_bulk_upload(Resource):
                             Column('Preferred Location*',str_validation + null_validation),
                             Column('Willing to travel?*',str_validation + null_validation),
                             Column('Willing to work in shifts?*',str_validation + null_validation),
-                            Column('BOCW Registration Id*',str_validation + null_validation),
                             Column('Expected CTC*',str_validation + null_validation),
                             Column('Highest Qualification*',str_validation + null_validation),
                             Column('Stream/Specialization*',str_validation + null_validation),
@@ -5559,8 +5565,6 @@ class upload_bulk_upload(Resource):
                             Column('Education Qualification*',str_validation + null_validation),
                             Column('Relationship*',str_validation + null_validation),
                             Column('Average Household Income*',str_validation + null_validation),
-                            Column('Bank Name*',str_validation + null_validation),
-                            Column('Account Number*',str_validation + null_validation),
                             Column('batch_id*',str_validation + null_validation),
                             #pincode check
                             Column('Present Pincode*',pincode_validation + null_validation),
@@ -5582,8 +5586,9 @@ class upload_bulk_upload(Resource):
 
                     len_error = len(errors_index_rows)
                     if len_error>0:
-                        pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv')
-                        return {"Status":False, "message":"Uploaded Failed (fails to validate data)" }
+                        file_name = str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv'
+                        pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                        return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
                     else:
                         out = Database.enrollment_web_inser(df,user_id)
                         return out
