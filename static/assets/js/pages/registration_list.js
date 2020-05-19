@@ -2,6 +2,7 @@ var varTable;
 var varTable1;
 var flag = "";
 var role_id;
+
 function UploadFileData()
 {   $("#imgSpinner1").show();
     var form_data = new FormData($('#formUpload')[0]);
@@ -44,7 +45,8 @@ function UploadFileData()
                             icon:icon,
                             confirmButtonClass:"btn btn-confirm mt-2"
                             }).then(function(){
-                                window.location.href = '/registration';
+                               // window.location.href = '/registration';
+                               $('#mdl_bulkupload_candidate').modal('hide');
                             }); 
             
                     
@@ -67,6 +69,8 @@ function UploadFileData()
 function Uploadfile(){
     $('#hdn_home_user_id_modal').val($('#hdn_home_user_id').val());
     $('#hdn_home_user_role_id_modal').val($('#hdn_home_user_role_id').val());
+    $("#imgSpinner1").hide();
+    $('#myFile').val('');
     $('#mdl_bulkupload_candidate').modal('show');
 }
 function Loadcreatedbyddl(){
@@ -227,11 +231,12 @@ function LoadTable()
             {
                 "data": function (row, type, val, meta) {
                     var varButtons = "";
+                    if(row.Is_Check)
                         varButtons += '<input id="addedchk" name="checkcase" type="checkbox" value="'+row.Candidate_Id+'" >';
                     return varButtons;
                 }
             },
-
+            { "data": "Candidate_Id"},
             { "data": function (row, type, val, meta) {
                 varButtons = '<a onclick="CandidateBasicDetails(\'' + row.First_Name + '\',\'' + row.Middle_Name + '\',\'' + row.Last_Name + '\',\'' + row.Salutation + '\',\'' + row.Date_Of_Birth+ '\',\'' + row.Age+ '\',\'' + row.Gender+ '\',\'' + row.Marital_Status+ '\',\'' + row.Caste+ '\',\'' + row.Disability_Status+ '\',\'' + row.Religion + '\')"  style="color:blue;cursor:pointer" >'+row.First_Name+'</a>';
                 return varButtons;
