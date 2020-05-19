@@ -416,9 +416,9 @@
         {
             var URL=$('#hdn_web_url').val()+ "/DownloadBatchReport";            
             $.ajax({
-                type:"POST",
-                url:URL,
-                async:false,        
+                type: "POST",
+                dataType: "json",
+                url: URL,        
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
                 data:{ 
