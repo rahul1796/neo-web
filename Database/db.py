@@ -4827,6 +4827,7 @@ SELECT					cb.name as candidate_name,
             cur.commit()
             out = {'Status': True, 'message': "Submitted Successfully"}
         except Exception as e:
+            print(e)
             out = {'Status': False, 'message': "error: "+str(e)}
         finally:
             cur.close()
@@ -4861,7 +4862,7 @@ SELECT					cb.name as candidate_name,
             values
             '''
             quer6='''
-            update	candidate_details.tbl_map_candidate_intervention_skilling set batch_id='{}' where intervention_id='{}'
+            update	candidate_details.tbl_map_candidate_intervention_skilling set batch_id=(select batch_id from batches.tbl_batches where batch_code=trm('{}')) where intervention_id='{}'
             '''
             query = ""
             b=[]
@@ -4888,7 +4889,7 @@ SELECT					cb.name as candidate_name,
             
             curs.commit()
             for i in range(len(d)):
-                quer5 += '\n' + "({},(select course_id from batches.tbl_batches where batch_id={}),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],b[i],b[i],user_id)
+                quer5 += '\n' + "((select batch_id from batches.tbl_batches where batch_code=trm('{}'),(select course_id from batches.tbl_batches where batch_code='{}'),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],b[i],b[i],user_id)
             quer5 = quer5[:-1]+';'
             curs.execute(quer5)
             curs.commit()
