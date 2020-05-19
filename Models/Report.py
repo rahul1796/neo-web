@@ -154,12 +154,29 @@ class Report:
             for i in newlist:
                 os.remove( DownloadPath + i)
             path = '{}{}'.format(DownloadPath,report_name)
+            response=Database.GetQpWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids)
+            
+            df=pd.DataFrame(response)
+            
+            df=df[[ 'Qp_Name','Batch_Count','Target_Enrolment','Target_Certification','Target_Placement','Enrolled','Dropped','Certified','In_Training','Placement']]
+            columns=[ 'Qp_Name','Batch_Count','Target_Enrolment','Target_Certification','Target_Placement','Enrolled','Dropped','Certified','In_Training','Placement']
+            temp_qp={"data":df,"columns":columns} 
+                     
+            response=Database.GetRegionWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids)
+            
+            df=pd.DataFrame(response)
+            df=df[['Region_Name', 'Qp_Name','Target_Enrolment','Target_Certification','Target_Placement','Enrolled','Dropped','Certified','In_Training','Placement']]
+            columns=['Region_Name', 'Qp_Name','Target_Enrolment','Target_Certification','Target_Placement','Enrolled','Dropped','Certified','In_Training','Placement']
+            temp_region={"data":df,"columns":columns}
+
             response=Database.GetQpWiseRegionWiseBatchLevelData(user_id,user_role_id,customer_ids,contract_ids,'','',0,0)
-            df=pd.DataFrame(response['response'])
-            df=df[['Region_Name', 'Qp_Name','Center_Name','Batch_Code','Actual_Start_Date','Actual_End_Date','Enrolled','Dropped','Certified','In_Training','Placement']]
+            df1=pd.DataFrame(response['response'])
+            df1=df1[['Region_Name', 'Qp_Name','Center_Name','Batch_Code','Actual_Start_Date','Actual_End_Date','Enrolled','Dropped','Certified','In_Training','Placement']]
             columns=['Region Name', 'Qp Name','Center Name','Batch Code','Actual Start Date','Actual End Date','Enrolled','Dropped','Certified','In_Training','Placement']
-            temp={"data":df,"columns":columns}
-            res=Report.CreateExcel(temp,path,'Batches')
+            temp_batch={"data":df1,"columns":columns}
+            
+            res=Report.CreateExcel(temp_qp,temp_region,temp_batch,path)
+            print(res)
             if res['success']:
                 return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
             else:
@@ -167,8 +184,9 @@ class Report:
         except Exception as e:
             return {"success":False,"msg":str(e)}
 
-    def CreateExcel(Response,file_path,sheet_name):
+    def CreateExcel(Response_qp,Response_region,Response_batch,file_path):
         try:
+            
             workbook = xlsxwriter.Workbook(file_path)
             
             header_format = workbook.add_format({
@@ -183,17 +201,37 @@ class Report:
                 'border': 1,
                 'align': 'top',
                 'valign': 'top'})
-
-            worksheet = workbook.add_worksheet(sheet_name)
+            worksheet = workbook.add_worksheet('QP_Wise')          
+            
             #print(worksheet.name)
-            for i in range(len(Response['columns'])):
-                worksheet.write(0,i ,Response['columns'][i], header_format)   
-            for j in range(len(Response['data'])) : 
-                for k in range(len(Response['columns'])):
-                    if Response['data'].iloc[j,k] is None:
+            for i in range(len(Response_qp['columns'])):
+                worksheet.write(0,i ,Response_qp['columns'][i], header_format)   
+            for j in range(len(Response_qp['data'])) : 
+                for k in range(len(Response_qp['columns'])):
+                    if Response_qp['data'].iloc[j,k] is None:
                         worksheet.write(j+1,k ,'',write_format)
                     else:
-                        worksheet.write(j+1,k ,Response['data'].iloc[j,k],write_format)
+                        worksheet.write(j+1,k ,Response_qp['data'].iloc[j,k],write_format)
+
+            worksheet = workbook.add_worksheet('Region_Wise')
+            for i in range(len(Response_region['columns'])):
+                worksheet.write(0,i ,Response_region['columns'][i], header_format)   
+            for j in range(len(Response_region['data'])) : 
+                for k in range(len(Response_region['columns'])):
+                    if Response_region['data'].iloc[j,k] is None:
+                        worksheet.write(j+1,k ,'',write_format)
+                    else:
+                        worksheet.write(j+1,k ,Response_region['data'].iloc[j,k],write_format)
+
+            worksheet = workbook.add_worksheet('Batch_Wise')
+            for i in range(len(Response_batch['columns'])):
+                worksheet.write(0,i ,Response_batch['columns'][i], header_format)   
+            for j in range(len(Response_batch['data'])) : 
+                for k in range(len(Response_batch['columns'])):
+                    if Response_batch['data'].iloc[j,k] is None:
+                        worksheet.write(j+1,k ,'',write_format)
+                    else:
+                        worksheet.write(j+1,k ,Response_batch['data'].iloc[j,k],write_format)
                                                     
             workbook.close()
             return {"success":True}
