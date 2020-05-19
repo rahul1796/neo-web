@@ -5447,7 +5447,7 @@ class upload_bulk_upload(Resource):
                     df= pd.read_excel(file_name,sheet_name='Registration')
                     df = df.fillna('')
                     df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
-                    df['ids']=df['Aadhar No*'].astype(str)+df['Identity number*'].astype(str)
+                    df['ids']=df['Aadhar No'].astype(str)+df['Identity number'].astype(str)
                     schema = Schema([
                             #nan check column non mandate
                             Column('Candidate_id',null_validation),
@@ -5531,7 +5531,7 @@ class upload_bulk_upload(Resource):
                     df= pd.read_excel(file_name,sheet_name='Enrollment')
                     df = df.fillna('')
                     df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
-                    df['ids']=df['Aadhar No*'].astype(str)+df['Identity number*'].astype(str)
+                    df['ids']=df['Aadhar No'].astype(str)+df['Identity number'].astype(str)
                     schema = Schema([
                             #nan check column non mandate
                             Column('Candidate_id',null_validation),
