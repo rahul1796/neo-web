@@ -5466,8 +5466,8 @@ class upload_bulk_upload(Resource):
                             Column('Permanent Village',null_validation),
                             Column('Permanent Panchayat',null_validation),
                             Column('Permanent Taluk/Block',null_validation),
-                            Column('Document copy*',null_validation),
-                            Column('BOCW Registration Id*',null_validation),
+                            Column('Document copy'),
+                            Column('BOCW Registration Id'),
                             #str+null check
                             Column('Fresher/Experienced?*',str_validation + null_validation),
                             Column('Salutation*',str_validation + null_validation),
@@ -5508,10 +5508,10 @@ class upload_bulk_upload(Resource):
                             Column('Age*',null_validation),
                             Column('date_age',dob_validation),
                             #ID Validation pass(null check)
-                            Column('Aadhar No*',null_validation),
-                            Column('Identifier Type*',null_validation),
-                            Column('Identity number*',null_validation),
-                            Column('ids',str_validation+null_validation)
+                            Column('Aadhar No'),
+                            Column('Identifier Type'),
+                            Column('Identity number'),
+                            Column('ids')
                             ])
                     errors = schema.validate(df)
                     errors_index_rows = [e.row for e in errors]
@@ -5560,11 +5560,11 @@ class upload_bulk_upload(Resource):
                             Column('Branch Code',null_validation),
                             Column('Account type',null_validation),
                             Column('Attachment',null_validation),
-                            Column('Candidate Photo*',null_validation),
-                            Column('Document copy*',null_validation),
-                            Column('Bank Name*',null_validation),
-                            Column('Account Number*',null_validation),
-                            Column('BOCW Registration Id*',null_validation),
+                            Column('Candidate Photo'),
+                            Column('Document copy'),
+                            Column('Bank Name'),
+                            Column('Account Number'),
+                            Column('BOCW Registration Id'),
                             #str+null check
                             Column('Fresher/Experienced?*',str_validation + null_validation),
                             #Column('Candidate Photo*',str_validation + null_validation),
@@ -5620,10 +5620,10 @@ class upload_bulk_upload(Resource):
                             Column('Age*',null_validation),
                             Column('date_age',dob_validation),
                             #ID Validation pass(null check)
-                            Column('Aadhar No*',null_validation),
-                            Column('Identifier Type*',null_validation),
-                            Column('Identity number*',null_validation),
-                            Column('ids',str_validation+null_validation)
+                            Column('Aadhar No'),
+                            Column('Identifier Type'),
+                            Column('Identity number'),
+                            Column('ids')
                             ])
                     errors = schema.validate(df)
                     errors_index_rows = [e.row for e in errors]
