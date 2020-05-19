@@ -5166,7 +5166,40 @@ SELECT					cb.name as candidate_name,
         con.close()
         return {"response":response,"columns":columns}
 
-            
+    def GetQpWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [reports].[sp_get_qp_wise_report_data_download]   ?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def GetRegionWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [reports].[sp_get_region_wise_report_data_download]   ?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response        
     def GetALLTrainingPartnerdb():
         try:            
             con = pyodbc.connect(conn_str)
