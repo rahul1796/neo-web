@@ -21,10 +21,18 @@
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script>
             $(document).ready(function(){
-            var swalText;
-				if('{{error}}' != "" )
+                var swalText;
+                
+                if('{{msg}}'!="")
                 {
-                    if('{{error}}'=="wrong")
+                    $('#msg').text('{{msg}}');
+                }
+				if('{{name}}' != "" )
+                {
+                    $('#name').text('{{name}}');
+                }                
+            });
+            /*if('{{error}}'=="wrong")
                         swalText="Invalid User-Id or Password !!";            
                     else if('{{error}}'=="Session Time Out!!")
                             swalText="Session Timed Out"; 
@@ -36,9 +44,7 @@
                                 confirmButtonClass:"btn btn-confirm mt-2"
                                 }).then(function(){
                                     window.location.href = '/EraseDisplayMsg';
-                                });
-                }
-            });
+                                });*/
         </script>
     </head>
 
@@ -59,53 +65,16 @@
                                 </div>
                                 <br/>
                                 <form method="POST" action="/login">
-
-                                    <div class="form-group mb-3">
-                                        <label for="emailaddress">Email address</label>
-                                        <input class="form-control" type="email" name="inemailaddress" id="emailaddress" required="" placeholder="Enter your email">
-                                    </div>
-
-                                    <div class="form-group mb-3">
-                                        <label for="password">Password</label>
-                                        <input class="form-control" type="password" required="" name="inpassword" id="password" placeholder="Enter your password">
-                                    </div>
-
-
-                                    <div class="form-group mb-0 text-center">
-                                        <button class="btn btn-primary btn-block" type="submit"> Log In </button>
-                                    </div>
-
+                                    <h5>
+                                        Hi <spam id="name"> </spam>,
+                                        <br><br>
+                                        <spam id="msg"> </spam>
+                                        <!-- Your mobile number is verified. -->
+                                    </h5>
                                 </form>
-
-                                <!-- <div class="text-center">
-                                    <h5 class="mt-3 text-muted">Sign in with</h5>
-                                    <ul class="social-list list-inline mt-3 mb-0">
-                                        <li class="list-inline-item">
-                                            <a href="javascript: void(0);" class="social-list-item border-primary text-primary"><i class="mdi mdi-facebook"></i></a>
-                                        </li>
-                                        <li class="list-inline-item">
-                                            <a href="javascript: void(0);" class="social-list-item border-danger text-danger"><i class="mdi mdi-google"></i></a>
-                                        </li>
-                                        <li class="list-inline-item">
-                                            <a href="javascript: void(0);" class="social-list-item border-info text-info"><i class="mdi mdi-twitter"></i></a>
-                                        </li>
-                                        <li class="list-inline-item">
-                                            <a href="javascript: void(0);" class="social-list-item border-secondary text-secondary"><i class="mdi mdi-github-circle"></i></a>
-                                        </li>
-                                    </ul>
-                                </div> -->
-
                             </div> <!-- end card-body -->
                         </div>
                         <!-- end card -->
-
-                        <div class="row mt-3">
-                            <div class="col-12 text-center">
-                                <p> <a href="/forget_password" class="text-white-50 ml-1">Forgot your password?</a></p>
-                            </div>
-                        </div>
-                        
-
                     </div> <!-- end col -->
                 </div>
                 <!-- end row -->

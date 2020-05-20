@@ -5144,8 +5144,19 @@ class otp_send(Resource):
                         f = urllib.request.urlopen(request, data)
                         fr = f.read()
                         return(fr)
-
-                    resp =  sendSMS('vAHJXKhB9AY-bJF1Ozs3XkCW2uv6UYRiHShavkGySL', '91{}'.format(mobile_no), 'NEOLNS'.upper(), 'Hi {},\n\nThank you for registering with LabourNet.\nYour OTP is {}.\n\nThanks,\nNEO Teams.'.format(cand_name, otp))
+                    sms_msg='''
+                                 Hi {},
+                                 
+                                 Thank you for registering with LabourNet.
+                                 Your OTP is {}.
+                                 <a href="{}/web_verification?name={}&mobile={}&otp={}">Click here</a> to verify.
+                                 
+                                 Thanks,
+                                 NEO Teams.
+                            '''.format(cand_name, otp,config.Base_URL,cand_name,mobile_no,otp)
+                    #sms_msg='Hi {},\n\nThank you for registering with LabourNet.\nYour OTP is {}.\n\nThanks,\nNEO Teams.'.format(cand_name, otp)
+                    #print(sms_msg)
+                    resp =  sendSMS('vAHJXKhB9AY-bJF1Ozs3XkCW2uv6UYRiHShavkGySL', '91{}'.format(mobile_no), 'NEOLNS'.upper(),sms_msg)
                     #print (resp)
                     data = json.loads(resp.decode("utf-8"))
                     if data['status'] == 'success':
@@ -6191,6 +6202,15 @@ def assign_External_treiner_add_edit():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+
+
+@app.route("/web_verification")
+def web_verification_page():
+    name=request.args.get('name','',type=str)
+    mobile=request.args.get('mobile','',type=str)
+    otp=request.args.get('otp','',type=str)
+    response=Database.web_verification(mobile,otp)
+    return render_template("web-verification.html",name=name,msg=response['msg'])
 
 if __name__ == '__main__':    
     app.run(debug=True)

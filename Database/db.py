@@ -5258,3 +5258,22 @@ SELECT					cb.name as candidate_name,
                     msg={"message":"User with the email id already exists", "UserId": UserId}
         return msg
 
+    def web_verification(mobile,otp):
+        try:
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            sql = 'exec	[masters].[sp_mobile_web_verification] ?, ?'
+            values = (mobile,otp)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop ==1:
+               return {"msg":"Your mobile number is verified."}
+            else: 
+               return {"msg":"Mobile number verification Failed."}
+        except Exception as e:
+            return {"msg":"Error"+str(e)}
+
