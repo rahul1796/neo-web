@@ -21,12 +21,18 @@
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script>
             $(document).ready(function(){
-            var swalText;
-            $('#name').text('Rohan');
-				if('{{error}}' != "" )
+                var swalText;
+                
+                if('{{msg}}'!="")
                 {
-
-                    if('{{error}}'=="wrong")
+                    $('#msg').text('{{msg}}');
+                }
+				if('{{name}}' != "" )
+                {
+                    $('#name').text('{{name}}');
+                }                
+            });
+            /*if('{{error}}'=="wrong")
                         swalText="Invalid User-Id or Password !!";            
                     else if('{{error}}'=="Session Time Out!!")
                             swalText="Session Timed Out"; 
@@ -38,9 +44,7 @@
                                 confirmButtonClass:"btn btn-confirm mt-2"
                                 }).then(function(){
                                     window.location.href = '/EraseDisplayMsg';
-                                });
-                }
-            });
+                                });*/
         </script>
     </head>
 
@@ -64,7 +68,8 @@
                                     <h5>
                                         Hi <spam id="name"> </spam>,
                                         <br><br>
-                                        Your mobile number is verified successfully.
+                                        <spam id="msg"> </spam>
+                                        <!-- Your mobile number is verified. -->
                                     </h5>
                                 </form>
                             </div> <!-- end card-body -->
