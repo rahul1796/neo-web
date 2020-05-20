@@ -5177,10 +5177,13 @@ class otp_verification(Resource):
                     otp = str(request.form['otp'])
                     mobile_no = str(request.form['mobile_no'])
                     app_name = str(request.form['app_name'])
+                    web_flag=0
+                    if 'web_flag' in request.form:
+                        web_flag=request.form['web_flag']
                 except Exception as e:
                     res = {'success': False, 'description': "unable to read data " + str(e)}
                     return jsonify(res)
-                out = Database.otp_verification_db(otp, mobile_no, app_name)
+                out = Database.otp_verification_db(otp, mobile_no, app_name,web_flag)
 
                 if out==True:
                     res = {'success': True, 'description': "Mobile number verified successfully"}

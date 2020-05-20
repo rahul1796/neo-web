@@ -4388,10 +4388,10 @@ SELECT					cb.name as candidate_name,
         conn.close()
         return [data[0], data[2]]
 
-    def otp_verification_db(otp, mobile_no, app_name):
+    def otp_verification_db(otp, mobile_no, app_name,web_flag):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
-        quer = "call [masters].[sp_to_verify_otp]('{}','{}','{}')".format(mobile_no, otp, app_name)
+        quer = "call [masters].[sp_to_verify_otp]('{}','{}','{}',{})".format(mobile_no, otp, app_name,web_flag)
         quer = "{"+ quer + "}"
         curs.execute(quer)
         data = curs.fetchall()[0]
@@ -4862,7 +4862,7 @@ SELECT					cb.name as candidate_name,
             values
             '''
             quer6='''
-            update	candidate_details.tbl_map_candidate_intervention_skilling set batch_id=(select batch_id from batches.tbl_batches where batch_code=trm('{}')) where intervention_id='{}'
+            update	candidate_details.tbl_map_candidate_intervention_skilling set batch_id=(select batch_id from batches.tbl_batches where batch_code=trim('{}')) where intervention_id='{}'
             '''
             query = ""
             b=[]
@@ -4889,7 +4889,7 @@ SELECT					cb.name as candidate_name,
             
             curs.commit()
             for i in range(len(d)):
-                quer5 += '\n' + "((select batch_id from batches.tbl_batches where batch_code=trm('{}'),(select course_id from batches.tbl_batches where batch_code='{}'),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],b[i],b[i],user_id)
+                quer5 += '\n' + "((select batch_id from batches.tbl_batches where batch_code=trim('{}'),(select course_id from batches.tbl_batches where batch_code=trim('{}')),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],b[i],b[i],user_id)
             quer5 = quer5[:-1]+';'
             curs.execute(quer5)
             curs.commit()
