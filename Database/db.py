@@ -4866,15 +4866,23 @@ SELECT					cb.name as candidate_name,
             '''
             query = ""
             b=[]
+            temp=""
             for row in out:
-                que = '''select candidate_intervention_id from candidate_details.tbl_candidate_interventions where candidate_id='{}' '''.format(row[0])
+                #que = '''select candidate_intervention_id from candidate_details.tbl_candidate_interventions where candidate_id='{}' '''.format(row[0])
+                que='''
+                        SELECT		cs.intervention_id 
+                        FROM		candidate_details.tbl_candidate_interventions i
+                        LEFT JOIN	candidate_details.tbl_map_candidate_intervention_skilling cs on cs.intervention_id= i.candidate_intervention_id 
+                        WHERE		i.candidate_id={}
+                        AND			cs.intervention_id is NOT NULL
+                    '''.format(row[0])
                 curs.execute(que)
                 intervention_id = curs.fetchall()
                 if intervention_id!=[]:
                     query += quer6.format(row[80],intervention_id[0][0])
                 else:
                     b.append(row[80])
-                    quer4 += '\n' + "({},'SAE',GETDATE(),{},1),".format(row[0],user_id)
+                    temp += '\n' + "({},'SAE',GETDATE(),{},1),".format(row[0],user_id)
                 
                 query += '\n' + quer1.format(1 if str(row[1]).lower()=='Fresher' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],user_id,row[0])
                 query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[23],row[32],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[55],row[56],row[61],row[62],row[63],row[64],row[69],row[70],row[71],row[72],row[73],row[74],row[78],user_id,row[0])
@@ -4882,17 +4890,22 @@ SELECT					cb.name as candidate_name,
             
             curs.execute(query)
             curs.commit()
+            d=[]
+            if temp!="":
+                #print(temp)  
+                quer4 =quer4 + temp[:-1]+';'                          
+                curs.execute(quer4)
+                d = list(map(lambda x:x[0],curs.fetchall()))
+                curs.commit()
             
-            quer4 = quer4[:-1]+';'
-            curs.execute(quer4)
-            d = list(map(lambda x:x[0],curs.fetchall()))
-            
-            curs.commit()
+            temp2=""
             for i in range(len(d)):
-                quer5 += '\n' + "((select batch_id from batches.tbl_batches where batch_code=trim('{}'),(select course_id from batches.tbl_batches where batch_code=trim('{}')),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],b[i],b[i],user_id)
-            quer5 = quer5[:-1]+';'
-            curs.execute(quer5)
-            curs.commit()
+                temp2 += '\n' + "({},(select course_id from batches.tbl_batches where batch_code=trim('{}')),(select batch_id from batches.tbl_batches where batch_code=trim('{}')),concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],b[i],b[i],user_id)
+            if temp2!="":
+                quer5 = quer5+ temp2[:-1]+';'
+                #print(quer5)
+                curs.execute(quer5)
+                curs.commit()
 
             out = {'Status': True, 'message': "Submitted Successfully"}
         except Exception as e:
