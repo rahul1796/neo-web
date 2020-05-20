@@ -158,21 +158,21 @@ class Report:
             
             df=pd.DataFrame(response)
             
-            df=df[[ 'Qp_Name','Batch_Count','Target_Enrolment','Target_Certification','Target_Placement','Enrolled','Dropped','Certified','In_Training','Placement']]
-            columns=[ 'Qp_Name','Batch_Count','Target_Enrolment','Target_Certification','Target_Placement','Enrolled','Dropped','Certified','In_Training','Placement']
+            df=df[[ 'Customer_Name','Contract_Name','Qp_Name','Batch_Count','Target_Enrolment','Target_Certification','Target_Placement','Enrolled','Dropped','Certified','In_Training','Placement']]
+            columns=['Customer Name','Contract Name', 'Qp Name','Batch Count','Target Enrolment','Target Certification','Target Placement','Enrolled','Dropped','Certified','In Training','Placement']
             temp_qp={"data":df,"columns":columns} 
                      
             response=Database.GetRegionWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids)
             
             df=pd.DataFrame(response)
-            df=df[['Region_Name', 'Qp_Name','Target_Enrolment','Target_Certification','Target_Placement','Enrolled','Dropped','Certified','In_Training','Placement']]
-            columns=['Region_Name', 'Qp_Name','Target_Enrolment','Target_Certification','Target_Placement','Enrolled','Dropped','Certified','In_Training','Placement']
+            df=df[['Region_Name', 'Customer_Name','Contract_Name','Qp_Name','Target_Enrolment','Target_Certification','Target_Placement','Enrolled','Dropped','Certified','In_Training','Placement']]
+            columns=['Region Name','Customer Name','Contract Name', 'Qp Name','Target Enrolment','Target Certification','Target Placement','Enrolled','Dropped','Certified','In Training','Placement']
             temp_region={"data":df,"columns":columns}
 
             response=Database.GetQpWiseRegionWiseBatchLevelData(user_id,user_role_id,customer_ids,contract_ids,'','',0,0)
             df1=pd.DataFrame(response['response'])
             df1=df1[['Region_Name', 'Qp_Name','Center_Name','Batch_Code','Actual_Start_Date','Actual_End_Date','Enrolled','Dropped','Certified','In_Training','Placement']]
-            columns=['Region Name', 'Qp Name','Center Name','Batch Code','Actual Start Date','Actual End Date','Enrolled','Dropped','Certified','In_Training','Placement']
+            columns=['Region Name', 'Qp Name','Center Name','Batch Code','Actual Start Date','Actual End Date','Enrolled','Dropped','Certified','In Training','Placement']
             temp_batch={"data":df1,"columns":columns}
             
             res=Report.CreateExcel(temp_qp,temp_region,temp_batch,path)
