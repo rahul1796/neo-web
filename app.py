@@ -5145,9 +5145,14 @@ class otp_send(Resource):
                         f = urllib.request.urlopen(request, data)
                         fr = f.read()
                         return(fr)
-                    short_url='{}/wv?n={}&m={}&o={}'.format(config.Base_URL,cand_name,mobile_no,otp)
+                    #short_url='{}/wv?n={}&m={}&o={}'.format(config.Base_URL,cand_name.replace(' ','%20'),mobile_no,otp)
+                    name=cand_name[0:19] if len(cand_name)>=19 else cand_name
+                    param={"n":name,"m":mobile_no,"o":otp}
+                    param_str=urllib.parse.urlencode(param)
+                    short_url='{}/wv?'.format(config.Base_URL)
+                    short_url=short_url+param_str
                     #sms_msg='Hi {},\n\nThank you for registering with LabourNet.\nYour OTP is {}.\n\nThanks,\nNEO Teams.'.format(cand_name, otp)
-                    sms_msg='Hi {},\n\nYour OTP is {}.\nOR\nClick here to verify {}\n\nThanks,\nNEO Team.'.format(cand_name, otp,short_url)
+                    sms_msg='Hi {},\n\nYour OTP is {}.\nOR\nClick here to verify {}\n\nThanks,\nNEO Team.'.format(name, otp,short_url)
                     #print(sms_msg)
                     resp =  sendSMS('vAHJXKhB9AY-bJF1Ozs3XkCW2uv6UYRiHShavkGySL', '91{}'.format(mobile_no), 'NEOLNS'.upper(),sms_msg)
                     #print (resp)
