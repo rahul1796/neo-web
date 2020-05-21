@@ -5158,7 +5158,7 @@ class otp_send(Resource):
                     #print (resp)
                     data = json.loads(resp.decode("utf-8"))
                     if data['status'] == 'success':
-                        res = {'success': True, 'description': "OTP Sent Successfully"}
+                        res = {'success': True, 'description': "SMS Sent Successfully"}
                         return jsonify(res)
                     else:
                         res = {'success': False, 'description': data['errors'][0]['message']}
