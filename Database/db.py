@@ -4403,7 +4403,7 @@ SELECT					cb.name as candidate_name,
     def get_candidate_list_updated(user_id,cand_stage,app_version):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
-        quer = "SELECT TOP (1) id FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        quer = "SELECT TOP (1) version_code FROM [masters].[tbl_mclg_app_version_history] order by id desc"
         curs.execute(quer)
         data=curs.fetchall()
         data = '' if data==[] else data[0][0]
@@ -4446,7 +4446,7 @@ SELECT					cb.name as candidate_name,
     def get_submit_candidate_mobi(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
-        quer = "SELECT TOP (1) id FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        quer = "SELECT TOP (1) version_code FROM [masters].[tbl_mclg_app_version_history] order by id desc"
         curs.execute(quer)
         data=curs.fetchall()
         data = '' if data==[] else data[0][0]
@@ -4515,7 +4515,7 @@ SELECT					cb.name as candidate_name,
     def get_submit_candidate_reg(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
-        quer = "SELECT TOP (1) id FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        quer = "SELECT TOP (1) version_code FROM [masters].[tbl_mclg_app_version_history] order by id desc"
         curs.execute(quer)
         data=curs.fetchall()
         data = '' if data==[] else data[0][0]
@@ -4560,7 +4560,7 @@ SELECT					cb.name as candidate_name,
     def get_submit_candidate_enr(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
-        quer = "SELECT TOP (1) id FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        quer = "SELECT TOP (1) version_code FROM [masters].[tbl_mclg_app_version_history] order by id desc"
         curs.execute(quer)
         data=curs.fetchall()
         data = '' if data==[] else data[0][0]
