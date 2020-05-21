@@ -463,6 +463,40 @@
                         if(goto !="" && goto!="dashboard")
                             $("#box").load(goto);
                         break;
+                        case 27:             //Assessment Management
+                        $('#Home').hide();
+						$('#Mobilization_Menu').hide();
+                        $('#Registration_Menu').hide();
+                        $('#Enrollment_Menu').hide();
+                        $('#Candidate_Menu').hide();
+                        //$('#Batch_Menu').show();
+                        $('#Assessment_Menu').show();
+                        $('#Content_Menu').hide();
+                            $('#AnchorSectors').hide();
+                            $('#AnchorQP').hide();
+                            $('#AnchorCourses').hide();
+                        $('#Master_Menu').hide();
+                            $('#AnchorClients').hide();
+                            $('#AnchorContracts').hide();
+                            $('#Project_Menu').hide();    
+                                $('#AnchorProjects').hide();  
+                                $('#AnchorSubProjects').hide();   
+                                $('#AnchorBatch').hide();
+                            $('#AnchorCenters').hide();
+                            $('#AnchorUsers').hide();
+                            $('#AnchorTrainers').hide();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').hide();
+                            $('#AnchorSalesDashboard').hide();
+                            $('#AnchorOperationDashboard').hide();
+                        $('#My_Projects_Menu').hide();
+                        $('#Report_Menu').hide();
+                            $('#ECP_report').hide();
+                            $('#Qp_wise_report').hide();
+                        console.log(goto);
+                        if(goto !="" && goto!="dashboard")
+                            $("#box").load(goto);
+                        break;
                 }
                    
                 
