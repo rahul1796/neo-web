@@ -5138,23 +5138,16 @@ class otp_send(Resource):
                 else:
                     otp=out[1]
                     def sendSMS(apikey, numbers, sender, message):
-                        data =  urllib.parse.urlencode({'apikey': apikey, 'numbers': numbers, 'message' : message, 'sender': sender})
+                        #make parameter value of test as True for testing to save the msg credits.
+                        data =  urllib.parse.urlencode({'apikey': apikey, 'numbers': numbers, 'message' : message.encode('utf-8'), 'sender': sender,'test':False,'tracking_links':True})
                         data = data.encode('utf-8')
                         request = urllib.request.Request("https://api.textlocal.in/send/?")
                         f = urllib.request.urlopen(request, data)
                         fr = f.read()
                         return(fr)
-                    sms_msg='''
-                                 Hi {},
-                                 
-                                 Thank you for registering with LabourNet.
-                                 Your OTP is {}.
-                                 <a href="{}/web_verification?name={}&mobile={}&otp={}">Click here</a> to verify.
-                                 
-                                 Thanks,
-                                 NEO Teams.
-                            '''.format(cand_name, otp,config.Base_URL,cand_name,mobile_no,otp)
+                    short_url='{}/wv?n={}&m={}&o={}'.format(config.Base_URL,cand_name,mobile_no,otp)
                     #sms_msg='Hi {},\n\nThank you for registering with LabourNet.\nYour OTP is {}.\n\nThanks,\nNEO Teams.'.format(cand_name, otp)
+                    sms_msg='Hi {},\n\nYour OTP is {}.\nOR\nClick here to verify {}\n\nThanks,\nNEO Team.'.format(cand_name, otp,short_url)
                     #print(sms_msg)
                     resp =  sendSMS('vAHJXKhB9AY-bJF1Ozs3XkCW2uv6UYRiHShavkGySL', '91{}'.format(mobile_no), 'NEOLNS'.upper(),sms_msg)
                     #print (resp)
@@ -6204,11 +6197,11 @@ def assign_External_treiner_add_edit():
 
 
 
-@app.route("/web_verification")
+@app.route("/wv")
 def web_verification_page():
-    name=request.args.get('name','',type=str)
-    mobile=request.args.get('mobile','',type=str)
-    otp=request.args.get('otp','',type=str)
+    name=request.args.get('n','',type=str)
+    mobile=request.args.get('m','',type=str)
+    otp=request.args.get('o','',type=str)
     response=Database.web_verification(mobile,otp)
     return render_template("web-verification.html",name=name,msg=response['msg'])
 
