@@ -207,7 +207,7 @@ def before_request():
 #home_batch -> for batchlist in home page
 @app.route("/")
 def index():
-    if g.user:        
+    if g.user:   
         return render_template("home.html",values=g.User_detail_with_ids,html="dashboard")
     else:
         return render_template("login.html",error=config.displaymsg)
@@ -227,7 +227,7 @@ def EraseDisplayMsg():
 @app.route("/home")
 def home():
     if g.user:
-        return render_template("home.html",values=g.User_detail_with_ids,html="dashboard")
+       return render_template("home.html",values=g.User_detail_with_ids,html="dashboard")
     else:        
         return redirect(url_for('index'))
 
