@@ -343,6 +343,7 @@ function LoadTable(FilterRoleId)
             { "data": "Entity_Name" },
             { "data": "Department_Name" },
             { "data": "Employee_Role_Name" },
+            { "data": "User_Role_Name" },
             { "data": "Region" },
             { 
                 "data": 
