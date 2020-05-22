@@ -1,19 +1,4 @@
 var varTable;
-$(document).ready(function () {
-    $("#tbl_centers").dataTable().fnDestroy();
-    
-    $('.dropdown-search-filter').select2({
-        placeholder:''
-    });
-    role_id=parseInt($('#hdn_home_user_role_id').val());
-    if(role_id == 5)
-        $('#btn_create').hide();
-    LoadCenterType();
-    LoadBuddl();
-	LoadCourseddl();
-	LoadRegionddl();
-    LoadTable(); 
-});
 
 function LoadCenterType()
 {       
@@ -150,7 +135,7 @@ function LoadRegionddl(){
                 var count=data.Regions.length;
                 if( count> 0)
                 {
-                    $('#ddlRegion').append(new Option('ALL','-1'));
+                    //$('#ddlRegion').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
                         $('#ddlRegion').append(new Option(data.Regions[i].Region_Name,data.Regions[i].Region_Id));
                     //$('#ddlCourse').val('-1');
@@ -184,15 +169,15 @@ function LoadClusterddl(){
             "region_id" : $('#ddlRegion').val().toString()//$('#ddlProject option:selected').val()
         },
 		success: function (data){
-            if(data.ClusterOnRegion != null)
+            if(data.States != null)
             {
                 $('#ddlCluster').empty();
-                var count=data.ClusterOnRegion.length;
+                var count=data.States.length;
                 if( count> 0)
                 {
-                    $('#ddlCluster').append(new Option('ALL','-1'));
+                    //$('#ddlCluster').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
-                        $('#ddlCluster').append(new Option(data.ClusterOnRegion[i].Cluster_Name,data.ClusterOnRegion[i].Cluster_Id));
+                        $('#ddlCluster').append(new Option(data.States[i].State_Name,data.States[i].State_Id));
                     //$('#ddlCourse').val('-1');
                 }
                 else
@@ -242,38 +227,54 @@ function LoadTable()
                 $("#tbl_centers tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
             }
 
-        },
+        }, 
 
         "columns": [
             { "data": "S_No"},
-            {"visible": false,
-                "data": function (row, type, val, meta) {
+            {"visible": ($('#hdn_home_user_role_id').val()=='1'||$('#hdn_home_user_role_id').val()=='15')?true:false,
+            
+             "data": function (row, type, val, meta) {
                 var varButtons = ""; 
-                if(role_id != 5)
-                    varButtons += '<a onclick="EditCenterDetail(\'' + row.Center_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Center" class="fas fa-edit" ></i></a><a onclick="AddSubCenterDetail(\'' + row.Center_Id + '\')" class="btn" style="cursor:pointer" ><i title="Add SubCenter" class="fas fa-plus" ></i></a>';
+                varButtons += '<a onclick="EditCenterDetail(\'' + row.Center_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Center" class="fas fa-edit" ></i></a>';
                 return varButtons;
                 }
             },
+            { "data": "Center_Code" },
             { "data": "Center_Name" },
             { "data": "Center_Type_Name"},
-            //{ "data": "Center_Category_Name" },
-            { "data": "Bu_Name"},
-            { "data": function (row, type, val, meta) {
-                var varStatus = ""; 
-                if(row.Is_Active)
-                    varStatus="Active";
-                else
-                    varStatus="In Active";
-                return varStatus;
+            { 
+                "data": 
+                function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Sub_Project_Count==0)
+                        varButtons=row.Sub_Project_Count;
+                    else
+                    {
+                        varButtons += '<a onclick="GetProjectDetails(\'' + row.Center_Id + '\',\'' + row.Center_Name + '\')"  style="color:blue;cursor:pointer" >' + row.Sub_Project_Count + '</a>';
+                    }                    
+                    return varButtons;
                 }
             },
-            { "data": "Region_Name"},
-            { "data": "Cluster_Name"},
-            { "data": "Country_Name"},
-            { "data": "State_Name" },
-            { "data": "District_Name"},
+            { 
+                "data": 
+                function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Course_Count==0)
+                        varButtons=row.Course_Count;
+                    else
+                    {
+                        varButtons += '<a onclick="GetCourseDetails(\'' + row.Center_Id + '\',\'' + row.Center_Name + '\')"  style="color:blue;cursor:pointer" >' + row.Course_Count + '</a>';
+                    }                    
+                    return varButtons;
+                }
+            },
             { "data": "Location" },
-            { "data": "Sub_Center_Names" }
+            { "data": "District_Name"},
+            { "data": "State_Name" },                       
+            { "data": "Region_Name"},
+            { "visible": false,"data": "Country_Name"},
+            {"data":"Is_Active"}
+            //{"data":"Course_Count"}
             
         ],
         "ColumnDefs":[
@@ -336,3 +337,132 @@ function Download()
             }
         });        
     }
+
+function GetProjectDetails(CenterId,CenterName)
+{
+    var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForCenter?center_id="+CenterId;
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            varHtml='';
+            $("#tblSubProject").dataTable().fnDestroy();
+            $("#tblSubProject tbody").empty();
+            if(!jQuery.isEmptyObject(data.SubProjects))
+            {   if (data.SubProjects != null){
+                    count=data.SubProjects.length;
+                    if (count>0)
+                    {   varHtml='';
+                        console.log(count);
+                        for(var i=0;i<count;i++)
+                        {
+                            td_open= '  <td style="text-align:center;">' ;
+                            td_close=   '</td>';       
+                            varHtml+='<tr>';
+                            varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].S_No +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ CenterName +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Sub_Project_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Sub_Project_Name +'</td>';                    
+                            varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Name +'</td>';  
+                            varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Bu +'</td>';         
+                            varHtml+='</tr>';
+                            
+                        }
+                            $("#tblSubProject tbody").append(varHtml);
+                            $("#tblSubProject").DataTable();
+                            $('#divSubProjectList').modal('show');
+                            varHtml='';
+                    }
+                    else
+                    {
+                        varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                        $("#tblSubProject tbody").append(varHtml);
+                        $('#divSubProjectList').modal('show');
+                    } 
+                    
+                }
+            }
+            else
+            {
+                varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                $("#tblSubProject tbody").append(varHtml);
+                $('#divSubProjectList').modal('show');
+            }   
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
+function GetCourseDetails(CenterId,CenterName)
+{
+    $('#HdCourse').text(CenterName);
+    var URL=$('#hdn_web_url').val()+ "/GetCoursesForCenter?center_id="+CenterId;
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            varHtml='';
+            $("#tblCourses").dataTable().fnDestroy();
+            $("#tblCourses tbody").empty();
+            if(!jQuery.isEmptyObject(data))
+            {   if (data.Courses != null){
+                    count=data.Courses.length;
+                    if (count>0)
+                    {   varHtml='';
+                        console.log(count);
+                        for(var i=0;i<count;i++)
+                        {
+                            td_open= '  <td style="text-align:center;">' ;
+                            td_close=   '</td>';       
+                            varHtml+='<tr>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Courses[i].S_No +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Courses[i].Course_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Courses[i].Course_Name +'</td>';                    
+                            varHtml+='  <td style="text-align:center;">'+ data.Courses[i].Qp_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Courses[i].Qp_Name +'</td>';     
+                            varHtml+='</tr>';
+                            
+                        }
+                        $("#tblCourses tbody").append(varHtml);
+                            $("#tblCourses").DataTable();
+                            $('#divCourseList').modal('show');
+                            varHtml='';
+                    }
+                    else
+                    {
+                        varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                        $("#tblCourses tbody").append(varHtml);
+                        $('#divCourseList').modal('show');
+                    } 
+                    
+                }
+            }
+            else
+            {
+                varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                $("#tblCourses tbody").append(varHtml);
+                $('#divCourseList').modal('show');
+            }   
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}

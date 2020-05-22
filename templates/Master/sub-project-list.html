@@ -1,0 +1,488 @@
+<link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+        
+<!-- third party css -->
+<link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
+
+<!-- third party css end -->
+
+
+<script type="text/javascript">
+var CustomerId='0',ProjectId='0';
+$(document).ready(function () {
+$("#tbl_projects").dataTable().fnDestroy();
+$('.dropdown-search-filter').select2({
+       placeholder:''
+   });
+if('{{project_id}}'!='0' & '{{customer_id}}'!='0')
+{
+    ProjectId='{{project_id}}';
+    CustomerId='{{customer_id}}';
+}
+$('#ddlStatus').append(new Option('Yet To Start','1'));
+$('#ddlStatus').append(new Option('Open','2'));
+$('#ddlStatus').append(new Option('Expired','3'));
+console.log('{{project_id}}','{{customer_id}}')
+LoadEntitydl();
+LoadCustomerdl();
+LoadProjectGroupdl();
+LoadBlockdl();
+LoadPracticedl();
+LoadBUdl();
+LoadProductdl();
+if ('{{status}}'==1)
+$('#ddlStatus').val('2');
+role_id=parseInt($('#hdn_home_user_role_id').val());
+if(role_id == 1)
+$('#btn_create').show();
+else 
+$('#btn_create').hide();
+if(role_id == 1)
+$('#btn_create2').show();
+else 
+$('#btn_create2').hide();
+
+LoadTable(); 
+if ('{{project_id}}'>0)
+GetSub_project('{{project_id}}')
+
+
+});
+</script>
+<form id='form1' method="POST" action="/assign_subproject_add_edit_to_home">
+   
+       <input type="hidden" id="hdn_subproject_id" name="hdn_subproject_id" value="0">
+       <input type="hidden" id="hdn_project_code" name="hdn_project_code" value="0">
+       <div class="container-fluid">
+
+           <!-- start page title -->
+           <div class="row">
+               <div class="col-12">
+                   <div class="page-title-box">
+                       <div class="page-title-right">
+                           <ol class="breadcrumb m-0">
+                               <li class="breadcrumb-item"><a href="javascript: void(0);">NEO</a></li>
+                               <li class="breadcrumb-item active">Sub Projects</li>
+                           </ol>
+                       </div>
+                       <h4 class="page-title">Sub Projects</h4>
+                   </div>
+               </div>
+           </div>     
+           <!-- end page title -->
+           
+           <div class="row">
+               <div class="col-12">
+                   <div class="card-box">
+                       <div class="row">
+                           <div class="col-lg-3">
+                               <label for="ddlEntity" class="mr-2">Entity</label>
+                               <select class="form-control dropdown-search-filter" id="ddlEntity" multiple>
+                                   <option selected="" value="">All</option>
+                                   
+                               </select>
+                           </div>
+                           <div class="col-lg-3">
+                               <label for="ddlCustomer" class="mr-2">Customer</label>
+                               <select class="form-control dropdown-search-filter" id="ddlCustomer" onchange="LoadProject();" multiple>
+                                   <option selected="" value="">All</option>
+                                   
+                               </select>
+                           </div>
+                           <div class="col-lg-3">
+                            <label for="ddlProject" class="mr-2">Project</label>
+                            <select class="form-control dropdown-search-filter" id="ddlProject" multiple>
+                                <option selected="" value="">All</option>
+                            </select>
+                        </div>
+                           <div class="col-lg-3">
+                               <label for="ddlP_Group" class="mr-2">Project Group</label>
+                               <select class="form-control dropdown-search-filter" id="ddlP_Group" multiple>
+                                   <option selected="" value="">All</option>
+                                   
+                               </select>
+                           </div>                           
+                       </div>
+                       <div class="row">
+                            <div class="col-lg-3">
+                                <label for="ddlBlock" class="mr-2">Block</label>
+                                <select class="form-control dropdown-search-filter" id="ddlBlock" multiple>
+                                    <option selected="" value="">All</option>
+                                    
+                                </select>
+                            </div>
+                           <div class="col-lg-3">
+                               <label for="ddlPractice" class="mr-2">Practice</label>
+                               <select class="form-control dropdown-search-filter" id="ddlPractice"  multiple>
+                                   <option selected="" value="">All</option>
+                                   
+                               </select>
+                           </div>
+                           <div class="col-lg-3">
+                               <label for="ddlBU" class="mr-2">BU</label>
+                               <select class="form-control dropdown-search-filter" id="ddlBU"  multiple>
+                                   <option selected="" value="">All</option>
+                                   
+                               </select>
+                           </div>
+                           <div class="col-lg-3">
+                               <label for="ddlProduct" class="mr-2">Product</label>
+                               <select class="form-control dropdown-search-filter" id="ddlProduct"  multiple>
+                                   <option selected="" value="">All</option>
+                               </select>
+                           </div>
+                           
+                       </div>
+                       <div class="row">
+                        <div class="col-lg-3">
+                            <label for="ddlStatus" class="mr-2">Status</label>
+                            <select class="form-control dropdown-search-filter" id="ddlStatus" >
+                                <option selected="" value="">All</option>
+                            </select>
+                        </div>
+                           <div class="col-lg-7" >
+                               
+                               <button style="float: right; margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
+                               onclick="LoadTable()">Search</button>
+                               &nbsp
+                               
+                               <!--button style="margin-top: 30px" type="button" class="btn btn-primary waves-effect waves-light submit" 
+                               onclick="Download()">Download</button-->
+                           </div>
+                           <div class="col-lg-2" >                                        
+                               <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-primary">Create Sub Project</a>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+           
+           
+           <div class="row">
+               <div class="col-12">
+                   <div class="card">
+                       <div class="card-body">
+                           <div class="row">
+                               <div class="col-lg-6">
+                                   <h4 class="header-title"></h4>
+                               </div>
+                               <div class="col-lg-6" >                                        
+                                       <button style="float: right; display: none;" type="submit" class="btn btn-primary">Create Project</a>
+                               </div>
+                           </div>
+                           <br/>
+                           <div class="col-lg-12">
+                               <!--  nowrap dataTable no-footer -->
+                               <table id="tbl_projects" class="table w-100  nowrap">
+                                   <thead>
+                                       <tr>
+                                           <th>S.No</th>
+                                           <th>Actions</th>
+                                           <th>Entity Name</th>
+                                           <th>Customer Name</th>
+                                           <th>Project Code</th>
+                                           <th>Project Name</th>
+                                           <th>Sub Project Code</th>
+                                           <th>Sub Project Name</th>
+                                           <th>Center</th>
+                                           <th>Course</th>
+                                           <th>Users</th>
+                                           <th>Group</th>
+                                           <th>Type</th>
+                                           <th>Block</th>
+                                           <th>Practice</th>
+                                           <th>BU</th>
+                                           <th>Product</th>
+                                           <th>Project Manager</th>
+                                           <th>Status</th>
+                                       </tr>
+                                   </thead>
+                               
+                               <tbody></tbody>
+                               </table>
+                           </div>
+                       </div> <!-- end card body-->
+                   </div> <!-- end card -->
+               </div><!-- end col-->
+           </div>
+           <!-- end row-->    
+       </div> <!-- end container -->
+   
+   <!-- end wrapper -->
+</form>
+<script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
+<!-- third party js ends -->
+
+<!-- datatables init js-->
+<script src="static/assets/js/pages/sub-project-list.js"></script>
+
+<div id="tr_sess_act" class="modal fade" role="dialog">
+   <div class="modal-dialog modal-xl">
+       <div class="modal-content ">
+           <div class="modal-header">
+               <h4 class="modal-title">Contracts</h4>
+               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+           </div>
+           <div class="row">
+               <div class="col-12">
+                   <div class="card">
+                       <div class="card-body"> 
+                           <div class="col-md-12">                                
+                               <div class="col-md-4 form-group">
+                                   <h5>Customer Name</h5>                                           
+                               </div>
+                               <div class="col-md-4" style="margin-top: -38px; margin-left: 13%;">
+                                   <div class="form-group" style="margin-bottom: 20px;">        
+                                       <input type="text" class="form-control" id="txtcustomer_name"  disabled/>                               
+                                   </div>
+                               </div>
+                               <div class="col-md-2 form-group" style="margin-top: -45px; margin-left: 50%;">
+                                   <h5>Funding Source</h5>                                           
+                               </div>
+                               <div class="col-md-4" style="margin-top: -42px; margin-left: 63%;">
+                                   <div class="form-group" style="margin-bottom: 20px;">        
+                                       <input type="text" class="form-control" id="txtfundingsource"  disabled/>                               
+                                   </div>
+                               </div>
+                           </div>
+                       
+                           <div class="col-md-12">                                
+                               <div class="col-md-4 form-group">
+                                   <h5>Customer Group</h5>                                           
+                               </div>
+                               <div class="col-md-4" style="margin-top: -38px; margin-left: 13%;">
+                                   <div class="form-group" style="margin-bottom: 20px;">        
+                                       <input type="text" class="form-control" id="txtcustomer_group"  disabled/>                               
+                                   </div>
+                               </div>
+                               <div class="col-md-2 form-group" style="margin-top: -45px; margin-left: 50%;">
+                                   <h5>Industry Type</h5>                                           
+                               </div>
+                               <div class="col-md-4" style="margin-top: -42px; margin-left: 63%;">
+                                   <div class="form-group" style="margin-bottom: 20px;">        
+                                       <input type="text" class="form-control" id="txtindustrytype"  disabled/>                                
+                                   </div>
+                               </div>
+                           </div>
+
+                       </div> <!--end card-body-->
+                   </div> <!-- end card-->
+               </div>
+           </div>
+
+           <div class="modal-body">
+               <table id="tblTrAct" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                   <thead>
+                       <tr style="background-color: #f5f6f8;">
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S No</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Contract Name</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Contract Code</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Start Date</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">End Date</th>
+                       </tr>
+                   </thead>
+                   <tbody>
+
+                   </tbody>
+               </table>	
+           </div>
+           <div class="modal-footer">
+               <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+               <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+           </div>
+       </div>
+   </div>
+</div><!--/.modal-->
+
+<div id="divCourseList" class="modal fade" role="dialog">
+   <div class="modal-dialog modal-xl">
+       <div class="modal-content ">
+           <div class="modal-header">
+               <h4 class="modal-title" id="HdCourse"></h4>
+               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+           </div>
+           <div class="modal-body">
+               <table id="tbl_proj_Courses" class="table table-bordered dt-responsive wrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                   <thead>                        
+                       <tr style="background-color: #f5f6f8;">
+                           <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                           <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Code</th>
+                           <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Name</th>
+                           <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">QP Code</th>
+                           <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">QP Name</th>
+                       </tr>
+                   </thead>
+                   <tbody>
+
+                   </tbody>
+               </table>	
+           </div>
+           <div class="modal-footer">
+               <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+           </div>
+       </div>
+   </div>
+</div><!--/.modal--> 
+
+<div id="divUsersList" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title" id="HdUsers"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <table id="tbl_proj_Users" class="table table-bordered dt-responsive wrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                    <thead>                        
+                        <tr style="background-color: #f5f6f8;">
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Actions</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">PMT</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">COO</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Manager</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Cluster Manager</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Mobilizer</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Trainer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+ 
+                    </tbody>
+                </table>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="refresh()">Close</button>
+            </div>
+        </div>
+    </div>
+ </div>
+ <div id="divUsersListForUntag" class="modal fade" role="dialog">
+    <input type="hidden" id="hdn_sub_project_id" name="hdn_sub_project_id" value="0">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title" id="HdUsers"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <table id="tbl_Users" class="table table-bordered dt-responsive wrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                    <thead>                        
+                        <tr style="background-color: #f5f6f8;">
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;"></th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Name</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Email</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Role</th>
+                              </tr>
+                    </thead>
+                    <tbody>
+ 
+                    </tbody>
+                </table>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" onclick="UntagUsers()">Untag</button>
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+ </div>
+ <div id="divUsersTag" class="modal fade" role="dialog">
+    <input type="hidden" id="hdn_sub_project_id" name="hdn_sub_project_id" value="0">
+    <input type="hidden" id="hdn_sub_project_name" name="hdn_sub_project_name" value="0">
+    <input type="hidden" id="hdn_user_id" name="hdn_user_id" value="0">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title" id="HdProject"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12">
+                    <div class="card-box">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <label for="ddlUserRole">User Role*:</label>
+                                </div>
+                                <div class="col-lg-8" >
+                                    <select id="ddlUserRole" class="form-control dropdown-search-filter"  onchange="LoadUsers()" name="ddlUserRole" ClientIdMode="static" required=""> <!-- myfunction(this.value) -->>
+                                       
+                                    </select>
+                                </div> 
+                            </div>
+                        </div>
+                        <div class="form-group" id ="trainer_type" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <label for="ddlTrainerType">Trainer Type*:</label>
+                                </div>
+                                <div class="col-lg-8" >
+                                    <select id="ddlTrainerType" class="form-control dropdown-search-filter"  onchange="LoadTrainers()" name="ddlTrainerType" ClientIdMode="static" required=""> <!-- myfunction(this.value) -->>
+                                       
+                                    </select>
+                                </div> 
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <label for="ddlUsers">Users*:</label>
+                                </div>
+                                <div class="col-lg-8" >
+                                    <select id="ddlUsers" class="form-control dropdown-search-filter"  onchange="LoadCourseList()" name="ddlUser" ClientIdMode="static" required=""> <!-- myfunction(this.value) -->>
+                                    
+                                    </select>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" onclick="TagUsers()">Tag</button>
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+ </div>
+<div id="mdl_Centes" class="modal fade" role="dialog">
+   <div class="modal-dialog modal-xl">
+       <div class="modal-content ">
+           <div class="modal-header">
+               <h4 class="modal-title" ><span id="headerCenter"></span></h4>
+               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+           </div>                    
+           <div class="modal-body">
+               <table id="tbl_proj_centers" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                   <thead>
+                       <tr style="background-color: #f5f6f8;">
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Code</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Name</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Type</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">State</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Region</th>
+                       </tr>
+                   </thead>
+                   <tbody>
+
+                   </tbody>
+               </table>	
+           </div>
+           <div class="modal-footer">
+               <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"onclick="OpenCourseVariantModal()"> Back</button>
+               <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+           </div>
+       </div>
+   </div>
+
+</div><!--/.modal-->

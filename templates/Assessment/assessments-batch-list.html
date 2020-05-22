@@ -1,0 +1,450 @@
+        <!-- Plugins css -->
+        <link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+        
+         <!-- third party css -->
+         <link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
+         <!-- third party css end -->
+
+         <!-- App css -->
+        <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+         <!-- third party js -->
+         <script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+         <script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+         <script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+         <script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+         <script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+         <script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+         <script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+         <script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+         <script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+         <script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+         <script src="static/assets/libs/datatables/dataTables.select.min.js"></script>        
+         <!-- third party js ends -->
+         <script src="static/assets/js/pages/assessments-batch-list.js"></script>
+
+        <style>
+            .center {
+                margin: auto;
+                width: 90%;
+                padding: 20px;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            }
+            
+            .hidedialog {
+                display: none;
+            }
+            .user-btn{    
+                    /* display:inline-block; */
+                    font-weight:400;
+                    color:#6c757d;
+                    text-align:center;
+                    vertical-align:middle;
+                    -webkit-user-select:none;
+                    -moz-user-select:none;
+                    -ms-user-select:none;
+                    user-select:none;
+                    background-color:transparent;
+                    border:1px solid transparent;
+                    padding:.45rem .9rem;
+                    font-size:.875rem;
+                    line-height:1.5;
+                    border-radius:.15rem;
+                    -webkit-transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
+                    transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out,-webkit-box-shadow .15s ease-in-out
+                }
+        </style>
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+            var Course=0,Batch=0;
+            $("#tbl_batchs").dataTable().fnDestroy();
+            $(".date-picker").flatpickr({
+                dateFormat : "d-M-yy"
+            });
+            $('.dropdown-search-filter').select2({
+                placeholder:''
+            });
+            LoadCenterType();
+            LoadRegionddl();
+            loadClient();
+            //LoadTable(); 
+            role_id=parseInt($('#hdn_home_user_role_id').val());
+            if(role_id == 1 || role_id ==5 || role_id ==15 || role_id  ==27)
+                $('#btn_create').show();
+            else 
+                $('#btn_create').hide();
+            if(role_id==25)
+            {
+                $('#get0').hide();
+                LoadTable();
+            }
+            else
+            {
+                $('#get0').show();
+            }
+            });
+        </script>
+        <!-- ============================================================== -->
+        <!-- Start Page Content here -->
+        <!-- ============================================================== -->
+        <form id='form1' method="POST" action="/assign_batch_add_edit_to_home">
+            
+                <input type="hidden" id="hdn_batch_id" name="hdn_batch_id" value="0">
+                <div class="container-fluid">
+    
+                    <!-- start page title -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="page-title-box">
+                                <div class="page-title-right">
+                                    <ol class="breadcrumb m-0">
+                                        <li class="breadcrumb-item"><a href="javascript: void(0);">NEO</a></li>
+                                        <li class="breadcrumb-item active">Assessments</li>
+                                    </ol>
+                                </div>
+                                <h4 class="page-title">Assessments</h4>
+                            </div>
+                        </div>
+                    </div>     
+                    <!-- end page title -->
+                    
+                    <div id="get0" class="row">  <!--  id="get0"  -->
+                        <div class="col-12">
+                            <div class="card-box">
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label for="ddlClient" class="mr-2">Customer</label>
+                                        <select class="form-control dropdown-search-filter" onchange="LoadProject();" id="ddlClient" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddlProject" class="mr-2">Project</label>
+                                        <select class="form-control dropdown-search-filter" onchange="LoadSubProject();" id="ddlProject" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddlSubProject" class="mr-2">Sub Project</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlSubProject" multiple>  <!-- onchange="LoadCenter();"-->>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddlRegion" class="mr-2">Region</label>
+                                        <select class="form-control dropdown-search-filter" onchange="LoadCenter();" id="ddlRegion" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+								</div>
+								<div class="row">
+                                    <div class="col-lg-3">
+                                        <label for="ddlCenter" class="mr-2">Center</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlCenter" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddlCenterType" class="mr-2">Center Type</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlCenterType" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+										<label for="ddlCourse" class="mr-2">Course</label>
+										<select class="form-control dropdown-search-filter" id="ddlCourse" multiple>
+											<option selected="" value="">All</option>
+										</select>
+                                    </div>
+                                    <div class="col-lg-1" style="float: center; margin-top: 30px">
+                                        <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTable()">Search</button>
+                                    </div>
+                                </div>    
+                                 <!-- end row -->
+                            </div> <!-- end card-box -->
+                        </div><!-- end col-->
+                    </div>
+
+                    <div id="divBcthList" class="row" style="display: none;"> <!-- id="get"  -->
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <h4 class="header-title">Batch List</h4>
+                                        </div>
+                                        <div class="col-lg-6" style="display:none">                                        
+                                                <button style="float: right" type="submit" id="btn_create" class="btn btn-primary">Create Batch</a>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <div class="col-lg-12">
+                                        <table id="tbl_batchs" class="table w-100 nowrap dataTable no-footer">
+                                            <thead>
+                                                <tr>
+                                                    <th>S No</th>
+                                                    <th>Actions</th>
+                                                    <th>Batch Name</th>
+                                                    <th>Batch Code</th>
+                                                    <th>Product</th>
+                                                    <th>Center</th>
+                                                    <th>Course</th>
+                                                    <th>Sub Project</th>
+                                                    <th>Trainer Email</th>
+                                                    <th>Center Manager Email</th>
+                                                    <th>Start Date</th>
+                                                    <th>End Date</th>
+                                                    <th>Start Time</th>
+                                                    <th>End Time</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                        
+                                        <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div> <!-- end card body-->
+                            </div> <!-- end card -->
+                        </div><!-- end col-->
+                    </div>
+                    <!-- end row-->    
+                </div> <!-- end container -->
+            
+            <!-- end wrapper -->
+        </form>
+        <!-- ============================================================== -->
+        <!-- End Page content -->
+        <!-- ============================================================== -->
+        
+    <div id="map_cand" class="center hidedialog col-lg-12">
+        <button id="close" class="btn btn-primary " style="float: right;"onclick="javascript:$('#get').show(); $('.center').hide();">X</button>
+        <table id="tbl_candidate"  class="table dt-responsive nowrap">
+            <thead>
+                <tr>
+                    <th>S No</th>
+                    <th>ADD</th>
+                    <th>Candidate Id</th>
+                    <th>Candidate Name</th>
+                    <th>Course Name</th>
+                    <th>Center Name</th>
+                    <th>Mobile Number</th>
+                    <th>Registration Id</th>
+                    <th>Enrollment Id</th>
+                    <th>Salutation</th>
+                </tr>
+            </thead>
+        
+        <tbody></tbody>
+        </table>
+
+        <table id="tbl_drop_candidate"  class="table dt-responsive nowrap">
+            <thead>
+                <tr>
+                    <th>S No</th>
+                    <th>DROP</th>
+                    <th>Candidate Id</th>
+                    <th>Candidate Name</th>
+                    <th>Course Name</th>
+                    <th>Center Name</th>
+                    <th>Mobile Number</th>
+                    <th>Registration Id</th>
+                    <th>Enrollment Id</th>
+                    <th>Salutation</th>
+                </tr>
+            </thead>
+        
+        <tbody></tbody>
+        </table>
+
+        <div class="form-group mb-0">
+            <button class="btn btn-primary" onclick="javascript:save();">Save</button>
+        </div>
+        
+    </div>
+
+    <div id="mdl_batch_assessments" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content ">
+                <div class="modal-header">
+                    <h4 class="modal-title" ><span id="hdBatchName">Assessments</span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>                    
+                <div class="modal-body">
+                    <table id="tbl_batch_assessment" class="table table-bordered dt-responsive wrap w-100" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                        <thead>
+                            <tr style="background-color: #f5f6f8;">
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Actions</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch Code</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Request Date</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Requested On</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Scheduled Date</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Date</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Type</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Agency</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Partner</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Stage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+    
+                        </tbody>
+                    </table>	
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Close</button>
+                </div>
+            </div>
+        </div>
+    </div><!--/.modal-->
+
+    <div id="mdl_create_batch_assessments" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content ">
+                <form id="frScheduleAssessment" data-parsley-validate="" action="javascript:ScheduleAssessment()">
+                <div class="modal-header">
+                    <h4 class="modal-title" ><span id="hdBatchName">Schedule Assessment</span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>                    
+                <div class="modal-body">  
+                    <input type="hidden" id="hdn_batch_assessment_id" name="hdn_batch_assessment_id" value="0"> 
+                    <input type="hidden" id="hdn_assessment_id" name="hdn_assessment_id" value="0"> 
+                    <input type="hidden" id="hdn_current_stage_id" name="hdn_current_stage_id" value="0">                  
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label for="ddlAssessmentType">Assessment Type* :</label>
+                            </div>
+                            <div class="col-lg-4">
+                                <select id="ddlAssessmentType" class="form-control " name="ddlAssessmentType" required="">
+                                </select>
+                            </div>
+                            <div class="col-lg-4"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label for="ddlAssessmentAgency">Assessment Agency* :</label>
+                            </div>
+                            <div class="col-lg-4">
+                                <select id="ddlAssessmentAgency" class="form-control " name="ddlAssessmentAgency" onchange="AgencyOnChange(this.value)" ClientIdMode="static" required="">
+                                </select>
+                            </div>
+                            <div class="col-lg-4"></div>
+                        </div>
+                    </div> 
+                    <div class="form-group" id="DivPartner" style="display:none">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label for="ddlPartner">partner * :</label>
+                            </div>
+                            <div class="col-lg-4">
+                                <select id="ddlPartner" class="form-control " name="ddlPartner" ClientIdMode="static" >
+                                </select>
+                            </div>
+                            <div class="col-lg-4"></div>
+                        </div>
+                    </div> 
+                    <div class="form-group" id="DivRequestDate">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label for="TxtRequestedDate">Requested Date*:</label>
+                            </div>
+                            <div class="col-lg-4">
+                                <input type="text" id="TxtRequestedDate" name="TxtRequestedDate" class="form-control date-picker" required placeholder="Requested Date">
+                            </div>
+                            <div class="col-lg-4"></div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="DivScheduleDate">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label for="TxtScheduledDate">Scheduled Date:</label>
+                            </div>
+                            <div class="col-lg-4">
+                                <input type="text" id="TxtScheduledDate" name="TxtScheduledDate" class="form-control date-picker" ClientIdMode="static" placeholder="Scheduled Date" >
+                            </div>
+                            <div class="col-lg-4"></div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="DivAssessmentDate">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label for="TxtAssessmnetDate">Assessment Date:</label>
+                            </div>
+                            <div class="col-lg-4">
+                                <input type="text" id="TxtAssessmnetDate" name="TxtAssessmnetDate" class="form-control date-picker" ClientIdMode="static" placeholder="Actual Assessment Date" >
+                            </div>
+                            <div class="col-lg-4"></div>
+                        </div>
+                    </div>                   
+                </div>
+                <div class="modal-footer">   
+                    <button class="btn btn-success" type="submit"> Submit </button>                
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="OpenAssessmentList()">Back</button>                    
+                </div>
+                </form>
+            </div>
+        </div>
+    </div><!--/.modal-->
+
+    <div id="mdl_candidate_result_upload" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content ">
+                <form id="formUpload" action="javascript:UploadFileData()">
+                    <input type="hidden" id="hdn_home_user_id_modal" name="hdn_home_user_id_modal" value="0">
+                    <input type="hidden" id="hdn_home_user_role_id_modal" name="hdn_home_user_role_id_modal" value="0">
+                    <input type="hidden" id="hdn_upl_assessment_id" name="hdn_assessment_id" value="0">
+                    <input type="hidden" id="hdn_upl_batch_id" name="hdn_batch_id" value="0">
+                    <input type="hidden" id="hdn_upl_stage_id" name="hdn_stage_id" value="0">
+                <div class="modal-header">
+                    <h4 class="modal-title"><span id="HduploadFile"></span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label for="TxtReqDate">Requested Date :</label>
+                                <input type="text" id="TxtReqDate" name="TxtReqDate" class="form-control" readonly ClientIdMode="static">
+                            </div>
+                            <div class="col-lg-4">
+                                <label for="TxtSchDate">Scheduled Date :</label>
+                                <input type="text" id="TxtSchDate" name="TxtSchDate" class="form-control" readonly ClientIdMode="static">
+                            </div>
+                            <div class="col-lg-4">
+                                <label for="TxtAssessDate">Assessment Date :</label>
+                                <input type="text" id="TxtAssessDate" name="TxtAssessDate" class="form-control" readonly ClientIdMode="static">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label for="myFile">Upload File* :</label>
+                            </div>
+                            <div class="col-lg-4">
+                                <input type="file" id="myFile" name="filename">
+                            </div>
+                            <div class="col-lg-4">
+                                <button class="btn btn-blue btn-sm waves-effect waves-light" type="button" onclick="DownloadResultTemplate($('#hdn_upl_assessment_id').val(),$('#hdn_upl_batch_id').val(),$('#hdn_upl_stage_id').val())">Download Template</button>
+                            </div>
+                        </div>
+                    </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary waves-effect" type="submit" >Submit</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="OpenAssessmentList()">Back</button>
+                </div>
+                <div id="imgSpinner1">
+                    <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                    <label style="display:inline-block;">Please wait while uploading candidate...</label>
+                </div> 
+            </form>
+            </div>
+        </div>
+    </div><!--/.modal-->

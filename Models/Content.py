@@ -1,7 +1,7 @@
 from Database import Database
 class Content:
-    def course_list(course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        course_l = Database.course_list(course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def course_list(user_id,user_role_id,course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status):
+        course_l = Database.course_list(user_id,user_role_id,course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status)
         return course_l
     def AllPractice():
         practice_list={"Pratices":Database.GetPractice()}
@@ -30,15 +30,15 @@ class Content:
         else:
             popupMessage = {"PopupMessage": Database.add_course_details(course_name,project_id,user_id,is_active,center_ids,qp_id,course_id,items,course_code)}
             return popupMessage
-    def get_course(glob_course_id):
-        indi_course={"CourseDetail":Database.get_course_details(glob_course_id)}
+    def get_course(course_id):
+        indi_course=Database.get_course_details(course_id)
         return indi_course
     def get_qp_for_course():
         qp_t={"Qp":Database.get_qp_course()}
         return qp_t
 
-    def qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors):
-        qp_l=Database.qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors)
+    def qp_list(user_id,user_role_id,qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors):
+        qp_l=Database.qp_list(user_id,user_role_id,qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors)
         return qp_l
     def add_qp(qp_name,qp_code,user_id,is_active,qp_id):
         popupMessage = {"PopupMessage": Database.add_qp_details(qp_name,qp_code,user_id,is_active,qp_id)}    

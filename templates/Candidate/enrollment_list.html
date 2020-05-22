@@ -1,0 +1,563 @@
+        <!-- Plugins css -->
+        <link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+        
+         <!-- third party css -->
+         <link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
+         <!-- third party css end -->
+
+         <!-- App css -->
+        <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+         <!-- third party js -->
+         <script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+         <script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+         <script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+         <script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+         <script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+         <script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+         <script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+         <script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+         <script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+         <script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+         <script src="static/assets/libs/datatables/dataTables.select.min.js"></script>        
+         <!-- third party js ends -->
+         <script src="static/assets/js/pages/enrollment_list.js"></script>
+
+        <style>
+            .center {
+                margin: auto;
+                width: 90%;
+                padding: 20px;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            }
+            
+            .hidedialog {
+                display: none;
+            }
+        </style>
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $("#imgSpinner").hide();
+                $("#imgSpinner1").hide();
+                
+            var Course=0,Batch=0;
+            $("#tbl_batchs").dataTable().fnDestroy();
+            $(".date-picker").flatpickr({
+                dateFormat : "d-M-yy"
+            });
+            $('.dropdown-search-filter').select2({
+                placeholder:''
+            });
+            LoadRegionddl();
+            Loadcreatedbyddl();
+            if($('#hdn_home_user_role_id').val()=='1')
+                $('#btnUpload').show();
+            else
+                $('#btnUpload').hide();
+            //LoadTable(); 
+            // role_id=parseInt($('#hdn_home_user_role_id').val());
+            // if(role_id == 1 || role_id ==5 || role_id ==15)
+            //     $('#btn_create').show();
+            // else 
+            //     $('#btn_create').hide();
+            // if(role_id == 7 || role_id==5 || role_id == 4)
+            // 	$('#btn_create').hide();
+            });
+        </script>
+        <!-- ============================================================== -->
+        <!-- Start Page Content here -->
+        <!-- ============================================================== -->
+        <form id='form1' method="POST" action="/assign_batch_add_edit_to_home">
+            
+                <input type="hidden" id="hdn_batch_id" name="hdn_batch_id" value="0">
+                <div class="container-fluid">
+    
+                    <!-- start page title -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="page-title-box">
+                                <div class="page-title-right">
+                                    <ol class="breadcrumb m-0">
+                                        <li class="breadcrumb-item"><a href="javascript: void(0);">NEO</a></li>
+                                        <li class="breadcrumb-item active">Enrollment</li>
+                                    </ol>
+                                </div>
+                                <h4 class="page-title">Enrollment</h4>
+                            </div>
+                        </div>
+                    </div>     
+                    <!-- end page title -->
+                    
+                    <div id="get0" class="row">  <!--  id="get0"  -->
+                        <div class="col-12">
+                            <div class="card-box">
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label for="ddlRegion" class="mr-2">Region</label>
+                                        <select class="form-control dropdown-search-filter" onchange="LoadState();" id="ddlRegion" multiple placeholder="Select Region">
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddlState" class="mr-2">State</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlState" multiple placeholder="Select Region First">
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label for="Pincode">Pincode</label>
+                                        <input type="number" class="form-control" name="Pincode" id="Pincode"  min='100000' max="999999" placeholder="Pincode"> <!--required-- step="1"  --> 
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddlcreated_by" class="mr-2">Created By</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlcreated_by" multiple placeholder="Select created by">
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                </div>
+								<div class="row">
+                                    <div class="col-lg-3">
+                                        <label for="FromDate" class="mr-2">From Date</label>
+                                        <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
+                                        ClientIdMode="static" placeholder="From Date">
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label for="ToDate" class="mr-2">To Date</label>
+                                        <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
+                                        ClientIdMode="static" placeholder="To Date">
+                                    </div>
+                                    <div class="col-lg-1" style="float: center; margin-top: 30px">
+                                        <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+                                    </div>
+                                    <div class="form-group col-lg-2">                                         
+                                        <a class="btn btn-success waves-effect waves-light" style="float: right; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadEnrTemplate()">Download Template</a>
+                                        <a id="lnkDownload" style="display:none;"></a>
+                                    </div>
+                                    <div class="form-group col-lg-1">   
+                                        <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Uploadfile()" id="btnUpload">Upload</button>
+<!--                                     <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+                                        <label for="MaxAge">Max Age</label>
+                                        
+                                        <input type="file" step="1.0" class="form-control" name="MaxAge" id="MaxAge" placeholder="Max Age"> <!--required-->                                   
+                                        <!-- <a class="btn btn-primary" style="float: right; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadMobTemplate()">Download Template</a> -->
+                                        <!-- <a id="lnkDownload" style="display:none;"></a> -->
+                                    </div>
+
+                                    <div class="form-group col-lg-3">
+                                            <div id="imgSpinner">
+                                                <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-block;"/>
+                                                <label style="display:inline-block;">Please wait while downloading Template...</label>
+                                            </div> 
+                                    </div>
+                                </div>    
+                                 <!-- end row -->
+                            </div> <!-- end card-box -->
+                        </div><!-- end col-->
+                    </div>
+                    <div id="divCandidateList" class="row" style="display: none;">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <h4 class="header-title">Candidate List</h4>
+                                        </div>
+                                        <!-- <div class="col-lg-6" >                                        
+                                                <button style="float: right" type="submit" id="btn_create" class="btn btn-primary">Create Candidate</a>
+                                        </div> -->
+                                    </div>
+                                    <br/>
+                                    <div class="col-lg-12">
+                                        <table id="tbl_candidate" class="table w-100 nowrap dataTable no-footer" >
+                                            <thead>
+                                                <tr>
+                                                    <th>S No</th>
+                                                    <th>check</th>
+                                                    <th>Candidate Id</th>
+                                                    <th>Candidate Name</th>
+                                                    <th>Source</th>
+                                                    <th>Contact</th>
+                                                </tr>
+                                            </thead>
+                                        
+                                        <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div> <!-- end card body-->
+                            </div> <!-- end card -->
+                        </div><!-- end col-->
+                    </div><!-- end row-->
+                </div> <!-- end container -->
+        
+        </form>
+        <!-- ============================================================== -->
+        <!-- End Page content -->
+        <!-- ============================================================== -->
+
+        <div id="mdl_cand_basic" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Candidate Basic Details</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body"> 
+                                        <div class="col-md-12">   
+                                            <div class="row">                             
+                                                <div class="col-md-2">
+                                                    <h5>Salutation:</h5>                                           
+                                                </div>
+                                                <div class="col-md-2" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtSalutation"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 ">
+                                                    <h5>First Name:</h5>                                           
+                                                </div>
+                                                <div class="col-md-2" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtFirstName"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 ">
+                                                    <h5>Middle Name:</h5>                                           
+                                                </div>
+                                                <div class="col-md-2" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtMiddleName"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">                             
+                                                <div class="col-md-2">
+                                                    <h5>Last Name:</h5>                                           
+                                                </div>
+                                                <div class="col-md-2" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtLastName"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 ">
+                                                    <h5>Date Of Birth:</h5>                                           
+                                                </div>
+                                                <div class="col-md-2" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtDob"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 ">
+                                                    <h5>Age:</h5>                                           
+                                                </div>
+                                                <div class="col-md-2" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtAge"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">                             
+                                                <div class="col-md-2">
+                                                    <h5>Gender:</h5>                                           
+                                                </div>
+                                                <div class="col-md-2" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtgender"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 ">
+                                                    <h5>Marital Status:</h5>                                           
+                                                </div>
+                                                <div class="col-md-2" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtMaritalStatus"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 ">
+                                                    <h5>Caste:</h5>                                           
+                                                </div>
+                                                <div class="col-md-2" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtCaste"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">                             
+                                                <div class="col-md-2">
+                                                    <h5>Disability:</h5>                                           
+                                                </div>
+                                                <div class="col-md-2" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtDisability"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 ">
+                                                    <h5>Religion:</h5>                                           
+                                                </div>
+                                                <div class="col-md-2" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtReligion"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                        
+                                    </div> <!--end card-body-->
+                                </div> <!-- end card-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->
+        
+        
+        <div id="mdl_cand_contact" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Candidate Contact Details</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body"> 
+                                        <div class="col-md-12">   
+                                            <div class="row">                             
+                                                <div class="col-md-3">
+                                                    <h5>Primary Contact Number:</h5>                                           
+                                                </div>
+                                                <div class="col-md-3" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtPrCont"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 ">
+                                                    <h5>Secondary Contact Number:</h5>                                           
+                                                </div>
+                                                <div class="col-md-3" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtSecondary"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <h5>Email:</h5>                                           
+                                                </div>
+                                                <div class="col-md-3" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtEmail"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <h4>Present Address</h4>  
+                                            </div>
+                                            <div class="row">                             
+                                                <div class="col-md-3">
+                                                    <h5>Address Line1:</h5>                                           
+                                                </div>
+                                                <div class="col-md-3" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtPrAdd1"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <h5>Address Line2:</h5>                                           
+                                                </div>
+                                                <div class="col-md-3" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtPrAdd2"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <h5>Village:</h5>                                           
+                                                </div>
+                                                <div class="col-md-3" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtPrVillage"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <h5>Panchayat:</h5>                                           
+                                                </div>
+                                                <div class="col-md-3" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtPrPanchayat"  disabled/>                               
+                                                    </div>
+                                                </div>
+        
+                                                <div class="col-md-3">
+                                                    <h5>Taluk/Block:</h5>                                           
+                                                </div>
+                                                <div class="col-md-3" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtPrBloack"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <h5>District:</h5>                                           
+                                                </div>
+                                                <div class="col-md-3" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtPrDistrict"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <h5>State:</h5>                                           
+                                                </div>
+                                                <div class="col-md-3" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtPrState"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <h5>Pin Code:</h5>                                           
+                                                </div>
+                                                <div class="col-md-3" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtPrPin"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <h5>Country:</h5>                                           
+                                                </div>
+                                                <div class="col-md-3" >
+                                                    <div class="form-group" >       
+                                                        <input type="text" class="form-control" id="txtPrCon"  disabled/>                               
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </br>
+                                        <div class="row">
+                                            <h4>Permanent Address</h4>  
+                                        </div>
+                                        <div class="row">                             
+                                            <div class="col-md-3">
+                                                <h5>Address Line1:</h5>                                           
+                                            </div>
+                                            <div class="col-md-3" >
+                                                <div class="form-group" >       
+                                                    <input type="text" class="form-control" id="txtPerAdd1"  disabled/>                               
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h5>Address Line2:</h5>                                           
+                                            </div>
+                                            <div class="col-md-3" >
+                                                <div class="form-group" >       
+                                                    <input type="text" class="form-control" id="txtPerAdd2"  disabled/>                               
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h5>Village:</h5>                                           
+                                            </div>
+                                            <div class="col-md-3" >
+                                                <div class="form-group" >       
+                                                    <input type="text" class="form-control" id="txtPerVillage"  disabled/>                               
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h5>Panchayat:</h5>                                           
+                                            </div>
+                                            <div class="col-md-3" >
+                                                <div class="form-group" >       
+                                                    <input type="text" class="form-control" id="txtPerPanchayat"  disabled/>                               
+                                                </div>
+                                            </div>
+        
+                                            <div class="col-md-3">
+                                                <h5>Taluk/Block:</h5>                                           
+                                            </div>
+                                            <div class="col-md-3" >
+                                                <div class="form-group" >       
+                                                    <input type="text" class="form-control" id="txtPerBloack"  disabled/>                               
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h5>District:</h5>                                           
+                                            </div>
+                                            <div class="col-md-3" >
+                                                <div class="form-group" >       
+                                                    <input type="text" class="form-control" id="txtPerDistrict"  disabled/>                               
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h5>State:</h5>                                           
+                                            </div>
+                                            <div class="col-md-3" >
+                                                <div class="form-group" >       
+                                                    <input type="text" class="form-control" id="txtPerState"  disabled/>                               
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h5>Pin Code:</h5>                                           
+                                            </div>
+                                            <div class="col-md-3" >
+                                                <div class="form-group" >       
+                                                    <input type="text" class="form-control" id="txtPerPin"  disabled/>                               
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h5>Country:</h5>                                           
+                                            </div>
+                                            <div class="col-md-3" >
+                                                <div class="form-group" >       
+                                                    <input type="text" class="form-control" id="txtPerCon"  disabled/>                               
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </div>
+                                        
+                                    </div> <!--end card-body-->
+                                </div> <!-- end card-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->
+
+        <div id="mdl_bulkupload_candidate" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content ">
+                    <form id="formUpload" action="javascript:UploadFileData()">
+                        <input type="hidden" id="hdn_home_user_id_modal" name="hdn_home_user_id_modal" value="0">
+                        <input type="hidden" id="hdn_home_user_role_id_modal" name="hdn_home_user_role_id_modal" value="0">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Candidate Bulk Upload</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="file" id="myFile" name="filename" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary waves-effect" type="submit" >Submit</button>
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                    </div>
+                    <div id="imgSpinner1">
+                        <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-block;"/>
+                        <label style="display:inline-block;">Please wait while uploading candidate...</label>
+                    </div> 
+                </form>
+                </div>
+            </div>
+        </div><!--/.modal-->
+        

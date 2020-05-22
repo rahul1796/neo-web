@@ -5,13 +5,43 @@
          <!-- third party css end -->
 
         <!-- App css -->
-        <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />        
+        <!-- <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />        
         <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-        <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" /> -->
 
         <link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
         <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
         
+        <script type="text/javascript">
+        $(document).ready(function () {
+            $("#tbl_centers").dataTable().fnDestroy();
+            
+            $('.dropdown-search-filter').select2({
+                placeholder:''
+            });
+            role_id=parseInt($('#hdn_home_user_role_id').val());
+            if(role_id == 1 || role_id==15)
+                $('#btn_create').hide();
+            $('#ddlStatus').empty();
+            $('#ddlStatus').append(new Option('All','-1'));
+            $('#ddlStatus').append(new Option('Active','1'));
+            $('#ddlStatus').append(new Option('Inactive','0'));
+            LoadCenterType();
+            LoadBuddl();
+            LoadCourseddl();
+            LoadRegionddl();
+            if ('{{status}}'==1)
+                    $('#ddlStatus').val("1");
+                    
+                else if ('{{status}}'==2)
+                    {
+                    $('#ddlStatus').val("1");
+                    $('#ddlCenterType').val('4');
+                    }
+            LoadTable(); 
+        });
+        </script>
+
         <form id='form1' method="POST" action="/assign_center_add_edit_to_home">
             
                 <input type="hidden" id="hdn_center_id" name="hdn_center_id" value="0">
@@ -23,7 +53,7 @@
                             <div class="page-title-box">
                                 <div class="page-title-right">
                                     <ol class="breadcrumb m-0">
-                                        <li class="breadcrumb-item"><a href="javascript: void(0);">LN</a></li>
+                                        <li class="breadcrumb-item"><a href="javascript: void(0);">NEO</a></li>
                                         <li class="breadcrumb-item active">Center</li>
                                     </ol>
                                 </div>
@@ -42,7 +72,7 @@
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-3" style="display: none;">
                                         <label for="ddlBu" class="mr-2">Business Unit</label>
                                         <select class="form-control dropdown-search-filter" id="ddlBu" multiple>
                                             <option selected="" value="">All</option>
@@ -55,35 +85,37 @@
                                             
                                         </select>
                                     </div>
-                                    
-                                </div>
-                                <div class="row">
                                     <div class="col-lg-3">
-                                        <label for="ddlCluster" class="mr-2">Cluster</label>
+                                        <label for="ddlCluster" class="mr-2">State</label>
                                         <select class="form-control dropdown-search-filter" id="ddlCluster" multiple>
-                                            <option selected="" value="">All</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <label for="ddlCourse" class="mr-2">Course</label>
-                                        <select class="form-control dropdown-search-filter" id="ddlCourse" multiple>
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
                                     <div class="col-lg-3">
                                         <label for="ddlStatus" class="mr-2">Status</label>
                                         <select class="form-control dropdown-search-filter" id="ddlStatus" >
-                                            <option selected="" value="-1">All</option>
-                                            <option  value="1">Active</option>
-                                            <option  value="0">In Active</option>
+                                            <option selected="" value="">All</option>
                                         </select>
                                     </div>
+                                </div>
+                                <div class="row">
+                                    
+                                    <div class="col-lg-3" style="display: none;">
+                                        <label for="ddlCourse" class="mr-2">Course</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlCourse" multiple>
+                                            <option selected="" value="">All</option>
+                                        </select>
+                                    </div>
+                                    
                                     <div class="col-lg-3" >
                                         <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
                                         onclick="LoadTableBasedOnSearch()">Search</button>
                                         &nbsp
-                                        <button style="margin-top: 30px" type="button" class="btn btn-primary waves-effect waves-light submit" 
+                                        <button style="margin-top: 30px; display: none;" type="button" class="btn btn-primary waves-effect waves-light submit" 
                                         onclick="Download()">Download</button>
+                                    </div>
+                                    <div class="col-lg-9" >
+                                        <button style="margin-top: 30px;float: right;" type="submit" class="btn btn-primary waves-effect waves-light submit">Create Center</button>
                                     </div>
                                 </div>
                             </div>
@@ -106,22 +138,20 @@
                                         <table id="tbl_centers" class="table dt-responsive wrap" >
                                             <thead>
                                                 <tr>
-                                                    <th>S.No</th>                                               
-                                                    <th>Actions</th>
+                                                    <th>S.No</th>     
+                                                    <th>Actions</th>                                            
+                                                    <th>Center Code</th>
                                                     <th>Center Name</th>
                                                     <th>Center Type</th>
-													<!--
-                                                    <th>Center Category</th>
-                                                    -->
-													<th>Business Unit</th>  
-                                                    <th>Status</th>
-                                                    <th>Region</th>
-                                                    <th>Cluster</th>
-                                                    <th>Country</th>
+                                                    <th>Sub Project</th>
+                                                    <th>Course</th>
+                                                    <th>Location</th>
+                                                    <th>District</th>                                                    
                                                     <th>State</th>
-                                                    <th>District</th>
-                                                    <th>Location</th>   
-                                                    <th>Sub Center(s)</th>
+                                                    <th>Region</th>
+                                                    <th>Country</th>                                                       
+                                                    <th>Status</th>
+                                                    
                                                 </tr>
                                             </thead>
                                         
@@ -137,21 +167,86 @@
             
             <!-- end wrapper -->
         </form>
-        <script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
-        <script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
-        <script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
-        <script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
-        <script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
-        <script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
-        <script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
-        <script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
-        <script src="static/assets/libs/datatables/buttons.print.min.js"></script>
-        <script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
-        <script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
-        <script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
-        <!-- third party js ends -->
+        
+    
+<div id="divSubProjectList" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title">Sub Project List</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <table id="tblSubProject" class="table table-bordered dt-responsive wrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                    <thead>                        
+                        <tr style="background-color: #f5f6f8;">
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Name</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Code</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Name</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Code</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Name</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Business Unit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-        <!-- datatables init js-->
-        <script src="static/assets/js/pages/center-list.js"></script>
+                    </tbody>
+                </table>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div><!--/.modal-->  
+<div id="divCourseList" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title" id="HdCourse"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <table id="tblCourses" class="table table-bordered dt-responsive wrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                    <thead>                        
+                        <tr style="background-color: #f5f6f8;">
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Code</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Name</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">QP Code</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">QP Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-        <!-- App js-->
+                    </tbody>
+                </table>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div><!--/.modal-->   
+
+<script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
+
+<!-- third party js ends -->
+
+<!-- datatables init js-->
+<script src="static/assets/js/pages/center-list.js"></script>
+
+<!-- App js-->

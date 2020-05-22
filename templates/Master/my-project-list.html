@@ -1,0 +1,280 @@
+<link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+        
+<!-- third party css -->
+<link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
+
+<!-- third party css end -->
+
+<!-- App css -->
+<link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript">
+    $(document).ready(function () {
+    $("#alternative-page-datatable").dataTable().fnDestroy();
+    $('.dropdown-search-filter').select2({
+        placeholder:''
+    });
+
+    LoadTable(); 
+    function LoadTable()
+    {
+        vartable1 = $("#alternative-page-datatable").DataTable({
+            "serverSide": true,
+            "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
+            "paging": true,
+            "pageLength": 10,
+            "sPaginationType": "full_numbers",
+            "scrollX": false,
+            "destroy": true,
+            "processing": true,
+            "language": { "processing": 'Loading..!' },
+            "ajax": {
+                "url": $('#hdn_web_url').val()+ "/my_project_list",
+                "type": "POST",
+                "dataType": "json",
+                "data": function (d) {
+                    d.user_id =$('#hdn_home_user_id').val();
+                    d.user_role_id = $('#hdn_home_user_role_id').val();
+                    d.user_region_id=$('#hdn_user_region_id').val();
+                },
+                error: function (e) {
+                    $("#alternative-page-datatable tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
+                }
+
+            },
+            "columns": [
+                { "data": "S_No"},
+                { "data": "Project_Code"},
+                { "data": "Project_Name"},
+                { "data": "Sub_Project_Code"},
+                { "data": "Sub_Project_Name"},
+                { "data": "Block_Name"},
+                { "data": "Practice_Name"},
+                { "data": "Bu_Name"},
+                { "data": "Product_Name"},
+                { "data": "Status"},
+                
+            ],
+            drawCallback: function(){
+                $('#alternative-page-datatable_paginate ul.pagination').addClass("pagination-rounded");
+            }
+        });        
+    }
+
+});
+</script>
+<form id='form1' method="POST" action="">   
+    <input type="hidden" id="hdn_project_id" name="hdn_project_id" value="0">
+    <div class="container-fluid">
+        <!-- start page title -->
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box">
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">NEO</a></li>
+                            <li class="breadcrumb-item active">Projects</li>
+                        </ol>
+                    </div>
+                    <h4 class="page-title">My Projects</h4>
+                </div>
+            </div>
+        </div>     
+        <!-- end page title -->        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <h4 class="header-title"></h4>
+                            </div>
+                            <!-- <div class="col-lg-6" >                                        
+                                    <button style="float: right; display: none;" type="submit" class="btn btn-primary">Create Project</a>
+                            </div> -->
+                        </div>
+                        <br/>
+                        <div class="col-lg-12">
+                            <table id="alternative-page-datatable" class="table dt-responsive nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>S.No</th>
+                                        <th>Project Code</th>
+                                        <th>Project Name</th>
+                                        <th>Sub Project Code</th>
+                                        <th>Sub Project Name</th>
+                                        <th>Block</th>
+                                        <th>Practice</th>
+                                        <th>BU</th>
+                                        <th>Product</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                            
+                            <tbody></tbody>
+                            </table>
+                        </div>
+                    </div> <!-- end card body-->
+                </div> <!-- end card -->
+            </div><!-- end col-->
+        </div>
+        <!-- end row-->    
+    </div> <!-- end container -->   
+   <!-- end wrapper -->
+</form>
+<script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
+<!-- third party js ends -->
+
+<!-- datatables init js-->
+
+<div id="tr_sess_act" class="modal fade" role="dialog">
+   <div class="modal-dialog modal-xl">
+       <div class="modal-content ">
+           <div class="modal-header">
+               <h4 class="modal-title">Contracts</h4>
+               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+           </div>
+           <div class="row">
+               <div class="col-12">
+                   <div class="card">
+                       <div class="card-body"> 
+                           <div class="col-md-12">                                
+                               <div class="col-md-4 form-group">
+                                   <h5>Customer Name</h5>                                           
+                               </div>
+                               <div class="col-md-4" style="margin-top: -38px; margin-left: 13%;">
+                                   <div class="form-group" style="margin-bottom: 20px;">        
+                                       <input type="text" class="form-control" id="txtcustomer_name"  disabled/>                               
+                                   </div>
+                               </div>
+                               <div class="col-md-2 form-group" style="margin-top: -45px; margin-left: 50%;">
+                                   <h5>Funding Source</h5>                                           
+                               </div>
+                               <div class="col-md-4" style="margin-top: -42px; margin-left: 63%;">
+                                   <div class="form-group" style="margin-bottom: 20px;">        
+                                       <input type="text" class="form-control" id="txtfundingsource"  disabled/>                               
+                                   </div>
+                               </div>
+                           </div>
+                       
+                           <div class="col-md-12">                                
+                               <div class="col-md-4 form-group">
+                                   <h5>Customer Group</h5>                                           
+                               </div>
+                               <div class="col-md-4" style="margin-top: -38px; margin-left: 13%;">
+                                   <div class="form-group" style="margin-bottom: 20px;">        
+                                       <input type="text" class="form-control" id="txtcustomer_group"  disabled/>                               
+                                   </div>
+                               </div>
+                               <div class="col-md-2 form-group" style="margin-top: -45px; margin-left: 50%;">
+                                   <h5>Industry Type</h5>                                           
+                               </div>
+                               <div class="col-md-4" style="margin-top: -42px; margin-left: 63%;">
+                                   <div class="form-group" style="margin-bottom: 20px;">        
+                                       <input type="text" class="form-control" id="txtindustrytype"  disabled/>                                
+                                   </div>
+                               </div>
+                           </div>
+
+                       </div> <!--end card-body-->
+                   </div> <!-- end card-->
+               </div>
+           </div>
+
+           <div class="modal-body">
+               <table id="tblTrAct" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                   <thead>
+                       <tr style="background-color: #f5f6f8;">
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S No</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Contract Name</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Contract Code</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Start Date</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">End Date</th>
+                       </tr>
+                   </thead>
+                   <tbody>
+
+                   </tbody>
+               </table>	
+           </div>
+           <div class="modal-footer">
+               <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+               <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+           </div>
+       </div>
+   </div>
+</div><!--/.modal-->
+
+<div id="tr_sub_project" class="modal fade" role="dialog">
+   <div class="modal-dialog modal-xl">
+       <div class="modal-content ">
+           <div class="modal-header">
+               <h4 class="modal-title">Sub Project</h4>
+               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+           </div>
+           
+           <div class="row">
+               <div class="col-12">
+                   <div class="card">
+                       <div class="card-body"> 
+                           <div class="col-md-12">                                
+                               <div class="col-md-4 form-group">
+                                   <h5>Project Name</h5>                                           
+                               </div>
+                               <div class="col-md-4" style="margin-top: -38px; margin-left: 13%;">
+                                   <div class="form-group" style="margin-bottom: 20px;">        
+                                       <input type="text" class="form-control" id="txtproject_name"  disabled/>                               
+                                   </div>
+                               </div>
+                               <div class="col-md-2 form-group" style="margin-top: -45px; margin-left: 50%;">
+                                   <h5>Project Code</h5>                                           
+                               </div>
+                               <div class="col-md-4" style="margin-top: -42px; margin-left: 63%;">
+                                   <div class="form-group" style="margin-bottom: 20px;">        
+                                       <input type="text" class="form-control" id="txtprojectcode"  disabled/>                               
+                                   </div>
+                               </div>
+                           </div>
+                           
+                       </div> <!--end card-body-->
+                   </div> <!-- end card-->
+               </div>
+           </div>
+           
+           <div class="modal-body">
+               <table id="tblsub_project" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                   <thead>
+                       <tr style="background-color: #f5f6f8;">
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S No</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Name</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Code</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Name</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Start Date</th>
+                           <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">End Date</th>
+                       </tr>
+                   </thead>
+                   <tbody>
+
+                   </tbody>
+               </table>	
+           </div>
+           <div class="modal-footer">
+               <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+               <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+           </div>
+       </div>
+   </div>
+</div><!--/.modal-->
