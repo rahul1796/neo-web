@@ -361,7 +361,7 @@ var Centers;
         LoadSubProjectMilestones();
         //GetCentersBasedOnSubProjects();
     }
-    function GetSubProjectCourseMilestone(divId,CourseId)
+    function GetSubProjectCourseMilestone(divId,CourseId,UnitRate)
     {
         var URL=$('#hdn_web_url').val()+ "/GetSubProjectCourseMilestones"
             $.ajax({
@@ -386,6 +386,15 @@ var Centers;
                         var varHtml='';
                             
                             varHtml+='<div class="row">';
+                            varHtml+='  <div class="col-lg-4" >';
+                            varHtml+='      Unit Rate*:';                                               
+                            varHtml+='  </div>';
+                            varHtml+='  <div class="col-lg-4" >'; 
+                            varHtml+='   <input type="number" required class="form-control"  id="unit_rate_'+CourseId+'"  name="unit_rate_'+CourseId+'" placeholder="Enter Unit Rate" min="1" required="" value="'+UnitRate+'"">   ';
+                            varHtml+='  </div>';
+                            varHtml+= '</div>';
+                            varHtml+='</br>';
+                            varHtml+='<div class="row">';
                             varHtml+='  <div class="col-lg-2" >';
                             varHtml+='      Milestone:';                                               
                             varHtml+='  </div>';
@@ -395,9 +404,11 @@ var Centers;
                             varHtml+='  <div class="col-lg-2" >';     
                             varHtml+='      Target:';      
                             varHtml+='  </div>';
+                            /*
                             varHtml+='  <div class="col-lg-2" >';  
                             varHtml+='      Is center wise rate:';                 
                             varHtml+='  </div>';
+                            */
                             varHtml+= '</div>';
                             varHtml+='</br>';
                         for(var i=0;i<count;i++)                                {
@@ -412,24 +423,30 @@ var Centers;
                             varHtml+='      <input type="text" placeholder="" readonly class="form-control" id="unit_type_'+id+'" name="milestone['+id+'][unit_type]" value="'+data.MileStones[i].Unit_Type_Name+'" data-value='+data.MileStones[i].Unit_Type_Id+' >';
                             varHtml+='  </div>';
                             varHtml+='  <div class="col-lg-2" id="target-container-'+id+'">';     
-                            varHtml+='      <input type="number" required class="form-control"  id="target_'+id+'"  name="milestone['+id+'][target]" placeholder="Enter Target Vale" min="1" required="" value="'+data.MileStones[i].Target_Value+'">';      
+                            varHtml+='      <input type="number" required class="form-control"  id="target_'+id+'"  name="milestone['+id+'][target]" placeholder="Enter Target Vale" min="1" required="" value="'+data.MileStones[i].Target_Value+'" onchange="changeTarget(event)" data-value='+CourseId+'>';      
                             varHtml+='  </div>';
+                            /* 
                             varHtml+='  <div class="col-lg-2" id="is-center-wise-container-'+id+'">';
                             varHtml+='      <input type="checkbox" name="milestone['+id+'][is_center_wise_rate]" id="is_center_wise_rate_'+id+'"  data-value='+id+' onclick="toggleCheckbox(event)">';  
                             varHtml+='  </div>';
-                              
+                             
                             varHtml+='  <div class="col-lg-2" id="link-container-'+id+'">';
                             varHtml+='      <a onclick="ShowCentersUnitValue(\''+data.MileStones[i].Map_Sub_Project_Stage_Id+'\',\''+CourseId+'\')"  style="color:blue;cursor:pointer" >Centers</a>';  
                             varHtml+='  </div>';        
                             varHtml+='  <div class="col-lg-2" id="unit-value-container-'+id+'">'; 
                             varHtml+='      <input type="number" placeholder="Enter Unit Value" step=".01" class="form-control"  id="unit_value_'+id+'" name="'+id+'" value="'+data.MileStones[i].Unit_Rate+'">';
-                            varHtml+='  </div>';                        
+                            varHtml+='  </div>';  
+                            */                      
                             varHtml+= '</div>';                            
                             varHtml+='</br>';
-                            console.log(id);
-
+                            //console.log(id);
+                            
                             $('#'+divId).append(varHtml);
-                            if (data.MileStones[i].Map_Sub_Project_Stage_Id==0)
+                            $('#target_'+id).data('key',data.MileStones[i].Dependent);
+                            if(data.MileStones[i].Is_Target_Percentage_Req==1)
+                            $('#target_'+id).prop( "disabled", true );
+                            varHtml='';
+                            /*if (data.MileStones[i].Map_Sub_Project_Stage_Id==0)
                             {
                                 $('#link-container-'+id).hide();
                                 $('#unit-value-container-'+id).hide();
@@ -444,11 +461,13 @@ var Centers;
                                 $('#unit-value-container-'+id).show();
                                 $('#link-container-'+id).hide();
                             } 
-                            varHtml='';
+                            
+                            
                             if(parseInt(data.MileStones[i].Is_Center_Wise_Rate_Defined)==1)
                                 $('#is_center_wise_rate_'+id).prop("checked",true);
                             else 
                                 $('#is_center_wise_rate_'+id).prop("checked",false);
+                            */
 
                         }
                             varHtml+='       <div style="float: right;">';
@@ -493,6 +512,7 @@ var Centers;
                             var varHtml='';
                             let id=data.Courses[i].Course_Id;
                             let val=data.Courses[i].Course_Name;
+                            let unit_rate=data.Courses[i].Unit_Rate;
                             varHtml+='<div class="card" id='+id+'>'; 
                             varHtml+='     <div class="card-body">';
                             varHtml+='        <div class="card-widgets">';
@@ -507,7 +527,7 @@ var Centers;
                             varHtml+='    </div>';
                             varHtml+=' </div>';                    
                             $('#divCourseCards').append(varHtml);
-                            GetSubProjectCourseMilestone('cardCollpase_'+id,id);
+                            GetSubProjectCourseMilestone('cardCollpase_'+id,id,unit_rate);
                         }
                         $("#ddlCourse :selected").each(function(){              
                             let id=$(this).val();
@@ -562,12 +582,13 @@ var Centers;
                     } 
                 }
             });
-            if(milestone_id!=-1 & unit_type_id!=-1 & target_value!=-1 & is_center_wise!=-1 & unit_rate!=-1)
-                varJson+='{"course_id":'+CourseId+',"milestone_id":'+milestone_id+' ,"unit_type_id":'+unit_type_id+' ,"target_value" :'+target_value+' ,"is_center_wise" :'+is_center_wise+',"unit_rate" :'+unit_rate+'},';
+            if(milestone_id!=-1 & unit_type_id!=-1 & target_value!=-1 )
+                varJson+='{"course_id":'+CourseId+',"milestone_id":'+milestone_id+' ,"unit_type_id":'+unit_type_id+' ,"target_value" :'+target_value+' ,"unit_rate" :'+$('#unit_rate_'+CourseId).val() +'},';
         });
         varJson='[ ' + varJson.substring(0, varJson.length - 1) + ' ]';
 
         console.log(varJson);
+        
         var URL=$('#hdn_web_url').val()+ "/SaveSubProjectCourseMilestones"
         $.ajax({
             type:"POST",
@@ -587,7 +608,7 @@ var Centers;
                             icon:"success",
                             confirmButtonClass:"btn btn-confirm mt-2"
                             }).then(function(){
-                                GetSubProjectCourseMilestone(DivId,CourseId);
+                                GetSubProjectCourseMilestone(DivId,CourseId,$('#unit_rate_'+CourseId).val());
                             }
                             );
             },
@@ -597,6 +618,7 @@ var Centers;
                 return false;
             }
         });
+        
     }
     function GetCentersBasedOnSubProjects()
     {
@@ -616,7 +638,7 @@ var Centers;
                 {
                     var count=data.Centers.length;
                     Centers=data.Centers;
-                    console.log(Centers);
+                    //console.log(Centers);
                 }
             },
             error:function(err)
@@ -679,7 +701,7 @@ var Centers;
     }
     function SaveSubProjectCenterUnitValues()
     {
-        console.log(JSON.stringify($('#formCenterUnitValue').serializeObject()));
+        //console.log(JSON.stringify($('#formCenterUnitValue').serializeObject()));
         var URL=$('#hdn_web_url').val()+ "/SaveSubProjectCourseCenterUnitPrice"
         $.ajax({
             type:"POST",
@@ -715,7 +737,7 @@ var Centers;
     function toggleCheckbox(e)
     {
         let id = e.currentTarget.getAttribute('data-value');
-        console.log(e.currentTarget.getAttribute('id'));
+        //console.log(e.currentTarget.getAttribute('id'));
         if($('#'+e.currentTarget.getAttribute('id')).is(':checked'))
         {
             $('#link-container-'+id).show();
@@ -727,7 +749,20 @@ var Centers;
             $('#unit-value-container-'+id).show();
         }
     }
-
+    function changeTarget(e)
+    {
+        let course_id=e.currentTarget.getAttribute('data-value');
+        let id=e.currentTarget.getAttribute('id');
+        let val=parseFloat($('#'+id).val());
+        
+        let data=JSON.parse($('#'+id).data('key'));
+        console.log(data);
+        $.each(data, function(index, element) {
+            //console.log(val,parseFloat(element.per_val_for_target),(0.01));
+            $('#target_'+course_id+'_'+element.milestone_id).val(val*parseFloat(element.per_val_for_target)*0.01);
+        });
+        
+    }
 </script>
                 <div class="container-fluid">
                     <input type="hidden" id="hdn_sub_project_id" name="hdn_sub_project_id" value="0">

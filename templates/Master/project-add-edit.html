@@ -31,7 +31,7 @@
             });
             return o;
         };
-
+        var MilestoneObject;
         LoadCustomerdl();
         Contractbycustomer(0);
         LoadPracticeList();
@@ -44,7 +44,7 @@
         LoadBillingMilestones();
         document.getElementById("PlannedStartDate").disabled = false;
         document.getElementById("PlannedEndDate").disabled = false;
-        
+        LoadUnitTypes('ddlUnitType','');
         
 
         if('{{project_id}}' !=0)
@@ -500,7 +500,7 @@
                                 $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
                             if(needed!='' && needed!='0' && needed!=null)
                             {
-                                console.log(needed);
+                                //console.log(needed);
                                 $('#ddlCourse').val(needed.split(',')); 
                             }
                         }
@@ -531,12 +531,13 @@
     }
     function ShowProjectBillingMetrics()
     {
+        MilestoneObject={}
         GetProjectMilestone();
         $('#headProject').text("Billing Metrics");
         $('#btnProjectInfo').show();
         $('#btnBillingMetric').hide();
         $('#divProjectInfo').hide();
-        $('#divBillingMetrics').show();
+        $('#divBillingMetrics').show();        
         //LoadBillingMilestones();
         //LoadUnitTypes();
     }
@@ -614,28 +615,40 @@
     {
         let id=$('#ddlBillingMilestones').val();
         let val=$('#ddlBillingMilestones :selected').text();
-        console.log(val);
+        //console.log(val);
         if (id=='')
         {
             alert('Please select a value');
             return;
         }
         $("#ddlBillingMilestones option[value="+id+"]").remove();
+        MilestoneObject[id]=val;
         let varHtml='';
         varHtml+='<div class="form-group" id="div_milestone_'+id+'">';
         varHtml+='<div class="row">';
         varHtml+='  <div class="col-lg-2" id="milestone-container-'+id+'">';
         varHtml+='      <input type="text" placeholder="" readonly class="form-control" id="billing_milestone_'+id+'" name="milestone['+id+'][billing_milestone]" value="'+val+'" data-value='+id+' >';                                               
         varHtml+='  </div>';
+        /*
         varHtml+='  <div class="col-lg-2" id="unit-type-container-'+id+'">'; 
         varHtml+='      <select class="form-control" required="" id="unit_type_'+id+'" name="milestone['+id+'][unit_type]"></select>';                           
-        varHtml+='  </div>';
-        varHtml+='  <div class="col-lg-2" id="rr-percentage-container-'+id+'">';     
-        varHtml+='      <input type="number" class="form-control" step=".01" id="rr_percentage_'+id+'"  name="milestone['+id+'][rr_percentage]" placeholder="Enter Percentage" min="1" max="100" required="">';      
         varHtml+='  </div>';
         varHtml+='  <div class="col-lg-2" id="order-container-'+id+'">';  
         varHtml+='      <input type="number" id="milestone_order_'+id+'"  class="form-control" name="milestone['+id+'][milestone_order]" placeholder="Enter Order" min="1" max="7" required="">';                 
         varHtml+='  </div>';
+        */
+        varHtml+='  <div class="col-lg-2" id="rr-percentage-container-'+id+'">';     
+        varHtml+='      <input type="number" class="form-control" step=".01" id="rr_percentage_'+id+'"  name="milestone['+id+'][rr_percentage]" placeholder="Enter Percentage" min="1" max="100" required="">';      
+        varHtml+='  </div>';   
+        varHtml+='  <div class="col-lg-2" id="is-percentage-wise-target-container-'+id+'">';
+        varHtml+='      <input type="checkbox" name="milestone['+id+'][is_percentage_wise_target_rate]" id="is_percentage_wise_target_rate_'+id+'"  data-value='+id+' onclick="toggleCheckbox(event)">';  
+        varHtml+='  </div>'; 
+        varHtml+='  <div class="col-lg-2" id="target-percentage-container-'+id+'">';     
+        varHtml+='      <input type="number" class="form-control" step=".01" id="target_percentage_'+id+'"  name="milestone['+id+'][target_percentage]" placeholder="Target Percentage" min="1" max="100" required="">';      
+        varHtml+='  </div>'; 
+        varHtml+='  <div class="col-lg-2" id="percentage-billing-milestone-container-'+id+'">'; 
+        varHtml+='      <select class="form-control" required="" id="percentage_billing_milestone_'+id+'" name="milestone['+id+'][percentage-billing-milestone]"></select>';                           
+        varHtml+='  </div>';  
         varHtml+='  <div class="col-lg-2" id="milestone-delete-container-'+id+'">';
         varHtml+='      <button type="button" id="milestone_del_btn_'+id+'" data-value="'+id+'" class="btn btn-danger waves-effect waves-light" onclick="removeMilestone(event)"><i class="mdi mdi-close"></i></button>';
         varHtml+='  </div>';     
@@ -643,20 +656,28 @@
         varHtml+= '</div>';
         
         $('#divProjectMilestones').append(varHtml);
-        LoadUnitTypes('unit_type_'+id,'');
+        $('#target-percentage-container-'+id).hide();
+        $('#percentage-billing-milestone-container-'+id).hide();
+        $('#target_percentage_'+id).removeAttr('required');        
+        $('#target_percentage_'+id).removeAttr('min');
+        $('#percentage_billing_milestone_'+id).removeAttr('required');
+        LoadPercentBillingMilestones('percentage_billing_milestone_'+id,'',id);
+        console.log(MilestoneObject);
     }
     function removeMilestone(e) {
         let position = e.currentTarget.getAttribute('data-value');
         let val=$('#billing_milestone_'+position).val();
         $("#ddlBillingMilestones").append('<option value='+position+'>'+val+'</option>');
             $('#div_milestone_'+position).remove();
+        delete MilestoneObject[position];
+        console.log(MilestoneObject);
     }
     function SaveProjectMilestones()
     {
         var varJson='';
         $('#divProjectMilestones').children('div').each(function(){
         var varDiv=$(this).children('div');
-        let milestone_id,unit_type_id,rr_percentage,stage_id;                
+        let milestone_id,unit_type_id,rr_percentage,stage_id,order=0,is_target_percentage_req=0,per_val_for_target=0,per_of_milestone=0;                
             $(varDiv).children('div').each(function(){
                 let id=$(this).attr("id").toString();                
                 switch(id.substring(0, id.lastIndexOf("-") + 1))
@@ -673,12 +694,27 @@
                     case 'order-container-':
                         order =$('#'+id).children('input').val();
                         break;
+                    case 'is-percentage-wise-target-container-':
+                        if($('#'+id).children('input').is(":checked"))
+                            is_target_percentage_req=1;
+                        else
+                            is_target_percentage_req=0;
+                        break;
+                    case 'target-percentage-container-':
+                        if($('#'+id).children('input').val()!=undefined)
+                            per_val_for_target =$('#'+id).children('input').val();
+                        break;
+                    case 'percentage-billing-milestone-container-':
+                        if($('#'+id).children('select').val()!=undefined & $('#'+id).children('select').val()!='')
+                            per_of_milestone =$('#'+id).children('select').val();
+                        break;
                 }                
             });
-            varJson+='{"milestone_id":'+milestone_id+' ,"unit_type_id":'+unit_type_id+' ,"rr_percentage" :'+rr_percentage+' ,"order" :'+order+'},';
+            varJson+='{"milestone_id":'+milestone_id+' ,"unit_type_id":'+$('#ddlUnitType').val()+' ,"rr_percentage" :'+rr_percentage+' ,"order" :'+order+',"is_target_percentage_req" :'+is_target_percentage_req+',"per_val_for_target" :'+per_val_for_target+',"per_of_milestone" :'+per_of_milestone+'},';
         });
         
         varJson='[ ' + varJson.substring(0, varJson.length - 1) + ' ]';
+        console.log(varJson);
         
         var URL=$('#hdn_web_url').val()+ "/SaveProjectBillingMilestones"
         $.ajax({
@@ -709,6 +745,7 @@
                 return false;
             }
         });
+        
     }
     function GetProjectMilestone()
     {
@@ -728,28 +765,41 @@
                 {
                     var count=data.MileStones.length;
                     if( count> 0)
-                    {
+                    {   
                         $('#divProjectMilestones').empty();
                         for(var i=0;i<count;i++)
                         {
+                            $('#ddlUnitType').val(data.MileStones[i].Unit_Type_Id);
                             let id=data.MileStones[i].Milestone_Id;
                             let val=data.MileStones[i].Milestone;
                             $("#ddlBillingMilestones option[value="+id+"]").remove();
+                            MilestoneObject[id]=val;
                             let varHtml='';
                             varHtml+='<div class="form-group" id="div_milestone_'+id+'">';
                             varHtml+='<div class="row">';
                             varHtml+='  <div class="col-lg-2" id="milestone-container-'+id+'">';
                             varHtml+='      <input type="text" placeholder="" readonly class="form-control" id="billing_milestone_'+id+'" name="milestone['+id+'][billing_milestone]" value="'+val+'" data-value='+id+' >';                                               
                             varHtml+='  </div>';
+                            /*
                             varHtml+='  <div class="col-lg-2" id="unit-type-container-'+id+'">'; 
                             varHtml+='      <select class="form-control" required="" id="unit_type_'+id+'" name="milestone['+id+'][unit_type]"></select>';                           
-                            varHtml+='  </div>';
-                            varHtml+='  <div class="col-lg-2" id="rr-percentage-container-'+id+'">';     
-                            varHtml+='      <input type="number" class="form-control" step=".01" id="rr_percentage_'+id+'"  name="milestone['+id+'][rr_percentage]" placeholder="Enter Percentage" min="1" max="100" required="" value='+data.MileStones[i].Rr_Percentage+'>';      
                             varHtml+='  </div>';
                             varHtml+='  <div class="col-lg-2" id="order-container-'+id+'">';  
                             varHtml+='      <input type="number" id="milestone_order_'+id+'"  class="form-control" name="milestone['+id+'][milestone_order]" placeholder="Enter Order" min="1" max="7" required="" value='+data.MileStones[i].Order+'>';                 
                             varHtml+='  </div>';
+                            */
+                            varHtml+='  <div class="col-lg-2" id="rr-percentage-container-'+id+'">';     
+                            varHtml+='      <input type="number" class="form-control" step=".01" id="rr_percentage_'+id+'"  name="milestone['+id+'][rr_percentage]" placeholder="Enter Percentage" min="1" max="100" required="" value='+data.MileStones[i].Rr_Percentage+'>';      
+                            varHtml+='  </div>';
+                            varHtml+='  <div class="col-lg-2" id="is-percentage-wise-target-container-'+id+'">';
+                            varHtml+='      <input type="checkbox" name="milestone['+id+'][is_percentage_wise_target_rate]" id="is_percentage_wise_target_rate_'+id+'"  data-value='+id+' onclick="toggleCheckbox(event)">';  
+                            varHtml+='  </div>'; 
+                            varHtml+='  <div class="col-lg-2" id="target-percentage-container-'+id+'">';     
+                            varHtml+='      <input type="number" required class="form-control" step=".01" id="target_percentage_'+id+'"  name="target_percentage_'+id+'" placeholder="Target Percentage" min="1" max="100" value='+data.MileStones[i].Per_Val_For_Target+'>';      
+                            varHtml+='  </div>'; 
+                            varHtml+='  <div class="col-lg-2" id="percentage-billing-milestone-container-'+id+'">'; 
+                            varHtml+='      <select class="form-control" required="" id="percentage_billing_milestone_'+id+'" name="milestone['+id+'][percentage-billing-milestone]" ></select>';                           
+                            varHtml+='  </div>'; 
                             varHtml+='  <div class="col-lg-2" id="milestone-delete-container-'+id+'">';
                             varHtml+='      <button type="button" id="milestone_del_btn_'+id+'" data-value="'+id+'" class="btn btn-danger waves-effect waves-light" onclick="removeMilestone(event)"><i class="mdi mdi-close"></i></button>';
                             varHtml+='  </div>';     
@@ -757,7 +807,26 @@
                             varHtml+= '</div>';
                             
                             $('#divProjectMilestones').append(varHtml);
-                            LoadUnitTypes('unit_type_'+id,data.MileStones[i].Unit_Type_Id);
+                            LoadPercentBillingMilestones('percentage_billing_milestone_'+id,data.MileStones[i].Per_Of_Milestone,id);
+                            //LoadUnitTypes('unit_type_'+id,data.MileStones[i].Unit_Type_Id);
+                            if(data.MileStones[i].Is_Target_Percentage_Req)
+                            {
+                                $('#is_percentage_wise_target_rate_'+id).prop("checked",true);
+                                $('#target-percentage-container-'+id).show();
+                                $('#percentage-billing-milestone-container-'+id).show();
+                                $('#target_percentage_'+id).attr('required');
+                                $('#target_percentage_'+id).attr('min','1');
+                                $('#percentage_billing_milestone_'+id).attr('required');
+                            }
+                            else 
+                            {
+                                $('#is_percentage_wise_target_rate_'+id).prop("checked",false);
+                                $('#target-percentage-container-'+id).hide();
+                                $('#percentage-billing-milestone-container-'+id).hide();
+                                $('#target_percentage_'+id).removeAttr('required');
+                                $('#target_percentage_'+id).removeAttr('min');
+                                $('#percentage_billing_milestone_'+id).removeAttr('required');
+                            }
                         }
                     }
                 }
@@ -769,6 +838,39 @@
             }
         });
         return false;
+    }
+    function toggleCheckbox(e)
+    {
+        let id = e.currentTarget.getAttribute('data-value');
+        //console.log(e.currentTarget.getAttribute('id'));
+        if($('#'+e.currentTarget.getAttribute('id')).is(':checked'))
+        {
+            $('#target-percentage-container-'+id).show();
+            $('#percentage-billing-milestone-container-'+id).show();
+            $('#target_percentage_'+id).attr('required');            
+            $('#target_percentage_'+id).attr('min','1')
+            $('#percentage_billing_milestone_'+id).attr('required');
+        }
+        else
+        {
+            $('#target-percentage-container-'+id).hide();
+            $('#percentage-billing-milestone-container-'+id).hide();
+            $('#target_percentage_'+id).removeAttr('required');
+            $('#target_percentage_'+id).removeAttr('min');
+            $('#percentage_billing_milestone_'+id).removeAttr('required');
+        }
+    }
+    function LoadPercentBillingMilestones(DivName,needed,id)
+    {
+        $('#'+DivName).append(new Option('Choose billing milestone',''));
+        $.each(MilestoneObject, function(key,val){
+            //console.log("key : "+key+" ; value : "+val);
+            if(key!=id)
+                $('#'+DivName).append(new Option(val,key));
+        });
+        if(needed!='')
+        $('#'+DivName).val(needed);
+
     }
 </script>
     <div class="container-fluid">
@@ -1021,25 +1123,46 @@
                 <div class="card-box">
                     <!-- <h4 class="header-title">Billing Metrics</h4> -->
                     <br/>  
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <label for="ddlBillingMilestones">Milestones :</label>
-                            </div>
-                            <div class="col-lg-4">
-                                <select id="ddlBillingMilestones" class="form-control " name="ddlBillingMilestones" ClientIdMode="static" >
-                                </select>
-                            </div>
-                            <div class="col-lg-4">
-                                <button type="button" class="btn btn-secondary btn-rounded" 
-                                    id="btnAddMilestones" onclick="AddMilestone();">Add</button>
-                            </div>
-                        </div>
-                    </div>                              
+                                                 
                     <form id="formBillingMetrics" name="formBillingMetrics" data-parsley-validate="" action="javascript:SaveProjectMilestones()">
-                        
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="ddlUnitType">Unit Type :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <select id="ddlUnitType" class="form-control " name="ddlUnitType" ClientIdMode="static" required>
+                                    </select>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="ddlBillingMilestones">Milestones :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <select id="ddlBillingMilestones" class="form-control " name="ddlBillingMilestones" ClientIdMode="static" >
+                                    </select>
+                                </div>
+                                <div class="col-lg-4">
+                                    <button type="button" class="btn btn-secondary btn-rounded" 
+                                        id="btnAddMilestones" onclick="AddMilestone();">Add</button>
+                                </div>
+                            </div>
+                        </div> 
                         <div id="divProjectMilestones">
-                                
+                            <div class="row">
+                                <div class="col-lg-2" id="milestone-container">
+                                   <h5> Milestone*:</h5>
+                                </div>
+                                <div class="col-lg-2" id="milestone-container">
+                                <h5>RR Percentage*:</h5>
+                                </div>
+                                <div class="col-lg-2" id="milestone-container">
+                                <h5>Is Percentage Wise*:</h5>
+                                </div>
+                            </div>
                         </div> 
                         <div class="form-group mb-0">
                             <button class="btn btn-primary" type="submit">Save</button>
