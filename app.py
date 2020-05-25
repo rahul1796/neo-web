@@ -5339,17 +5339,15 @@ def mobilization():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
-class registered_list_updated(Resource):
+class mobilized_list_updated(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
             candidate_id=request.form['candidate_id']
             region_ids=request.form['region_ids']
             state_ids = request.form["state_ids"]
-            Pincode = request.form["Pincode"]
-            ToDate = request.form["ToDate"]
-            FromDate = request.form["FromDate"]
-            created_by = request.form["created_by"]
+            MinAge=request.form['MinAge']
+            MaxAge = request.form["MaxAge"]
             
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
@@ -5361,8 +5359,8 @@ class registered_list_updated(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             
-            return Candidate.registered_list(candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-api.add_resource(registered_list_updated, '/registered_list_updated')
+            return Candidate.mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+api.add_resource(mobilized_list_updated, '/mobilized_list_updated')
 
 class DownloadMobTemplate(Resource):
     report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
@@ -5673,6 +5671,32 @@ def registration():
         return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
     else:
         return render_template("login.html",error="Session Time Out!!")
+
+class registered_list_updated(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            candidate_id=request.form['candidate_id']
+            region_ids=request.form['region_ids']
+            state_ids = request.form["state_ids"]
+            Pincode = request.form["Pincode"]
+            ToDate = request.form["ToDate"]
+            FromDate = request.form["FromDate"]
+            created_by = request.form["created_by"]
+            
+            user_id = request.form["user_id"]
+            user_role_id = request.form["user_role_id"]
+            
+            start_index = request.form['start']
+            page_length = request.form['length']
+            search_value = request.form['search[value]']
+            order_by_column_position = request.form['order[0][column]']
+            order_by_column_direction = request.form['order[0][dir]']
+            draw=request.form['draw']
+            
+            return Candidate.registered_list(candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+api.add_resource(registered_list_updated, '/registered_list_updated')
+
 
 class AllCreatedByBasedOnUser(Resource):
     @staticmethod
@@ -6209,6 +6233,24 @@ def web_verification_page():
     otp=request.args.get('o','',type=str)
     response=Database.web_verification(mobile,otp)
     return render_template("web-verification.html",name=name,msg=response['msg'])
+
+class app_email_validation(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            client_id = request.args['client_id']
+            client_key = request.args['client_key']
+            email = request.args['email']
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                if Database.app_email_validation(email):
+                    out = {'success': True, 'description': "Email validation successfully"}  
+                else:
+                    out = {'success': False, 'description': "Email validation failed(already exists)"}
+            else:
+                out = {'success': False, 'description': "client name and password not matching"}
+            return jsonify(out)
+
+api.add_resource(app_email_validation, '/app_email_validation')
 
 if __name__ == '__main__':    
     app.run(debug=True)

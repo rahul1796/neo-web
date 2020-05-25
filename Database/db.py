@@ -5277,3 +5277,10 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             return {"msg":"Error"+str(e)}
 
+    def app_email_validation(email):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "select count(*) as email_count from candidate_details.tbl_candidates where coalesce(email_id,'')!='' and is_active=1 and email_id like '{}'".format(email)
+        #quer = "{"+ quer + "}"
+        curs.execute(quer)
+        return curs.fetchall()[0][0]<=0
