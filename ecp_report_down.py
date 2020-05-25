@@ -24,8 +24,8 @@ def create_report(user_id, user_role_id, customer_ids, contract_ids, region_ids,
         cnxn=pyodbc.connect(config.conn_str) #
         curs = cnxn.cursor()
         sql = 'exec [reports].[sp_get_ecp_report_data_download] ?, ?,?, ?, ?, ?, ?'
-        values = ('798',1,'','','','','')
-
+        values = (user_id, user_role_id, customer_ids, contract_ids, region_ids, from_date, to_date)
+        
         curs.execute(sql,(values))
         columns = [column[0].title() for column in curs.description]
         
