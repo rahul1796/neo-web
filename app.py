@@ -6234,5 +6234,23 @@ def web_verification_page():
     response=Database.web_verification(mobile,otp)
     return render_template("web-verification.html",name=name,msg=response['msg'])
 
+class app_email_validation(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            client_id = request.args['client_id']
+            client_key = request.args['client_key']
+            email = request.args['email']
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                if Database.app_email_validation(email):
+                    out = {'success': True, 'description': "Email validation successfully"}  
+                else:
+                    out = {'success': False, 'description': "Email validation failed(already exists)"}
+            else:
+                out = {'success': False, 'description': "client name and password not matching"}
+            return jsonify(out)
+
+api.add_resource(app_email_validation, '/app_email_validation')
+
 if __name__ == '__main__':    
     app.run(debug=True)
