@@ -242,4 +242,70 @@ class Report:
     def user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         return Database.user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
     
-  
+    def DownloadBatchStatusReport(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date):
+        try:
+            DownloadPath=config.neo_report_file_path+'report file/'
+            report_name = config.BatchStatusReportFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
+            r=re.compile(config.BatchStatusReportFileName + ".*")
+            lst=os.listdir(DownloadPath)
+            newlist = list(filter(r.match, lst))
+            for i in newlist:
+                os.remove( DownloadPath + i)
+            path = '{}{}'.format(DownloadPath,report_name)
+            response=Database.DownloadBatchStatusReport(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date)
+            
+            df=pd.DataFrame(response)
+            if len(df.index)>0:
+                df=df[[ 'Practice_Name','Customer_Name','Contract_Code','Contract_Name','Center_Name','Product_Name','Bu_Name','Region_Name','Batch_Code','Course_Code','Status','Actual_Start_Date','Actual_End_Date','Unit_Rate','E_Ratio','C_Ratio','P_Ratio','Batch_Enrolled','Batch_Dropped','Batch_Certified','Certification_Distribution','Batch_Placement','Ojt_Completed','Filtered_Enrolled','Filtered_Dropped','Filtered_Certified','Filtered_Certification_Distribution','Filtered_Placed','Filtered_Ojt_Completed','Overall_Revenue','Mon_Revenue']]
+                columns=[ 'Practice','Customer','Contract_Code','Contract_Name','Center','Product','BU','Region','Batch_Code','Course_Code','Status','Actual Start Date','Actual End Date','Unit Rate','E Ratio','C Ratio','P Ratio','Enrolled','Dropped','Certified','Certificates Distribution','Placed','Ojt Completed','Filtered Enrolled','Filtered Dropped','Filtered Certified','Filtered Certificates Distribution','Filtered Placed','Filtered Ojt Completed','Overall Revenue','Filtered Revenue']
+                temp={"data":df,"columns":columns} 
+                
+                res=Report.CreateExcelFun(temp,path,'Batch Status')
+                print(res)
+                if res:
+                    return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
+                else:
+                    return {"success":False,"msg":res['msg']}
+            else:
+                return {"success":False,"msg":'No records found'} 
+        except Exception as e:
+            return {"success":False,"msg":str(e)}
+    
+    #Please do not edit/remove the below function and try to reuse the same to create an excel with single sheet by passing data and sheet name as paramenters. 
+    #Response param is tuple as shown {"data":df,"columns":column_names}.
+    def CreateExcelFun(Response,file_path,sheet_name):
+        try:
+            #print(Response)
+            workbook = xlsxwriter.Workbook(file_path)
+            
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'align': 'top',
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+
+            write_format = workbook.add_format({
+                'border': 1,
+                'align': 'top',
+                'valign': 'top'})
+
+            worksheet = workbook.add_worksheet(sheet_name)
+            #print(worksheet.name)
+            for i in range(len(Response['columns'])):
+                worksheet.write(0,i ,Response['columns'][i], header_format)   
+            for j in range(len(Response['data'])) : 
+                for k in range(len(Response['columns'])):
+                    if Response['data'].iloc[j,k] is None:
+                        worksheet.write(j+1,k ,'',write_format)
+                    else:
+                        worksheet.write(j+1,k ,Response['data'].iloc[j,k],write_format)
+                                                    
+            workbook.close()
+            return True
+        except Exception as e:
+            print(str(e))
+            return False
+    def GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        return Database.GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw) 
