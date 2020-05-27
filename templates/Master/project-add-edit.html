@@ -49,6 +49,7 @@
 
         if('{{project_id}}' !=0)
         { 
+            $('#hdn_project_id').val('{{project_id}}');
             $('#headProject').text("Project Details");
             $('#divBtns').show();  
             document.getElementById("PlannedStartDate").disabled = true;
@@ -665,12 +666,17 @@
         console.log(MilestoneObject);
     }
     function removeMilestone(e) {
-        let position = e.currentTarget.getAttribute('data-value');
-        let val=$('#billing_milestone_'+position).val();
-        $("#ddlBillingMilestones").append('<option value='+position+'>'+val+'</option>');
-            $('#div_milestone_'+position).remove();
-        delete MilestoneObject[position];
-        console.log(MilestoneObject);
+        let isBoss = confirm("Are you sure you want to remove milestone?");
+        if( isBoss){
+            let position = e.currentTarget.getAttribute('data-value');
+            let val=$('#billing_milestone_'+position).val();
+            $("#ddlBillingMilestones").append('<option value='+position+'>'+val+'</option>');
+                $('#div_milestone_'+position).remove();
+            delete MilestoneObject[position];
+            console.log(MilestoneObject);
+        }
+        return false;
+        
     }
     function SaveProjectMilestones()
     {
@@ -702,7 +708,7 @@
                         break;
                     case 'target-percentage-container-':
                         if($('#'+id).children('input').val()!=undefined)
-                            per_val_for_target =$('#'+id).children('input').val();
+                            per_val_for_target =$('#'+id).children('input').val()==''?0:$('#'+id).children('input').val();
                         break;
                     case 'percentage-billing-milestone-container-':
                         if($('#'+id).children('select').val()!=undefined & $('#'+id).children('select').val()!='')
@@ -735,7 +741,9 @@
                             icon:"success",
                             confirmButtonClass:"btn btn-confirm mt-2"
                             }).then(function(){
-                                GetProjectMilestone();
+                                //GetProjectMilestone();
+                                $('#form1').submit();
+                                //window.location.href = '/assign_project_add_edit_to_home';
                             }
                             );
             },
@@ -1151,7 +1159,7 @@
                                 </div>
                             </div>
                         </div> 
-                        <div id="divProjectMilestones">
+                        <div class="form-group">
                             <div class="row">
                                 <div class="col-lg-2" id="milestone-container">
                                    <h5> Milestone*:</h5>
@@ -1160,9 +1168,12 @@
                                 <h5>RR Percentage*:</h5>
                                 </div>
                                 <div class="col-lg-2" id="milestone-container">
-                                <h5>Is Percentage Wise*:</h5>
+                                <h5>Is Percentage Wise:</h5>
                                 </div>
                             </div>
+                        </div>
+                        <div id="divProjectMilestones">
+                            
                         </div> 
                         <div class="form-group mb-0">
                             <button class="btn btn-primary" type="submit">Save</button>
@@ -1174,7 +1185,9 @@
         <!-- end row-->
 
     </form>
-    
+    <form id='form1' method="POST" action="/assign_project_add_edit_to_home">
+        <input type="hidden" id="hdn_project_id" name="hdn_project_id" value="0">
+    </form>
     </div> <!-- end container -->
 
 <script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>

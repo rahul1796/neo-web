@@ -751,15 +751,22 @@ var Centers;
     }
     function changeTarget(e)
     {
+        console.log(e);
         let course_id=e.currentTarget.getAttribute('data-value');
         let id=e.currentTarget.getAttribute('id');
         let val=parseFloat($('#'+id).val());
         
         let data=JSON.parse($('#'+id).data('key'));
-        console.log(data);
+        
         $.each(data, function(index, element) {
-            //console.log(val,parseFloat(element.per_val_for_target),(0.01));
             $('#target_'+course_id+'_'+element.milestone_id).val(val*parseFloat(element.per_val_for_target)*0.01);
+        });
+        $.each(data, function(index, element) {
+            console.log('#target_'+course_id+'_'+element.milestone_id);
+            var ele = document.getElementById('target_'+course_id+'_'+element.milestone_id);
+            var event = new Event('change');
+            ele.dispatchEvent(event);
+            //$('#target_'+course_id+'_'+element.milestone_id).onchange();
         });
         
     }
