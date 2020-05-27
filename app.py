@@ -5389,6 +5389,12 @@ class upload_bulk_upload(Resource):
                 user_role_id = request.form["user_role_id"]
                 file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
                 f.save(file_name)
+                all_email=Database.all_email_validation(cand_stage)
+                email_validation = [CustomElementValidation(lambda d: d.lower() in all_email, 'Invalid mobilizer')]
+                all_state=Database.all_state_validation()
+                #print(data)
+                state_validation = [CustomElementValidation(lambda d: d.lower() in all_state, 'Invalid State')]
+                cand_email_validation = [CustomElementValidation(lambda d: Database.app_email_validation(d), 'Email already exists')]
                 if cand_stage==str(1):
                     df= pd.read_excel(file_name,sheet_name='Mobilizer')
                     if df.values.tolist() == []:
@@ -5402,7 +5408,7 @@ class upload_bulk_upload(Resource):
                             Column('Middle Name',null_validation),
                             Column('Last Name',null_validation),
                             Column('Secondary Contact  No',null_validation),
-                            Column('Email id',null_validation),
+                            Column('Email id',cand_email_validation + null_validation),
                             Column('Present Panchayat',null_validation),
                             Column('Present Taluk/Block',null_validation),
                             Column('Present Address line1',null_validation),
@@ -5424,10 +5430,10 @@ class upload_bulk_upload(Resource):
                             Column('Religion*',str_validation + null_validation),
                             Column('Source of Information*',str_validation + null_validation),
                             Column('Present District*',str_validation + null_validation),
-                            Column('Present State*',str_validation + null_validation),
+                            Column('Present State*',state_validation + str_validation + null_validation),
                             Column('Present Country*',str_validation + null_validation),
                             Column('Permanent District*',str_validation + null_validation),
-                            Column('Permanent State*',str_validation + null_validation),
+                            Column('Permanent State*',state_validation + str_validation + null_validation),
                             Column('Permanent Country*',str_validation + null_validation),
                             #pincode check
                             Column('Present Pincode*',pincode_validation + null_validation),
@@ -5437,7 +5443,9 @@ class upload_bulk_upload(Resource):
                             #date of birth and age pass(null check)
                             Column('Date of Birth*',null_validation),
                             Column('Age*',null_validation),
-                            Column('date_age',dob_validation)
+                            Column('date_age',dob_validation),
+                            #Email validation
+                            Column('Mobilized By*',email_validation+str_validation)
                             ])
                     errors = schema.validate(df)
                     errors_index_rows = [e.row for e in errors]
@@ -5454,6 +5462,7 @@ class upload_bulk_upload(Resource):
                         return out
 
                 elif cand_stage==str(2):
+                    
                     df= pd.read_excel(file_name,sheet_name='Registration')
                     df = df.fillna('')
                     df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
@@ -5465,7 +5474,7 @@ class upload_bulk_upload(Resource):
                             Column('Middle Name',null_validation),
                             Column('Last Name',null_validation),
                             Column('Secondary Contact  No',null_validation),
-                            Column('Email id',null_validation),
+                            Column('Email id',cand_email_validation + null_validation),
                             Column('Present Panchayat',null_validation),
                             Column('Present Taluk/Block',null_validation),
                             Column('Present Address line1',null_validation),
@@ -5494,10 +5503,10 @@ class upload_bulk_upload(Resource):
                             Column('Interested Course*',str_validation + null_validation),
                             Column('Product*',str_validation + null_validation),
                             Column('Present District*',str_validation + null_validation),
-                            Column('Present State*',str_validation + null_validation),
+                            Column('Present State*',state_validation + str_validation + null_validation),
                             Column('Present Country*',str_validation + null_validation),
                             Column('Permanent District*',str_validation + null_validation),
-                            Column('Permanent State*',str_validation + null_validation),
+                            Column('Permanent State*',state_validation + str_validation + null_validation),
                             Column('Permanent Country*',str_validation + null_validation),                            
                             Column('Employment Type*',str_validation + null_validation),
                             Column('Preferred Job Role*',str_validation + null_validation),
@@ -5518,10 +5527,12 @@ class upload_bulk_upload(Resource):
                             Column('Age*',null_validation),
                             Column('date_age',dob_validation),
                             #ID Validation pass(null check)
-                            Column('Aadhar No'),
-                            Column('Identifier Type'),
-                            Column('Identity number'),
-                            Column('ids')
+                            Column('Aadhar No',null_validation),
+                            Column('Identifier Type',null_validation),
+                            Column('Identity number',null_validation),
+                            Column('ids',null_validation),
+                            #Email validation
+                            Column('Registered by*',email_validation+str_validation)
                             ])
                     errors = schema.validate(df)
                     errors_index_rows = [e.row for e in errors]
@@ -5548,7 +5559,7 @@ class upload_bulk_upload(Resource):
                             Column('Middle Name',null_validation),
                             Column('Last Name',null_validation),
                             Column('Secondary Contact  No',null_validation),
-                            Column('Email id',null_validation),
+                            Column('Email id',cand_email_validation + null_validation),
                             Column('Present Panchayat',null_validation),
                             Column('Present Taluk/Block',null_validation),
                             Column('Present Address line2',null_validation),
@@ -5593,11 +5604,11 @@ class upload_bulk_upload(Resource):
                             Column('Product*',str_validation + null_validation),
                             Column('Present Address line1*',str_validation + null_validation),
                             Column('Present District*',str_validation + null_validation),
-                            Column('Present State*',str_validation + null_validation),
+                            Column('Present State*',state_validation + str_validation + null_validation),
                             Column('Present Country*',str_validation + null_validation),
                             Column('Permanent Address line1*',str_validation + null_validation),
                             Column('Permanent District*',str_validation + null_validation),
-                            Column('Permanent State*',str_validation + null_validation),
+                            Column('Permanent State*',state_validation + str_validation + null_validation),
                             Column('Permanent Country*',str_validation + null_validation),
                             #Column('Document copy*',str_validation + null_validation),
                             Column('Employment Type*',str_validation + null_validation),
@@ -5630,10 +5641,12 @@ class upload_bulk_upload(Resource):
                             Column('Age*',null_validation),
                             Column('date_age',dob_validation),
                             #ID Validation pass(null check)
-                            Column('Aadhar No'),
-                            Column('Identifier Type'),
-                            Column('Identity number'),
-                            Column('ids')
+                            Column('Aadhar No',null_validation),
+                            Column('Identifier Type',null_validation),
+                            Column('Identity number',null_validation),
+                            Column('ids',null_validation),
+                            #Email validation
+                            Column('Enrolled_By*',email_validation + str_validation)
                             ])
                     errors = schema.validate(df)
                     errors_index_rows = [e.row for e in errors]
@@ -5646,13 +5659,10 @@ class upload_bulk_upload(Resource):
                     else:
                         out = Database.enrollment_web_inser(df,user_id)
                         return out
-                
                 else:
-                    return {"Status":False, "message":"Wrong Candidate Stage" }
-
+                    return {"Status":False, "message":"Wrong Candidate Stage"}
             except Exception as e:
-                 return {"Status":False, "message":"Unable to upload " + str(e)}  
-             
+                return {"Status":False, "message":"Unable to upload " + str(e)}       
 api.add_resource(upload_bulk_upload,'/upload_bulk_upload')
 
 @app.route("/registration_list_page")
