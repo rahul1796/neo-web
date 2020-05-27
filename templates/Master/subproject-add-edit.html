@@ -759,7 +759,7 @@ var Centers;
         let data=JSON.parse($('#'+id).data('key'));
         
         $.each(data, function(index, element) {
-            $('#target_'+course_id+'_'+element.milestone_id).val(val*parseFloat(element.per_val_for_target)*0.01);
+            $('#target_'+course_id+'_'+element.milestone_id).val((val*parseFloat(element.per_val_for_target)*0.01).toFixed());
         });
         $.each(data, function(index, element) {
             console.log('#target_'+course_id+'_'+element.milestone_id);
