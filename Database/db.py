@@ -944,7 +944,7 @@ class Database:
     def get_batch_details(batch_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'select batch_name, product_id, center_id, course_id, sub_project_id, coalesce(co_funding_project_id,-1) as co_funding_project_id, trainer_id, actual_start_date, actual_end_date, training_start_time, training_end_time, is_active, planned_start_date, planned_end_date from batches.tbl_batches where batch_id =?'
+        sql = 'select batch_name, product_id, center_id, course_id, sub_project_id, coalesce(co_funding_project_id,-1) as co_funding_project_id, trainer_id, cast(actual_start_date as varchar(MAX)), cast(actual_end_date as varchar(MAX)), training_start_time, training_end_time, is_active, cast(planned_start_date as varchar(MAX)), cast(planned_end_date as varchar(MAX)) from batches.tbl_batches where batch_id =?'
         values = (batch_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
@@ -1446,7 +1446,7 @@ class Database:
     def get_contarct_detail(glob_contract_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = "select contract_name, contract_code, coalesce(customer_id,'') as customer_id, coalesce(entity_id,'') as entity_id, coalesce(sales_category_id,'') as sales_category_id, coalesce(start_date,'') as start_date, coalesce(end_date,'') as end_date, is_active, coalesce(value,'') as value, coalesce(sales_manager_id,'') as sales_manager_id  from masters.tbl_contract where contract_id=?"
+        sql = "select contract_name, contract_code, coalesce(customer_id,'') as customer_id, coalesce(entity_id,'') as entity_id, coalesce(sales_category_id,'') as sales_category_id, coalesce(cast(start_date as varchar(MAX)),'') as start_date, coalesce(cast(end_date as varchar(MAX)),'') as end_date, is_active, coalesce(value,'') as value, coalesce(sales_manager_id,'') as sales_manager_id  from masters.tbl_contract where contract_id=?"
         values = (glob_contract_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
@@ -5296,6 +5296,7 @@ SELECT					cb.name as candidate_name,
         curs.execute(quer)
         return curs.fetchall()[0][0]<=0
 
+
     def all_email_validation(cand_stage):
         if cand_stage =='3':
             quer = """
@@ -5325,3 +5326,43 @@ SELECT					cb.name as candidate_name,
         curs = conn.cursor()
         curs.execute(quer)
         return list(map(lambda x:str.lower(x[0]), curs.fetchall()))
+
+    def DownloadBatchStatusReport(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [reports].[sp_get_batch_status_report_data]    ?,?,?,?,?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        response = {}
+        d = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [reports].[sp_get_batch_status_date_list] ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
+        response = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        return response

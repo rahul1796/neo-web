@@ -6264,5 +6264,65 @@ class app_email_validation(Resource):
 
 api.add_resource(app_email_validation, '/app_email_validation')
 
+
+#################################################################################################################################
+#Batch Status REPORT PAGE
+@app.route("/batch_status_report_page")
+def batch_status_report_page():
+    if g.user:
+        return render_template("Reports/batch-status-report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/batch_status_report")
+def batch_status_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="batch_status_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class GetBatchStatusReportDataList(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id=request.form['user_id']
+                user_role_id=request.form['user_role_id']
+                customer_ids = request.form['customer_ids']
+                contract_ids = request.form['contract_ids']
+                contract_status = request.form['contract_status']
+                batch_status = request.form['batch_status']
+                from_date = request.form['from_date']
+                to_date = request.form['to_date']
+                start_index = request.form['start']
+                page_length = request.form['length']
+                search_value = request.form['search[value]']
+                order_by_column_position = request.form['order[0][column]']
+                order_by_column_direction = request.form['order[0][dir]']
+                draw=request.form['draw']
+                response = Report.GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetBatchStatusReportDataList,'/GetBatchStatusReportDataList')
+
+class DownloadBatchStatusReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            user_id = request.form["user_id"]
+            user_role_id = request.form["user_role_id"]
+            customer_ids = request.form["customer_ids"]
+            contract_ids = request.form["contract_ids"]
+            contract_status = request.form["contract_status"]
+            batch_status = request.form["batch_status"]
+            from_date = request.form["from_date"]
+            to_date = request.form["to_date"]
+            resp = Report.DownloadBatchStatusReport(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date)            
+            return resp
+
+api.add_resource(DownloadBatchStatusReport,'/DownloadBatchStatusReport')
+###############################################################################
+
 if __name__ == '__main__':    
     app.run(debug=True)
