@@ -5123,6 +5123,9 @@ class otp_send(Resource):
                     mobile_no = str(request.form['mobile_no'])
                     app_name = str(request.form['app_name'])
                     cand_name = str(request.form['cand_name'])
+                    is_otp=1
+                    if 'is_otp' in request.form:
+                        is_otp=int(request.form['is_otp'])
                 except Exception as e:
                     res = {'success': False, 'description': "unable to read data " + str(e)}
                     return jsonify(res)
@@ -5152,7 +5155,11 @@ class otp_send(Resource):
                     short_url='{}/wv?'.format(config.Base_URL)
                     short_url=short_url+param_str
                     #sms_msg='Hi {},\n\nThank you for registering with LabourNet.\nYour OTP is {}.\n\nThanks,\nNEO Teams.'.format(cand_name, otp)
-                    sms_msg='Hi {},\n\nYour OTP is {}.\nOR\nClick here to verify {}\n\nThanks,\nNEO Team.'.format(name, otp,short_url)
+                    #sms_msg='Hi {},\n\nYour OTP is {}.\nOR\nClick here to verify {}\n\nThanks,\nNEO Team.'.format(name, otp,short_url)
+                    if is_otp==1:
+                        sms_msg='Hi {},\n\nThank you for getting in touch with Labournet.\nYour OTP for mobile number verification is {}.\n\nThanks,\nNEO Teams.'.format(name, otp)
+                    elif is_otp==0:
+                        sms_msg='Hi {},\n\nClick to verify your mobile number with Labournet.{}.\n\nNEO Team.'.format(name,short_url)
                     #print(sms_msg)
                     resp =  sendSMS('vAHJXKhB9AY-bJF1Ozs3XkCW2uv6UYRiHShavkGySL', '91{}'.format(mobile_no), 'NEOLNS'.upper(),sms_msg)
                     #print (resp)
