@@ -5278,6 +5278,16 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             return {"msg":"Error"+str(e)}
 
+    def app_mobile_validation(mob_no):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "select count(*) as mob_count from candidate_details.tbl_candidates where coalesce(primary_contact_no,'')!='' and primary_contact_no like '{}'".format(mob_no)
+        #quer = "{"+ quer + "}"
+        curs.execute(quer)
+        out = curs.fetchall()[0][0]<=0
+        print(out)
+        return out
+
     def app_email_validation(email):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()

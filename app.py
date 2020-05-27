@@ -50,6 +50,7 @@ def check_mob_number(mob):
         mob = str(mob)
         mob = mob.replace(' ','')
         mob = mob.replace('-','')
+        return (len(mob)==10)and(mob.isnumeric())
         if mob[0:3]=='+91':
             return (len(mob)==13)and(mob.isnumeric())
         else:
@@ -73,7 +74,7 @@ def check_dob(date_age):
         return False
 
 str_validation = [CustomElementValidation(lambda d: check_str(d), 'invalid String')]
-mob_validation = [CustomElementValidation(lambda d: check_mob_number(d), 'invalid mobile number')]
+mob_validation = [CustomElementValidation(lambda d: check_mob_number(d), 'invalid mobile number (dont use +91)')]
 pincode_validation = [CustomElementValidation(lambda d: check_pincode(d), 'invalid pincode')]
 null_validation = [CustomElementValidation(lambda d: d is not np.nan, 'this field cannot be null')]
 dob_validation = [CustomElementValidation(lambda d: check_dob(d), 'either date or age is not valid')]
@@ -5395,6 +5396,7 @@ class upload_bulk_upload(Resource):
                 #print(data)
                 state_validation = [CustomElementValidation(lambda d: d.lower() in all_state, 'Invalid State')]
                 cand_email_validation = [CustomElementValidation(lambda d: Database.app_email_validation(d), 'Email already exists')]
+                cand_mobile_validation = [CustomElementValidation(lambda d: Database.app_mobile_validation(d), 'mobile number already exists')]
                 if cand_stage==str(1):
                     df= pd.read_excel(file_name,sheet_name='Mobilizer')
                     if df.values.tolist() == []:
@@ -5439,7 +5441,7 @@ class upload_bulk_upload(Resource):
                             Column('Present Pincode*',pincode_validation + null_validation),
                             Column('Permanent Pincode*',pincode_validation + null_validation),
                             #mobile number check
-                            Column('Primary contact  No*',mob_validation + null_validation),
+                            Column('Primary contact  No*',cand_mobile_validation + mob_validation + null_validation),
                             #date of birth and age pass(null check)
                             Column('Date of Birth*',null_validation),
                             Column('Age*',null_validation),
@@ -5474,7 +5476,7 @@ class upload_bulk_upload(Resource):
                             Column('Middle Name',null_validation),
                             Column('Last Name',null_validation),
                             Column('Secondary Contact  No',null_validation),
-                            Column('Email id',cand_email_validation + null_validation),
+                            Column('Email id',null_validation),
                             Column('Present Panchayat',null_validation),
                             Column('Present Taluk/Block',null_validation),
                             Column('Present Address line1',null_validation),
@@ -5559,7 +5561,7 @@ class upload_bulk_upload(Resource):
                             Column('Middle Name',null_validation),
                             Column('Last Name',null_validation),
                             Column('Secondary Contact  No',null_validation),
-                            Column('Email id',cand_email_validation + null_validation),
+                            Column('Email id',null_validation),
                             Column('Present Panchayat',null_validation),
                             Column('Present Taluk/Block',null_validation),
                             Column('Present Address line2',null_validation),
