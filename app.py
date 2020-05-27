@@ -5394,6 +5394,7 @@ class upload_bulk_upload(Resource):
                 all_state=Database.all_state_validation()
                 #print(data)
                 state_validation = [CustomElementValidation(lambda d: d.lower() in all_state, 'Invalid State')]
+                cand_email_validation = [CustomElementValidation(lambda d: Database.app_email_validation(d), 'Email already exists')]
                 if cand_stage==str(1):
                     df= pd.read_excel(file_name,sheet_name='Mobilizer')
                     if df.values.tolist() == []:
@@ -5407,7 +5408,7 @@ class upload_bulk_upload(Resource):
                             Column('Middle Name',null_validation),
                             Column('Last Name',null_validation),
                             Column('Secondary Contact  No',null_validation),
-                            Column('Email id',null_validation),
+                            Column('Email id',cand_email_validation + null_validation),
                             Column('Present Panchayat',null_validation),
                             Column('Present Taluk/Block',null_validation),
                             Column('Present Address line1',null_validation),
@@ -5473,7 +5474,7 @@ class upload_bulk_upload(Resource):
                             Column('Middle Name',null_validation),
                             Column('Last Name',null_validation),
                             Column('Secondary Contact  No',null_validation),
-                            Column('Email id',null_validation),
+                            Column('Email id',cand_email_validation + null_validation),
                             Column('Present Panchayat',null_validation),
                             Column('Present Taluk/Block',null_validation),
                             Column('Present Address line1',null_validation),
@@ -5558,7 +5559,7 @@ class upload_bulk_upload(Resource):
                             Column('Middle Name',null_validation),
                             Column('Last Name',null_validation),
                             Column('Secondary Contact  No',null_validation),
-                            Column('Email id',null_validation),
+                            Column('Email id',cand_email_validation + null_validation),
                             Column('Present Panchayat',null_validation),
                             Column('Present Taluk/Block',null_validation),
                             Column('Present Address line2',null_validation),
