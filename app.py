@@ -5227,7 +5227,7 @@ class otp_send(Resource):
                         fr = f.read()
                         return(fr)
                     #short_url='{}/wv?n={}&m={}&o={}'.format(config.Base_URL,cand_name.replace(' ','%20'),mobile_no,otp)
-                    name=cand_name[0:19] if len(cand_name)>=19 else cand_name
+                    name=cand_name[0:18] if len(cand_name)>=18 else cand_name
                     param={"n":name,"m":mobile_no,"o":otp}
                     param_str=urllib.parse.urlencode(param)
                     short_url='{}/wv?'.format(config.Base_URL)

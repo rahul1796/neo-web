@@ -663,6 +663,14 @@
         $('#target_percentage_'+id).removeAttr('required');        
         $('#target_percentage_'+id).removeAttr('min');
         $('#percentage_billing_milestone_'+id).removeAttr('required');
+        if(id=='7')
+        {
+            $('#is_percentage_wise_target_rate_'+id).prop( "disabled", false );
+        }
+        else
+        {
+            $('#is_percentage_wise_target_rate_'+id).prop( "disabled", true );
+        }
         LoadPercentBillingMilestones('percentage_billing_milestone_'+id,'',id);
         console.log(MilestoneObject);
     }
