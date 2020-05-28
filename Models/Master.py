@@ -234,8 +234,8 @@ class Master:
         return response
     def partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         return Database.partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-    def add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id):
-        popupMessage = {"PopupMessage": Database.add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id)}
+    def add_partner_details(partner_name,user_id,is_active,partner_type_id,assessment_partner_type_id,address,partner_id):
+        popupMessage = {"PopupMessage": Database.add_partner_details(partner_name,user_id,is_active,partner_type_id,assessment_partner_type_id,address,partner_id)}
         return popupMessage
     def get_partner_details(partner_id):
         return {"PartnerDetail":Database.get_partner_details(partner_id)}

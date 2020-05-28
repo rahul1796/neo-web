@@ -6028,9 +6028,10 @@ class add_partner_details(Resource):
             user_id=g.user_id
             is_active=request.form['isactive']
             partner_type_id=request.form['ddlPartnerTypes']
+            assessment_partner_type_id=request.form['ddlAssessmentPartnerTypes']
             address=request.form['Address']
             partner_id=request.form['PartnerId']
-            return Master.add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id)
+            return Master.add_partner_details(partner_name,user_id,is_active,partner_type_id,assessment_partner_type_id,address,partner_id)
 api.add_resource(add_partner_details,'/add_partner_details')
 
 @app.route("/after_popup_partner")
