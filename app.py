@@ -5356,6 +5356,7 @@ class mobilized_list_updated(Resource):
             state_ids = request.form["state_ids"]
             MinAge=request.form['MinAge']
             MaxAge = request.form["MaxAge"]
+            created_by = request.form["created_by"]
             
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
@@ -5367,7 +5368,7 @@ class mobilized_list_updated(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             
-            return Candidate.mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Candidate.mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,created_by)
 api.add_resource(mobilized_list_updated, '/mobilized_list_updated')
 
 class DownloadMobTemplate(Resource):
@@ -5379,7 +5380,7 @@ class DownloadMobTemplate(Resource):
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
                 
-                return {'Description':'Downloaded Template', 'Status':True, 'filename':'Master_Mobilizer.xlsx'}
+                return {'Description':'Downloaded Template', 'Status':True, 'filename':'CandidateBulkUpload_Mobilization.xlsx'}
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:
                 #print(str(e))
@@ -5417,7 +5418,7 @@ class upload_bulk_upload(Resource):
                             Column('Middle Name',null_validation),
                             Column('Last Name',null_validation),
                             Column('Secondary Contact  No',null_validation),
-                            Column('Email id',cand_email_validation + null_validation),
+                            Column('Email id*',cand_email_validation + null_validation),
                             Column('Present Panchayat',null_validation),
                             Column('Present Taluk/Block',null_validation),
                             Column('Present Address line1',null_validation),
@@ -5483,7 +5484,7 @@ class upload_bulk_upload(Resource):
                             Column('Middle Name',null_validation),
                             Column('Last Name',null_validation),
                             Column('Secondary Contact  No',null_validation),
-                            Column('Email id',null_validation),
+                            Column('Email id*',null_validation),
                             Column('Present Panchayat',null_validation),
                             Column('Present Taluk/Block',null_validation),
                             Column('Present Address line1',null_validation),
@@ -5568,7 +5569,7 @@ class upload_bulk_upload(Resource):
                             Column('Middle Name',null_validation),
                             Column('Last Name',null_validation),
                             Column('Secondary Contact  No',null_validation),
-                            Column('Email id',null_validation),
+                            Column('Email id*',null_validation),
                             Column('Present Panchayat',null_validation),
                             Column('Present Taluk/Block',null_validation),
                             Column('Present Address line2',null_validation),
@@ -5742,7 +5743,7 @@ class DownloadRegTemplate(Resource):
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
                 candidate_ids = request.form["candidate_ids"]
-                file_name='Master_reg_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                file_name='CandidateBulkUpload_Registration_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
                 data = Database.download_selected_registration_candidate(candidate_ids,file_name)
                 if len(data[0])==0:
                     return {'Description':'candidates not available', 'Status':False}
@@ -5845,7 +5846,7 @@ class DownloadEnrTemplate(Resource):
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
                 candidate_ids = request.form["candidate_ids"]
-                file_name='Master_enr_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                file_name='CandidateBulkUpload_Enrolment_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
                 data = Database.download_selected_enrolled_candidate(candidate_ids,file_name)
                 if len(data[0])==0:
                     return {'Description':'candidates not available', 'Status':False}
