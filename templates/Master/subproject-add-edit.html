@@ -76,6 +76,8 @@ var Centers;
                         
                     } 
                     $('#hdn_sub_project_id').val(data.SubProjectDetail.Sub_Project_Id);
+                    $('#hdn_sub_project_name').val(data.SubProjectDetail.Sub_Project_Name);
+                    $('#hdn_sub_project_code').val(data.SubProjectDetail.Sub_Project_Code);
                     //GetProjectMilestone();
                 },
                 error:function(x){
@@ -350,8 +352,9 @@ var Centers;
         $('#divBillingMetrics').hide();
     }
     function ShowProjectBillingMetrics()
-    {
-        $('#headProject').text("Billing Metrics");
+    {   
+        let txt="Billing Metrics: "+ $('#hdn_sub_project_name').val()+"("+$('#hdn_sub_project_code').val()+")";
+        $('#headProject').text(txt);
         $('#btnProjectInfo').show();
         $('#btnBillingMetric').hide();
         $('#divProjectInfo').hide();
@@ -773,6 +776,8 @@ var Centers;
 </script>
                 <div class="container-fluid">
                     <input type="hidden" id="hdn_sub_project_id" name="hdn_sub_project_id" value="0">
+                    <input type="hidden" id="hdn_sub_project_name" name="hdn_sub_project_name" value="">
+                    <input type="hidden" id="hdn_sub_project_code" name="hdn_sub_project_code" value="">
                     <!-- start page title -->
                     <div class="row">
                         <div class="col-12">
