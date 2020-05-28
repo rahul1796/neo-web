@@ -919,6 +919,32 @@ class Database:
         cur.close()
         con.close()
         return content
+    def batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
+        #print(status, customer, project, course, region, center)
+        content = {}
+        d = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+
+        sql = 'exec [batches].[sp_get_batch_list_assessment] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?'
+
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
+        print(values)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
+        content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        return content
 
     def add_batch_details(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id):
         con = pyodbc.connect(conn_str)
@@ -1067,6 +1093,26 @@ class Database:
         cur.close()
         con.close()
         return content
+    def candidate_enrolled_in_batch(batch_id):
+        h = {}
+        response = []
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [candidate_details].[sp_get_candidate_enrolled_in_batch] ?'
+       
+        values = (batch_id,)
+        cur.execute(sql,(values))
+        #print(values)
+        #print(cur2.description)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur.close()
+        con.close()
+        #print(response)
+        return response
   
     def add_edit_map_candidate_batch(candidate_ids,batch_id,course_id,user_id):
         con = pyodbc.connect(conn_str)
@@ -3498,6 +3544,24 @@ SELECT					cb.name as candidate_name,
         return response
         con.close()       
         return response
+    def GetBatchDetailsAssessment(batch_code):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [batches].[sp_get_batch_details_for_assessment]  ?'
+        values = (batch_code,)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+               
     def GetSubProjectsForCenter_course(user_id,user_role_id,center_id, course_id, sub_project_id):
         response = []
         h={}
@@ -3734,13 +3798,14 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return out
-    def GetBatchAssessments(BatchId):
+    def GetBatchAssessments(BatchId,Stage):
         response=[]
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [assessments].[get_batch_assessments] ?'
-        values = (BatchId,)
+        sql = 'exec [assessments].[get_batch_assessments] ?,?'
+        values = (BatchId,Stage)
+        print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -3820,14 +3885,14 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return out
-    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id):
+    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile):
         try:
             response=[]
             h={}
             con = pyodbc.connect(conn_str)
             cur = con.cursor()
-            sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?,?,?,?'
-            values = (batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id)
+            sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
+            values = (batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile)
             print(values)
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]
@@ -3851,7 +3916,8 @@ SELECT					cb.name as candidate_name,
             con = pyodbc.connect(conn_str)
             cur = con.cursor()
             sql = 'exec [assessments].[sp_get_candidate_result] ?'
-            values=(AssessmentId,)            
+            values=(AssessmentId,)  
+            print(values)          
             cur.execute(sql,(values))
             col = [column[0].title() for column in cur.description]
             data=cur.fetchall()   
@@ -3862,6 +3928,7 @@ SELECT					cb.name as candidate_name,
             cur.close()
             con.close()
             response= {"columns":col,"data":df}
+            print(response)
             return response
         except Exception as e:
             print(str(e))
@@ -4974,6 +5041,20 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
+    def GetAssessmentPartnerTypes():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        cur2.execute("exec [masters].[sp_get_assessment_partner_types]")
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response    
     def partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         response = {}
         d = []
@@ -5064,24 +5145,22 @@ SELECT					cb.name as candidate_name,
         else:
             msg={"message":"Created"}
         return msg
-    def GetPartners():
-        response=[]
+    def GetPartners(PartnerTypeId):
+        response = []
         h={}
         con = pyodbc.connect(conn_str)
-        cur = con.cursor()
-        sql = 'exec [masters].[sp_get_partners]'
-        #values = (BatchId,)
-        cur.execute(sql)
-        columns = [column[0].title() for column in cur.description]
-        for row in cur:
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_partners] ?'
+        values = (PartnerTypeId,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
             for i in range(len(columns)):
-                h[columns[i]]=row[i]
+                h[columns[i]]=row[i]           
             response.append(h.copy())
-        out = response
-        cur.commit()
-        cur.close()
-        con.close()       
-        return out
+        cur2.close()
+        con.close()
+        return response 
     def GetAssessmentCandidateResultUploadTemplate(AssessmentId,BatchId):
         try:
             col=[]

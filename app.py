@@ -926,6 +926,59 @@ class batch_list_updated(Resource):
             #print(order_by_column_position)
             
             return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
+class batch_list_assessment(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            
+            batch_id = request.form['batch_id'] 
+            
+            user_role_id  = request.form['user_role_id']
+            user_id = request.form['user_id']
+            customer = request.form['customer']
+            project = request.form['project']
+            sub_project = request.form['sub_project']
+            region = request.form['region']
+            center = request.form['center']
+            center_type = request.form['center_type']
+            # Planned_actual = request.form['Planned_actual']
+            # StartFromDate = request.form['StartFromDate']
+            # StartToDate = request.form['StartToDate']
+            # EndFromDate = request.form['EndFromDate']
+            # EndToDate = request.form['EndToDate']
+            status = request.form['status']
+            Planned_actual=''
+            if 'Planned_actual' in request.form:
+                Planned_actual = request.form['Planned_actual']
+            StartFromDate=''
+            if 'StartFromDate' in request.form:
+                StartFromDate = request.form['StartFromDate']
+            StartToDate=''
+            if 'StartToDate' in request.form:
+                StartToDate = request.form['StartToDate']
+            EndFromDate=''
+            if 'EndFromDate' in request.form:
+                EndFromDate = request.form['EndFromDate']
+            EndToDate=''
+            if 'EndToDate' in request.form:
+                EndToDate = request.form['EndToDate']
+            BU=''
+            if 'BU' in request.form:
+                BU = request.form['BU']            
+            course_ids=''
+            if 'course_ids' in request.form:
+                course_ids=request.form['course_ids']
+
+            start_index = request.form['start']
+            page_length = request.form['length']
+            search_value = request.form['search[value]']
+            order_by_column_position = request.form['order[0][column]']
+            order_by_column_direction = request.form['order[0][dir]']
+            draw=request.form['draw']
+
+            #print(order_by_column_position)
+            
+            return Batch.batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
 
 class add_batch_details(Resource):
     @staticmethod
@@ -1031,6 +1084,13 @@ class candidates_maped_in_batch(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             return Batch.candidate_maped_in_batch(candidate_id,course_ids,batch_id,center_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+class candidates_enrolled_in_batch(Resource):
+    @staticmethod
+    def get():
+         if request.method == 'GET':  
+            batch_id=request.args.get('batch_id',0,type=int)          
+            return Batch.candidate_enrolled_in_batch(batch_id)
+
 
 class add_edit_map_candidate_batch(Resource):
     @staticmethod
@@ -1067,6 +1127,7 @@ class tag_users_from_sub_project(Resource):
 
 api.add_resource(batch_list, '/batch_list')
 api.add_resource(batch_list_updated, '/batch_list_updated')
+api.add_resource(batch_list_assessment, '/batch_list_assessment')
 api.add_resource(add_batch_details, '/add_batch_details')
 api.add_resource(get_batch_details, '/GetBatchDetails')
 api.add_resource(all_course_list, '/AllCourseList')
@@ -1076,6 +1137,7 @@ api.add_resource(trainers_based_on_sub_project, '/TrainersBasedOnSubProject')
 api.add_resource(center_manager_based_on_center, '/CenterManagerBasedOnCenter')
 api.add_resource(candidates_based_on_course,'/ALLCandidatesBasedOnCourse')
 api.add_resource(candidates_maped_in_batch,'/ALLCandidatesMapedInBatch')
+api.add_resource(candidates_enrolled_in_batch,'/ALLCandidatesEnrolledInBatch')
 api.add_resource(add_edit_map_candidate_batch,'/add_edit_map_candidate_batch')
 api.add_resource(drop_edit_map_candidate_batch,'/drop_edit_candidate_batch')
 api.add_resource(untag_users_from_sub_project,'/untag_users_from_sub_project')
@@ -4297,6 +4359,15 @@ class GetSubProjectsForCenter(Resource):
             return response
 api.add_resource(GetSubProjectsForCenter,'/GetSubProjectsForCenter')
 
+class GetBatchDetailsAssessment(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            batch_code=request.args.get('batch_code','',type=str)
+            response={"Batches":Master.GetBatchDetailsAssessment(batch_code)}
+            return response
+api.add_resource(GetBatchDetailsAssessment,'/GetBatchDetailsAssessment')
+
 class Get_all_Center(Resource):
     @staticmethod
     def get():
@@ -4496,7 +4567,8 @@ class GetBatchAssessments(Resource):
         if request.method=='GET':
             try:
                 BatchId=request.args.get('BatchId',0,type=int)
-                response = Assessments.GetBatchAssessments(BatchId)
+                Stage=request.args.get('Stage',0,type=int)
+                response = Assessments.GetBatchAssessments(BatchId,Stage)
                 return response 
             except Exception as e:
                 return {'exception':str(e)}
@@ -4538,7 +4610,12 @@ class ScheduleAssessment(Resource):
             assessment_id=request.form['assessment_id']
             partner_id=request.form['partner_id']
             current_stage_id=request.form['current_stage_id']
-            return Assessments.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id)
+            present_candidate=request.form['Present_Candidate']
+            absent_candidate=request.form['Absent_Candidate']
+            assessor_name=request.form['Assessor_Name']
+            assessor_email=request.form['Assessor_Email']
+            assessor_mobile=request.form['Assessor_Mobile']
+            return Assessments.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile)
 api.add_resource(ScheduleAssessment,'/ScheduleAssessment')
 
 api.add_resource(DownloadAssessmentResult,'/DownloadAssessmentResult')
@@ -5880,6 +5957,13 @@ class GetPartnerTypes(Resource):
             return Master.GetPartnerTypes()
 api.add_resource(GetPartnerTypes,'/GetPartnerTypes')
 
+class GetAssessmentPartnerTypes(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            return Master.GetAssessmentPartnerTypes()
+api.add_resource(GetAssessmentPartnerTypes,'/GetAssessmentPartnerTypes')
+
 class partner_list(Resource):
     @staticmethod
     def post():
@@ -5951,7 +6035,9 @@ class GetPartners(Resource):
     def get():
         if request.method=='GET':
             try:
-                response = Master.GetPartners()
+                PartnerTypeId=request.args.get('PartnerTypeId',0,type=int)
+                print(PartnerTypeId)
+                response = Master.GetPartners(PartnerTypeId)
                 return response 
             except Exception as e:
                 return {'exception':str(e)}
