@@ -69,6 +69,47 @@ function Uploadfile(){
     $('#hdn_home_user_role_id_modal').val($('#hdn_home_user_role_id').val());
     $('#mdl_bulkupload_candidate').modal('show');
 }
+function Loadcreatedbyddl(){
+    var URL=$('#hdn_web_url').val()+ "/AllCreatedByBasedOnUser"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id" : $('#hdn_home_user_role_id').val()
+        },
+
+        success: function (data){
+            console.log(data)
+            if(data.CreatedBy != null)
+            {
+                $('#ddlcreated_by').empty();
+                var count=data.CreatedBy.length;
+                if( count> 0)
+                {
+                    //$('#ddlRegion').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlcreated_by').append(new Option(data.CreatedBy[i].User_Name,data.CreatedBy[i].User_Id));
+                    //$('#ddlCourse').val('-1');
+                }
+                else
+                {
+                    $('#ddlcreated_by').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
 function LoadRegionddl(){
     var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
         $.ajax({
@@ -174,6 +215,7 @@ function LoadTable()
                 d.state_ids = $('#ddlState').val().toString();
                 d.MinAge  = $('#MinAge').val();
                 d.MaxAge  = $('#MaxAge').val();
+                d.created_by  = $('#ddlcreated_by').val().toString();
             },
             error: function (e) {
                 $("#tbl_candidate tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
