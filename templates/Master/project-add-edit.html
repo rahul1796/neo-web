@@ -92,6 +92,7 @@
                                 $('#isactive').prop('checked',false);
                             }
                         }
+                        $('#spnProjectName').text(data.ProjectDetail.Project_Name);
                     } 
                 },
                 error:function(x){
@@ -1144,9 +1145,9 @@
         <div class="row" id="divBillingMetrics" >
             <div class="col-12">
                 <div class="card-box">
-                    <!-- <h4 class="header-title">Billing Metrics</h4> -->
-                    <br/>  
-                                                 
+                    <!-- <h4 class="header-title">Billing Metrics</h4> -->                      
+                    <h4><span id="spnProjectName"></span></h4>   
+                    <br/>                          
                     <form id="formBillingMetrics" name="formBillingMetrics" data-parsley-validate="" action="javascript:SaveProjectMilestones()">
                         <div class="form-group">
                             <div class="row">
