@@ -834,24 +834,38 @@
                             $('#divProjectMilestones').append(varHtml);
                             //LoadPercentBillingMilestones('percentage_billing_milestone_'+id,data.MileStones[i].Per_Of_Milestone,id);
                             //LoadUnitTypes('unit_type_'+id,data.MileStones[i].Unit_Type_Id);
-                            if(data.MileStones[i].Is_Target_Percentage_Req)
+                            if(id=='7')
                             {
-                                $('#is_percentage_wise_target_rate_'+id).prop("checked",true);
-                                $('#target-percentage-container-'+id).show();
-                                $('#percentage-billing-milestone-container-'+id).show();
-                                $('#target_percentage_'+id).attr('required','');
-                                $('#target_percentage_'+id).attr('min','1');
-                                $('#percentage_billing_milestone_'+id).attr('required','');
+                                $('#is_percentage_wise_target_rate_'+id).prop( "disabled", false );
+                                if(data.MileStones[i].Is_Target_Percentage_Req)
+                                {
+                                    $('#is_percentage_wise_target_rate_'+id).prop("checked",true);
+                                    $('#target-percentage-container-'+id).show();
+                                    $('#percentage-billing-milestone-container-'+id).show();
+                                    $('#target_percentage_'+id).attr('required','');
+                                    $('#target_percentage_'+id).attr('min','1');
+                                    $('#percentage_billing_milestone_'+id).attr('required','');
+                                }
+                                else 
+                                {
+                                    $('#is_percentage_wise_target_rate_'+id).prop("checked",false);
+                                    $('#target-percentage-container-'+id).hide();
+                                    $('#percentage-billing-milestone-container-'+id).hide();
+                                    $('#target_percentage_'+id).removeAttr('required');
+                                    $('#target_percentage_'+id).removeAttr('min');
+                                    $('#percentage_billing_milestone_'+id).removeAttr('required');
+                                }
                             }
-                            else 
+                            else
                             {
-                                $('#is_percentage_wise_target_rate_'+id).prop("checked",false);
+                                $('#is_percentage_wise_target_rate_'+id).prop( "disabled", true );
                                 $('#target-percentage-container-'+id).hide();
-                                $('#percentage-billing-milestone-container-'+id).hide();
-                                $('#target_percentage_'+id).removeAttr('required');
-                                $('#target_percentage_'+id).removeAttr('min');
-                                $('#percentage_billing_milestone_'+id).removeAttr('required');
+                                    $('#percentage-billing-milestone-container-'+id).hide();
+                                    $('#target_percentage_'+id).removeAttr('required');
+                                    $('#target_percentage_'+id).removeAttr('min');
+                                    $('#percentage_billing_milestone_'+id).removeAttr('required');
                             }
+                            
                         }
                         for(var i=0;i<count;i++)
                         {
