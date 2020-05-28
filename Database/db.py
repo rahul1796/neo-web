@@ -5081,12 +5081,12 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return response
-    def add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id):
+    def add_partner_details(partner_name,user_id,is_active,partner_type_id,assessment_partner_type_id,address,partner_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_partner] ?, ?, ?, ?, ?, ?'
-        values = (partner_name,user_id,is_active,partner_type_id,address,partner_id)
-        #print(values)
+        sql = 'exec	[masters].[sp_add_edit_partner] ?, ?, ?, ?,?, ?, ?'
+        values = (partner_name,user_id,is_active,partner_type_id,assessment_partner_type_id,address,partner_id)
+        print(values)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
