@@ -828,7 +828,7 @@ function add_map_message(){
                                 {
                                     varHtml+='<tr>';
                                     varHtml+='  <td style="text-align:center;">'+ data.candidates[i].S_No +'</td>';
-                                    varHtml += '<td style="text-align:center;"><input id="addedchk_'+data.candidates[i].Skilling_Id+'" name="checkcase" type="checkbox" value="'+data.candidates[i].Skilling_Id+'" ></td>';
+                                    varHtml += '<td style="text-align:center;"><input id="addedchk1" name="checkcase1" type="checkbox" value="'+data.candidates[i].Skilling_Id+'" ></td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Intervention_Value +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Candidate_Name +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Date_Of_Birth +'</td>';
@@ -942,7 +942,7 @@ function add_map_message(){
     function DropCandidates()
     {
         var cands='';
-        $('[name=checkcase]:checked').each(function () {
+        $('[name=checkcase1]:checked').each(function () {
             cands+= $(this).val()+',';
         });
         cands=cands.substring(0,cands.length-1)
@@ -952,8 +952,9 @@ function add_map_message(){
         }
         else
         {
+            alert(cands);
             $('#hdn_mdl_skilling_id').val(cands);
-            $('#tr_candidate_detail').modal('hide');
+            $('#map_cand').modal('hide');
             $('#con_close_modal').modal('show');
         }
     }

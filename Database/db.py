@@ -4111,13 +4111,14 @@ SELECT					cb.name as candidate_name,
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            for i in range(len(columns)-4):
+            for i in range(len(columns)-1):
                 h[columns[i]]=row[i]
             #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
             response.append(h.copy())
         out = {"candidates":response,"batch_name":row[9],"center_name":row[10],"course_name":row[11]}
         cur.close()
-        con.close()       
+        con.close() 
+        print(response)      
         return out
 
     def GetSubProjectsForuser(user_id):
@@ -5182,6 +5183,7 @@ SELECT					cb.name as candidate_name,
             cur.close()
             con.close()
             response= {"columns":col,"data":df}
+            #print(response)
             return response
         except Exception as e:
             print(str(e))

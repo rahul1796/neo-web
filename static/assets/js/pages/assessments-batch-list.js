@@ -947,11 +947,13 @@ function add_map_message(){
         $('#ddlAssessmentType').prop('disabled', 'disabled');
         $('#ddlAssessmentAgency').prop('disabled', 'disabled');
         $('#ddlPartner').prop('disabled', 'disabled');
+        $('#ddlPartnerType').prop('disabled', 'disabled');
         $('#TxtRequestedDate').prop('disabled', 'disabled');
 
         if (StageId==1)
         {
             $('#DivScheduleDate').show();
+            
             $('#DivAssessmentDate').hide();
             $('#DivAssessorName').hide();
             $('#DivAssessorMob').hide();
@@ -974,9 +976,9 @@ function add_map_message(){
         {
             $('#TxtScheduledDate').prop('disabled', 'disabled');   
             $('#TxtAssessmnetDate').prop('disabled', 'disabled'); 
-            $('#TxtAssessorName').prop('disabled', 'disabled');   
-            $('#TxtAssessorMob').prop('disabled', 'disabled'); 
-            $('#TxtAssessorEmail').prop('disabled', 'disabled');   
+            $('#DivAssessorName').hide();
+            $('#DivAssessorMob').hide();
+            $('#DivAssessorEmail').hide();  
             $('#DivCandidates').hide();
             
         }
@@ -1057,6 +1059,9 @@ function add_map_message(){
     }
     function ScheduleAssessment()
     {   console.log($('#ddlPartner').val());
+        var DateRequested = new Date($('#TxtRequestedDate').val());
+        var DateScheduled = new Date($('#TxtScheduledDate').val());
+        var DateAssessed = new Date($('#TxtAssessmentDate').val());
         if($('#hdn_home_user_role_id').val()=="7" || $('#hdn_home_user_role_id').val()=="5")
         {
             if($('#ddlAssessmentType').val() =="2")
@@ -1078,6 +1083,16 @@ function add_map_message(){
         else if($('#hdn_current_stage_id').val()=="1" & $('#TxtScheduledDate').val()=='')
         {
             alert("Please enter scheduled date.");
+            return false;
+        }
+        else if($('#hdn_current_stage_id').val()=="1" & (DateScheduled < DateRequested))
+        {
+            alert("Assessment Confirmed date can not be less than proposed date.");
+            return false;
+        }
+        else if($('#hdn_current_stage_id').val()=="2" & (DateAssessed < DateScheduled))
+        {
+            alert("Assesssment date can not be less than Assessment Confirmed date.");
             return false;
         }
         else if($('#hdn_current_stage_id').val()=="2" & $('#TxtAssessmnetDate').val()=='')
@@ -1374,7 +1389,7 @@ function add_map_message(){
         $.ajax({
             type:"GET",
             url:URL,
-            async:false,        
+            //async:false,        
             beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
             datatype:"json",
             data:{  
@@ -1383,7 +1398,7 @@ function add_map_message(){
             },
             success:function(data){
                 if(data!=null)
-                {                       
+                {   
                     window.location=data.FilePath+data.FileName;
                     //$('#divLoader').hide();
                 }                    
