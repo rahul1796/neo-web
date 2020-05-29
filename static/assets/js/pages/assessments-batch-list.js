@@ -1062,7 +1062,7 @@ function add_map_message(){
         var DateRequested = new Date($('#TxtRequestedDate').val());
         var DateScheduled = new Date($('#TxtScheduledDate').val());
         var DateAssessed = new Date($('#TxtAssessmentDate').val());
-        if($('#hdn_home_user_role_id').val()=="7" || $('#hdn_home_user_role_id').val()=="5")
+        if($('#hdn_home_user_role_id').val()=="7" )
         {
             if($('#ddlAssessmentType').val() =="2")
             {
@@ -1077,12 +1077,12 @@ function add_map_message(){
         }
         else if($('#TxtRequestedDate').val()=='')
         {
-            alert("Please enter requested date.");
+            alert("Please enter proposed date.");
             return false;
         }
         else if($('#hdn_current_stage_id').val()=="1" & $('#TxtScheduledDate').val()=='')
         {
-            alert("Please enter scheduled date.");
+            alert("Please enter assesment confirmed date.");
             return false;
         }
         else if($('#hdn_current_stage_id').val()=="1" & (DateScheduled < DateRequested))
@@ -1100,7 +1100,7 @@ function add_map_message(){
             alert("Please enter assessment date.");
             return false;
         }
-        else if($('#hdn_current_stage_id').val()=="2" & $('#TxtAssessorName').val()=='')
+        /*else if($('#hdn_current_stage_id').val()=="2" & $('#TxtAssessorName').val()=='')
         {
             alert("Please enter assessor name.");
             return false;
@@ -1109,7 +1109,7 @@ function add_map_message(){
         {
             alert("Please enter assessor email.");
             return false;
-        }
+        }*/
 
         var cand_present='';
         var cand_absent='';
@@ -1478,4 +1478,8 @@ function add_map_message(){
                 });
             }
         }
+    }
+    function Back()
+    {
+        window.location.href = '/assessment';
     }

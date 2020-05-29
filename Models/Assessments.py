@@ -41,7 +41,7 @@ class DownloadAssessmentResultUploadTemplate(Resource):
 
 class DownloadAssessmentResult(Resource):
     DownloadPath=config.DownloadcandidateResultPathLocal
-    print(DownloadPath)
+    #print(DownloadPath)
     report_name = config.AssessmentCandidateResult+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"   
 
     @staticmethod
@@ -49,9 +49,10 @@ class DownloadAssessmentResult(Resource):
         if request.method=='GET':
             try:
                 AssessmentId=request.args.get('AssessmentId',0,type=int)
+                #print(AssessmentId)
                 r=re.compile(config.AssessmentCandidateResult + ".*")
                 lst=os.listdir(DownloadAssessmentResult.DownloadPath)
-                print(DownloadPath)
+                #print(DownloadAssessmentResult.DownloadPath)
                 newlist = list(filter(r.match, lst))
                 for i in newlist:
                     os.remove( DownloadAssessmentResult.DownloadPath + i)
