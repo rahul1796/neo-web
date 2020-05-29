@@ -51,7 +51,7 @@ class DownloadAssessmentResult(Resource):
                 AssessmentId=request.args.get('AssessmentId',0,type=int)
                 r=re.compile(config.AssessmentCandidateResult + ".*")
                 lst=os.listdir(DownloadAssessmentResult.DownloadPath)
-                print(DownloadAssessmentResult.DownloadPath)
+                print(DownloadPath)
                 newlist = list(filter(r.match, lst))
                 for i in newlist:
                     os.remove( DownloadAssessmentResult.DownloadPath + i)
