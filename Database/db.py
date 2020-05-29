@@ -1,7 +1,56 @@
 import pypyodbc as pyodbc
 #import pyodbc
 from .config import *
+#from Database import config
 import pandas as pd
+from datetime import datetime
+from flask import request,make_response
+import requests
+import xml.etree.ElementTree as ET
+import requests
+import io
+import csv
+
+
+def to_xml(df, filename=None, mode='w'):
+    if len(df)>0:
+        df1=df[['Candidate_Id','Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On']]
+        df2=df.drop(['Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On'],axis=1)
+        df2.drop_duplicates(subset ="Candidate_Id",inplace=True)
+    else:
+        df1=None
+        df2=None
+
+    def nested_row_to_xml(row):
+        xml = ['      <status>']
+        for i, col_name in enumerate(row.index):
+            xml.append('        <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
+        xml.append('      </status>')
+        return '\n'.join(xml)
+
+    def row_to_xml(row):
+        xml = ['  <candidate>']
+        for i, col_name in enumerate(row.index):
+            xml.append('    <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
+        df3=df1.loc[(df1['Candidate_Id'] == row['Candidate_Id']) & (df1['Activity_Status_Id']>0)]
+        #print(df3.dtypes)
+        xml.append('    <statushistory>')
+        xml.append('\n'.join(df3.apply(nested_row_to_xml, axis=1)))
+        xml.append('    </statushistory>')
+        xml.append('  </candidate>')
+        return '\n'.join(xml)
+    res=''
+    if len(df)>0:
+        res = '\n'.join(df2.apply(row_to_xml, axis=1))
+    
+    out = ['<data>',res,'</data>']
+    res = '\n'.join(out)
+    if filename is None:
+        return res
+    with open(filename, mode) as f:
+        f.write(res)
+
+pd.DataFrame.to_xml = to_xml
 
 class Database:
     def Login(email,passw):
@@ -286,44 +335,52 @@ class Database:
         con.close()
         return h
     
-    def project_list(project_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, region_ids, cluster_id, center_id, qp):
+    def project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status):
         content = {}
         d = []
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (project_id,user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, region_ids, cluster_id, center_id, qp)
+        sql = 'exec [masters].[sp_get_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,entity,customer,p_group,block,practice,bu,product,status)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[12]
-            fil=row[11]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10]}
-            d.append(h)
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
         return content
-    def GetALLClient():
+    def GetALLClient(user_id,user_role_id):
         client = []
+        h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        cur2.execute("SELECT * FROM [masters].[tbl_client] where is_active=1 and is_deleted=0")
+        values=(user_id,user_role_id)
+        sql='exec [masters].[sp_get_all_clients] ?,?'
+        cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
-        for r in cur2:
-            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
-            client.append(h)
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]            
+            client.append(h.copy())
+            #h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            #client.append(h)
         cur2.close()
         con.close()
         return client
-    def add_project_details(project_name,client_id,practice_id,user_id,is_active,project_id):
+    def add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, ProjectManager, ActualEndDate, ActualStartDate, PlannedEndDate, PlannedStartDate, isactive, project_id, user_id,CourseIds):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_project] ?, ?, ?, ?, ?, ?'
-        values = (project_name,client_id,practice_id,user_id,is_active,project_id)
-        print(values)
+        sql = 'exec	[masters].[sp_add_edit_project] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, ProjectManager, ActualEndDate, ActualStartDate, PlannedEndDate, PlannedStartDate, isactive, project_id, user_id,CourseIds)
+        #print(values)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -331,19 +388,63 @@ class Database:
         cur.close()
         con.close()
         if pop ==1:
-            msg={"message":"Updated"}
-        else:
-            msg={"message":"Created"}
+            msg={"message":"Updated","client_flag":1}
+        else: 
+                if pop==0:
+                    msg={"message":"Created","client_flag":0}
+                else:
+                    if pop==2:
+                        msg={"message":"Customer with the Customer code already exists","client_flag":2}
         return msg
+    
+    def add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_add_edit_subproject] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive)
+        #print(values)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated","client_flag":1}
+        else: 
+                if pop==0:
+                    msg={"message":"Created","client_flag":0}
+                else:
+                    if pop==2:
+                        msg={"message":"Customer with the Customer code already exists","client_flag":2}
+        return msg
+        
     def get_project_details(glob_project_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'SELECT * FROM [masters].[tbl_projects] where project_id=?'
+        h={}
+        sql = "[masters].[sp_get_project_details] ?"
         values = (glob_project_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15]}
+        cur.close()
+        con.close()
+        return h
+    
+    def get_subproject_details(glob_project_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = "exec	[masters].[sp_GetsubprojectDetails] ?"
+        values = (glob_project_id,)
+        print(values)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9].split(','),""+columns[10]+"":row[10].split(','),""+columns[11]+"":row[11],""+columns[12]+"":row[12]}
         cur.close()
         con.close()
         return h
@@ -351,29 +452,32 @@ class Database:
     def center_list(center_id,user_id,user_role_id,user_region_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses):
         content = {}
         d = []
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec [masters].[sp_get_centers_list] ?,?,?,?, ?, ?, ?, ?, ?,?,?,?,?,?,?'        
         values = (center_id,user_id,user_role_id,user_region_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,regions,clusters,courses)
-        print(values)
+        #print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[21]
-            fil=row[20]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16],""+columns[17]+"":row[17],""+columns[18]+"":row[18],""+columns[19]+"":row[19]}
-            d.append(h)
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]            
+            d.append(h.copy())
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
         return content
-    def add_center_details(center_name,user_id,is_active,center_id,center_type_id,center_category_id,bu_id,region_id,cluster_id,country_id,satet_id,district_id,location_name):
+
+    def add_center_details(center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pincode,District,partner_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_centers] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (center_name,user_id,is_active,center_id,center_type_id,center_category_id,bu_id,region_id,cluster_id,country_id,satet_id,district_id,location_name)
+        sql = 'exec	[masters].[sp_add_edit_centers] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?'
+        values = (center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pincode,District,partner_id)
         #print(values)
         cur.execute(sql,(values))
         for row in cur:
@@ -426,7 +530,7 @@ class Database:
         bu = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'SELECT * FROM [masters].[tbl_bu] where is_active=1;'
+        sql = 'SELECT bu_id, bu_name FROM [masters].[tbl_bu] where is_active=1;'
         cur.execute(sql)
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -439,7 +543,7 @@ class Database:
         cluster = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = "SELECT * FROM [masters].[tbl_cluster] where is_active=1 AND (('{}'='-1')OR(region_id in (select	value from	string_split('{}',',')   WHERE	trim(value)!='' )));".format(region_id,region_id)
+        sql = "SELECT state_id,state_name FROM [masters].[tbl_states] where is_active=1 AND (('{}'='-1')OR(region_id in (select	value from	string_split('{}',',')   WHERE	trim(value)!='' )));".format(region_id,region_id)
         cur.execute(sql)
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -486,22 +590,24 @@ class Database:
         con.close()
         return districts
 
-    def course_list(course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def course_list(user_id,user_role_id,course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status):
         content = {}
         d = []
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [content].[sp_get_course_list] ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [content].[sp_get_course_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,course_id,sectors,qps,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,status)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[13]
-            fil=row[12]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11]}
-            d.append(h)
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
@@ -598,18 +704,22 @@ class Database:
         else:
             msg={"message":"Created"}
         return msg
-    def get_course_details(glob_course_id):
+    def get_course_details(course_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec [content].[sp_get_course_detail] ?'
-        values = (glob_course_id)
+        values = (course_id)
         cur.execute(sql,(values,))
         columns = [column[0].title() for column in cur.description]
+        response=[]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+            response.append(h)
+        data = {"CourseDetail":response,""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9]}
         cur.close()
         con.close()
-        return h
+        return data
+
     def get_qp_course():
         qp = []
         con = pyodbc.connect(conn_str)
@@ -692,15 +802,15 @@ class Database:
         cur.close()
         con.close()
         return content
-    def trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids):
+    def trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids,TrainerType):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [users].[sp_get_trainer_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?'
-        values = (user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids)
+        sql = 'exec [users].[sp_get_trainer_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?'
+        values = (user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids,TrainerType)
         cur.execute(sql,(values))
-        print(values)
+        #print(values)
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
@@ -757,7 +867,7 @@ class Database:
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],columns[8]+"":row[8],columns[9]+"":row[9],columns[10]+"":row[10]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],columns[8]+"":row[8],columns[9]+"":row[9]}
         cur.close()
         con.close()
         return h
@@ -768,45 +878,79 @@ class Database:
         cur = con.cursor()
         sql = 'exec [batches].[sp_get_batch_list] ?, ?, ?, ?, ?, ?, ?, ?'
         values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id)
-        cur.execute(sql,(values))
+        print(values)
+        cur.execute(sql,(values))        
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[19]
-            fil=row[18]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16],""+columns[17]+"":row[17]}
+            record=row[20]
+            fil=row[19]
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16],""+columns[17]+"":row[17],""+columns[18]+"":row[18]}
             d.append(h)
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
         return content
-    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, course, region, center):
+        
+    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
         #print(status, customer, project, course, region, center)
         content = {}
         d = []
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, course, region, center)
+
+        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?'
+
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
+
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[19]
-            fil=row[18]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16],""+columns[17]+"":row[17]}
-            d.append(h)
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
         return content
-    def add_batch_details(batch_id,batch_name,course_id,batch_code,center_id,trainer_id,center_manager_id,start_date,end_date,start_time,end_time,user_id,is_active,actual_start_date,actual_end_date):
+    def batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
+        #print(status, customer, project, course, region, center)
+        content = {}
+        d = []
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	batches.sp_add_edit_batches ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (batch_id,batch_name,course_id,center_id,trainer_id,center_manager_id,start_date,end_date,start_time,end_time,user_id,is_active,batch_code,actual_start_date,actual_end_date)
+
+        sql = 'exec [batches].[sp_get_batch_list_assessment] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?'
+
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
+        print(values)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
+        content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        return content
+
+    def add_batch_details(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	batches.sp_add_edit_batches ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -822,15 +966,16 @@ class Database:
                     if pop==2:
                         msg={"message":"Batch with the Batch code already exists","batch_flag":2}
         return msg
+
     def get_batch_details(batch_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'SELECT * FROM [batches].[tbl_batches] where batch_id=?'
+        sql = 'select batch_name, product_id, center_id, course_id, sub_project_id, coalesce(co_funding_project_id,-1) as co_funding_project_id, trainer_id, cast(actual_start_date as varchar(MAX)), cast(actual_end_date as varchar(MAX)), training_start_time, training_end_time, is_active, cast(planned_start_date as varchar(MAX)), cast(planned_end_date as varchar(MAX)) from batches.tbl_batches where batch_id =?'
         values = (batch_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16],""+columns[17]+"":row[17],""+columns[18]+"":row[18]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[12]+"":row[12],""+columns[11]+"":row[11],""+columns[13]+"":row[13]}
         cur.close()
         con.close()
         return h
@@ -862,7 +1007,19 @@ class Database:
         trainers = []
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        cur2.execute("EXEC [masters].[sp_get_trainer_based_on_center] @center_id="+center_id)
+        cur2.execute("EXEC [masters].[sp_get_trainer_based_on_center] @center_id="+str(center_id))
+        columns = [column[0].title() for column in cur2.description]
+        for r in cur2:
+            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            trainers.append(h)
+        cur2.close()
+        con.close()
+        return trainers
+    def GetTrainersBasedOnSubProject(sub_project_id):
+        trainers = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        cur2.execute("EXEC [masters].[sp_get_trainer_based_on_sub_project] @sub_project_id="+str(sub_project_id))
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
             h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
@@ -936,6 +1093,26 @@ class Database:
         cur.close()
         con.close()
         return content
+    def candidate_enrolled_in_batch(batch_id):
+        h = {}
+        response = []
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [candidate_details].[sp_get_candidate_enrolled_in_batch] ?'
+       
+        values = (batch_id,)
+        cur.execute(sql,(values))
+        #print(values)
+        #print(cur2.description)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur.close()
+        con.close()
+        #print(response)
+        return response
   
     def add_edit_map_candidate_batch(candidate_ids,batch_id,course_id,user_id):
         con = pyodbc.connect(conn_str)
@@ -954,11 +1131,11 @@ class Database:
             msg={"message":"Candidate Mapping"}
         return msg
 
-    def drop_edit_map_candidate_batch(candidate_ids,batch_id,course_id,user_id,drop_remark):
+    def drop_edit_map_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec	[candidate_details].[drop_edit_map_candidate_batch] ?, ?, ?, ?, ?'
-        values = (candidate_ids,batch_id,course_id,user_id,drop_remark)
+        values = (skilling_ids,batch_id,course_id,user_id,drop_remark)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -966,18 +1143,49 @@ class Database:
         cur.close()
         con.close()
         if pop ==1:
-            msg={"message":"Candidate Dropout"}
+            msg={"message":"Candidate(s) Dropped"}
         else:
             msg={"message":"Error fetching batch data for Droping"}
         return msg
-
-    def qp_list(qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors):
+    def untag_users_from_sub_project(user_ids,sub_project_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[untag_users_from_sub_project] ?, ?'
+        values = (user_ids,sub_project_id)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"User Untagged"}
+        else:
+            msg={"message":"Error in untagging"}
+        return msg
+    def tag_users_from_sub_project(user_id,sub_project_id,tagged_by):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[tag_users_from_sub_project] ?, ?, ?'
+        values = (user_id,sub_project_id,tagged_by)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"User tagged"}
+        else:
+            msg={"message":"Error in tagging"}
+        return msg
+    def qp_list(user_id,user_role_id,qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_qp_list] ?, ?, ?, ?, ?, ?, ?'
-        values = (qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, sectors)
+        sql = 'exec [masters].[sp_get_qp_list] ?,?,?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, sectors)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -1024,26 +1232,127 @@ class Database:
         con.close()
         return h
 
-    def candidate_list(candidate_id,client_id,project_id,center_id,course_ids,section_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id, user_role_id):
+    def candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, Contracts, candidate_stage, from_date, to_date):
         content = {}
         d = []
+        h={}
+        
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_web_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (candidate_id,client_id,project_id,center_id,course_ids,section_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id, user_role_id)
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?'
+        values = (candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,Contracts, candidate_stage, from_date, to_date)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[7]
-            fil=row[6]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5]}
-            d.append(h)
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):                
+                h[columns[i]]=row[i] if row[i]!=None else 'NA'
+            d.append(h.copy())            
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
         return content
+    def user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        content = {}
+        d = []
+        h={}
+        
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [reports].[sp_get_user_sub_project_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        print(values)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):                
+                h[columns[i]]=row[i] if row[i]!=None else 'NA'
+            d.append(h.copy())            
+        content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        print(d)
+        return content
+           
+    def mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,created_by):
+        content = {}
+        d = []
+        h={}
+        
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_M] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,created_by)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):                
+                h[columns[i]]=row[i] if row[i]!=None else 'NA'
+            d.append(h.copy())            
+        content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        return content
+
+    def registered_list(candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        content = {}
+        d = []
+        h={}
+        
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_R] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):                
+                h[columns[i]]=row[i] if row[i]!=None else 'NA'
+            d.append(h.copy())            
+        content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        return content
+    
+    def enrolled_list(candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        content = {}
+        d = []
+        h={}
+        
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_E] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):                
+                h[columns[i]]=row[i] if row[i]!=None else 'NA'
+            d.append(h.copy())            
+        content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        return content
+
     def get_project_basedon_client(client_id):
         project = []
         con = pyodbc.connect(conn_str)
@@ -1097,11 +1406,11 @@ class Database:
         cur2.close()
         con.close()
         return center
-    def get_cand_center_basedon_course_multiple(course_id, RegionId):
+    def get_cand_center_basedon_course_multiple(user_id,user_role_id,course_id, RegionId):
         center = []
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = """SELECT distinct cen.center_id,cen.center_name FROM masters.tbl_center As cen LEFT JOIN masters.tbl_map_course_center As map on map.center_id=cen.center_id where cen.is_active=1 and cen.is_deleted=0 and ('{}'='-1' or '{}'='' or cen.region_id in (select value from string_split('{}',',') where trim(value)!='')) and ('{}'='-1' or map.course_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(RegionId, RegionId, RegionId, course_id, course_id)
+        sql = """SELECT distinct cen.center_id,cen.center_name FROM masters.tbl_center As cen left join masters.tbl_states as st on st.state_id=cen.state_id where cen.is_active=1 and cen.is_deleted=0 and ('{}'='-1' or '{}'='' or st.region_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(RegionId, RegionId, RegionId)
         cur2.execute(sql)
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
@@ -1123,31 +1432,34 @@ class Database:
         con.close()
         return section
 
-    def client_list(client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_resources):
+    def client_list(user_id,user_role_id,client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_sources,customer_groups,category_type_ids):
         content = {}
         d = []
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_client_list] ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, funding_resources)
+        sql = 'exec [masters].[sp_get_client_list] ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,client_id,Is_Active, funding_sources,customer_groups,category_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[8]
-            fil=row[7]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
-            d.append(h)
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+            d.append(h.copy())
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
         return content
-    def add_client_details(client_name,client_code,user_id,is_active,client_id):
+    def add_client_details(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_client] ?, ?, ?, ?, ?'
-        values = (client_name,client_code,user_id,is_active,client_id)
+        sql = 'exec	[masters].[sp_add_edit_client] ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -1163,15 +1475,64 @@ class Database:
                     if pop==2:
                         msg={"message":"Customer with the Customer code already exists","client_flag":2}
         return msg
+
     def get_client_detail(glob_client_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'SELECT * FROM [masters].[tbl_client] where client_id=?'
+        sql = 'select customer_name,customer_code,is_active,funding_source_id,customer_group_id,industry_type_id,category_type_id from masters.tbl_customer where customer_id=?'
         values = (glob_client_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+        cur.close()
+        con.close()
+        return h
+    
+    def get_contarct_detail(glob_contract_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = "select contract_name, contract_code, coalesce(customer_id,'') as customer_id, coalesce(entity_id,'') as entity_id, coalesce(sales_category_id,'') as sales_category_id, coalesce(cast(start_date as varchar(MAX)),'') as start_date, coalesce(cast(end_date as varchar(MAX)),'') as end_date, is_active, coalesce(value,'') as value, coalesce(sales_manager_id,'') as sales_manager_id  from masters.tbl_contract where contract_id=?"
+        values = (glob_contract_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        h={}
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9]}
+        cur.close()
+        con.close()
+        return h
+
+    def add_contract_details(ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, SalesManager, ContractValue, isactive, user_id, contract_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_add_edit_contract] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (ContractName, ContractCode, ClientName, EntityName, SalesCatergory, StartDate, EndDate, SalesManager, ContractValue, isactive, user_id, contract_id)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated Successfully","client_flag":1}
+        else: 
+                if pop==0:
+                    msg={"message":"Created Successfully","client_flag":0}
+                else:
+                    if pop==2:
+                        msg={"message":"Customer with the Customer code already exists","client_flag":2}
+        return msg
+
+    def get_contract_detail(glob_client_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'select customer_name,customer_code,is_active,funding_source_id,customer_group_id,industry_type_id,category_type_id from masters.tbl_customer where customer_id=?'
+        values = (glob_client_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
         cur.close()
         con.close()
         return h
@@ -2654,6 +3015,7 @@ SELECT					cb.name as candidate_name,
     def sector_list(sector_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec [masters].[sp_get_sector_list] ?, ?, ?, ?, ?, ?'
@@ -2663,31 +3025,35 @@ SELECT					cb.name as candidate_name,
         record="0"
         fil="0"
         for row in cur:
-            record=row[6]
-            fil=row[5]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4]}
-            d.append(h)
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
         return content
 
-    def contract_list(contract_id,customer_ids,stage_ids,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_contract_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (contract_id,customer_ids,stage_ids,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [masters].[sp_get_contract_list] ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[11]
-            fil=row[10]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9]}
-            d.append(h)
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9]}
+            d.append(h.copy())
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
@@ -2940,12 +3306,13 @@ SELECT					cb.name as candidate_name,
         response=[]
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        
+        h={}
         cur.execute("SELECT entity_id,entity_name  FROM [masters].[tbl_entity] where is_active=1 and is_deleted=0")
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
-            response.append(h)
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
         cur.commit()
         cur.close()
         con.close()       
@@ -3082,13 +3449,13 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return res
-    def get_project_basedon_client_multiple(client_id):
+    def get_project_basedon_client_multiple(user_id,user_role_id,client_id):
         project = []
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        #print(client_id)
-        sql = """SELECT * FROM masters.tbl_projects WHERE is_active=1 and is_deleted=0 and ('{}'='-1' or client_id in (select value from string_split('{}',',') where trim(value)!=''))""".format(client_id, client_id)  #'{}'='' or 
-        cur2.execute(sql)
+        values=(user_id,user_role_id,client_id)
+        sql = 'exec masters.sp_get_projects_based_on_customer ?,?,?'
+        cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
             h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
@@ -3110,4 +3477,1975 @@ SELECT					cb.name as candidate_name,
         cur.commit()
         cur.close()
         con.close()       
+        return response
+
+    def GetAllSalesCategory():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        cur2.execute("exec [masters].[sp_get_sales_category]")
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    
+    def Get_all_Customer_Group_db(customer_group_id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_all_customer_group]  ?'
+        values = (customer_group_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()     
+        return response
+
+    def GetAllCategoryTypes():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        cur2.execute("exec [masters].[sp_get_category_type]")
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    def GetSubProjectsForCenter(center_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_sub_projects_for_center]  ?'
+        values = (center_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+        con.close()       
+        return response
+    def GetBatchDetailsAssessment(batch_code):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [batches].[sp_get_batch_details_for_assessment]  ?'
+        values = (batch_code,)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+               
+    def GetSubProjectsForCenter_course(user_id,user_role_id,center_id, course_id, sub_project_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_sub_projects_for_center_course]  ?,?,?, ?, ?'
+        values = (user_id,user_role_id,center_id, course_id, sub_project_id)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        #print(response)
+        return response
+        con.close()       
+        return response
+    def Get_all_Entity_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[get_all_entity]'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    def Get_all_Project_Group_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[get_all_group]'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+    
+    def Get_all_Block_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[get_all_block]'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    def Get_all_Product_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[get_all_product]'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    def Get_all_Center_db(user_id,user_role_id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[get_all_Center] ?,?'
+        values=(user_id,user_role_id)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    def GetContractbycustomer_db(Customer_Id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_GetContractbycustomer]  ?'
+        values = (Customer_Id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[9]+"":row[9]}
+            response.append(h)
+
+        out = {'contracts':response,'Customer_Name':row[5],'Funding_Source':row[6],'Customer_Group':row[7],'Industry_type':row[8]}
+        cur.commit()
+        cur.close()
+        con.close()       
+        return out
+
+    def Getsubprojectbyproject_db(Project_Id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_Getsubprojectbyproject]  ?'
+        values = (Project_Id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2], ""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[10]+"":row[10]}
+            response.append(h)
+
+        out = {'sub_project':response,'project_name':row[7],'project_code':row[8],'project_id':row[9]}
+        cur.commit()
+        cur.close()
+        con.close()       
+        return out
+
+    def get_subproject_basedon_proj_multiple(user_id,user_role_id,project_id):
+        courses = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+
+        sql = 'exec [masters].[sp_get_sub_projects_based_on_projects] ?,?,?'
+        values=(user_id,user_role_id,project_id)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for r in cur2:
+            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            courses.append(h)
+        cur2.close()
+        con.close()
+        return courses
+
+    def Get_all_industry_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'SELECT distinct [industry_type_id], [industry_type_name] FROM [masters].[tbl_industry_type] where is_deleted=0'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+    
+    def GetProjectsForCourse(CourseId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_projects_for_course]  ?'
+        values = (CourseId,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = {'Projects':response}
+        cur.commit()
+        cur.close()
+        con.close()       
+        return out
+
+    def GetSubProjectsForCourse(CourseId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_sub_projects_for_course] ?'
+        values = (CourseId,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = {'Projects':response}
+        cur.commit()
+        cur.close()
+        con.close()       
+        return out
+
+    def GetCourseVariantsForCourse(CourseId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_course_variants_for_course] ?'
+        values = (CourseId,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = {'CourseVariants':response}
+        cur.commit()
+        cur.close()
+        con.close()       
+        return out
+    def GetCentersForCourse(CourseId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_centers_for_course] ?'
+        values = (CourseId,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = {'Centers':response}
+        cur.commit()
+        cur.close()
+        con.close()
+        return out
+    def GetBatchAssessments(BatchId,Stage):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [assessments].[get_batch_assessments] ?,?'
+        values = (BatchId,Stage)
+        print(values)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = {'Assessments':response}
+        cur.commit()
+        cur.close()
+        con.close()       
+        return out
+
+
+    def Get_all_ProjectType_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[get_all_ProjectType]'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    @classmethod
+    def AllCourse_center_db(cls, user_id,user_role_id,center_id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_course_basedon_center] ?,?,?'
+        values = (user_id,user_role_id,center_id, )
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response
+
+    def GetAssessmentTypes():
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [assessments].[sp_get_assessment_types]'
+        #values = (BatchId,)
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = {'AssessmentTypes':response}
+        cur.commit()
+        cur.close()
+        con.close()       
+        return out
+    def GetAssessmentAgency():
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [assessments].[sp_get_assessment_agency] '
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = {'AssessmentAgency':response}
+        cur.close()
+        con.close()       
+        return out
+    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile):
+        try:
+            response=[]
+            h={}
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
+            values = (batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile)
+            print(values)
+            cur.execute(sql,(values))
+            columns = [column[0].title() for column in cur.description]
+            for row in cur:
+                pop=row[0]
+                msg=row[1]
+            cur.commit()
+            cur.close()
+            con.close() 
+            if pop>0:
+                out={"message":msg,"success":1,"assessment_id":pop}
+            else:
+                out={"message":"Error scheduling assessment","success":0,"assessment_id":pop}
+            return out
+        except Exception as e:
+            return {"message":"Error changing assessment stage","success":0,"assessment_id":0}
+    def GetAssessmentCandidateResults(AssessmentId):
+        try:
+            col=[]
+            response={}
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            sql = 'exec [assessments].[sp_get_candidate_result] ?'
+            values=(AssessmentId,)  
+            print(values)          
+            cur.execute(sql,(values))
+            col = [column[0].title() for column in cur.description]
+            data=cur.fetchall()   
+            out = []
+            for i in data:
+                out.append(list(i))        
+            df=pd.DataFrame(out)       
+            cur.close()
+            con.close()
+            response= {"columns":col,"data":df}
+            print(response)
+            return response
+        except Exception as e:
+            print(str(e))
+        return out
+
+    def PMT_Department_user_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [users].[sp_get_PMT_Dept]'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+
+        out = {"PMT_Dept_role":response}
+        #cur.commit()
+        cur.close()
+        con.close()       
+        return out
+
+    def sales_Department_user_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [users].[sales_Department_user_db]'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+
+        out = {"sales_Department_role":response}
+        #cur.commit()
+        cur.close()
+        con.close()        
+        return out
+
+
+    def Getstatebasedonregion_db(region_id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'select state_id, state_name from masters.tbl_states where is_active=1 and region_id ='+str(region_id)
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+
+        out = {"state":response}
+        #cur.commit()
+        cur.close()
+        con.close()       
+        return out
+    
+    def Getcenterbasedonstate_db(state_id):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'select center_id, center_name from masters.tbl_center where is_active=1 and state_id='+str(state_id)
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+
+        out = {"center":response}
+        #cur.commit()
+        cur.close()
+        con.close()       
+        return out
+
+    def Getcoursebasedoncenter_db(center_ids,project_code):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_course_basedon_center_project] ?, ?'
+        values=(center_ids,project_code)      
+        print(values)  
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+
+        out = {"course":response}
+        #cur.commit()
+        cur.close()
+        con.close()       
+        return out
+      
+    def my_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        content = {}
+        d = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_my_project_list] ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
+        content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        return content
+    def GetCoursesForCenter(center_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_courses_for_center]  ?'
+        values = (center_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+        con.close()       
+        return response
+    
+    def GetCoursesForProject(project_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_courses_for_project]  ?'
+        values = (project_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+        con.close()       
+        return response
+    def GetCentersForProject(project_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_centers_for_project]  ?'
+        values = (project_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+        con.close()       
+        return response
+
+    def Getcandidatebybatch_db(batch_id):
+        response = []
+        
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        h={}
+        sql = 'exec [masters].[sp_Getcandidatebybatch]  ?'
+        values = (batch_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)-1):
+                h[columns[i]]=row[i]
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+            response.append(h.copy())
+        out = {"candidates":response,"batch_name":row[9],"center_name":row[10],"course_name":row[11]}
+        cur.close()
+        con.close() 
+        print(response)      
+        return out
+
+    def GetSubProjectsForuser(user_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [users].[sp_get_sub_projects_for_user]  ?'
+        values = (user_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    def GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [reports].[sp_get_ecp_report_data ]  ?,?,?,?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return {"Data":response}
+    def GetContractsBasedOnCustomer(user_id,user_role_id,customer_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_contracts_based_on_customer]  ?,?,?'
+        values = (user_id,user_role_id,customer_id)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return {"Contracts":response}
+
+
+    def GetBillingMilestones():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[get_billing_milestones] '        
+        cur2.execute(sql)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    def GetUnitTypes():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[get_unit_types]  '        
+        cur2.execute(sql)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def SaveProjectBillingMilestones(json_string,project_id,user_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_store_project_milestone] ?, ?, ?'
+        values = (json_string,project_id,user_id)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[0]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop >0 :
+            msg="Saved Successfully"
+        else:
+            msg="Error"
+        return {"PopupMessage":msg,"RowCount":pop}
+    def GetProjectMilestones(project_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_project_milestones] ?'  
+        values=(project_id,)      
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def GetSubProjectCourseMilestones(sub_project_id,course_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_sub_project_course_milestones] ?,?'  
+        values=(sub_project_id,course_id)     
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def SaveSubProjectCourseMilestones(json_string,sub_project_id,user_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_store_sub_project_course_milestone] ?, ?, ?'
+        values = (json_string,sub_project_id,user_id)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[0]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop >0 :
+            msg="Saved Successfully"
+        else:
+            msg="Error"
+        return {"PopupMessage":msg,"RowCount":pop}
+    def GetCoursesBasedOnSubProject(sub_project_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_courses_based_on_sub_project]  ?'
+        values = (sub_project_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def GetUsersBasedOnSubProject(sub_project_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_users_based_on_sub_project]  ?'
+        values = (sub_project_id,)
+        cur2.execute(sql,(values))
+        #print(values)
+        #print(cur2.description)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        #print(response)
+        return response
+    def GetUserListForSubProject(sub_project_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_user_list_for_sub_project]  ?'
+        values = (sub_project_id,)
+        cur2.execute(sql,(values))
+        #print(values)
+        #print(cur2.description)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        #print(response)
+        return response
+    def GetCentersbasedOnSubProject(sub_project_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_centers_based_on_sub_project]  ?'
+        values = (sub_project_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def GetTrainersBasedOnType(trainer_flag):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_trainers_based_on_type]  ?'
+        values = (trainer_flag,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def GetUsersBasedOnRole(user_role_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_users_based_on_role]  ?'
+        values = (user_role_id,)
+        #print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        #print(response)
+        return response
+    def GetUserRole():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_user_roles_for_sub_project_tagging] '
+        cur2.execute(sql)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        #print(response)
+        return response
+    def SaveSubProjectCourseCenterUnitPrice(json_string,primary_key_id,user_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_store_sub_project_course_center_unitrate]  ?, ?, ?'
+        values = (json_string,primary_key_id,user_id)
+        #print(values)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[0]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop >0 :
+            msg="Saved Successfully"
+        else:
+            msg="Error"
+        return {"PopupMessage":msg,"RowCount":pop}
+    def GetSubProjectCourseCenterUnitRates(sub_project_id,primary_key):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec  [masters].[sp_get_sub_projects_course_center_unitrates]  ?,?'
+        values = (sub_project_id,primary_key)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    def check_password(username,password,app_version,device_model,imei_num,android_version):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "call users.sp_user_authentication_updated('{}','{}','{}','{}','{}','{}')".format(username,password,app_version,device_model,imei_num,android_version)
+        quer = "{"+ quer + "}"
+        curs.execute(quer)
+        data = curs.fetchall()
+        data = data[0]
+
+        if str.lower(data[0]) =='false':
+            return {'app_status':False, 'success': False, 'description': data[2]}
+        elif str.lower(data[0]) =='true':
+            if str.lower(data[1])=='false':
+                return {'success': False, 'description': data[2],'app_status':True}
+            elif str.lower(data[1])=='true':
+                return {'app_status':True, 'success': True, 'description': data[2], 'role_id':data[3],'user_id':data[4],'user_name':data[5],'user_email':data[6]}
+            else:
+                return {'success': False, 'description': 'stored procedure not return true/false','app_status':True}
+        else:
+            return {'success': False, 'description': 'stored procedure not return true/false','app_status':False}
+    
+    def otp_send_db(otp, mobile_no, app_name, flag):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "call [masters].[sp_mobile_otp_verification]('{}','{}',{},'{}')".format(mobile_no, otp, flag, app_name)
+        quer = "{"+ quer + "}"
+        curs.execute(quer)
+        data = curs.fetchall()[0]
+        curs.commit()
+        curs.close()
+        conn.close()
+        return [data[0], data[2]]
+
+    def otp_verification_db(otp, mobile_no, app_name,web_flag):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "call [masters].[sp_to_verify_otp]('{}','{}','{}',{})".format(mobile_no, otp, app_name,web_flag)
+        quer = "{"+ quer + "}"
+        curs.execute(quer)
+        data = curs.fetchall()[0]
+        curs.commit()
+        curs.close()
+        conn.close()
+        return data[0]
+
+    def get_candidate_list_updated(user_id,cand_stage,app_version):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "SELECT TOP (1) version_code FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        curs.execute(quer)
+        data=curs.fetchall()
+        data = '' if data==[] else data[0][0]
+        if app_version < str(data):
+            curs.close()
+            conn.close()
+            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            return out
+        if cand_stage==1:
+            sql = 'exec [candidate_details].[sp_get_candidate_list_stage_M]  ?, ?'
+            filenmae = 'candidate_list_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_M.xml'
+        elif cand_stage==2:
+            sql = 'exec [candidate_details].[sp_get_candidate_list_stage_R]  ?, ?'
+            filenmae = 'candidate_list_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_R.xml'
+        elif cand_stage==3:
+            sql = 'exec [candidate_details].[sp_get_candidate_list_stage_E]  ?, ?'
+            filenmae = 'candidate_list_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_E.xml'
+        else:
+            out = {'success': False, 'description': "incorrect stage", 'app_status':True}
+            return out
+        
+        values = (user_id,cand_stage)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        response = []
+        h={}
+        for row in curs:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        df = pd.DataFrame(response)
+        df = df.fillna('')
+
+        curs.close()
+        conn.close()
+        df.to_xml(candidate_xmlPath + filenmae)
+        out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
+        return out
+
+    def get_submit_candidate_mobi(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "SELECT TOP (1) version_code FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        curs.execute(quer)
+        data=curs.fetchall()
+        data = '' if data==[] else data[0][0]
+        if app_version < str(data):
+            curs.close()
+            conn.close()
+            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            return out
+        
+        try:
+            '''
+            insert into candidate_details.tbl_candidate_interventions
+            (candidate_id,intervention_category,created_on,created_by,is_active)
+            OUTPUT inserted.candidate_id
+            values
+            '''
+            quer1 = '''
+            insert into candidate_details.tbl_candidates
+            (isFresher, salutation, first_name, middle_name, last_name, date_of_birth, isDob, age,primary_contact_no, secondary_contact_no, email_id, gender,marital_status, caste, disability_status, religion, source_of_information, present_pincode,present_district, permanent_district,permanent_pincode,candidate_stage_id, candidate_status_id, created_on, created_by, is_active, insert_from,permanent_state,permanent_country,present_state, present_country)
+            OUTPUT inserted.candidate_id
+            values
+            '''
+            quer2='''
+            insert into candidate_details.tbl_candidate_reg_enroll_details
+            (candidate_id,mother_tongue,current_occupation,average_annual_income,interested_course,product,candidate_photo,present_address_line1,permanaet_address_line1,created_on,created_by,is_active)
+            values
+            '''
+            quer3='''
+            insert into candidate_details.tbl_candidate_reg_enroll_non_mandatory_details
+            (candidate_id,present_address_line2,present_village,present_panchayat,present_taluk_block,permanent_address_line2,permanent_village,permanent_panchayat,permanent_taluk_block,created_on,created_by,is_active)
+            values
+            '''
+            url = candidate_xml_weburl + xml
+            r = requests.get(url)
+            data = r.text
+            root = ET.fromstring(data)
+            out = []
+            for child in root:
+                data = child.attrib
+                out.append(data)
+                #quer1_a + = 
+                quer = "({},'{}','{}','{}','{}','{}',{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},1,'m','{}','{}','{}','{}'),".format(1 if data['isFresher']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],
+                            data['candDob'],1 if data['dobEntered']=='true' else 0,data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'], data['disableStatus'], data['candReligion'],
+                            data['candSource'], data['presPincode'],data['presDistrict'],data['permDistrict'],data['permPincode'],user_id,data['permState'],data['permCountry'] ,data['presState'],data['presCountry'])
+                quer1 += '\n'+quer
+            quer1 = quer1[:-1]+';'
+            curs.execute(quer1)
+            d = list(map(lambda x:x[0],curs.fetchall()))
+            curs.commit()
+
+            for i in range(len(d)):
+                quer2 += '\n' + "({},'{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(d[i],out[i]['motherTongue'],out[i]['candOccuptn'],out[i]['annualIncome'],out[i]['interestCourse'],out[i]['candProduct'],out[i]['candPic'],out[i]['presAddrOne'],out[i]['permAddrOne'],user_id)
+                quer3 += '\n' + "({},'{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(d[i],out[i]['presAddrTwo'],out[i]['presVillage'],out[i]['presPanchayat'],out[i]['presTaluk'],out[i]['permAddrTwo'],out[i]['permVillage'],out[i]['permPanchayat'],out[i]['permTaluk'],user_id)
+              
+            quer2 = quer2[:-1]+';'
+            quer3 = quer3[:-1]+';'
+            curs.execute(quer2 + '\n' + quer3)
+            curs.commit()
+            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
+        except Exception as e:
+            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+        finally:
+            curs.close()
+            conn.close()
+            return out
+    def get_submit_candidate_reg(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "SELECT TOP (1) version_code FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        curs.execute(quer)
+        data=curs.fetchall()
+        data = '' if data==[] else data[0][0]
+        if app_version < str(data):
+            curs.close()
+            conn.close()
+            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            return out
+        
+        try:
+            quer1 = '''
+            update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',candidate_stage_id=2,candidate_status_id=2,created_on=GETDATE(),created_by='{}',is_active=1 where candidate_id='{}';
+            '''
+            quer2='''
+            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type={},identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',created_by='{}',aadhar_image_name='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            '''
+
+            url = candidate_xml_weburl + xml
+            r = requests.get(url)
+            data = r.text
+            root = ET.fromstring(data)
+            query = ""
+            for child in root:
+                data = child.attrib
+                aadhar_image_name=''
+                if 'aadhar_image_name' in data:
+                    aadhar_image_name=data['aadhar_image_name']
+                query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1 if data['dobEntered']=='true' else 0,data['yrsExp'],data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],user_id,data['cand_id'])
+                query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['aadhaarNo'],data['idType'],data['idNum'],data['idCopy'],data['empType'],data['prefJob'],data['relExp'],data['lastCtc'],data['prefLocation'],data['willTravel'],data['workShift'],data['bocwId'],data['expectCtc'],user_id,aadhar_image_name,data['cand_id'])
+            
+            curs.execute(query)
+            curs.commit()
+
+            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
+        except Exception as e:
+            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+        finally:
+            curs.close()
+            conn.close()
+            return out
+            
+    def get_submit_candidate_enr(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "SELECT TOP (1) version_code FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        curs.execute(quer)
+        data=curs.fetchall()
+        data = '' if data==[] else data[0][0]
+        if app_version < str(data):
+            curs.close()
+            conn.close()
+            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            return out
+        
+        try:
+            quer1 = '''
+            update candidate_details.tbl_candidates set isFresher={},isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',is_active=1 where candidate_id='{}';
+            '''
+            quer2='''
+            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',present_address_line1='{}',permanaet_address_line1='{}',highest_qualification='{}',stream_specialization='{}',computer_knowledge='{}',technical_knowledge='{}',average_household_income='{}',bank_name='{}',account_number='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            '''
+            quer3='''
+            update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set present_address_line2='{}',present_village='{}',present_panchayat='{}',present_taluk_block='{}',permanent_address_line2='{}',permanent_village='{}',permanent_panchayat='{}',permanent_taluk_block='{}',name_of_institute='{}',university='{}',year_of_pass='{}',percentage='{}',branch_name='{}',branch_code='{}',account_type='{}',attachment_image_name='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            '''
+            quer4='''
+            insert into candidate_details.tbl_candidate_interventions
+            (candidate_id,intervention_category,created_on,created_by,is_active)
+            OUTPUT inserted.candidate_intervention_id
+            values
+            '''
+
+            quer5='''
+            insert into candidate_details.tbl_map_candidate_intervention_skilling
+            (intervention_id, course_id, batch_id, intervention_value, created_on,created_by,is_active)
+            values
+            '''
+
+            quer6='''
+            INSERT INTO [candidate_details].[tbl_candidate_family_details]
+                ([candidate_id]
+                ,[salutation]
+                ,[name]
+                ,[family_date_of_birth]
+                ,[family_age]
+                ,[family_primary_contact]
+                ,[family_email_address]
+                ,[gender]
+                ,[relationship]
+                ,[education_qualification]
+                ,[current_occupation]
+                ,[created_by]
+                ,[created_on]
+                ,[is_active])
+            VALUES
+            '''
+            url = candidate_xml_weburl + xml
+            r = requests.get(url)
+            data = r.text
+            root = ET.fromstring(data)
+            query = ""
+            fam_query=""
+            out=[]
+            for child in root:
+                data = child.attrib
+                out.append(data['assign_batch'])
+                query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,data['cand_id'])
+                query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['presAddrOne'],data['permAddrOne'],data['highQuali'],data['candStream'],data['compKnow'],data['techKnow'],data['houseIncome'],data['bankName'],data['accNum'],user_id,data['cand_id'])
+                query += '\n' + quer3.format(data['presAddrTwo'],data['presVillage'],data['presPanchayat'],data['presTaluk'],data['permAddrTwo'],data['permVillage'],data['permPanchayat'],data['permTaluk'],data['instiName'],data['university'],data['yrPass'],data['percentage'],data['branchName'],data['ifscCode'],data['accType'],data['bankCopy'],user_id,data['cand_id'])
+
+                quer = "({},'SAE',GETDATE(),{},1),".format(data['cand_id'],user_id)
+                quer4 += '\n'+quer
+                
+                for fam in child.findall('family_details'):
+                    dt=fam.attrib
+                    fam_query+="({},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',{},GETDATE(),1),".format(data['cand_id'],dt['memberSal'],dt['memberName'],dt['memberDob'],dt['memberAge'],dt['memberContact'],dt['memberEmail'],dt['memberGender'],dt['memberRelation'],dt['memberQuali'],dt['memberOccuptn'],user_id)
+            curs.execute(query)
+            curs.commit()
+
+            quer4 = quer4[:-1]+';'
+            curs.execute(quer4)
+            d = list(map(lambda x:x[0],curs.fetchall()))
+            curs.commit()
+            for i in range(len(d)):
+                quer5 += '\n' + "({},(select course_id from batches.tbl_batches where batch_id={}),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],out[i],out[i],user_id)
+            quer5 = quer5[:-1]+';'
+            curs.execute(quer5)
+            curs.commit()
+            
+            if fam_query!="":
+                quer6 += fam_query[:-1]+';'
+                curs.execute(quer6)
+                curs.commit()
+
+            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
+        except Exception as e:
+            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+        finally:
+            curs.close()
+            conn.close()
+            return out
+          
+    def get_batch_list_updated(user_id):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = """
+        SELECT	distinct b.batch_id, b.batch_name, batch_code FROM [masters].[tbl_map_sub_project_user] as mspb inner join	batches.tbl_batches as b on b.sub_project_id=mspb.sub_project_id where mspb.user_id={} and CONVERT(DATE, GETDATE(), 102) <= b.actual_end_date
+        UNION
+        SELECT	distinct b.batch_id, b.batch_name, batch_code FROM [masters].[tbl_map_sub_project_user] as mspb inner join	batches.tbl_batches as b on b.co_funding_project_id=mspb.sub_project_id where mspb.user_id={} and CONVERT(DATE, GETDATE(), 102) <= b.actual_end_date
+        """.format(user_id,user_id)
+        
+        curs.execute(quer)
+        columns = [column[0].title() for column in curs.description]
+        response = []
+        h={}
+        for row in curs:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        curs.close()
+        conn.close()
+        out = {'success': True, 'description': "Success", "batches":response}
+        return out
+
+    def GetContractProjectTargets(contact_id,user_id,user_role_id,region_id,from_date,to_date):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec  [masters].[sp_get_contract_project_target_values]  ?,?,?,?,?,?'
+        values = (contact_id,user_id,user_role_id,region_id,from_date,to_date)
+        cur2.execute(sql,(values))
+        #   print(cur2.fetchall())
+        #print(cur2)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    def sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project):
+        response = {}
+        d = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_sub_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
+        values = (user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,entity,customer,p_group,block,practice,bu,product,status,project)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
+        response = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        return response
+    def mobilization_web_inser(df,user_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        try:
+            quer1 = '''
+            insert into candidate_details.tbl_candidates
+            (isFresher, salutation, first_name, middle_name, last_name, date_of_birth, isDob, age,primary_contact_no, secondary_contact_no, email_id, gender,marital_status, caste, disability_status, religion, source_of_information, present_pincode,present_district, permanent_district,permanent_pincode,candidate_stage_id, candidate_status_id, created_on, created_by, is_active, insert_from,present_state, present_country,permanent_state,permanent_country)
+            OUTPUT inserted.candidate_id
+            values
+            '''
+            quer2='''
+            insert into candidate_details.tbl_candidate_reg_enroll_details
+            (candidate_id,candidate_photo,present_address_line1,permanaet_address_line1,created_on,created_by,is_active)
+            values
+            '''
+            quer3='''
+            insert into candidate_details.tbl_candidate_reg_enroll_non_mandatory_details
+            (candidate_id,present_address_line2,present_village,present_panchayat,present_taluk_block,permanent_address_line2,permanent_village,permanent_panchayat,permanent_taluk_block,created_on,created_by,is_active)
+            values
+            '''
+            df['Date of Birth*'] = df['Date of Birth*'].astype(str)
+            out = df.values.tolist()
+            for row in out:
+                quer = "({},'{}','{}','{}','{}','{}',{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},1,'w',{},'{}',{},'{}'),".format(1 if row[0]=='Fresher' else 0,row[2],row[3],row[4],row[5],row[6],
+                1 if row[7]=='' else 0,row[7] if row[7]!='' else 0,row[8],row[9],row[10],row[11],row[12],row[13],row[14],row[15],row[16],row[24],row[22],row[31],row[33],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[35]),
+                "(select state_id from masters.tbl_states where state_name like trim('{}'))".format(row[23]),'1',"(select state_id from masters.tbl_states where state_name like trim('{}'))".format(row[32]),'1')
+                quer1 += '\n'+quer
+            quer1 = quer1[:-1]+';'
+            #print(quer1)
+            cur.execute(quer1)
+            d = list(map(lambda x:x[0],cur.fetchall()))
+            cur.commit()
+            for i in range(len(d)):
+                quer2 += '\n' + "({},'{}','{}','{}',GETDATE(),{},1),".format(d[i],out[i][1],out[i][17],out[i][26],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(out[i][35]))
+                quer3 += '\n' + "({},'{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(d[i],out[i][18],out[i][19],out[i][20],out[i][21],out[i][27],out[i][28],out[i][29],out[i][30],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(out[i][35]))
+            quer2 = quer2[:-1]+';'
+            quer3 = quer3[:-1]+';'
+            cur.execute(quer2 + '\n' + quer3)
+            cur.commit()
+            out = {'Status': True, 'message': "Submitted Successfully"}
+        except Exception as e:
+            out = {'Status': False, 'message': "error: "+str(e)}
+        finally:
+            cur.close()
+            con.close()
+            return out    
+    
+    def AllCreatedByBasedOnUser(UserId,UserRoleId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_get_createdby_based_on_user] ?, ?'
+        values = (UserId,UserRoleId)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i] 
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h.copy())
+        cur.commit()
+        cur.close()
+        con.close()
+        return response
+
+    def download_selected_registration_candidate(candidate_ids,filename):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[candidate_details].[sp_get_candidate_download_new_R] ?'
+        values = (candidate_ids,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        data = list(map(lambda x:list(x),cur.fetchall()))
+
+        cur.close()
+        con.close()
+        return data
+
+    def registration_web_inser(df,user_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        #print(df.columns)
+        #try:
+        df['Date of Birth*'] = df['Date of Birth*'].astype(str)
+        out = df.values.tolist()
+                                                                                                                                                                                                                                                                                                                                                                                                
+        quer1 = '''
+        update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=2,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1 where candidate_id='{}';
+        '''
+        quer2='''
+        update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where UPPER(identification_name)=UPPER('{}')),identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',present_address_line1='{}',permanaet_address_line1='{}',created_by={},created_on=GETDATE(),is_active=1 where candidate_id='{}';
+        '''
+        quer3='''
+        update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set present_address_line2='{}',present_village='{}',present_panchayat='{}',present_taluk_block='{}',permanent_address_line2='{}',permanent_village='{}',permanent_panchayat='{}',permanent_taluk_block='{}',created_by={},created_on=GETDATE(),is_active=1 where candidate_id='{}';
+        '''
+        query = ""
+        for row in out:
+            #row[42]=1
+            query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[55]),row[0])
+            query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[23],row[32],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[55]),row[0])
+            query += '\n' + quer3.format(row[24],row[25],row[26],row[27],row[33],row[34],row[35],row[36],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[55]),row[0])
+        
+        #print(query)
+        cur.execute(query)
+        cur.commit()
+        out = {'Status': True, 'message': "Submitted Successfully"}
+        #except Exception as e:
+        #    print(e)
+        #    out = {'Status': False, 'message': "error: "+str(e)}
+        #finally:
+        cur.close()
+        con.close()
+        return out
+    
+    def enrollment_web_inser(df,user_id):
+        try:
+            conn = pyodbc.connect(conn_str)
+            curs = conn.cursor()
+
+            df['Date of Birth*'] = df['Date of Birth*'].astype(str)
+            out = df.values.tolist()
+            quer1 = '''
+            update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1 where candidate_id='{}';
+            '''
+            quer2='''
+            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',present_address_line1='{}',permanaet_address_line1='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where UPPER(identification_name)=UPPER('{}')),identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',highest_qualification='{}',stream_specialization='{}',computer_knowledge='{}',technical_knowledge='{}',family_salutation='{}',member_name='{}',gender='{}',education_qualification='{}',relationship='{}',occupation='{}',average_household_income='{}',bank_name='{}',account_number='{}',created_by={},created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            '''
+            quer3='''
+            update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set present_address_line2='{}',present_village='{}',present_panchayat='{}',present_taluk_block='{}',permanent_address_line2='{}',permanent_village='{}',permanent_panchayat='{}',permanent_taluk_block='{}',name_of_institute='{}',university='{}',year_of_pass='{}',percentage='{}',family_date_of_birth='{}',family_age='{}',family_primary_contact='{}',family_email_address='{}',branch_name='{}',branch_code='{}',account_type='{}',attachment_image_name='{}',created_by={},created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            '''
+            quer4='''
+            insert into candidate_details.tbl_candidate_interventions
+            (candidate_id,intervention_category,created_on,created_by,is_active)
+            OUTPUT inserted.candidate_intervention_id
+            values
+            '''
+            quer5='''
+            insert into candidate_details.tbl_map_candidate_intervention_skilling
+            (intervention_id, course_id, batch_id, intervention_value, created_on,created_by,is_active)
+            values
+            '''
+            quer6='''
+            update	candidate_details.tbl_map_candidate_intervention_skilling set batch_id=(select batch_id from batches.tbl_batches where batch_code=trim('{}')) where intervention_id='{}'
+            '''
+            query = ""
+            b=[]
+            temp=""
+            for row in out:
+                #que = '''select candidate_intervention_id from candidate_details.tbl_candidate_interventions where candidate_id='{}' '''.format(row[0])
+                que='''
+                        SELECT		cs.intervention_id 
+                        FROM		candidate_details.tbl_candidate_interventions i
+                        LEFT JOIN	candidate_details.tbl_map_candidate_intervention_skilling cs on cs.intervention_id= i.candidate_intervention_id 
+                        WHERE		i.candidate_id={}
+                        AND			cs.intervention_id is NOT NULL
+                    '''.format(row[0])
+                curs.execute(que)
+                intervention_id = curs.fetchall()
+                if intervention_id!=[]:
+                    query += quer6.format(row[80],intervention_id[0][0])
+                else:
+                    b.append(row[80])
+                    temp += '\n' + "({},'SAE',GETDATE(),{},1),".format(row[0],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[81]))
+                
+                query += '\n' + quer1.format(1 if str(row[1]).lower()=='Fresher' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[81]),row[0])
+                query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[23],row[32],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[55],row[56],row[61],row[62],row[63],row[64],row[69],row[70],row[71],row[72],row[73],row[74],row[78],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[81]),row[0])
+                query += '\n' + quer3.format(row[24],row[25],row[26],row[27],row[33],row[34],row[35],row[36],row[57],row[58],row[59],row[60],row[65],row[66],row[67],row[68],row[75],row[76],row[77],row[79],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[81]),row[0])
+            #print(query)
+            curs.execute(query)
+            curs.commit()
+            d=[]
+            if temp!="":
+                #print(temp)  
+                quer4 =quer4 + temp[:-1]+';'                          
+                curs.execute(quer4)
+                d = list(map(lambda x:x[0],curs.fetchall()))
+                curs.commit()
+            
+            temp2=""
+            for i in range(len(d)):
+                temp2 += '\n' + "({},(select course_id from batches.tbl_batches where batch_code=trim('{}')),(select batch_id from batches.tbl_batches where batch_code=trim('{}')),concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],b[i],b[i],user_id)
+            if temp2!="":
+                quer5 = quer5+ temp2[:-1]+';'
+                #print(quer5)
+                curs.execute(quer5)
+                curs.commit()
+
+            out = {'Status': True, 'message': "Submitted Successfully"}
+        except Exception as e:
+            out = {'Status': False, 'message': "error: "+str(e)}
+        finally:
+            curs.close()
+            conn.close()
+            return out
+
+    def SaveCandidateActivityStatus(json_string,user_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[candidate_details].[sp_store_sub_candidate_activity_status]  ?, ?,?,?,?,?,?,?,?'
+        values = (json_string,user_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version)
+        cur.execute(sql,(values))
+        for row in cur:
+            success=row[0]
+            description=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        return {"success":success,"description":description}
+
+
+    def download_selected_enrolled_candidate(candidate_ids,filename):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[candidate_details].[sp_get_candidate_download_new_E] ?'
+        values = (candidate_ids,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        data = list(map(lambda x:list(x),cur.fetchall()))
+        cur.close()
+        con.close()
+        return data
+
+    def get_center_details(center_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        h={}
+        sql = "[masters].[sp_get_center_details] ?"
+        values = (center_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15]}
+        cur.close()
+        con.close()
+        return h
+
+    def GetPartnerTypes():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        cur2.execute("exec [masters].[sp_get_partner_types]")
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def GetAssessmentPartnerTypes():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        cur2.execute("exec [masters].[sp_get_assessment_partner_types]")
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response    
+    def partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        response = {}
+        d = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_partner_list] ?, ?, ?, ?, ?, ?'
+        values = (partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        print(values)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
+        response = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        return response
+    def add_partner_details(partner_name,user_id,is_active,partner_type_id,assessment_partner_type_id,address,partner_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_add_edit_partner] ?, ?, ?, ?,?, ?, ?'
+        values = (partner_name,user_id,is_active,partner_type_id,assessment_partner_type_id,address,partner_id)
+        print(values)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated"}
+        else:
+            msg={"message":"Created"}
+        return msg
+    def get_partner_details(partner_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        h={}
+        sql = "[masters].[sp_get_partner_details] ?"
+        values = (partner_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+        cur.close()
+        con.close()
+        return h
+    def GetPartnerUsers(partner_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_partner_users]  ?'
+        values = (partner_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+        con.close()       
+        return response
+    def add_edit_partner_user(UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[users].[sp_add_edit_partner_user] ?, ?, ?, ?, ?, ?,?'
+        values = (UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId)
+        print(values)
+        #print(values)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated"}
+        else:
+            msg={"message":"Created"}
+        return msg
+    def GetPartners(PartnerTypeId):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_partners] ?'
+        values = (PartnerTypeId,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response 
+    def GetAssessmentCandidateResultUploadTemplate(AssessmentId,BatchId):
+        try:
+            col=[]
+            response={}
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            sql = 'exec [assessments].[sp_get_candidate_result_upload_template_data] ?,?'
+            values=(AssessmentId,BatchId)            
+            cur.execute(sql,(values))
+            col = [column[0].title() for column in cur.description]
+            data=cur.fetchall()   
+            out = []
+            for i in data:
+                out.append(list(i))        
+            df=pd.DataFrame(out)       
+            cur.close()
+            con.close()
+            response= {"columns":col,"data":df}
+            #print(response)
+            return response
+        except Exception as e:
+            print(str(e))
+        return out
+    def upload_assessment_result(df,user_id,assessment_id,batch_id,stage_id):
+        try:            
+            print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            json_str=df.to_json(orient='records')
+            sql = 'exec	[assessments].[sp_upload_assessment_result]  ?,?, ?, ?,?'
+            values = (json_str,user_id,assessment_id,batch_id,stage_id)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop >0 :
+                Status=True
+                msg="Uploaded Successfully"
+            else:
+                msg="Error"
+                Status=False
+            return {"Status":Status,'message':msg}
+        except Exception as e:
+            print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+
+    def GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [reports].[sp_get_qp_wise_report_data]   ?,?,?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def GetQpWiseRegionLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [reports].[sp_get_qp_wise_region_level_report_data]   ?,?,?,?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def GetQpWiseRegionWiseBatchLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id,region_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [reports].[sp_get_qp_wise_region_wise_batch_report_data]    ?,?,?,?,?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id,region_id)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return {"response":response,"columns":columns}
+
+    def GetQpWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [reports].[sp_get_qp_wise_report_data_download]   ?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def GetRegionWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [reports].[sp_get_region_wise_report_data_download]   ?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response        
+    def GetALLTrainingPartnerdb():
+        try:            
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            sql = 'select partner_id, partner_name from masters.tbl_partners where partner_type_id=1 and is_active=1'
+            cur.execute(sql)
+            columns = [column[0].title() for column in cur.description]
+            d=[]
+            h={}
+            for row in cur:
+                for i in range(len(columns)):
+                    h[columns[i]]=row[i]
+                d.append(h.copy())
+            cur.commit()
+            cur.close()
+            con.close()
+            return d
+        except Exception as e:
+            print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+
+    def add_ex_triner_details(first_name, last_name, email, mobile, trainer_tyoe, Partner, is_active, created_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[users].[sp_add_edit_ex_treiner] ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (first_name, last_name, email, mobile, trainer_tyoe, Partner, is_active, created_id)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+            UserId=row[0]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated" , "UserId": UserId}
+        else: 
+            if pop==0:
+                msg={"message":"Created", "UserId": UserId}
+            else:
+                if pop==2:
+                    msg={"message":"User with the email id already exists", "UserId": UserId}
+        return msg
+
+    def web_verification(mobile,otp):
+        try:
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            sql = 'exec	[masters].[sp_mobile_web_verification] ?, ?'
+            values = (mobile,otp)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop ==1:
+               return {"msg":"Your mobile number is verified."}
+            else: 
+               return {"msg":"Mobile number verification Failed."}
+        except Exception as e:
+            return {"msg":"Error"+str(e)}
+
+    def app_mobile_validation(mob_no):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "select count(*) as mob_count from candidate_details.tbl_candidates where coalesce(primary_contact_no,'')!='' and primary_contact_no like '{}'".format(mob_no)
+        #quer = "{"+ quer + "}"
+        curs.execute(quer)
+        out = curs.fetchall()[0][0]<=0
+        print(out)
+        return out
+
+    def app_email_validation(email):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "select count(*) as email_count from candidate_details.tbl_candidates where coalesce(email_id,'')!='' and is_active=1 and email_id like '{}'".format(email)
+        #quer = "{"+ quer + "}"
+        curs.execute(quer)
+        return curs.fetchall()[0][0]<=0
+
+
+    def all_email_validation(cand_stage):
+        if cand_stage =='3':
+            quer = """
+                    select		distinct
+                                coalesce(ud.email,'') as email
+                    from		users.tbl_users as u
+                    left join	users.tbl_user_details as ud on ud.user_id=u.user_id
+                    where		u.user_role_id in (24,5)
+                                
+                    """
+        else:
+            quer = """
+                    select		distinct
+                                coalesce(ud.email,'') as email
+                    from		users.tbl_users as u
+                    left join	users.tbl_user_details as ud on ud.user_id=u.user_id
+                    where		u.user_role_id in (2,24,5)
+                    """
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        curs.execute(quer)
+        return list(map(lambda x:str.lower(x[0]), curs.fetchall()))
+    
+    def all_state_validation():
+        quer = """ select distinct state_name from masters.tbl_states """
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        curs.execute(quer)
+        return list(map(lambda x:str.lower(x[0]), curs.fetchall()))
+
+    def DownloadBatchStatusReport(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [reports].[sp_get_batch_status_report_data]    ?,?,?,?,?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        response = {}
+        d = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [reports].[sp_get_batch_status_date_list] ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
+        response = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
         return response

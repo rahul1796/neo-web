@@ -44,18 +44,18 @@
 
             "columns": [
                 { "data": "S_No"},
-                
-                { "data": "Sector_Name" },
                 { "data": "Sector_Code" },
-                { "data": function (row, type, val, meta) {
-                    var varStatus = ""; 
-                    if(row.Is_Active)
-                        varStatus="Active";
-                    else
-                        varStatus="In Active";
-                    return varStatus;
-                    }
-                }
+                { "data": "Sector_Name" },                
+                // { "visible":false,"data": function (row, type, val, meta) {
+                //     var varStatus = ""; 
+                //     if(row.Is_Active)
+                //         varStatus="Active";
+                //     else
+                //         varStatus="In Active";
+                //     return varStatus;
+                //     }
+                // },
+                //  { "visible":false,"data": "Industry_Name" }
             ],
             drawCallback: function(){
                 $('#tbl_sector_paginate ul.pagination').addClass("pagination-rounded");
@@ -100,13 +100,14 @@
                             </div>
                             <br/>
                             <div class="col-lg-12">
-                                <table id="tbl_sector" class="table dt-responsive nowrap" >
+                                <table id="tbl_sector" class="table dt-responsive wrap" >
                                     <thead>
                                         <tr>
                                             <th>S No</th>
-                                            <th>Sector Name</th>
                                             <th>Sector Code</th>
-                                            <th>Status</th>
+                                            <th>Sector Name</th>                                            
+                                            <!-- <th>Status</th>
+                                            <th>Industry</th> -->
                                             <!-- <th>Actions</th>   -->
                                         </tr>
                                     </thead>

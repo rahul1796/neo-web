@@ -64,7 +64,27 @@
     $(document).ready(function(){   
         $('#span_candidate_block').hide()
         LoadDashboardcount(); 
-        LoadDepartmentTrainers();    
+        LoadDepartmentTrainers();  
+        var role_id=parseInt($('#hdn_home_user_role_id').val());
+        if(role_id==1 || role_id==19 ||role_id==23 ||role_id==15 || role_id == 11)
+        {
+            
+        }
+        else
+        {
+            $('#AttCustomer').removeAttr('href');
+            $('#AttContract').removeAttr('href');
+            $('#AttProject').removeAttr('href');
+            $('#AttCourse').removeAttr('href');
+            $('#AttTrainer').removeAttr('href');
+            $('#AttMobilizer').removeAttr('href');
+            $('#AttPlacementOfficer').removeAttr('href');
+            $('#AttRecruiter').removeAttr('href');
+            $('#AttBatch').removeAttr('href');
+            $('#AttPartBatch').removeAttr('href');
+            $('#AttCenter').removeAttr('href');
+            $('#AttPartCenter').removeAttr('href');
+        }
     });
     function LoadDashboardcount()
     {
@@ -96,11 +116,19 @@
                         $('#span_customer').text(data.Dashboard.Client_Count);
                         $('#span_contract').text(data.Dashboard.Contract_Count);
                         $('#span_projects').text(data.Dashboard.Project_Count);
-                        $('#span_centers').text(data.Dashboard.Center_Count);
+                        
                         $('#span_course').text(data.Dashboard.Course_Count);
                         $('#span_trainer').text(data.Dashboard.Trainer_Count);
                         $('#span_mobilizer').text(data.Dashboard.Mobilizer_Count);
                         $('#span_candidate').text(data.Dashboard.Candidate_Count);
+                        $('#span_PO').text(data.Dashboard.Placement_Officer_Count);
+                        
+                        $('#span_total_center').text(data.Dashboard.Center_Count);
+                        $('#span_partner_centers').text(data.Dashboard.Partner_Center_Count);
+                        $('#span_total_batches').text(data.Dashboard.Batch_Count);
+                        $('#span_partmer_batches').text(data.Dashboard.Partner_Batch_Count);
+                        $('#span_recruiter').text(data.Dashboard.Recruiter_Count);
+
                     }
                 }
             },
@@ -207,6 +235,7 @@
         });
         return false;
     }
+
 </script>
     <div class="container-fluid">
         <!-- start page title -->
@@ -229,7 +258,7 @@
                         </div>                      
                         <div class="col-6">
                             <div class="text-right">
-                                <h3 class="text-dark mt-1"><a href="/client"><span id="span_customer" data-plugin="counterup"></span></a></h3>
+                                <h3 class="text-dark mt-1"><a href="/client" id="AttCustomer"><span id="span_customer" data-plugin="counterup"></span></a></h3>
                                 <p class="text-muted mb-1 text-truncate">Customers</p>
                             </div>
                         </div>
@@ -248,8 +277,8 @@
                         </div>                    
                         <div class="col-6">
                             <div class="text-right">
-                                <h3 class="text-dark mt-1"><a href="/contract"><span id="span_contract" data-plugin="counterup"></span></a></h3>
-                                <p class="text-muted mb-1 text-truncate">Contracts</p>
+                                <h3 class="text-dark mt-1"><a href="/contract?status=1" id="AttContract"><span id="span_contract" data-plugin="counterup"></span></a></h3>
+                                <p class="text-muted mb-1 text-truncate">Open Contracts</p>
                             </div>
                         </div>
                         <div class="col-1"></div>
@@ -267,27 +296,26 @@
                         </div>                     
                         <div class="col-6">
                             <div class="text-right">
-                                <h3 class="text-dark mt-1"><a href="/project"><span id="span_projects" data-plugin="counterup"></span></a></h3>
-                                <p class="text-muted mb-1 text-truncate">Projects</p>
+                                <h3 class="text-dark mt-1"><a href="/project?status=1" id="AttProject"><span id="span_projects" data-plugin="counterup"></span></a></h3>
+                                <p class="text-muted mb-1 text-truncate">Open Projects</p>
                             </div>
                         </div>
                         <div class="col-1"></div>
                     </div> <!-- end row-->
                 </div> <!-- end widget-rounded-circle-->
             </div> <!-- end col-->
-
             <div class="col-md-6 col-xl-3">
                 <div class="widget-rounded-circle card-box">
                     <div class="row">   
                         <div class="col-5">
-                            <div class="avatar-lg rounded-circle bg-soft-info border-info border">
-                                <i class="mdi mdi-google-classroom font-22 avatar-title text-info"></i>
+                            <div class="avatar-lg rounded-circle bg-soft-secondary border-secondary border">
+                                <i class="mdi mdi-content-save-outline font-22 avatar-title text-secondary"></i>
                             </div>
-                        </div>                    
+                        </div>                      
                         <div class="col-6">
                             <div class="text-right">
-                                <h3 class="text-dark mt-1"><a href="/center"><span id="span_centers" data-plugin="counterup"></span></a></h3>
-                                <p class="text-muted mb-1 text-truncate">Centers</p>
+                                <h3 class="text-dark mt-1"><a href="/course?status=1" id="AttCourse"><span id="span_course" data-plugin="counterup"></span></a></h3>
+                                <p class="text-muted mb-1 text-truncate">Active Courses</p>
                             </div>
                         </div>
                         <div class="col-1"></div>
@@ -299,25 +327,6 @@
         <div class="row">
             <div class="col-md-6 col-xl-3">
                 <div class="widget-rounded-circle card-box">
-                    <div class="row">   
-                        <div class="col-5">
-                            <div class="avatar-lg rounded-circle bg-soft-secondary border-secondary border">
-                                <i class="mdi mdi-content-save-outline font-22 avatar-title text-secondary"></i>
-                            </div>
-                        </div>                      
-                        <div class="col-6">
-                            <div class="text-right">
-                                <h3 class="text-dark mt-1"><a href="/course"><span id="span_course" data-plugin="counterup"></span></a></h3>
-                                <p class="text-muted mb-1 text-truncate">Courses</p>
-                            </div>
-                        </div>
-                        <div class="col-1"></div>
-                    </div> <!-- end row-->
-                </div> <!-- end widget-rounded-circle-->
-            </div> <!-- end col-->
-
-            <div class="col-md-6 col-xl-3">
-                <div class="widget-rounded-circle card-box">
                     <div class="row">  
                         <div class="col-5">
                             <div class="avatar-lg rounded-circle bg-soft-danger border-danger border">
@@ -326,7 +335,7 @@
                         </div>                    
                         <div class="col-6">
                             <div class="text-right">
-                                <h3 class="text-dark mt-1"><a href="/trainer"><span id="span_trainer" data-plugin="counterup"></span></a></h3>
+                                <h3 class="text-dark mt-1"><a href="/trainer" id="AttTrainer"><span id="span_trainer" data-plugin="counterup"></span></a></h3>
                                 <p class="text-muted mb-1 text-truncate">Trainers</p>
                             </div>
                         </div>
@@ -334,26 +343,7 @@
                     </div> <!-- end row-->
                 </div> <!-- end widget-rounded-circle-->
             </div> <!-- end col-->
-
-            <div class="col-md-6 col-xl-3">
-                <div class="widget-rounded-circle card-box">
-                    <div class="row"> 
-                        <div class="col-5">
-                            <div class="avatar-lg rounded-circle bg-soft-dark border-dark border">
-                                <i class="dripicons-user font-22 avatar-title text-dark"></i>
-                            </div>
-                        </div>                     
-                        <div class="col-6">
-                            <div class="text-right">
-                                <h3 class="text-dark mt-1"><a href="/user?role_id=2"><span id="span_mobilizer" data-plugin="counterup"></span></a></h3>
-                                <p class="text-muted mb-1 text-truncate">Mobilizers</p>
-                            </div>
-                        </div>
-                        <div class="col-1"></div>
-                    </div> <!-- end row-->
-                </div> <!-- end widget-rounded-circle-->
-            </div> <!-- end col-->
-
+            
             <div class="col-md-6 col-xl-3" id="span_candidate_block" style="display: none" >
                 <div class="widget-rounded-circle card-box">
                     <div class="row">   
@@ -372,10 +362,142 @@
                     </div> <!-- end row-->
                 </div> <!-- end widget-rounded-circle-->
             </div> <!-- end col-->
+            
+            <div class="col-md-6 col-xl-3">
+                <div class="widget-rounded-circle card-box">
+                    <div class="row"> 
+                        <div class="col-5">
+                            <div class="avatar-lg rounded-circle bg-soft-dark border-dark border">
+                                <i class="dripicons-user font-22 avatar-title text-dark"></i>
+                            </div>
+                        </div>                     
+                        <div class="col-6">
+                            <div class="text-right">
+                                <h3 class="text-dark mt-1"><a href="/user?role_id=2" id="AttMobilizer"><span id="span_mobilizer" data-plugin="counterup"></span></a></h3>
+                                <p class="text-muted mb-1 text-truncate">Mobilizers</p>
+                            </div>
+                        </div>
+                        <div class="col-1"></div>
+                    </div> <!-- end row-->
+                </div> <!-- end widget-rounded-circle-->
+            </div> <!-- end col-->
+
+            <!-- placement officer-->
+            <div class="col-md-6 col-xl-3" id="span_candidate_block">
+                <div class="widget-rounded-circle card-box">
+                    <div class="row">   
+                        <div class="col-5">
+                            <div class="avatar-lg rounded-circle bg-soft-secondary border-dark border">
+                                <i class="fas fa-user-tie font-22 avatar-title text-warning"></i>
+                            </div>
+                        </div>                    
+                        <div class="col-6">
+                            <div class="text-right">
+                                <h3 class="text-dark mt-1"><a href="/user?role_id=21" id="AttPlacementOfficer"><span id="span_PO" data-plugin="counterup"></span></a></h3>
+                                <p class="text-muted mb-1 text-nowrap">Placement Officers</p>  <!--text-truncate-->
+                            </div>
+                        </div>
+                        <div class="col-1"></div>
+                    </div> <!-- end row-->
+                </div> <!-- end widget-rounded-circle--> 
+            </div> <!-- end col-->
+            <div class="col-md-6 col-xl-3">
+                <div class="widget-rounded-circle card-box">
+                    <div class="row">   
+                        <div class="col-5">
+                            <div class="avatar-lg rounded-circle bg-soft-info border-info border">
+                                <i class="fas fa-users font-22 avatar-title text-info"></i>
+                            </div>
+                        </div>                    
+                        <div class="col-6">
+                            <div class="text-right">
+                                <h3 class="text-dark mt-1"><a href="/user?role_id=22"id="AttRecruiter"><span id="span_recruiter" data-plugin="counterup"></span></a></h3>
+                                <p class="text-muted mb-1 text-truncate">Recruiters</p>
+                            </div>
+                        </div>
+                        <div class="col-1"></div>
+                    </div> <!-- end row-->
+                </div> <!-- end widget-rounded-circle-->
+            </div> <!-- end col-->
         </div>
-        <!-- end row-->
 
         <div class="row">
+            <div class="col-md-6 col-xl-3">
+                <div class="widget-rounded-circle card-box">
+                    <div class="row">   
+                        <div class="col-5">
+                            <div class="avatar-lg rounded-circle bg-soft-info border-info border">
+                                <i class="mdi mdi-school font-22 avatar-title text-info"></i>
+                            </div>
+                        </div>                    
+                        <div class="col-6">
+                            <div class="text-right">
+                                <h3 class="text-dark mt-1"><a href="/batch?status=1" id="AttBatch"><span id="span_total_batches" data-plugin="counterup"></span></a></h3>
+                                <p class="text-muted mb-1 text-truncate">Active Batches</p>
+                            </div>
+                        </div>
+                        <div class="col-1"></div>
+                    </div> <!-- end row-->
+                </div> <!-- end widget-rounded-circle-->
+            </div> <!-- end col-->
+            <div class="col-md-6 col-xl-3">
+                <div class="widget-rounded-circle card-box">
+                    <div class="row">   
+                        <div class="col-5">
+                            <div class="avatar-lg rounded-circle bg-soft-info border-info border">
+                                <i class="mdi mdi-school font-22 avatar-title text-info"></i>
+                            </div>
+                        </div>                    
+                        <div class="col-6">
+                            <div class="text-right">
+                                <h3 class="text-dark mt-1"><a href="/batch?status=2" id="AttPartBatch"><span id="span_partmer_batches" data-plugin="counterup"></span></a></h3>
+                                <p class="text-muted mb-1 text-truncate">Partner Batches</p>
+                            </div>
+                        </div>
+                        <div class="col-1"></div>
+                    </div> <!-- end row-->
+                </div> <!-- end widget-rounded-circle-->
+            </div> <!-- end col-->
+            <div class="col-md-6 col-xl-3">
+                <div class="widget-rounded-circle card-box">
+                    <div class="row">   
+                        <div class="col-5">
+                            <div class="avatar-lg rounded-circle bg-soft-info border-info border">
+                                <i class="mdi mdi-google-classroom font-22 avatar-title text-info"></i>
+                            </div>
+                        </div>                    
+                        <div class="col-6">
+                            <div class="text-right">
+                                <h3 class="text-dark mt-1"><a href="/center?status=1" id="AttCenter"><span id="span_total_center" data-plugin="counterup"></span></a></h3>
+                                <p class="text-muted mb-1 text-truncate">Active Centers</p>
+                            </div>
+                        </div>
+                        <div class="col-1"></div>
+                    </div> <!-- end row-->
+                </div> <!-- end widget-rounded-circle-->
+            </div> <!-- end col-->
+            <div class="col-md-6 col-xl-3">
+                <div class="widget-rounded-circle card-box">
+                    <div class="row">   
+                        <div class="col-5">
+                            <div class="avatar-lg rounded-circle bg-soft-info border-info border">
+                                <i class="mdi mdi-google-classroom font-22 avatar-title text-info"></i>
+                            </div>
+                        </div>                    
+                        <div class="col-6">
+                            <div class="text-right">
+                                <h3 class="text-dark mt-1"><a href="/center?status=2" id="AttPartCenter"><span id="span_partner_centers" data-plugin="counterup"></span></a></h3>
+                                <p class="text-muted mb-1 text-truncate">Partner Centers</p>
+                            </div>
+                        </div>
+                        <div class="col-1"></div>
+                    </div> <!-- end row-->
+                </div> <!-- end widget-rounded-circle-->
+            </div> <!-- end col-->
+        </div>
+        <!-- end row-->
+        
+        <div class="row"  style="display: none" >
             <div class="col-lg-6">
                 <div class="card">
                     <div class="card-body">   

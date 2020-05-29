@@ -1,4 +1,3 @@
-<link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/libs/bootstrap-colorpicker/bootstrap-colorpicker.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/libs/clockpicker/bootstrap-clockpicker.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" />
@@ -7,50 +6,7 @@
 <script type="text/javascript">
 var Candidates = {};
     $(document).ready(function(){
-        
-        LoadCourseList();
-        if('{{batch_id}}' !=0)
-        {
-            var URL=$('#hdn_web_url').val()+ "/GetBatchDetails";
-            $.ajax({
-                type:"GET",
-                url:URL,
-                success:function(data){
-                    if(data!=null)
-                    {
-                        if(data.BatchDetail!="")
-                        {
-                            //alert(data.BatchDetail.Course_Id);-- dropdown-search-filter
-                            $('#BatchName').val(data.BatchDetail.Batch_Name);
-                            $('#ddlCourse').val(data.BatchDetail.Course_Id).change();
-                            $('#BatchCode').val(data.BatchDetail.Batch_Code);
-                            LoadCenterList($('#ddlCourse').val(),data.BatchDetail.Center_Id);
-                            console.log('fvhg',data);
-                            TrainersBasedOnUsers($('#ddlCenter').val(),data.BatchDetail.Trainer_Id);
-                            CenterManagerBasedOnUsers($('#ddlCenter').val(),data.BatchDetail.Center_Manager_Id);
-                            $('#StartDate').val(data.BatchDetail.Start_Date);
-                            $('#EndDate').val(data.BatchDetail.End_Date);
-                            $('#StartTime').val(data.BatchDetail.Training_Start_Time);
-                            $('#EndTime').val(data.BatchDetail.Training_End_Time);
-                            $('#ActualStartDate').val(data.BatchDetail.Actual_Start_Date);
-                            $('#ActualEndDate').val(data.BatchDetail.Actual_End_Date);
-                            if(data.BatchDetail.Is_Active)
-                            {
-                                $('#isactive').prop('checked',true);
-                            }
-                            else
-                            {
-                                $('#isactive').prop('checked',false);
-                            }
-                        }
-                    } 
-                },
-                error:function(x){
-                    alert('error');
-                }
-            });
-        }
-        $('.dropdown-search-filter').select2();
+         $('.dropdown-search-filter').select2();
         $(".date-picker").flatpickr();             
         $(".time-picker").flatpickr({
             enableTime: !0,
@@ -64,23 +20,175 @@ var Candidates = {};
         $('#EndDate').flatpickr({
             minDate: "today"
         });
+
+        
+        
+
+        document.getElementById("PlannedStartDate").disabled = false;
+        document.getElementById("PlannedEndDate").disabled = false;
+
+        // alert('{{batch_id}}')
+        if('{{batch_id}}' !=0)
+        {   
+            document.getElementById("PlannedStartDate").disabled = true;
+            document.getElementById("PlannedEndDate").disabled = true;
+
+            var URL=$('#hdn_web_url').val()+ "/GetBatchDetails";
+            $.ajax({
+                type:"GET",
+                url:URL,
+                success:function(data){
+                    //alert(data);
+                    if(data!=null)
+                    {
+                        if(data.BatchDetail!="")
+                        {   
+                            //alert(data.BatchDetail);
+                            $('#BatchName').val(data.BatchDetail.Batch_Name);                            
+                            //LoadProductList(data.BatchDetail.Product_Id);
+                            LoadCenterList(data.BatchDetail.Center_Id);
+                            LoadCourseList(data.BatchDetail.Course_Id,data.BatchDetail.Center_Id);
+                            LoadsubProject(data.BatchDetail.Sub_Project_Id,data.BatchDetail.Center_Id,data.BatchDetail.Course_Id);
+                            LoadCoFunding(data.BatchDetail.Co_Funding_Project_Id);
+                            TrainersBasedOnSubProject(data.BatchDetail.Trainer_Id,data.BatchDetail.Sub_Project_Id);
+                            $('#PlannedStartDate').val(data.BatchDetail.Planned_Start_Date);
+                            $('#PlannedEndDate').val(data.BatchDetail.Planned_End_Date);
+                            $('#ActualStartDate').val(data.BatchDetail.Actual_Start_Date);
+                            $('#ActualEndDate').val(data.BatchDetail.Actual_End_Date);
+                            $('#StartTime').val(data.BatchDetail.Training_Start_Time);
+                            $("#EndTime").val(data.BatchDetail.Training_End_Time);
+                            if(data.BatchDetail.Is_Active)
+                            {
+                                $('#isactive').prop('checked',true);
+                            }
+                            else
+                            {
+                                $('#isactive').prop('checked',false);
+                            }
+                            // alert(data.BatchDetail.Sub_Project_Id);
+                            // alert(data.BatchDetail.Course_Id);
+                            //$('#ddlTrainer').val();
+                            //$('#BatchCode').val(data.BatchDetail.Batch_Code);
+                            //$('#ddlProduct').val(data.BatchDetail.Product_Id);
+                            //$('#ddlProduct').select2('val',data.BatchDetail.Product_Id);
+                            //$('#ddlCenter').val();
+                        }
+                    } 
+                },
+                error:function(x){
+                    alert('error');
+                }
+            });
+        }
+        else
+        {
+            //LoadProductList('0');
+            LoadCenterList('0');
+            LoadCourseList('0','');
+            LoadsubProject('0','','');
+            LoadCoFunding('0');
+            //TrainersBasedOnSubProject('0');
+        }
     });
 
         function myfunction(valuereceived)
         {
-            TrainersBasedOnUsers(valuereceived,0);
+            //TrainersBasedOnUsers(valuereceived,0);
+           // TrainersBasedOnSubProject(valuereceived,0);
             CenterManagerBasedOnUsers(valuereceived),0;
         }
-    
-        function LoadCourseList()
+        function LoadProductList(needed)
         {
-            var URL=$('#hdn_web_url').val()+ "/AllCourseList"
+            var URL=$('#hdn_web_url').val()+ "/Get_all_Product"
             $.ajax({
                 type:"GET",
                 url:URL,
                 async:false,
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
+                success: function (data){
+                    if(data.Product != null)
+                    {
+                        $('#ddlProduct').empty();
+                        var count=data.Product.length;
+                        if( count> 0)
+                        {
+                            $('#ddlProduct').append(new Option('Choose Product',''));
+                            for(var i=0;i<count;i++)
+                                $('#ddlProduct').append(new Option(data.Product[i].Product_Name,data.Product[i].Product_Id));
+                        
+                            if(needed!='' & needed!='0')
+                                $('#ddlProduct').val(needed);
+                        }
+                        else
+                        {
+                            $('#ddlProduct').append(new Option('No Product','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+        function LoadCenterList(needed)
+        {
+            var URL=$('#hdn_web_url').val()+ "/Get_all_Center"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                        "user_id": $('#hdn_home_user_id').val(),
+                        "user_role_id": $('#hdn_home_user_role_id').val()
+                    },
+                success: function (data){
+                    if(data.Center != null)
+                    {
+                        $('#ddlCenter').empty();
+                        var count=data.Center.length;
+                        if( count> 0)
+                        {
+                            $('#ddlCenter').append(new Option('Choose Center',''));
+                            for(var i=0;i<count;i++)
+                                $('#ddlCenter').append(new Option(data.Center[i].Center_Name,data.Center[i].Center_Id));
+                            if(needed!='' & needed!='0')
+                                $('#ddlCenter').val(needed);
+                        }
+                        else
+                        {
+                            $('#ddlCenter').append(new Option('No Center','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+
+        function LoadCourseList(needed,CenterId)
+        {console.log(CenterId);
+            var URL=$('#hdn_web_url').val()+ "/All_Course_basedon_center"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                        "Center_id": CenterId,
+                        "user_id": $('#hdn_home_user_id').val(),
+                        "user_role_id": $('#hdn_home_user_role_id').val()
+                    },
                 success: function (data){
                     if(data.Courses != null)
                     {
@@ -91,114 +199,122 @@ var Candidates = {};
                             $('#ddlCourse').append(new Option('Choose Course',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
+                                if (needed !=0)
+                                {
+                                    $('#ddlCourse').val(needed);
+                                }
                         }
                         else
                         {
                             $('#ddlCourse').append(new Option('Choose Course',''));
                         }
-                    }
-                },
-                error:function(err)
-                {
-                    alert('Error! Please try again');
-                    return false;
-                }
-            });
-            return false;
-        }
-        function LoadCenterList(Course_selected,needed)
-        {
-            var URL=$('#hdn_web_url').val()+ "/CentersBasedOnCourse"
-            $.ajax({
-                type:"POST",
-                url:URL,
-                async:false,
-                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                datatype:"json",
-                data:{
-                    "course_id": Course_selected
-                },
-                success: function (data){
-                    if(data.Centers != null)
-                    {
-                        $('#ddlCenter').empty();
-                        var count=data.Centers.length;
-                        if( count> 0)
-                        {
-                            $('#ddlCenter').append(new Option('Choose Center',''));
-                            for(var i=0;i<count;i++)
-                                $('#ddlCenter').append(new Option(data.Centers[i].Center_Name,data.Centers[i].Center_Id));
-                        }
-                        else
-                        {
-                            $('#ddlCenter').append(new Option('Choose Center',''));
-                        }
-                    }
-                },
-                error:function(err)
-                {
-                    alert('Error! Please try again');
-                    return false;
-                }
-            });
-                if (needed !=0)
-                {
-                    $('#ddlCenter').val(needed);
-                }
-            return false;
-        }
-		function LoadSubCenterList(Center_selected,needed)
-        {
-            //alert("hello");
-            if(needed ==0){
-                myfunction(Center_selected);
-            }
-            //myfunction(Center_selected);
-            var URL=$('#hdn_web_url').val()+ "/SubCenterBasedOnCenter";
-            $.ajax({
-                type:"POST",
-                url:URL,
-                async:false,
-                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                datatype:"json",
-                data:{
-                    "center_id": Center_selected
-                },
-                success: function (res){
-                    //alert(JSON.stringify(res));
-                    if(res.SubCenter != null)
-                    {
-                        $('#ddlSubCenter').empty();
-                        var count=res.SubCenter.length;
                         
+
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            
+            return false;
+        }
+        function LoadsubProject(needed,CenterId,CourseId)
+        {console.log(CenterId,CourseId);
+            var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForCenter_Course"
+            
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                        "center_id": CenterId,
+                        "course_id": CourseId,
+                        "sub_project_id": '0',
+                        "user_id": $('#hdn_home_user_id').val(),
+                        "user_role_id": $('#hdn_home_user_role_id').val()
+                    },
+                success: function (data){
+                    if(data.SubProjects != null)
+                    {
+                        $('#ddlSubProject').empty();
+                        var count=data.SubProjects.length;
                         if( count> 0)
                         {
-                            $('#ddlSubCenter').append(new Option('Choose Sub Center',''));
+                            $('#ddlSubProject').append(new Option('Choose Sub Project',''));
                             for(var i=0;i<count;i++)
-                                $('#ddlSubCenter').append(new Option(res.SubCenter[i].Center_Name,res.SubCenter[i].Center_Id));
+                                $('#ddlSubProject').append(new Option(data.SubProjects[i].Sub_Project_Name,data.SubProjects[i].Sub_Project_Id));
+                                if (needed !=0)
+                                {
+                                    $('#ddlSubProject').val(needed);
+                                }
                         }
                         else
                         {
-                            $('#ddlSubCenter').append(new Option('Choose Sub Center',''));
+                            $('#ddlSubProject').append(new Option('Choose Sub Project',''));
                         }
                     }
                 },
                 error:function(err)
                 {
-                    //alert('Error! Please try again');
+                    alert('Error! Please try again');
                     return false;
                 }
             });
-                if (needed !=0)
-                {
-                    $('#ddlSubCenter').val(needed);
-                }
+            
             return false;
         }
-
-        function TrainersBasedOnUsers(CenterSeleceted,needed)
+        function LoadCoFunding(needed)
         {
-            var URL=$('#hdn_web_url').val()+ "/TrainersBasedOnCenter"
+            var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForCenter_Course"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                        "center_id": $('#ddlCenter').val(),
+                        "course_id": $('#ddlCourse').val(),
+                        "sub_project_id": $('#ddlSubProject').val()
+                    },
+                success: function (data){
+                    if(data.SubProjects != null)
+                    {
+                        $('#ddlCofunding').empty();
+                        var count=data.SubProjects.length;
+                        if( count> 0)
+                        {
+                            $('#ddlCofunding').append(new Option('NA','-1'));
+                            for(var i=0;i<count;i++)
+                                $('#ddlCofunding').append(new Option(data.SubProjects[i].Sub_Project_Name,data.SubProjects[i].Sub_Project_Id));
+                                if (needed !=0)
+                                {
+                                    $('#ddlCofunding').val(needed);
+                                }
+                        }
+                        else
+                        {
+                            $('#ddlCofunding').append(new Option('NA','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            
+            return false;
+        }
+        function TrainersBasedOnSubProject(needed,SubProjectId)
+        {
+            var URL=$('#hdn_web_url').val()+ "/TrainersBasedOnSubProject"
             $.ajax({
                 type:"POST",
                 url:URL,
@@ -206,7 +322,7 @@ var Candidates = {};
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
                 data:{
-                    "center_id": CenterSeleceted
+                    "sub_project_id": SubProjectId
                 },
                 success: function (data){
                     if(data.Trainers != null)
@@ -218,6 +334,54 @@ var Candidates = {};
                             $('#ddlTrainer').append(new Option('Choose Trainer',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlTrainer').append(new Option(data.Trainers[i].User_Name,data.Trainers[i].User_Id));
+                        
+                            if (needed !='0' & needed!='')
+                                {
+                                    $('#ddlTrainer').val(needed);
+                                }
+                        }
+                        else
+                        {
+                            $('#ddlTrainer').append(new Option('Choose Trainer',''));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please tryyyyagain');
+                    return false;
+                }
+            });
+            
+            return false;
+        }
+        function TrainersBasedOnUsers(needed)
+        {
+            var URL=$('#hdn_web_url').val()+ "/TrainersBasedOnCenter"
+            $.ajax({
+                type:"POST",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                    "center_id": '0'
+                },
+                success: function (data){
+                    if(data.Trainers != null)
+                    {
+                        $('#ddlTrainer').empty();
+                        var count=data.Trainers.length;
+                        if( count> 0)
+                        {
+                            $('#ddlTrainer').append(new Option('Choose Trainer',''));
+                            for(var i=0;i<count;i++)
+                                $('#ddlTrainer').append(new Option(data.Trainers[i].User_Name,data.Trainers[i].User_Id));
+                        
+                            if (needed !='0' & needed!='')
+                                {
+                                    $('#ddlTrainer').val(needed);
+                                }
                         }
                         else
                         {
@@ -231,133 +395,24 @@ var Candidates = {};
                     return false;
                 }
             });
-            if (needed !=0)
-                {
-                    $('#ddlTrainer').val(needed);
-                }
-            return false;
-        }
-        // function CandidatesBasedOnCourse(CourseId)
-        // {
-        //     var addch;
-        //     vartable1 = $("#tbl_candidate").DataTable({
-        //         "serverSide": true,
-        //         "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
-        //         "paging": true,
-        //         "pageLength": 10,
-        //         "sPaginationType": "full_numbers",
-        //         "scrollX": false,
-        //         "destroy": true,
-        //         "processing": true,
-        //         "language": { "processing": 'Loading..!' },
-        //         "ajax": {
-        //             "url": $('#hdn_web_url').val()+ "/ALLCandidatesBasedOnCourse",
-        //             "type": "POST",
-        //             "dataType": "json",
-        //             "data": function (d) {
-        //                 d.candidate_id = 0;
-        //                 d.course_id = CourseId;
-        //                 d.center_id = $('#ddlCenter').val();
-        //             },
-        //             error: function (e) {
-        //                 $("#tbl_candidate tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
-        //             }
-
-        //         },
-
-        //         "columns": [
-        //             { "data": "S_No"},
-        //             { "data": "Candidate_Name" },
-        //             { "data": "Course_Name" },
-        //             { "data": "Center_Name"},
-        //             { "data": "Mobile_Number" },
-        //             { "data": "Registration_Id" },
-        //             { "data": "Enrollment_Id" },
-        //             { "data": "Salutaion"},
-        //             {
-        //             "data": function (row, type, val, meta) {
-        //             if(row.Is_Added){
-        //                 var varButtons = "";
-        //                     varButtons += '<input id="addedchk" name="checkcase" type="checkbox" value="'+row.Candidate_Id+'" checked>';
-        //                 return varButtons;
-        //             }
-        //             else{
-        //                 var varButtons = "";
-        //                     varButtons += '<input id="addedchk" name="checkcase" type="checkbox" value="'+row.Candidate_Id+'" >';
-        //                 return varButtons;
-        //             }
-        //             }
-        //         }
-        //         ],
-        //     });
-        //     // if(addch){
-        //     //     $('#addedchk').prop('checked',true);
-        //     // }
-        //     // else{
-        //     //     $('#addedchk').prop('checked',false);
-        //     // }
             
-        //     $('#get').hide();
-        //     $('.center').show();
-        //     //add_popup_message();
-        // }
-
-        function CenterManagerBasedOnUsers(CenterSeleceted1,needed)
-        {
-            var URL=$('#hdn_web_url').val()+ "/CenterManagerBasedOnCenter"
-            $.ajax({
-                type:"POST",
-                url:URL,
-                async:false,
-                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                datatype:"json",
-                data:{
-                    "center_id": CenterSeleceted1
-                },
-                success: function (data){
-                    if(data.CenterManager != null)
-                    {
-                        $('#ddlCentralManager').empty();
-                        var count=data.CenterManager.length;
-                        if( count> 0)
-                        {
-                            $('#ddlCentralManager').append(new Option('Choose Center Manager',''));
-                            for(var i=0;i<count;i++)
-                                $('#ddlCentralManager').append(new Option(data.CenterManager[i].User_Name,data.CenterManager[i].User_Id));
-                        }
-                        else
-                        {
-                            $('#ddlCentralManager').append(new Option('Choose Center Manager',''));
-                        }
-                    }
-                },
-                error:function(err)
-                {
-                    alert('Error! Please try again');
-                    return false;
-                }
-            });
-            if (needed !=0)
-                {
-                    $('#ddlCentralManager').val(needed);
-                }
             return false;
         }
-        
-        
         function add_popup_message(){
-            if(($('#StartTime').val() < $("#EndTime").val()) && ($('#StartDate').val() <= $('#EndDate').val()) && ($('#ActualStartDate').val()<=$('#ActualEndDate').val()))
+			
+            if(($('#StartTime').val() < $("#EndTime").val()) && ($('#ActualStartDate').val() <= $('#ActualEndDate').val()) && ($('#PlannedStartDate').val() <= $('#PlannedEndDate').val()))
             {
 				var centertype;
                 //alert($('#ActualStartDate').val());
-				if($('#ddlSubCenter').val() != '')
-                {
-                    centertype = $('#ddlSubCenter').val()
-                }
-                else
-                {
-                    centertype = $('#ddlCenter').val()
-                }
+				// if($('#ddlSubCenter').val() != '')
+                // {
+                //     centertype = $('#ddlSubCenter').val()
+                // }
+                // else
+                // {
+                //     centertype = $('#ddlCenter').val()
+                // }
+
                 var URL=$('#hdn_web_url').val()+ "/add_batch_details";
                 //alert($('#ddlCourse').val());
                     $.ajax({
@@ -365,19 +420,21 @@ var Candidates = {};
                         url:URL,
                         data:{
                             "BatchName" : $('#BatchName').val(),
-                            "BatchCode" : $('#BatchCode').val(),
+                            //"BatchCode" : $('#BatchCode').val(),
+                            "Product" : 0,
+                            "Center" : $('#ddlCenter').val(),
+                            "Course":$('#ddlCourse').val(),
+                            "SubProject":$('#ddlSubProject').val(),
+                            "Cofunding":$('#ddlCofunding').val(),
+                            "Trainer":$('#ddlTrainer').val(),
                             "isactive" : $('#isactive').prop('checked'),
-                            "CourseId" : $('#ddlCourse').val(),
-                            "CenterId" : centertype,
-                            "TrainerId":$('#ddlTrainer').val(),
-                            "CentralManagerId":$('#ddlCentralManager').val(),
-                            "StartDate":$('#StartDate').val(),
-                            "EndDate":$('#EndDate').val(),
-                            "StartTime":$('#StartTime').val(),
-                            "EndTime":$("#EndTime").val(),
+                            "PlannedStartDate":$('#PlannedStartDate').val(),
+                            "PlannedEndDate":$('#PlannedEndDate').val(),
                             "ActualStartDate":$('#ActualStartDate').val(),
                             "ActualEndDate":$('#ActualEndDate').val(),
-							"BatchId":'{{batch_id}}'
+                            "StartTime":$('#StartTime').val(),
+                            "EndTime":$("#EndTime").val(),
+                            "BatchId":'{{batch_id}}'
                         },
                         success:function(data){
                             var message="",title="",icon="";
@@ -457,64 +514,88 @@ var Candidates = {};
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="BatchName">Batch Name * :</label>
+                                <label for="BatchName">Batch External Code:</label>   <!-- * : -->
                             </div>
                             <div class="col-lg-6">
-                                <input type="text" class="form-control" name="BatchName" id="BatchName"  ClientIdMode="static" required placeholder="Batch name">
+                                <input type="text" class="form-control" name="BatchName" id="BatchName"  ClientIdMode="static" placeholder="Batch External Code">
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="BatchName">Batch Code * :</label>
+                                <label for="BatchCode">Batch Code</label>
                             </div>
                             <div class="col-lg-6">
                                 <input type="text" class="form-control" name="BatchCode" id="BatchCode"  ClientIdMode="static" required placeholder="Batch Code">
                             </div>
+                        </div> 
+                    </div> 
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="ProductId">Product*:</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <select id="ddlProduct" class="form-control dropdown-search-filter" name="ProductId" required=""> <!-- ClientIdMode="static" required="" >
+                                    <option selected="" value="">Choose Product</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="CenterId">Center*:</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <select id="ddlCenter" class="form-control dropdown-search-filter"  onchange="LoadCourseList('0',this.value)" name="CenterId" ClientIdMode="static" required=""> <!-- myfunction(this.value) -->>
+                                    <option value="">Center</option>
+                                </select>
+                            </div> 
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="CourseId">Course *:</label>
+                                <label for="CourseId">Course*:</label>
                             </div>
                             <div class="col-lg-6">
-                                <select id="ddlCourse" class="form-control dropdown-search-filter" name="CourseId" onchange="LoadCenterList(this.value,0)" ClientIdMode="static" required="">
+                                <select id="ddlCourse" class="form-control dropdown-search-filter" name="CourseId" onchange="LoadsubProject('0',$('#ddlCenter').val(),this.value)" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
                                     <option value="">Choose Course</option>
                                 </select>
                             </div>
                         </div>
                     </div>
-                     <div class="form-group">
+                    <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="CenterId">Center *:</label>
+                                <label for="SubProjectId">Sub Project*:</label>
                             </div>
                             <div class="col-lg-6">
-                                <select id="ddlCenter" class="form-control dropdown-search-filter" onchange="LoadSubCenterList(this.value,0)" name="CenterId" ClientIdMode="static"  required="">
-                                    <option value="">Choose Center</option>
+                                <select id="ddlSubProject" class="form-control dropdown-search-filter" name="SubProjectId" onchange="TrainersBasedOnSubProject('0',$('#ddlSubProject').val())" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                    <option value="">Choose Sub Project</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="CoFundingprojectId">Co Funding Sub Project:</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <select id="ddlCofunding" class="form-control dropdown-search-filter" name="CoFundingprojectId" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                    <option value="">Choose Co Funding Sub Project</option>
                                 </select>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <label for="SubCenterId">Sub Center :</label>
-                        </div>
-                        <div class="col-lg-6">
-                            <select id="ddlSubCenter" class="form-control dropdown-search-filter"  onchange="myfunction(this.value)" name="SubCenterId" ClientIdMode="static"  >
-                                <option value="">Choose Sub Center</option>
-                            </select>
-                        </div>
-                    </div>
-					</div>
                     <!--onchange="myfunction(this.value)"-->
-                <div class="form-group">
+                    <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="TrainerId">Trainer *:</label>
+                                <label for="TrainerId">Trainer*:</label>
                             </div>
                             <div class="col-lg-6">
                                 <select id="ddlTrainer" class="form-control dropdown-search-filter" name="TrainerId" ClientIdMode="static"  required="">
@@ -523,75 +604,63 @@ var Candidates = {};
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="row">
+                    <div class="form-group row ">
                             <div class="col-lg-6">
-                                <label for="CentralManagerId">Central Manager *:</label>
-                            </div>
-                            <div class="col-lg-6">
-                                <select id="ddlCentralManager" class="form-control dropdown-search-filter" name="CentralManagerId" ClientIdMode="static" required="">
-                                    <option value="">Choose Central Manager</option>
-                                </select>
-                            </div>
+                                    <label for="PlannedStartDate">Planned Start Date*:</label>
+                                </div>
+                                <div class="col-lg-6">
+                            <input type="text" id="PlannedStartDate" name="PlannedStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required="">
                         </div>
                     </div>
                     <div class="form-group row ">
                             <div class="col-lg-6">
-                                    <label for="StartDate">Start Date *:</label>
+                                    <label for="PlannedEndDate">Planned End Date*:</label>
                                 </div>
                                 <div class="col-lg-6">
-                            <input type="text" id="StartDate" name="StartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date">
+                            <input type="text" id="PlannedEndDate" name="PlannedEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date" required="">
                         </div>
                     </div>
                     <div class="form-group row ">
                             <div class="col-lg-6">
-                                    <label for="EndDate">End Date *:</label>
+                                    <label for="ActualStartDate">Actual Start Date:</label>
                                 </div>
                                 <div class="col-lg-6">
-                            <input type="text" id="EndDate" name="EndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date">
+                            <input type="text" id="ActualStartDate" name="ActualStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required="">
                         </div>
                     </div>
                     <div class="form-group row ">
                             <div class="col-lg-6">
-                                    <label for="StartTime">Start Time *:</label>
+                                    <label for="ActualEndDate">Actual End Date:</label>
                                 </div>
                                 <div class="col-lg-6">
-                            <input type="text" id="StartTime" name="StartTime" class="form-control time-picker" ClientIdMode="static" placeholder="Start Time">
+                            <input type="text" id="ActualEndDate" name="ActualEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date" required="">
                         </div>
                     </div>
                     <div class="form-group row ">
                             <div class="col-lg-6">
-                                    <label for="EndTime">End Time *:</label>
+                                    <label for="StartTime">Start Time:</label>
                                 </div>
                                 <div class="col-lg-6">
-                            <input type="text" id="EndTime" name="EndTime" class="form-control time-picker" ClientIdMode="static" placeholder="End Time">
+                            <input type="text" id="StartTime" name="StartTime" class="form-control time-picker" ClientIdMode="static" placeholder="Start Time" required="">
                         </div>
                     </div>
                     <div class="form-group row ">
                             <div class="col-lg-6">
-                                    <label for="ActualStartDate">Actual Start Date :</label>
+                                    <label for="EndTime">End Time:</label>
                                 </div>
                                 <div class="col-lg-6">
-                            <input type="text" id="ActualStartDate" name="ActualStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Actual Start Date">
-                        </div>
-                    </div>
-                    <div class="form-group row ">
-                            <div class="col-lg-6">
-                                    <label for="ActualEndDate">Actual End Date :</label>
-                                </div>
-                                <div class="col-lg-6">
-                            <input type="text" id="ActualEndDate" name="ActualEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="Actual End Date">
+                            <input type="text" id="EndTime" name="EndTime" class="form-control time-picker" ClientIdMode="static" placeholder="End Time" required="">
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label>Is Active :</label>
+                                <label>Is Active:</label>
                             </div>
                             <div class="col-lg-6">
                                 <div class="checkbox checkbox-pink mb-0">
                                     <input type="checkbox" name="isactive" id="isactive" ClientIdMode="static" 
-                                                    value="1" data-parsley-mincheck="1" >
+                                                    value="1" data-parsley-mincheck="1" checked>
                                     <label for="isactive"> Is active </label>
                                 </div>
                             </div>   
@@ -626,7 +695,6 @@ var Candidates = {};
 </div> <!-- end container -->
     <!-- end wrapper -->
 
-<script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>  
 <script src="static/assets/libs/bootstrap-colorpicker/bootstrap-colorpicker.min.js"></script>
 <script src="static/assets/libs/clockpicker/bootstrap-clockpicker.min.js"></script>
 <script src="static/assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
@@ -642,4 +710,3 @@ var Candidates = {};
 <script src="static/assets/libs/datatables/buttons.print.min.js"></script>
 <script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
 <script src="static/assets/libs/datatables/dataTables.select.min.js"></script> 
-

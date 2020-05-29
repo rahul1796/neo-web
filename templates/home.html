@@ -29,583 +29,493 @@
         <script type="text/javascript" src="static/assets/js/slimscroll.min.js"></script>
         <script type="text/javascript" src="static/assets/js/waves.js"></script>
         <script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>
-        
+        <script src="static/assets/js/pages/home.js"></script>
 
 
         
         <script type="text/javascript">
-        $(document).ready(function(){
-            var goto = '{{html}}';
-            /*if( goto != "")
-            {
-                $("#box").load(goto);
-            }*/
-            if('{{values}}'!= "")
-            {
-                // $('#usernamelbl').val('{{values[0]}}');
-                $('#hdn_home_user_id').val('{{values[1]}}');
-                $('#hdn_home_user_role_id').val('{{values[2]}}');
-                $('#hdn_home_user_name').val('{{values[0]}}');
-                $('#hdn_web_url').val('{{values[3]}}');
-                $('#hdn_user_region_id').val('{{values[4]}}');
-            }
+            $(document).ready(function(){
+                var goto = '{{html}}';
+                goto=goto.replace("&amp;","&");
+                if('{{values}}'!= "")
+                {
+                    // $('#usernamelbl').val('{{values[0]}}');
+                    $('#hdn_home_user_id').val('{{values[1]}}');
+                    $('#hdn_home_user_role_id').val('{{values[2]}}');
+                    $('#hdn_home_user_name').val('{{values[0]}}');
+                    $('#hdn_web_url').val('{{values[3]}}');
+                    $('#hdn_user_region_id').val('{{values[4]}}');
+                }
             if(parseInt($('#hdn_home_user_role_id').val())>0)
             {
                 var role_id=parseInt($('#hdn_home_user_role_id').val());
-                $('#Home').show();
-                $('#Master_Menu').show();
-                $('#AnchorCenters').show();
-                $('#AnchorCenterType').show();
-                $('#AnchorCenterCategory').show();
-                $('#Org_menu').show();
-                $('#AnchorRoles').show();
-                $('#AnchorUsers').show();
-                $('#Content_Menu').show();
-                $('#AnchorCourses').show();
-                $('#Batch_Menu').show();
-                $('#Candidate_Menu').show();
-
-                $('#TMA_content').show();
-                $('#TMA_batch_Menu').show();
-                $('#TMA_report_Menu').show();
-                $('#MCL_report_Menu').show();
-                $('#Mobilization_report_Menu').show();
-                $('#Report_Menu').show();
-                $('#CoomplianceReport').show();
-                //TMA_registraion_Menu, TrainerwiseTMARegistration
                 
-                $('#Trainer_Menu').show()
-                
-                if(goto !="")
-                    $("#box").load(goto);
-                /*
                 switch(role_id)
-				{
-                    case 1:         //Tech Admin
-						$('#Home').show();
-                        $('#Master_Menu').show();
-                        $('#AnchorCenters').show();
-                        $('#AnchorCenterType').show();
-                        $('#AnchorCenterCategory').show();
-                        $('#Org_menu').show();
-                        $('#AnchorRoles').show();
-                        $('#AnchorUsers').show();
+				{   
+                    case 1:             //Admin
+                        $('#Home').show();
+						$('#Mobilization_Menu').show();
+                        $('#Registration_Menu').show();
+                        $('#Enrollment_Menu').show();
+                        $('#Candidate_Menu').show();
+                        //$('#Batch_Menu').show();
+                        $('#Assessment_Menu').show();
                         $('#Content_Menu').show();
-                        $('#AnchorCourses').show();
-                        $('#Batch_Menu').show();
-						$('#Candidate_Menu').show();
-
-                        $('#TMA_content').show();
-						$('#TMA_batch_Menu').show();
-						$('#TMA_report_Menu').show();
-                        $('#MCL_report_Menu').show();
-						$('#Mobilization_report_Menu').show();
-						$('#Report_Menu').show();
-						$('#CoomplianceReport').show();
-						//TMA_registraion_Menu, TrainerwiseTMARegistration
-						
-						$('#Trainer_Menu').show()
-						
-                        if(goto !="")
-                            $("#box").load(goto);
-                        break;
-                    case 2:         //Mobilizer
-						$('#Home').show();
-                        $('#Master_Menu').hide();
-                        $('#AnchorCenters').hide();
-                        $('#AnchorCenterType').hide();
-                        $('#AnchorCenterCategory').hide();
-                        $('#Org_menu').hide();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').hide();
-                        $('#Content_Menu').hide();
-                        $('#AnchorCourses').hide();
-                        $('#Batch_Menu').hide();
-						$('#Candidate_Menu').show();
-                        
-                        $('#TMA_content').show();
-                        $('#TMA_batch_Menu').show();
-                        $('#TMA_report_Menu').show();
-                        $('#MCL_report_Menu').hide();
-                        $('#Mobilization_report_Menu').hide();
+                            $('#AnchorSectors').show();
+                            $('#AnchorQP').show();
+                            $('#AnchorCourses').show();
+                        $('#Master_Menu').show();
+                            $('#AnchorClients').show();
+                            $('#AnchorContracts').show();
+                            $('#Project_Menu').show();    
+                                $('#AnchorProjects').show();  
+                                $('#AnchorSubProjects').show();   
+                                $('#AnchorBatch').show();
+                            $('#AnchorCenters').show();
+                            $('#AnchorUsers').show();
+                            $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').show();
+                        $('#Insight_Menu').show();
+                            $('#AnchorSalesDashboard').show();
+                            $('#AnchorOperationDashboard').show();
+                        $('#My_Projects_Menu').hide();
                         $('#Report_Menu').show();
-						$('#CoomplianceReport').hide();
-
-						$('#Trainer_Menu').hide();
-						
-						
-						
-                        if(goto !=""){
-							//candidate_list_page || mcl_report_page
-                            if(goto == "candidate_list_page" || goto == "mcl_report_page" || goto == "change_password_page"){
-                                $("#box").load(goto);
-                            }
-                        }
-                        break;
-                    case 3:         //Department Head
-                        $('#Master_Menu').show();
-                        $('#AnchorCenters').show();
-                        $('#AnchorCenterType').show();
-                        $('#AnchorCenterCategory').show();
-                        $('#Org_menu').show();
-                        $('#AnchorRoles').show();
-                        $('#AnchorUsers').show();
-                        $('#Content_Menu').show();
-                        $('#AnchorCourses').show();
-                        $('#Batch_Menu').show();
-						$('#CoomplianceReport').hide();
+                            $('#ECP_report').show();
+                            $('#Qp_wise_report').show();
+                            $('#Batch_Status_report').show();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
-					case 4:         //Placement Officer
-                        $('#Master_Menu').hide();
-                        $('#AnchorCenters').hide();
-                        $('#AnchorCenterType').hide();
-                        $('#AnchorCenterCategory').hide();
-                        $('#Org_menu').hide();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').hide();
-                        $('#Content_Menu').hide();
-                        $('#AnchorCourses').hide();
-                        $('#Batch_Menu').show();
-						$('#Candidate_Menu').hide();
-                        
-                        $('#TMA_content').hide();
-                        $('#TMA_batch_Menu').hide();
-                        $('#TMA_report_Menu').hide();
-                        $('#MCL_report_Menu').hide();
-                        $('#Mobilization_report_Menu').hide();
+                    case 19:            //Sales
+                        $('#Home').show();
+						$('#Mobilization_Menu').hide();
+                        $('#Registration_Menu').hide();
+                        $('#Enrollment_Menu').hide();
+                        $('#Candidate_Menu').hide();
+                        $('#Assessment_Menu').hide();
+                        $('#Content_Menu').show();
+                            $('#AnchorSectors').show();
+                            $('#AnchorQP').show();
+                            $('#AnchorCourses').show();
+                        $('#Master_Menu').show();
+                            $('#AnchorClients').show();
+                            $('#AnchorContracts').show();
+                            $('#Project_Menu').show();    
+                                $('#AnchorProjects').show();  
+                                $('#AnchorSubProjects').show();   
+                                $('#AnchorBatch').hide();
+                            $('#AnchorCenters').show();
+                            $('#AnchorUsers').hide();
+                            $('#AnchorTrainers').hide();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').show();
+                            $('#AnchorSalesDashboard').show();
+                            $('#AnchorOperationDashboard').show();
+                        $('#My_Projects_Menu').hide();
                         $('#Report_Menu').hide();
-						$('#CoomplianceReport').hide();
-                        
-						$('#Trainer_Menu').hide();
-												
-                        if(goto !=""){
-							// home || batch_list_page || batch_add_edit
-                            if(goto == "home" || goto == "batch_list_page" || goto == "batch_add_edit" || goto == "change_password_page"){
-                                $("#box").load(goto);
-                            }
-                        }
-                        break;
-                    case 5:         //Center Manager
-						$('#Home').show();
-                        $('#Master_Menu').hide();
-                        $('#AnchorCenters').hide();
-                        $('#AnchorCenterType').hide();
-                        $('#AnchorCenterCategory').hide();
-                        $('#Org_menu').hide();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').hide();
-                        $('#Content_Menu').hide();
-                        $('#AnchorCourses').hide();
-                        $('#Batch_Menu').show();
-						$('#Candidate_Menu').show();
-						
-                        $('#TMA_content').show();
-                        $('#TMA_batch_Menu').show();
-                        $('#TMA_report_Menu').show();
-                        $('#MCL_report_Menu').show();
-                        $('#Mobilization_report_Menu').show();
-                        $('#Report_Menu').show();
-						$('#CoomplianceReport').hide();
-                        
-						$('#Trainer_Menu').show();
-						
-						
-                        if(goto != ""){
-							// home, batch_list_page, batch_add_edit, candidate_list_page, trainer_list_page, trainer_add_edit, mcl_report_page, tma_batch_page, tma_report_download_page
-                            if(goto == "home" || goto == "batch_list_page" || goto == "batch_add_edit" || goto == "candidate_list_page" || goto == "trainer_list_page" || goto == "trainer_add_edit" || goto == "mcl_report_page" || goto == "tma_batch_page" || goto == "tma_report_download_page" || goto == "change_password_page" || goto == "trainer_deployment" || goto == "attendance_report" || goto == "batch_sessions" || goto == "mobilization_report" || goto == "registered_candidates_list"){
-                                $("#box").load(goto);
-                            }
-                        }
-                        break;
-                    case 6:         //Super Admin
-                        $('#Master_Menu').show();
-                        $('#AnchorCenters').show();
-                        $('#AnchorCenterType').show();
-                        $('#AnchorCenterCategory').show();
-                        $('#Org_menu').show();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').show();
-                        $('#Content_Menu').show();
-                        $('#AnchorCourses').show();
-                        $('#Batch_Menu').show();
-						$('#CoomplianceReport').hide();
+                            $('#ECP_report').hide();
+                            $('#Qp_wise_report').hide();
+                            $('#Batch_Status_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
-                    case 7:         //Trainer
-                        $('#Master_Menu').hide();
-                        $('#AnchorCenters').hide();
-                        $('#AnchorCenterType').hide();
-                        $('#AnchorCenterCategory').hide();
-                        $('#Org_menu').hide();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').hide();
-                        $('#Content_Menu').hide();
-                        $('#AnchorCourses').hide();
-                        $('#Batch_Menu').show();
-						$('#Candidate_Menu').hide();
-						
-                        $('#TMA_content').show();
-                        $('#TMA_batch_Menu').show();
-                        $('#TMA_report_Menu').show();
-                        $('#MCL_report_Menu').hide();
-                        $('#Mobilization_report_Menu').hide();
-                        $('#Report_Menu').show();
-						$('#CoomplianceReport').hide();
-                        
-						$('#Trainer_Menu').hide();
-						
-                        if(goto !=""){
-							// home, batch_list_page, batch_add_edit, tma_batch_page, tma_report_download_page
-                            if(goto == "home" || goto == "batch_list_page" || goto == "batch_add_edit"  || goto == "tma_batch_page" || goto == "tma_report_download_page" || goto == "change_password_page"){
-                                $("#box").load(goto);
-                            }
-                        }
-                        break;
-                    case 8:         //Center Ops
-                        $('#Master_Menu').show();
-                        $('#AnchorCenters').show();
-                        $('#AnchorCenterType').show();
-                        $('#AnchorCenterCategory').show();
-                        $('#Org_menu').show();
-                        $('#AnchorRoles').show();
-                        $('#AnchorUsers').show();
+                    case 23:            //PMO
+                        $('#Home').show();
+						$('#Mobilization_Menu').hide();
+                        $('#Registration_Menu').hide();
+                        $('#Enrollment_Menu').hide();
+                        $('#Candidate_Menu').show();
+                        $('#Assessment_Menu').show();
                         $('#Content_Menu').show();
-                        $('#AnchorCourses').show();
-                        $('#Batch_Menu').show();
+                            $('#AnchorSectors').show();
+                            $('#AnchorQP').show();
+                            $('#AnchorCourses').show();
+                        $('#Master_Menu').show();
+                            $('#AnchorClients').show();
+                            $('#AnchorContracts').show();
+                            $('#Project_Menu').show();    
+                                $('#AnchorProjects').show();  
+                                $('#AnchorSubProjects').show();   
+                                $('#AnchorBatch').show();
+                            $('#AnchorCenters').show();
+                            $('#AnchorUsers').show();
+                            $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').show();
+                            $('#AnchorSalesDashboard').show();
+                            $('#AnchorOperationDashboard').show();
+                        $('#My_Projects_Menu').hide();
+                        $('#Report_Menu').show();
+                            $('#ECP_report').show();
+                            $('#Qp_wise_report').show();
+                            $('#Batch_Status_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
-                    case 9:         //Content Executive
-                        $('#Master_Menu').hide();
-                        $('#AnchorCenters').hide();
-                        $('#AnchorCenterType').hide();
-                        $('#AnchorCenterCategory').hide();
-                        $('#Org_menu').hide();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').hide();
-                        $('#Content_Menu').show();
-                        $('#AnchorCourses').show();
-                        $('#Batch_Menu').hide();
-                        if(goto != ""){
-                            if(goto == "course_list_page"){
-                                $("#box").load(goto);
-                            }
-                        }
-                        break;
-                        case 10:         //Content Executive
-                        $('#Master_Menu').hide();
-                        $('#AnchorCenters').hide();
-                        $('#AnchorCenterType').hide();
-                        $('#AnchorCenterCategory').hide();
-                        $('#Org_menu').hide();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').hide();
-                        $('#Content_Menu').show();
-                        $('#AnchorCourses').show();
-                        $('#Batch_Menu').hide();
-                        if(goto != ""){
-                            if(goto == "course_list_page" || goto == "change_password_page"){
-                                $("#box").load(goto);
-                            }
-                        }
-                        break;
-                        case 11:         //COO
+                    case 15:            //PMT
                         $('#Home').show();
+						$('#Mobilization_Menu').hide();
+                        $('#Registration_Menu').hide();
+                        $('#Enrollment_Menu').hide();
+                        $('#Candidate_Menu').show();
+                        $('#Assessment_Menu').show();
+                        $('#Content_Menu').show();
+                            $('#AnchorSectors').hide();
+                            $('#AnchorQP').hide();
+                            $('#AnchorCourses').show();
                         $('#Master_Menu').show();
-                        $('#AnchorCenters').show();
-                        $('#AnchorCenterType').show();
-                        $('#AnchorCenterCategory').hide();
-                        $('#Org_menu').hide();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').hide();
-                        $('#Content_Menu').hide();
-                        $('#AnchorCourses').hide();
-                        $('#Batch_Menu').show();
-						$('#Candidate_Menu').show();
-						
-                        $('#TMA_content').show();
-                        $('#TMA_batch_Menu').show();
-                        $('#TMA_report_Menu').show();
-                        $('#MCL_report_Menu').show();
-                        $('#Mobilization_report_Menu').show();
+                            $('#AnchorClients').show();
+                            $('#AnchorContracts').show();
+                            $('#Project_Menu').show();    
+                                $('#AnchorProjects').show();  
+                                $('#AnchorSubProjects').show();   
+                                $('#AnchorBatch').show();
+                            $('#AnchorCenters').show();
+                            $('#AnchorUsers').show();
+                            $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').hide();
+                            $('#AnchorSalesDashboard').hide();
+                            $('#AnchorOperationDashboard').hide();
                         $('#Report_Menu').show();
-						$('#CoomplianceReport').hide();
-                        
-                        $('#Trainer_Menu').show();
-						
-                        if(goto != ""){
-							// home, batch_list_page, batch_add_edit, candidate_list_page, trainer_list_page, trainer_add_edit, mcl_report_page, tma_batch_page, tma_report_download_page
-                            // if(goto == "home" || goto == "batch_list_page" || goto == "batch_add_edit" || goto == "candidate_list_page" || goto == "trainer_list_page" || goto == "trainer_add_edit" || goto == "mcl_report_page" || goto == "tma_batch_page" || goto == "tma_report_download_page" || goto == "mcl_report_page" || goto == "mobilization_report" || goto == "attendance_report" || goto=="trainer_deployment" || goto == "change_password_page" || goto == "trainer_deployment" || goto == "attendance_report" || goto == "batch_sessions" || goto == "mobilization_report" || goto == "registered_candidates_list"){
-                            //     $("#box").load(goto);
-                            // }
+                            $('#ECP_report').show();
+                            $('#Qp_wise_report').show();
+                            $('#Batch_Status_report').hide();
+                        if(goto !="")
                             $("#box").load(goto);
-                        }
                         break;
-                        case 12:         //P-ops
+                    case 11:            //COO
                         $('#Home').show();
-                        $('#Master_Menu').hide();
-                        $('#AnchorCenters').hide();
-                        $('#AnchorCenterType').hide();
-                        $('#AnchorCenterCategory').hide();
-                        $('#Org_menu').hide();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').hide();
-                        $('#Content_Menu').hide();
-                        $('#AnchorCourses').hide();
-                        $('#Batch_Menu').show();
-						$('#Candidate_Menu').show();
-						
-                        $('#TMA_content').show();
-                        $('#TMA_batch_Menu').show();
-                        $('#TMA_report_Menu').show();
-                        $('#MCL_report_Menu').show();
-                        $('#Mobilization_report_Menu').show();
+						$('#Mobilization_Menu').hide();
+                        $('#Registration_Menu').hide();
+                        $('#Enrollment_Menu').hide();
+                        $('#Candidate_Menu').show();
+                        $('#Assessment_Menu').show();
+                        $('#Content_Menu').show();
+                            $('#AnchorSectors').show();
+                            $('#AnchorQP').show();
+                            $('#AnchorCourses').show();
+                        $('#Master_Menu').show();
+                            $('#AnchorClients').show();
+                            $('#AnchorContracts').show();
+                            $('#Project_Menu').show();    
+                                $('#AnchorProjects').show();  
+                                $('#AnchorSubProjects').show();   
+                                $('#AnchorBatch').show();
+                            $('#AnchorCenters').show();
+                            $('#AnchorUsers').show();
+                            $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').show();
+                            $('#AnchorSalesDashboard').show();
+                            $('#AnchorOperationDashboard').show();
                         $('#Report_Menu').show();
-						$('#CoomplianceReport').hide();
-                        
-						$('#Trainer_Menu').show();
-						
-                        if(goto != ""){
-							// home, batch_list_page, batch_add_edit, candidate_list_page, trainer_list_page, trainer_add_edit, mcl_report_page, tma_batch_page, tma_report_download_page
-                            if(goto == "home" || goto == "batch_list_page" || goto == "batch_add_edit" || goto == "candidate_list_page" || goto == "trainer_list_page" || goto == "trainer_add_edit" || goto == "mcl_report_page" || goto == "tma_batch_page" || goto == "tma_report_download_page" || goto == "mcl_report_page" || goto == "mobilization_report" || goto == "attendance_report" || goto=="trainer_deployment" || goto == "change_password_page"){
-                                $("#box").load(goto);
-                            }
-                        }
+                            $('#ECP_report').show();
+                            $('#Qp_wise_report').show();
+                            $('#Batch_Status_report').hide();
+                        if(goto !="")
+                            $("#box").load(goto);
                         break;
-                        case 13:         //Region Manager
+                    case 14:            //Territory Manager
                         $('#Home').show();
-                        $('#Master_Menu').hide();
-                        $('#AnchorCenters').hide();
-                        $('#AnchorCenterType').hide();
-                        $('#AnchorCenterCategory').hide();
-                        $('#Org_menu').hide();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').hide();
-                        $('#Content_Menu').hide();
-                        $('#AnchorCourses').hide();
-                        $('#Batch_Menu').show();
-						$('#Candidate_Menu').show();
-                        
-                        $('#TMA_content').show();
-                        $('#TMA_batch_Menu').show();
-                        $('#TMA_report_Menu').show();
-                        $('#MCL_report_Menu').show();
-                        $('#Mobilization_report_Menu').show();
+						$('#Mobilization_Menu').hide();
+                        $('#Registration_Menu').hide();
+                        $('#Enrollment_Menu').hide();
+                        $('#Candidate_Menu').show();
+                        $('#Assessment_Menu').show();
+                        $('#Content_Menu').show();
+                            $('#AnchorSectors').show();
+                            $('#AnchorQP').show();
+                            $('#AnchorCourses').show();
+                        $('#Master_Menu').show();
+                            $('#AnchorClients').hide();
+                            $('#AnchorContracts').hide();
+                            $('#Project_Menu').show();    
+                                $('#AnchorProjects').show();  
+                                $('#AnchorSubProjects').show();   
+                                $('#AnchorBatch').show();
+                            $('#AnchorCenters').show();
+                            $('#AnchorUsers').show();
+                            $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').show();
+                            $('#AnchorSalesDashboard').hide();
+                            $('#AnchorOperationDashboard').hide();
                         $('#Report_Menu').show();
-						$('#CoomplianceReport').hide();
-                        
-                        $('#Trainer_Menu').show();
-						
-                        if(goto != ""){
-							// home, batch_list_page, batch_add_edit, candidate_list_page, trainer_list_page, trainer_add_edit, mcl_report_page, tma_batch_page, tma_report_download_page
-                            if(goto == "home" || goto == "batch_list_page" || goto == "batch_add_edit" || goto == "candidate_list_page" || goto == "trainer_list_page" || goto == "trainer_add_edit" || goto == "mcl_report_page" || goto == "tma_batch_page" || goto == "tma_report_download_page" || goto == "mcl_report_page" || goto == "mobilization_report" || goto == "attendance_report" || goto=="trainer_deployment" || goto == "change_password_page" || goto == "trainer_deployment" || goto == "attendance_report" || goto == "batch_sessions" || goto == "mobilization_report" || goto == "registered_candidates_list"){
-                                $("#box").load(goto);
-                            }
-                        }
+                            $('#ECP_report').show();
+                            $('#Qp_wise_report').hide();
+                            $('#Batch_Status_report').hide();
+                        if(goto !="")
+                            $("#box").load(goto);
                         break;
-                        case 14:         //Cluster Manager
+                    case 5:             //Center Manager
                         $('#Home').show();
-                        $('#Master_Menu').hide();
-                        $('#AnchorCenters').hide();
-                        $('#AnchorCenterType').hide();
-                        $('#AnchorCenterCategory').hide();
-                        $('#Org_menu').hide();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').hide();
-                        $('#Content_Menu').hide();
-                        $('#AnchorCourses').hide();
-                        $('#Batch_Menu').show();
-						$('#Candidate_Menu').show();
-						
-                        $('#TMA_content').show();
-                        $('#TMA_batch_Menu').show();
-                        $('#TMA_report_Menu').show();
-                        $('#MCL_report_Menu').show();
-                        $('#Mobilization_report_Menu').show();
+						$('#Mobilization_Menu').show();
+                        $('#Registration_Menu').show();
+                        $('#Enrollment_Menu').show();
+                        $('#Candidate_Menu').show();
+                        $('#Assessment_Menu').show();
+                        $('#Content_Menu').show();
+                            $('#AnchorSectors').hide();
+                            $('#AnchorQP').show();
+                            $('#AnchorCourses').show();
+                        $('#Master_Menu').show();
+                            $('#AnchorClients').hide();
+                            $('#AnchorContracts').hide();
+                            $('#Project_Menu').show();    
+                                $('#AnchorProjects').show();  
+                                $('#AnchorSubProjects').show();   
+                                $('#AnchorBatch').show();
+                            $('#AnchorCenters').show();
+                            $('#AnchorUsers').show();
+                            $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').hide();
+                            $('#AnchorSalesDashboard').hide();
+                            $('#AnchorOperationDashboard').hide();
                         $('#Report_Menu').show();
-						$('#CoomplianceReport').hide();
-                        
-                        $('#Trainer_Menu').show();
-                        
-						
-                        if(goto != ""){
-                            
-							// home, batch_list_page, batch_add_edit, candidate_list_page, trainer_list_page, trainer_add_edit, mcl_report_page, tma_batch_page, tma_report_download_page
-                            if(goto == "home" || goto == "batch_list_page" || goto == "batch_add_edit" || goto == "candidate_list_page" || goto == "trainer_list_page" || goto == "trainer_add_edit" || goto == "mcl_report_page" || goto == "tma_batch_page" || goto == "tma_report_download_page" || goto == "batch_list_page" || goto == "mcl_report_page" || goto == "mobilization_report" || goto == "attendance_report" || goto=="trainer_deployment" || goto == "change_password_page" || goto == "trainer_deployment" || goto == "attendance_report" || goto == "batch_sessions" || goto == "mobilization_report" || goto == "registered_candidates_list"){
-                                $("#box").load(goto);
-                            }
-                        }
+                            $('#ECP_report').show();
+                            $('#Qp_wise_report').hide();
+                            $('#Batch_Status_report').hide();
+                        if(goto !="")
+                            $("#box").load(goto);
                         break;
-                        case 15:         //PMT
+                    case 2:             //Mobilizer
                         $('#Home').show();
-                        $('#Master_Menu').hide();
-                        $('#AnchorCenters').hide();
-                        $('#AnchorCenterType').hide();
-                        $('#AnchorCenterCategory').hide();
-                        $('#Org_menu').hide();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').hide();
+						$('#Mobilization_Menu').show();
+                        $('#Registration_Menu').show();
+                        $('#Enrollment_Menu').hide();
+                        $('#Candidate_Menu').show();
+                        $('#Assessment_Menu').hide();
                         $('#Content_Menu').hide();
-                        $('#AnchorCourses').hide();
-                        $('#Batch_Menu').show();
-						$('#Candidate_Menu').show();
-						
-                        $('#TMA_content').show();
-                        $('#TMA_batch_Menu').show();
-                        $('#TMA_report_Menu').show();
-                        $('#MCL_report_Menu').show();
-                        $('#Mobilization_report_Menu').show();
-                        $('#Report_Menu').show();
-                        $('#CoomplianceReport').hide();
-						
-                        $('#Trainer_Menu').show();
-                        
-						
-                        if(goto != ""){
-                            
-							// home, batch_list_page, batch_add_edit, candidate_list_page, trainer_list_page, trainer_add_edit, mcl_report_page, tma_batch_page, tma_report_download_page
-                            if(goto == "home" || goto == "batch_list_page" || goto == "batch_add_edit" || goto == "candidate_list_page" || goto == "trainer_list_page" || goto == "trainer_add_edit" || goto == "mcl_report_page" || goto == "tma_batch_page" || goto == "tma_report_download_page" || goto == "batch_list_page" || goto == "mcl_report_page" || goto == "mobilization_report" || goto == "attendance_report" || goto=="trainer_deployment" || goto == "change_password_page" || goto == "trainer_deployment" || goto == "attendance_report" || goto == "batch_sessions" || goto == "mobilization_report" || goto == "registered_candidates_list"){
-                                $("#box").load(goto);
-                            }
-                        }
+                            $('#AnchorSectors').hide();
+                            $('#AnchorQP').hide();
+                            $('#AnchorCourses').hide();
+                        $('#Master_Menu').hide();
+                            $('#AnchorClients').hide();
+                            $('#AnchorContracts').hide();
+                            $('#Project_Menu').show();    
+                                $('#AnchorProjects').hide();  
+                                $('#AnchorSubProjects').hide();   
+                                $('#AnchorBatch').show();
+                            $('#AnchorCenters').hide();
+                            $('#AnchorUsers').hide();
+                            $('#AnchorTrainers').hide();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').hide();
+                            $('#AnchorSalesDashboard').hide();
+                            $('#AnchorOperationDashboard').hide();
+                        $('#Report_Menu').hide();
+                            $('#ECP_report').hide();
+                            $('#Qp_wise_report').hide();
+                            $('#Batch_Status_report').hide();
+                        if(goto !="")
+                            $("#box").load(goto);
                         break;
-                        case 16:         //Content
+                    case 24:            //Counsellor
+                        $('#Home').show();
+						$('#Mobilization_Menu').show();
+                        $('#Registration_Menu').show();
+                        $('#Enrollment_Menu').show();
+                        $('#Candidate_Menu').show();
+                        $('#Assessment_Menu').hide();
+                        $('#Content_Menu').hide();
+                            $('#AnchorSectors').hide();
+                            $('#AnchorQP').hide();
+                            $('#AnchorCourses').hide();
+                        $('#Master_Menu').hide();
+                            $('#AnchorClients').hide();
+                            $('#AnchorContracts').hide();
+                            $('#Project_Menu').show();    
+                                $('#AnchorProjects').hide();  
+                                $('#AnchorSubProjects').hide();   
+                                $('#AnchorBatch').show();
+                            $('#AnchorCenters').hide();
+                            $('#AnchorUsers').hide();
+                            $('#AnchorTrainers').hide();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').hide();
+                            $('#AnchorSalesDashboard').hide();
+                            $('#AnchorOperationDashboard').hide();
+                        $('#Report_Menu').hide();
+                            $('#ECP_report').hide();
+                            $('#Qp_wise_report').hide();
+                            $('#Batch_Status_report').hide();
+                        if(goto !="")
+                            $("#box").load(goto);
+                        break;
+                    case 7:             //Trainer
+                        $('#Home').show();
+						$('#Mobilization_Menu').hide();
+                        $('#Registration_Menu').hide();
+                        $('#Enrollment_Menu').hide();
+                        $('#Candidate_Menu').hide();
+                        $('#Assessment_Menu').hide();
+                        $('#Content_Menu').show();
+                            $('#AnchorSectors').hide();
+                            $('#AnchorQP').show();
+                            $('#AnchorCourses').show();
+                        $('#Master_Menu').hide();
+                            $('#AnchorClients').hide();
+                            $('#AnchorContracts').hide();
+                            $('#Project_Menu').show();    
+                                $('#AnchorProjects').hide();  
+                                $('#AnchorSubProjects').hide();   
+                                $('#AnchorBatch').show();
+                            $('#AnchorCenters').hide();
+                            $('#AnchorUsers').hide();
+                            $('#AnchorTrainers').hide();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').hide();
+                            $('#AnchorSalesDashboard').hide();
+                            $('#AnchorOperationDashboard').hide();
+                        $('#Report_Menu').hide();
+                            $('#ECP_report').hide();
+                            $('#Qp_wise_report').hide();
+                            $('#Batch_Status_report').hide();
+                        if(goto !="")
+                            $("#box").load(goto);
+                        break;
+                    case 21:            //Placemet Officer
+                        $('#Home').show();
+						$('#Mobilization_Menu').hide();
+                        $('#Registration_Menu').hide();
+                        $('#Enrollment_Menu').hide();
+                        $('#Candidate_Menu').hide();
+                        $('#Assessment_Menu').hide();
+                        $('#Content_Menu').hide();
+                            $('#AnchorSectors').hide();
+                            $('#AnchorQP').hide();
+                            $('#AnchorCourses').hide();
+                        $('#Master_Menu').show();
+                            $('#AnchorClients').show();
+                            $('#AnchorContracts').hide();
+                            $('#Project_Menu').show();    
+                                $('#AnchorProjects').show();  
+                                $('#AnchorSubProjects').show();   
+                                $('#AnchorBatch').hide();
+                            $('#AnchorCenters').show();
+                            $('#AnchorUsers').show();
+                            $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').hide();
+                            $('#AnchorSalesDashboard').hide();
+                            $('#AnchorOperationDashboard').hide();
+                        $('#Report_Menu').hide();
+                            $('#ECP_report').hide();
+                            $('#Qp_wise_report').hide();
+                            $('#Batch_Status_report').hide();
+                        if(goto !="")
+                            $("#box").load(goto);
+                        break;
+                    case 16:            //Content
+                        $('#Home').show();
+						$('#Mobilization_Menu').hide();
+                        $('#Registration_Menu').hide();
+                        $('#Enrollment_Menu').hide();
+                        $('#Candidate_Menu').show();
+                        $('#Assessment_Menu').hide();
+                        $('#Content_Menu').hide();
+                            $('#AnchorSectors').hide();
+                            $('#AnchorQP').hide();
+                            $('#AnchorCourses').hide();
+                        $('#Master_Menu').show();
+                            $('#AnchorClients').show();
+                            $('#AnchorContracts').show();
+                            $('#Project_Menu').show();    
+                                $('#AnchorProjects').show();  
+                                $('#AnchorSubProjects').show();   
+                                $('#AnchorBatch').show();
+                            $('#AnchorCenters').show();
+                            $('#AnchorUsers').show();
+                            $('#AnchorTrainers').hide();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').hide();
+                            $('#AnchorSalesDashboard').hide();
+                            $('#AnchorOperationDashboard').hide();
+                        $('#My_Projects_Menu').hide();
+                        $('#Report_Menu').hide();
+                            $('#ECP_report').hide();
+                            $('#Qp_wise_report').hide();
+                            $('#Batch_Status_report').hide();
+                        if(goto !="")
+                            $("#box").load(goto);
+                        break;
+                    case 25:             //Assessment Partner
                         $('#Home').hide();
+						$('#Mobilization_Menu').hide();
+                        $('#Registration_Menu').hide();
+                        $('#Enrollment_Menu').hide();
+                        $('#Candidate_Menu').hide();
+                        //$('#Batch_Menu').show();
+                        $('#Assessment_Menu').show();
+                        $('#Content_Menu').hide();
+                            $('#AnchorSectors').hide();
+                            $('#AnchorQP').hide();
+                            $('#AnchorCourses').hide();
                         $('#Master_Menu').hide();
-                        $('#AnchorCenters').hide();
-                        $('#AnchorCenterType').hide();
-                        $('#AnchorCenterCategory').hide();
-                        $('#Org_menu').hide();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').hide();
-                        $('#Content_Menu').show();
-                        $('#AnchorCourses').show();
-                        $('#Batch_Menu').hide();
-						$('#Candidate_Menu').hide();
-						
-                        $('#TMA_content').hide();
-                        $('#TMA_batch_Menu').hide();
-                        $('#TMA_report_Menu').hide();
-                        $('#MCL_report_Menu').hide();
-                        $('#Mobilization_report_Menu').hide();
+                            $('#AnchorClients').hide();
+                            $('#AnchorContracts').hide();
+                            $('#Project_Menu').hide();    
+                                $('#AnchorProjects').hide();  
+                                $('#AnchorSubProjects').hide();   
+                                $('#AnchorBatch').hide();
+                            $('#AnchorCenters').hide();
+                            $('#AnchorUsers').hide();
+                            $('#AnchorTrainers').hide();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').hide();
+                            $('#AnchorSalesDashboard').hide();
+                            $('#AnchorOperationDashboard').hide();
+                        $('#My_Projects_Menu').hide();
                         $('#Report_Menu').hide();
-                        $('#CoomplianceReport').hide();
-						
-                        $('#Trainer_Menu').hide();
-                        
-						
-                        if(goto != ""){
-							// home, batch_list_page, batch_add_edit, candidate_list_page, trainer_list_page, trainer_add_edit, mcl_report_page, tma_batch_page, tma_report_download_page
-                            if(goto == "home" || goto == "qp_list_page" || goto == "qp_add_edit" || goto == "course_list_page" || goto == "course_add_edit" || goto == "change_password_page"){
-                                $("#box").load(goto);
-                            }
-                        }
+                            $('#ECP_report').hide();
+                            $('#Qp_wise_report').hide();
+                            $('#Batch_Status_report').hide();
+                        console.log(goto);
+                        if(goto !="" && goto!="dashboard")
+                            $("#box").load(goto);
                         break;
-                        case 17:         //PH
-                        $('#Home').show();
-                        $('#Master_Menu').hide();
-                        $('#AnchorCenters').hide();
-                        $('#AnchorCenterType').hide();
-                        $('#AnchorCenterCategory').hide();
-                        $('#Org_menu').hide();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').hide();
-                        $('#Content_Menu').show();
-                        $('#AnchorCourses').show();
-                        $('#Batch_Menu').show();
-						$('#Candidate_Menu').show();
-						
-                        $('#TMA_content').show();
-                        $('#TMA_batch_Menu').show();
-                        $('#TMA_report_Menu').show();
-                        $('#MCL_report_Menu').show();
-                        $('#Mobilization_report_Menu').show();
-                        $('#Report_Menu').show();
-                        $('#CoomplianceReport').hide();
-						
-                        $('#Trainer_Menu').show();
-						
-                        if(goto != ""){
-                            
-							// home, batch_list_page, batch_add_edit, candidate_list_page, trainer_list_page, trainer_add_edit, mcl_report_page, tma_batch_page, tma_report_download_page
-                            if(goto == "home" || goto == "batch_list_page" || goto == "batch_add_edit" || goto == "candidate_list_page" || goto == "trainer_list_page" || goto == "trainer_add_edit" || goto == "mcl_report_page" || goto == "tma_batch_page" || goto == "tma_report_download_page" || goto == "batch_list_page" || goto == "mcl_report_page" || goto == "mobilization_report" || goto == "attendance_report" || goto=="trainer_deployment" || goto == "qp_list_page" || goto == "qp_add_edit" || goto == "course_list_page" || goto == "course_add_edit" || goto == "change_password_page"){
-                                $("#box").load(goto);
-                            }
-                        }
-                        break;
-                        case 18:         //AUdit Compliance
-                        $('#Home').show();
-                        $('#Master_Menu').hide();
-                        $('#AnchorCenters').hide();
-                        $('#AnchorCenterType').hide();
-                        $('#AnchorCenterCategory').hide();
-                        $('#Org_menu').hide();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').hide();
+                        case 27:             //Assessment Management
+                        $('#Home').hide();
+						$('#Mobilization_Menu').hide();
+                        $('#Registration_Menu').hide();
+                        $('#Enrollment_Menu').hide();
+                        $('#Candidate_Menu').hide();
+                        //$('#Batch_Menu').show();
+                        $('#Assessment_Menu').show();
                         $('#Content_Menu').hide();
-                        $('#AnchorCourses').hide();
-                        $('#Batch_Menu').show();
-						$('#Candidate_Menu').show();
-						
-                        $('#TMA_content').show();
-                        $('#TMA_batch_Menu').show();
-                        $('#TMA_report_Menu').show();
-                        $('#MCL_report_Menu').show();
-                        $('#Mobilization_report_Menu').show();
-                        $('#Report_Menu').show();
-                        $('#CoomplianceReport').show();
-						
-                        $('#Trainer_Menu').show();
-                        
-						
-                        if(goto != ""){
-                            
-							// home, batch_list_page, batch_add_edit, candidate_list_page, trainer_list_page, trainer_add_edit, mcl_report_page, tma_batch_page, tma_report_download_page
-                            if(goto == "home" || goto == "batch_list_page" || goto == "batch_add_edit" || goto == "candidate_list_page" || goto == "trainer_list_page" || goto == "trainer_add_edit" || goto == "mcl_report_page" || goto == "tma_batch_page" || goto == "tma_report_download_page" || goto == "batch_list_page" || goto == "mcl_report_page" || goto == "mobilization_report" || goto == "attendance_report" || goto=="trainer_deployment" || goto == "change_password_page" || goto == "trainer_deployment" || goto == "attendance_report" || goto == "batch_sessions" || goto == "mobilization_report" || goto == "registered_candidates_list" || goto == "trainerwise_tma_registration" || goto == "tma_registration"){
-                                $("#box").load(goto);
-                            }
-                        }
-                        break;
-                        case 19:         //PH
-                        $('#Home').show();
+                            $('#AnchorSectors').hide();
+                            $('#AnchorQP').hide();
+                            $('#AnchorCourses').hide();
                         $('#Master_Menu').hide();
-                        $('#AnchorCenters').hide();
-                        $('#AnchorCenterType').hide();
-                        $('#AnchorCenterCategory').hide();
-                        $('#Org_menu').hide();
-                        $('#AnchorRoles').hide();
-                        $('#AnchorUsers').hide();
-                        $('#Content_Menu').hide();
-                        $('#AnchorCourses').hide();
-                        $('#Batch_Menu').hide();
-						$('#Candidate_Menu').hide();
-						
-                        $('#TMA_content').show();
-                        $('#TMA_batch_Menu').show();
-                        $('#TMA_report_Menu').show();
-                        $('#MCL_report_Menu').show();
-                        $('#Mobilization_report_Menu').show();
-                        $('#Report_Menu').show();
-                        $('#CoomplianceReport').hide();
-						
-                        $('#Trainer_Menu').hide();
-						
-                        if(goto != ""){
-                            
-							// home, batch_list_page, batch_add_edit, candidate_list_page, trainer_list_page, trainer_add_edit, mcl_report_page, tma_batch_page, tma_report_download_page
-                            if(goto == "home" || goto == "batch_list_page" || goto == "batch_add_edit" || goto == "candidate_list_page" || goto == "trainer_list_page" || goto == "trainer_add_edit" || goto == "mcl_report_page" || goto == "tma_batch_page" || goto == "tma_report_download_page" || goto == "batch_list_page" || goto == "mcl_report_page" || goto == "mobilization_report" || goto == "attendance_report" || goto=="trainer_deployment" || goto == "qp_list_page" || goto == "qp_add_edit" || goto == "course_list_page" || goto == "course_add_edit" || goto == "change_password_page"){
-                                $("#box").load(goto);
-                            }
-                        }
+                            $('#AnchorClients').hide();
+                            $('#AnchorContracts').hide();
+                            $('#Project_Menu').hide();    
+                                $('#AnchorProjects').hide();  
+                                $('#AnchorSubProjects').hide();   
+                                $('#AnchorBatch').hide();
+                            $('#AnchorCenters').hide();
+                            $('#AnchorUsers').hide();
+                            $('#AnchorTrainers').hide();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').hide();
+                            $('#AnchorSalesDashboard').hide();
+                            $('#AnchorOperationDashboard').hide();
+                        $('#My_Projects_Menu').hide();
+                        $('#Report_Menu').hide();
+                            $('#ECP_report').hide();
+                            $('#Qp_wise_report').hide();
+                            $('#Batch_Status_report').hide();
+                        console.log(goto);
+                        if(goto !="" && goto!="dashboard")
+                            $("#box").load(goto);
                         break;
                 }
-                */
+                   
+                
             }
-        });
-        
+        });        
         </script>
     </head>
 
@@ -616,7 +526,7 @@
             <input type="hidden" id="hdn_web_url" name="hdn_web_url" value="">
             <input type="hidden" id="hdn_user_region_id" name="hdn_user_region_id" value="">
 			
-        <header id="topnav" style="background-color:#1C2A43;min-height: 10%; font-size: 15px;" >
+        <header id="topnav" style="background-color:#1C2A43;min-height: 10%; font-size: 15px; z-index: 1000;" >
 
             <!-- Topbar Start -->
             <div class="navbar-custom" style="background-color: white;max-height: 12%;"><!--#e3e8e5;" >-->
@@ -641,13 +551,15 @@
                             <a href="#" class="active">
                                     <span style="color: black;"><i class="fe-user"></i>{{values[0]}}</span><div class="arrow-down"></div></a>
                             <ul class="submenu">
+                                <li id="My_Projects_Menu">
+                                    <a href="/my_projects" >My Projects</a>
+                                </li>
                                 <li id="changepass_Menu">
                                     <a href="/change_password" >Change Password</a>
-                                </li>                                    
-                                <li id="UserRole_Menu">
-                                        <a href="/log_out" ><i class="fe-log-out"></i>Logout</a>
                                 </li>
-                                
+                                <li id="UserRole_Menu">
+                                    <a href="/log_out" ><i class="fe-log-out"></i>Logout</a>
+                                </li>
                             </ul>
                         </li>
                         </ul>
@@ -681,91 +593,48 @@
 							<li class="has-submenu active" id="Home">
                                 <a href="/home" class="active"> <i class="ti-home"></i>Home<div class="button"></div></a>
                             </li>
-							
-							<li class="has-submenu active" id="Batch_Menu">
-                                    <a id="AnchorBatch" href="/batch"  class="active"> <i class="fe-tag"></i>Batch<div class="button"></div></a>
+							<li class="has-submenu active" id="Mobilization_Menu">
+                                <a id="AnchorMobilization" href="/mobilization"  class="active"> <i class="fe-edit-2"></i>Mobilization<div class="button"></div></a>
                             </li>
-							
-							<li class="has-submenu active" id="Candidate_Menu">
-                                <a href="/candidate" class="active"> <i class="fe-user"></i>Candidate<div class="button"></div></a>
+                            <li class="has-submenu active" id="Registration_Menu">
+                                <a id="AnchorRegistration" href="/registration"  class="active"> <i class="fe-edit-2"></i>Registration<div class="button"></div></a>
                             </li>
-							
-							<li class="has-submenu active" id="Content_Menu">
-                                <a href="#" class="active"> <i class="fe-briefcase"></i>Content <div class="arrow-down"></div></a>
-                                <ul class="submenu">
-                                    <li id="Sector_Menu">
-                                        <a id="AnchorSectors"  href="/sector" >Sectors</a>
-                                    </li>
-                                    <li id="Course_Menu">
-                                        <a id="AnchorCourses" href="/course">Courses</a>
-                                    </li>
-                                    <li id="Section_Menu">
-                                        <a id="AnchorSections" hidden>Sections</a>
-                                    </li>
-                                    <li id="Question_Menu">
-                                        <a id="AnchorQuestions" hidden>Questions</a>
-                                    </li>
-                                    <li id="QP_Menu">
-                                        <a id="AnchorQP" href="/qp">Qualification Pack</a>
-                                    </li>
-                                </ul>
+                            <li class="has-submenu active" id="Enrollment_Menu">
+                                <a id="AnchorRegistration" href="/enrollment"  class="active"> <i class="fe-edit-2"></i>Enrollment<div class="button"></div></a>
                             </li>
-							
-                            <li class="has-submenu active" id="Master_Menu">
-                                <a href="#" class="active">
-                                    <i class="fe-anchor"></i>Master <div class="arrow-down"></div></a>
-                                <ul class="submenu">
-                                    <li id="Client_Menu">
-                                        <a id="AnchorClients"  href="/client" >Customers</a>
-                                    </li>
-                                    <li id="Contract_Menu">
-                                        <a id="AnchorContracts"  href="/contract" >Contracts</a>
-                                    </li>                                    
-                                    <li id="Practicce_Menu" style="display: none">
-                                        <a id="AnchorPractices" hidden href="/practice">Practices</a>
-                                    </li>
-                                    <li id="Project_Menu">
-                                        <a id="AnchorProjects"  href="/project">Projects</a>
-                                    </li>
-                                    <li id="Center_Type_Menu" style="display: none">
-                                        <a id="AnchorCenterType" hidden href="/center_type">Center Type</a>
-                                    </li>
-									<!--
-                                    <li id="Center_Category_Menu">
-                                        <a id="AnchorCenterCategory" href="/center_category">Center Category</a>
-                                    </li>
-									-->                                    
-                                    <li id="Region_Menu" style="display: none">
-                                        <a id="AnchorRegion" href="/region">Region</a>
-                                    </li>
-                                    <li id="Cluster_Menu"style="display: none">
-                                        <a id="AnchorCluster" href="/cluster">Cluster</a>
-                                    </li>
-                                    <li id="Center_Menu">
-                                        <a id="AnchorCenters" href="/center">Centers</a>
-                                    </li>
-                                    <li id="Users_Menu">
-                                        <a id="AnchorUsers" href="/user">Users</a>
-                                    </li>
-                                    <li id="Trainer_Menu">
-                                        <a id="AnchorUsers" href="/trainer">Trainers</a>
-                                    </li>
+							<!-- <li class="has-submenu active" id="Batch_Menu">
+                                <a id="AnchorBatch" href="/batch"  class="active"> <i class="fe-tag"></i>Batch<div class="button"></div></a>
+                            </li> -->
+                            <li class="has-submenu active" id="Assessment_Menu">
+                                <a id="AnchorAssessment" href="/assessment"  class="active"> <i class="fe-edit-2"></i>Assessment<div class="button"></div></a>
+                            </li>
 
-                                </ul>
-                            </li>                            
-
-                            
-							<li class="has-submenu active"  id="Report_Menu">
+							<li class="has-submenu active"  id="Report_Menu"  >
                                 <a href="#" class="active">
                                     <i class="fe-airplay"></i>Report <div class="arrow-down"></div></a>
                                 <ul class="submenu"> 
-									<li  id="MCL_report_Menu">
-										<a href="/mcl_report" class="active">MCL Response Report<div class="button"></div></a>
-									</li>
-									<li  id="Mobilization_report_Menu">
-                                            <a href="/MobilizationReport" class="active"> Mobilization Report<div class="button"></div></a>
+                                    <li>
+										<a href="/ecp_report" id="ECP_report" class="active">ECP Report<div class="button"></div></a>
                                     </li>
-                                    <li class="has-submenu"  id="TMA_content">
+                                    <li>
+										<a href="/qp_wise_report" id="Qp_wise_report" class="active">Customer Contract Report<div class="button"></div></a>
+                                    </li>
+                                    <li>
+                                        <a href="/candidate" id="Candidate_Menu" class="active">Candidate Report<div class="button"></div></a>
+                                    </li>
+                                    <li>
+                                        <a href="/user_sub_project" id="User_Sub+Project_Menu" class="active">User-Sub Project Report<div class="button"></div></a>
+                                    </li>
+                                    <li>
+										<a href="/batch_status_report" id="Batch_Status_report" class="active">Batch Status Report<div class="button"></div></a>
+                                    </li>
+                                	<li  id="MCL_report_Menu" style="display:none">
+										<a href="/mcl_report" id="MCL_report" class="active">MCL Response Report<div class="button"></div></a>
+									</li>
+									<li  id="Mobilization_report_Menu" style="display:none">
+                                        <a href="/MobilizationReport" id="Mobilization_report" class="active"> Mobilization Report<div class="button"></div></a>
+                                    </li>
+                                    <li class="has-submenu"  id="TMA_content" style="display:none">
                                         <a href="#">Training Report <div class="arrow-down"></div></a>
                                         <ul class="submenu">                                    
                                             <!--<li  id="TMA_batch_Menu">
@@ -784,7 +653,7 @@
                                     </li>
 									
 									
-                                    <li class="has-submenu"  id="CoomplianceReport">
+                                    <li class="has-submenu"  id="CoomplianceReport" style="display:none">
                                         <a href="#">Compliance Reports <div class="arrow-down"></div></a>
                                         <ul class="submenu">
                                             <li  id="TMA_registraion_Menu"><!--/tma_batch,/tma_report-->
@@ -795,12 +664,106 @@
 											</li>
                                         </ul>
                                     </li>
-                                    <li  id="master_data_Menu">
+                                    <li  id="master_data_Menu" style="display:none"> 
 										<a href="/download_master_data" class="active">Download Master Data<div class="button"></div></a>
 									</li>
                                 </ul>
                             </li>
-                        </ul>
+                            <li class="has-submenu active" id="Insight_Menu">
+                                <a href="#" class="active" > <i class="fe-bar-chart-line-"></i>Insight<div class="arrow-down"></div></a>
+                                <ul class="submenu">
+                                    <li id="Sales_Dashboard_Menu">
+                                        <a id="AnchorSalesDashboard"  href="/sales_dashboard" >Sales Dashboard</a>
+                                    </li>
+
+									<li id="Operation_dashboard_Menu">
+                                        <a id="AnchorOperationDashboard"  href="/operation_dashboard" >Operation Dashboard</a>
+                                  
+                                    </li>
+                                    <li id="jobs_Menu">
+                                        <a id="Anchorjobs"  href="/Placement_Dashboard" >Placement Dashboard</a>
+                                    </li>
+                                    <li id="Sector_Menu">
+                                        <a id="AnchorSectors"  href="/trainer_dashboard" >Trainer Dashboard</a>
+                                    </li>
+                                </ul>
+                            </li>
+							<li class="has-submenu active" id="Master_Menu">
+                                <a href="#" class="active">
+                                    <i class="fe-anchor"></i>Master <div class="arrow-down"></div></a>
+                                <ul class="submenu">
+                                    <li id="Client_Menu">
+                                        <a id="AnchorClients"  href="/client" >Customers</a>
+                                    </li>
+                                    <li id="Contract_Menu">
+                                        <a id="AnchorContracts"  href="/contract" >Contracts</a>
+                                    </li>                                    
+                                    <li class="has-submenu" id="Project_Menu" >
+                                        <a href="#">Projects <div class="arrow-down"></div></a>
+                                        <ul class="submenu"> 
+                                            <li >
+                                                <a href="/project" id="AnchorProjects" class="active">Main Projects<div class="button"></div></a>
+                                            </li>
+                                            <li id="SubProject_Menu">
+                                                <a href="/sub_project" id="AnchorSubProjects" class="active">Sub Projects<div class="button"></div></a>
+                                            </li>
+                                            <li id="Batch_Menu">
+                                                <a href="/batch" id="AnchorBatch" class="active"> Batches<div class="button"></div></a>
+                                            </li>                                            
+                                        </ul>
+                                    </li>
+                                    <li id="Center_Menu">
+                                        <a id="AnchorCenters" href="/center">Centers</a>
+                                    </li>
+                                    <li class="has-submenu" id="Content_Menu">
+                                        <a href="#"> Content <div class="arrow-down"></div></a>
+                                        <ul class="submenu">
+                                            <li id="Sector_Menu">
+                                                <a id="AnchorSectors"  href="/sector" >Sectors</a>
+                                            </li>
+                                            <li id="QP_Menu">
+                                                <a id="AnchorQP" href="/qp">Qualification Pack</a>
+                                            </li>
+                                            <li id="Course_Menu">
+                                                <a id="AnchorCourses" href="/course">Courses</a>
+                                            </li>
+                                            <li id="Section_Menu">
+                                                <a id="AnchorSections" hidden>Sections</a>
+                                            </li>
+                                            <li id="Question_Menu">
+                                                <a id="AnchorQuestions" hidden>Questions</a>
+                                            </li>
+                                            
+                                        </ul>
+                                    </li>
+                                    <li id="Users_Menu">
+                                        <a id="AnchorUsers" href="/user">Employees</a>
+                                    </li>
+                                    <li id="Trainer_Menu">
+                                        <a id="AnchorTrainers" href="/trainer">Trainers</a>
+                                    </li>
+                                    <li id="Partner_Menu">
+                                        <a id="AnchorPartnerss"  href="/partner" >Partners</a>
+                                    </li>
+
+
+                                    <li id="Practicce_Menu" style="display: none">
+                                        <a id="AnchorPractices" hidden href="/practice">Practices</a>
+                                    </li>
+                                    
+                                    <li id="Center_Type_Menu" style="display: none">
+                                        <a id="AnchorCenterType" hidden href="/center_type">Center Type</a>
+                                    </li>                                  
+                                    <li id="Region_Menu" style="display: none">
+                                        <a id="AnchorRegion" href="/region">Region</a>
+                                    </li>
+                                    <li id="Cluster_Menu"style="display: none">
+                                        <a id="AnchorCluster" href="/cluster">Cluster</a>
+                                    </li>
+                                </ul>
+                            </li>
+							
+                            </ul>
                         <!-- End navigation menu -->
                     <!-- </ul> -->
                         <div class="clearfix"></div>
@@ -831,13 +794,7 @@
         <footer class="footer" style="background-color: #1C2A43; font-size: 14px;position:fixed;max-height: 6%; color: white; z-index: 1000;">
             <div class=" container-fluid"  style="padding: 0%;" >
                          &copy; Powered by <a style="color: chartreuse;" href="https://www.labournet.in/">Labournet</a> 
-                    <!-- <div class="col-md-6">
-                        <div class="text-md-right footer-links d-none d-sm-block">
-                             <a href="https://www.labournet.in/">About Us</a> 
-                            <a href="javascript:void(0);">Help</a>
-                            <a href="javascript:void(0);">Contact Us</a> 
-                        </div>
-                    </div> -->
+                
             </div>
         </footer>
         

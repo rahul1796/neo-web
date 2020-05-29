@@ -2,14 +2,17 @@ from Database import Database
 class Batch:
     def batch_list(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id):
         return Database.batch_list(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id)
-    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, course, region, center):
-        return Database.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, course, region, center)
+    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center,center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
+        return Database.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
+    def batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center,center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
+        return Database.batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
     
-    def add_batch(batch_id,batch_name,course_id,batch_code,center_id,trainer_id,center_manager_id,start_date,end_date,start_time,end_time,user_id,is_active,actual_start_date,actual_end_date):
-        popupMessage = {"PopupMessage": Database.add_batch_details(batch_id,batch_name,course_id,batch_code,center_id,trainer_id,center_manager_id,start_date,end_date,start_time,end_time,user_id,is_active,actual_start_date,actual_end_date)}
+    def add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id):
+        popupMessage = {"PopupMessage": Database.add_batch_details(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id)}
         return popupMessage
     def get_batch(batch_id):
         indi_batch={"BatchDetail":Database.get_batch_details(batch_id)}
+        #print(indi_batch)
         return indi_batch
     def AllCourse():
         course_f={"Courses":Database.GetCourse()}
@@ -19,6 +22,9 @@ class Batch:
         return centers_f
     def AllTrainersOnCenter(center_id):
         trainers_f={"Trainers":Database.GetTrainersBasedOnCenter(center_id)}
+        return trainers_f
+    def AllTrainersOnSubProject(SubProject_Id):
+        trainers_f={"Trainers":Database.GetTrainersBasedOnSubProject(SubProject_Id)}
         return trainers_f
     def AllCenterManagerOnCenter(center_id):
         centermanager_f={"CenterManager":Database.GetCenterManagerBasedOnCenter(center_id)}
@@ -30,12 +36,12 @@ class Batch:
         return Database.candidates_based_on_course(candidate_id,course_ids,batch_id,center_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
     def candidate_maped_in_batch(candidate_id,course_ids,batch_id,center_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         return Database.candidate_maped_in_batch(candidate_id,course_ids,batch_id,center_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def candidate_enrolled_in_batch(batch_id):
+        candidate={"Candidates": Database.candidate_enrolled_in_batch(batch_id)}
+        return candidate    
     def add_edit_candidate_batch(candidate_ids,batch_id,course_id,user_id):
         popupMessage = {"PopupMessage": Database.add_edit_map_candidate_batch(candidate_ids,batch_id,course_id,user_id)}
         return popupMessage
-    def drop_edit_candidate_batch(candidate_ids,batch_id,course_id,user_id,drop_remark):
-        if len(candidate_ids)==0:
-            popupMessage = {"PopupMessage": {"message":"Please select at least one candidate to dropout"}}
-        else:
-            popupMessage = {"PopupMessage": Database.drop_edit_map_candidate_batch(candidate_ids,batch_id,course_id,user_id,drop_remark)}
+    def drop_edit_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark):
+        popupMessage = {"PopupMessage": Database.drop_edit_map_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark)}
         return popupMessage

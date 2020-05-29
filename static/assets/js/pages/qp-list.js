@@ -50,15 +50,8 @@ function LoadSector()
         return false;
 }
 
-function LoadTableBasedOnSearch(){
-        if($('#ddlsector').val().toString()==''|| $('#ddlsector').val().toString()==null){
-            alert("Please select a Sector.");
-        }
-        else{
-            
+function LoadTableBasedOnSearch(){      
             LoadTable($('#ddlsector').val().toString());
-        }
-        
     }
 	
 	
@@ -79,6 +72,8 @@ function LoadTable(sectors)
             "type": "POST",
             "dataType": "json",
             "data": function (d) {
+                d.user_id =$('#hdn_home_user_id').val();
+                d.user_role_id = $('#hdn_home_user_role_id').val();
                 d.qp_id = 0;
 				d.sectors = sectors;
             },
@@ -101,7 +96,7 @@ function LoadTable(sectors)
             { "data": "Qp_Name" },
             { "data": "Qp_Code"},
             { "data": "Sector_Name"},
-            { "data": function (row, type, val, meta) {
+            { "visible":false,"data": function (row, type, val, meta) {
                 var varStatus = ""; 
                 if(row.Is_Active)
                     varStatus="Active";
