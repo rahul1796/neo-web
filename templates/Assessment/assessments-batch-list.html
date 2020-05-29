@@ -292,7 +292,7 @@
                     </table>	
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Close</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="Back()" >Close</button>
                 </div>
             </div>
         </div>
@@ -338,7 +338,7 @@
             <div class="modal-content " >
                 <form id="frScheduleAssessment" data-parsley-validate="" action="javascript:ScheduleAssessment()">
                 <div class="modal-header">
-                    <h4 class="modal-title" ><span id="hdBatchName">Schedule Assessment</span></h4>
+                    <h4 class="modal-title" ><span id="hdBatchName">Assessment Details</span></h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 </div>                    
                 <div class="modal-body" style="overflow: auto;width: 100%;height:400px;">  
@@ -408,7 +408,7 @@
                         <div class="form-group" id="DivScheduleDate">
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <label for="TxtScheduledDate">Assessment Confirmed Date:</label>
+                                    <label for="TxtScheduledDate">Assessment Confirmed Date*:</label>
                                 </div>
                                 <div class="col-lg-4">
                                     <input type="text" id="TxtScheduledDate" name="TxtScheduledDate" class="form-control date-picker" ClientIdMode="static" placeholder="Assessment Confirmed Date" >
@@ -419,7 +419,7 @@
                         <div class="form-group" id="DivAssessmentDate">
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <label for="TxtAssessmnetDate">Assessment Date:</label>
+                                    <label for="TxtAssessmnetDate">Actual Assessment Date*:</label>
                                 </div>
                                 <div class="col-lg-4">
                                     <input type="text" id="TxtAssessmnetDate" name="TxtAssessmnetDate" class="form-control date-picker" ClientIdMode="static" placeholder="Actual Assessment Date" >
