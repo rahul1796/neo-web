@@ -4475,7 +4475,7 @@ SELECT					cb.name as candidate_name,
         curs.execute(quer)
         data=curs.fetchall()
         data = '' if data==[] else data[0][0]
-        if app_version < str(data):
+        if int(app_version) < int(data):
             curs.close()
             conn.close()
             out = {'success': False, 'description': "Lower App Version", 'app_status':False}
@@ -4518,7 +4518,7 @@ SELECT					cb.name as candidate_name,
         curs.execute(quer)
         data=curs.fetchall()
         data = '' if data==[] else data[0][0]
-        if app_version < str(data):
+        if int(app_version) < int(data):
             curs.close()
             conn.close()
             out = {'success': False, 'description': "Lower App Version", 'app_status':False}
@@ -4587,7 +4587,7 @@ SELECT					cb.name as candidate_name,
         curs.execute(quer)
         data=curs.fetchall()
         data = '' if data==[] else data[0][0]
-        if app_version < str(data):
+        if int(app_version) < int(data):
             curs.close()
             conn.close()
             out = {'success': False, 'description': "Lower App Version", 'app_status':False}
@@ -4632,7 +4632,7 @@ SELECT					cb.name as candidate_name,
         curs.execute(quer)
         data=curs.fetchall()
         data = '' if data==[] else data[0][0]
-        if app_version < str(data):
+        if int(app_version) < int(data):
             curs.close()
             conn.close()
             out = {'success': False, 'description': "Lower App Version", 'app_status':False}
