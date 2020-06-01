@@ -326,7 +326,8 @@ class add_center_details(Resource):
             pinCode=request.form['PinCode']
             District=request.form['District']
             partner_id=request.form['PartnerId']
-            return Master.add_center(center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pinCode,District,partner_id)
+            geolocation=request.form['geolocation']
+            return Master.add_center(center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pinCode,District,partner_id,geolocation)
 
 class get_center_details(Resource):
     @staticmethod
@@ -1017,6 +1018,7 @@ class all_course_list(Resource):
     def get():
         if request.method == 'GET':
             return Batch.AllCourse()
+
 
 class centers_based_on_course(Resource):
     @staticmethod
@@ -6419,6 +6421,43 @@ class DownloadBatchStatusReport(Resource):
 
 api.add_resource(DownloadBatchStatusReport,'/DownloadBatchStatusReport')
 ###############################################################################
+class GetCenterRooms(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            center_id=request.args.get('center_id',0,type=int)
+            response=Master.GetCenerRoom(center_id)
+            return response
+api.add_resource(GetCenterRooms,'/GetCenterRooms')
 
-if __name__ == '__main__':    
+class add_edit_center_room(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            try:
+                Room_Name=request.form['Room_Name']
+                user_id=g.user_id
+                is_active=request.form['isactive']
+                Room_Type=request.form['Room_Type']
+                Room_Size=request.form['Room_Size']
+                Room_Capacity=request.form['Room_Capacity']
+                center_id=request.form['center_id']
+                room_id=request.form['room_id']
+                uploaded_files = request.files.getlist("fileToUpload[]")
+                course_ids=request.form['course_ids']
+
+                file_name = ''
+                for file in uploaded_files:
+                    file_name += file.filename + ','
+                    file.save(os.getcwd() + config.upload_data_path +'RoomImages/' + file.filename)
+                file_name = file_name[:-1]
+                out = Master.add_edit_center_room(Room_Name, user_id, is_active, Room_Type, Room_Size, Room_Capacity, center_id, room_id, file_name, course_ids)
+            except Exception as e:
+                out = {"PopupMessage":{"message":"Error " + str(e), "status":False}}
+            finally:
+                return out
+
+api.add_resource(add_edit_center_room,'/add_edit_center_room')
+
+if __name__ == '__main__':
     app.run(debug=True)

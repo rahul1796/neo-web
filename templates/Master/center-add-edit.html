@@ -16,7 +16,7 @@
                     url:URL,
                     success:function(data){
                         if(data!=null)
-                        {
+                        { 
                             if(data.CenterDetail!="")
                             {
                                 $('#CenterName').val(data.CenterDetail.Center_Name);
@@ -34,6 +34,7 @@
                                 $('#LocationName').val(data.CenterDetail.Location);
                                 $('#TxtAddress').val(data.CenterDetail.Address);
                                 $('#TxtPinCode').val(data.CenterDetail.Pin_Code);
+                                $('#Txtgeolocation').val(data.CenterDetail.Geo_Location)
                                 if(data.CenterDetail.Is_Active)
                                     $('#isactive').prop('checked',true);
                                 else
@@ -268,7 +269,8 @@
                         "PinCode":$("#TxtPinCode").val(),
                         "District":$("#ddlCenterDistrict").val(),
                         "CenterId":'{{center_id}}',
-                        "PartnerId":$('#ddlPartner').val()
+                        "PartnerId":$('#ddlPartner').val(),
+                        "geolocation":$('#Txtgeolocation').val()
                     },
                     success:function(data){
                         swal({   title:data.PopupMessage.message,
@@ -471,6 +473,17 @@
                                     </div>
                                     <div class="col-lg-6">
                                         <input type="number"  class="form-control" name="TxtPinCode" id="TxtPinCode"   placeholder="Pin Code" >
+                                        <!-- data-parsley-length="[6,6]" -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <label for="Txtgeolocation">Geo Location:</label>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <input type="text"  class="form-control" name="Txtgeolocation" id="Txtgeolocation"   placeholder="Geo Location in 'https://www.google.com/maps?q=37.819722,-122.478611'">
                                         <!-- data-parsley-length="[6,6]" -->
                                     </div>
                                 </div>

@@ -473,11 +473,11 @@ class Database:
         con.close()
         return content
 
-    def add_center_details(center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pincode,District,partner_id):
+    def add_center_details(center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pincode,District,partner_id,geolocation):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_centers] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?'
-        values = (center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pincode,District,partner_id)
+        sql = 'exec	[masters].[sp_add_edit_centers] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, ?'
+        values = (center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pincode,District,partner_id, geolocation)
         #print(values)
         cur.execute(sql,(values))
         for row in cur:
@@ -557,7 +557,7 @@ class Database:
         countries = []
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        cur2.execute("SELECT * FROM [masters].[tbl_countries]")
+        cur2.execute("SELECT country_id, country_name FROM [masters].[tbl_countries]")
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
             h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
@@ -5449,3 +5449,37 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return response
+
+    def Getcenterroom(center_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_center_room]  ?'
+        values = (center_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i] 
+            #h["Course_Ids"] = row[i] # .split(',')#list(map(lambda x : int(x), row[i].split(',')))  
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def add_edit_center_room(Room_Name, user_id, is_active, Room_Type, Room_Size, Room_Capacity, center_id, room_id, file_name, course_ids):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_add_edit_center_room] ?, ?, ?, ?, ?, ?,?, ?, ?, ?'
+        values = (Room_Name, user_id, is_active, Room_Type, Room_Size, Room_Capacity, center_id, room_id, file_name, course_ids)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated", "status":True}
+        else:
+            msg={"message":"Created", "status":True}
+        return msg
