@@ -6355,7 +6355,7 @@ class add_edit_center_room(Resource):
                 file_name = ''
                 for file in uploaded_files:
                     file_name += file.filename + ','
-                    file.save(config.upload_data_path +'RoomImages/' + file.filename)
+                    file.save(os.getcwd() + config.upload_data_path +'RoomImages/' + file.filename)
                 file_name = file_name[:-1]
                 out = Master.add_edit_center_room(Room_Name, user_id, is_active, Room_Type, Room_Size, Room_Capacity, center_id, room_id, file_name, course_ids)
             except Exception as e:
