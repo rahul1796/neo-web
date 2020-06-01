@@ -16,9 +16,8 @@
         $(document).ready(function () {
             $("#tbl_centers").dataTable().fnDestroy();
             
-            $('.dropdown-search-filter').select2({
-                placeholder:''
-            });
+            $('.dropdown-search-filter').select2();
+            
             role_id=parseInt($('#hdn_home_user_role_id').val());
             if(role_id == 1 || role_id==15)
                 $('#btn_create').hide();
@@ -38,7 +37,9 @@
                     $('#ddlStatus').val("1");
                     $('#ddlCenterType').val('4');
                     }
-            LoadTable(); 
+            LoadTable();
+            
+            onchange_roomtype();
         });
         </script>
 
@@ -145,6 +146,8 @@
                                                     <th>Center Type</th>
                                                     <th>Sub Project</th>
                                                     <th>Course</th>
+                                                    <th>Rooms</th>
+                                                    <th>Geo Location</th>
                                                     <th>Location</th>
                                                     <th>District</th>                                                    
                                                     <th>State</th>
@@ -231,6 +234,159 @@
         </div>
     </div>
 </div><!--/.modal-->   
+
+<div id="mdl_room_center" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title" ><span id="headerRooms"></span></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>                    
+            <div class="modal-body">
+                <input type="hidden" id="hdn_modal_center_id" name="hdn_modal_center_id" value="0">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button style="float: right;" type="button" id="btn_add" onclick="AddModal()" class="btn btn-primary">Add Room</a>
+                    </div>
+                </div>
+            </br>
+                <div >
+                    <table id="tbl_rooms" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                        <thead>
+                            <tr style="background-color: #f5f6f8;">
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Action</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Room Name</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Room Type</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Room Size</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Room Capacity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+            </div>
+        </div>
+    </div>
+</div><!--/.modal-->
+
+<div id="mdl_add_edit_rooms" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <form enctype="multipart/form-data" action="javascript:AddeEditCenterRoom();" method="POST" >
+                <div class="modal-header">
+                    <h4 class="modal-title" ><span id="header">Room Details</span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>                    
+                <div class="modal-body">
+                    <div class="col-12">
+                        <input type="hidden" id="hdn_room_id" name="hdn_room_id" value="0">
+                        <input type="hidden" id="hdn_center_id_m2" name="hdn_center_id_m2" value="0">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="Room_Name">Room Name * :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="text" class="form-control" name="Room_Name" id="Room_Name" required placeholder="Room Name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="Room_Type">Room Type * :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <select class="form-control dropdown-search-filter" name="Room_Type" id="Room_Type"  ClientIdMode="static" style="width:100%" onchange="onchange_roomtype();" required=""> <!-- style="width:100%" -->>
+                                        <option value="">Choose Room Tyoe</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" id="ddl_If_Others">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="If_Others">If Others * :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="text" class="form-control" name="If_Others" id="If_Others" placeholder="If Others">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="Room_Size">Room Size (SqFt)* :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="number" class="form-control" name="Room_Size" id="Room_Size" required placeholder="Room Size (SqFt)">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="Room_Capacity">Room Capacity * :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="number" class="form-control" name="Room_Capacity" id="Room_Capacity" required placeholder="Room Capacity">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="map_course">Course * :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <select class="form-control dropdown-search-filter" name="map_course" id="map_course"  ClientIdMode="static" style="width:100%" onchange="onchange_roomtype();" required="" multiple> <!-- style="width:100%" -->>
+                                        <option value="">Choose Course</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="images">Images :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="file" class="form-control" name="images" id="images" placeholder="Images" multiple>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label>Is Active :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="checkbox checkbox-pink mb-0">
+                                        <input type="checkbox" name="isactive" id="isactive" ClientIdMode="static" 
+                                                        value="1" data-parsley-mincheck="1" >
+                                        <label for="isactive"> Is active </label>
+                                    </div>
+                                </div>   
+                            </div>                                     
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary waves-effect" > Save</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div><!--/.modal-->
+
+
 
 <script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
 <script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
