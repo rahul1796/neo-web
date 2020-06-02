@@ -35,6 +35,7 @@ from pandas_schema import Column, Schema
 from pandas_schema.validation import CustomElementValidation
 import numpy as np
 import requests
+from email.utils import parseaddr
 #import excel_validation
 #String check
 def check_str(st):
@@ -5482,7 +5483,7 @@ class upload_bulk_upload(Resource):
             all_state=Database.all_state_validation()
             #print(data)
             state_validation = [CustomElementValidation(lambda d: d.lower() in all_state, 'Invalid State')]
-            cand_email_validation = [CustomElementValidation(lambda d: Database.app_email_validation(d), 'Email already exists')]
+            cand_email_validation = [CustomElementValidation(lambda d: ((Database.app_email_validation(d))and(d==parseaddr(d)[1])), 'Email already exists')]
             cand_mobile_validation = [CustomElementValidation(lambda d: Database.app_mobile_validation(d), 'mobile number already exists')]
             #dob_validation = [CustomElementValidation(lambda d: , 'invalid format. please provide in "MM-DD-YYYY')]
             if cand_stage==str(1):
