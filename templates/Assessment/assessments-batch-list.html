@@ -188,19 +188,14 @@
                                                 <tr>
                                                     <th>S No</th>
                                                     <th>Actions</th>
-                                                    <th>Batch Name</th>
+                                                   
                                                     <th>Batch Code</th>
-                                                    <th>Product</th>
-                                                    <th>Center</th>
-                                                    <th>Course</th>
-                                                    <th>Sub Project</th>
-                                                    <th>Trainer Email</th>
-                                                    <th>Center Manager Email</th>
-                                                    <th>Start Date</th>
-                                                    <th>End Date</th>
-                                                    <th>Start Time</th>
-                                                    <th>End Time</th>
+                                                    
                                                     <th>Status</th>
+                                                    <th>Assessment Proposed</th>
+                                                    <th>Assessment Confirmed</th>
+                                                    <th>Assessment Completed</th>
+                                                    <th>Result Uploaded</th>
                                                 </tr>
                                             </thead>
                                         
@@ -274,20 +269,55 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 </div>                    
                 <div class="modal-body">
-                    <table id="tbl_batch_assessment" class="table table-bordered dt-responsive wrap w-100" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                    <table id="tbl_batch_assessment" class="table table-bordered dt-responsive nowrap w-100" style="border-color: lightgray;width:100% !important;font-size: 10px;">
                         <thead>
                             <tr style="background-color: #f5f6f8;">
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Actions</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch Code</th>
-                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Request Date</th>
-                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Requested On</th>
-                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Scheduled Date</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Proposed Date</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Proposed On</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Confirmed Date</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Date</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Type</th>
-                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Agency</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Awarding Body</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Partner</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Stage</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Attempt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+    
+                        </tbody>
+                    </table>	
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="Back()" >Close</button>
+                </div>
+            </div>
+        </div>
+    </div><!--/.modal-->
+    <div id="divBatchDetails" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content ">
+                <div class="modal-header">
+                    <h4 class="modal-title" ><span id="hdBatchName">Batch Detail</span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>                    
+                <div class="modal-body">
+                    <table id="tblBatchDetails" class="table table-bordered dt-responsive wrap w-100" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                        <thead>
+                            <tr style="background-color: #f5f6f8;">
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th> 
+                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch Code</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch Name</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Product</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Trainer</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Start Date</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">End Date</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -302,87 +332,162 @@
         </div>
     </div><!--/.modal-->
 
+
     <div id="mdl_create_batch_assessments" class="modal fade" role="dialog">
         <div class="modal-dialog modal-xl">
-            <div class="modal-content ">
+            <div class="modal-content " >
                 <form id="frScheduleAssessment" data-parsley-validate="" action="javascript:ScheduleAssessment()">
                 <div class="modal-header">
-                    <h4 class="modal-title" ><span id="hdBatchName">Schedule Assessment</span></h4>
+                    <h4 class="modal-title" ><span id="hdBatchName">Assessment Details</span></h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 </div>                    
-                <div class="modal-body">  
+                <div class="modal-body" style="overflow: auto;width: 100%;height:400px;">  
                     <input type="hidden" id="hdn_batch_assessment_id" name="hdn_batch_assessment_id" value="0"> 
                     <input type="hidden" id="hdn_assessment_id" name="hdn_assessment_id" value="0"> 
                     <input type="hidden" id="hdn_current_stage_id" name="hdn_current_stage_id" value="0">                  
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <label for="ddlAssessmentType">Assessment Type* :</label>
+                    <div >
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="ddlAssessmentType">Assessment Type* :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <select id="ddlAssessmentType" class="form-control " name="ddlAssessmentType" required="">
+                                    </select>
+                                </div>
+                                <div class="col-lg-4"></div>
                             </div>
-                            <div class="col-lg-4">
-                                <select id="ddlAssessmentType" class="form-control " name="ddlAssessmentType" required="">
-                                </select>
-                            </div>
-                            <div class="col-lg-4"></div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <label for="ddlAssessmentAgency">Assessment Agency* :</label>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="ddlAssessmentAgency">Awarding Body* :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <select id="ddlAssessmentAgency" class="form-control " name="ddlAssessmentAgency" onchange="AgencyOnChange(this.value)" ClientIdMode="static" required="">
+                                    </select>
+                                </div>
+                                <div class="col-lg-4"></div>
                             </div>
-                            <div class="col-lg-4">
-                                <select id="ddlAssessmentAgency" class="form-control " name="ddlAssessmentAgency" onchange="AgencyOnChange(this.value)" ClientIdMode="static" required="">
-                                </select>
+                        </div> 
+                        <div class="form-group" id="DivPartnerType" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="ddlPartnerType">Partner Type * :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <select id="ddlPartnerType" class="form-control " name="ddlPartnerType" onchange="PartnetTypeOnChange(this.value)" ClientIdMode="static" >
+                                    </select>
+                                </div>
+                                <div class="col-lg-4"></div>
                             </div>
-                            <div class="col-lg-4"></div>
+                        </div> 
+                        <div class="form-group" id="DivPartner" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="ddlPartner">Partner * :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <select id="ddlPartner" class="form-control " name="ddlPartner" ClientIdMode="static" >
+                                    </select>
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
+                        </div> 
+                        <div class="form-group" id="DivRequestDate">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtRequestedDate">Proposed Date*:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtRequestedDate" name="TxtRequestedDate" class="form-control date-picker" required placeholder="Proposed Date">
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
                         </div>
-                    </div> 
-                    <div class="form-group" id="DivPartner" style="display:none">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <label for="ddlPartner">partner * :</label>
+                        <div class="form-group" id="DivScheduleDate">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtScheduledDate">Assessment Confirmed Date*:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtScheduledDate" name="TxtScheduledDate" class="form-control date-picker" ClientIdMode="static" placeholder="Assessment Confirmed Date" >
+                                </div>
+                                <div class="col-lg-4"></div>
                             </div>
-                            <div class="col-lg-4">
-                                <select id="ddlPartner" class="form-control " name="ddlPartner" ClientIdMode="static" >
-                                </select>
-                            </div>
-                            <div class="col-lg-4"></div>
                         </div>
-                    </div> 
-                    <div class="form-group" id="DivRequestDate">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <label for="TxtRequestedDate">Requested Date*:</label>
+                        <div class="form-group" id="DivAssessmentDate">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtAssessmnetDate">Actual Assessment Date*:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtAssessmnetDate" name="TxtAssessmnetDate" class="form-control date-picker" ClientIdMode="static" placeholder="Actual Assessment Date" >
+                                </div>
+                                <div class="col-lg-4"></div>
                             </div>
-                            <div class="col-lg-4">
-                                <input type="text" id="TxtRequestedDate" name="TxtRequestedDate" class="form-control date-picker" required placeholder="Requested Date">
+                        </div>  
+                        <div class="form-group" id="DivAssessorName">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtAssessorName">Assessor Name:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtAssessorName" name="TxtAssessorName" class="form-control " ClientIdMode="static" placeholder="Assessor Name" >
+                                </div>
+                                <div class="col-lg-4"></div>
                             </div>
-                            <div class="col-lg-4"></div>
-                        </div>
-                    </div>
-                    <div class="form-group" id="DivScheduleDate">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <label for="TxtScheduledDate">Scheduled Date:</label>
+                        </div>  
+                        <div class="form-group" id="DivAssessorMob">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtAssessorMob">Assessor Mobile No. :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtAssessorMob" name="TxtAssessorMob" class="form-control " ClientIdMode="static" placeholder="Assessor Mobile No." >
+                                </div>
+                                <div class="col-lg-4"></div>
                             </div>
-                            <div class="col-lg-4">
-                                <input type="text" id="TxtScheduledDate" name="TxtScheduledDate" class="form-control date-picker" ClientIdMode="static" placeholder="Scheduled Date" >
+                        </div> 
+                        <div class="form-group" id="DivAssessorEmail">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtAssessorEmail">Assessor Email:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtAssessorEmail" name="TxtAssessorEmail" class="form-control " ClientIdMode="static" placeholder="Assessor Email" >
+                                </div>
+                                <div class="col-lg-4"></div>
                             </div>
-                            <div class="col-lg-4"></div>
-                        </div>
-                    </div>
-                    <div class="form-group" id="DivAssessmentDate">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <label for="TxtAssessmnetDate">Assessment Date:</label>
+                        </div> 
+                        <div class="form-group" id="DivCandidates">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label> Select Absent Candidates :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                </div>
+                                <div class="col-lg-4">
+                                </div>
                             </div>
-                            <div class="col-lg-4">
-                                <input type="text" id="TxtAssessmnetDate" name="TxtAssessmnetDate" class="form-control date-picker" ClientIdMode="static" placeholder="Actual Assessment Date" >
+                            <div class="row">
+                                <table id="tbl_mark_absent_candidate"  class="table dt-responsive nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>S No</th>
+                                            <th>ABSENT</th>
+                                            <th>Candidate Id</th>
+                                            <th>Candidate Name</th>
+                                            <th>Mobile Number</th>
+                                            <th>Enrollment Id</th>
+                                        </tr>
+                                    </thead>
+                                
+                                <tbody></tbody>
+                                </table>  
                             </div>
-                            <div class="col-lg-4"></div>
-                        </div>
-                    </div>                   
+                        </div>    
+                    </div>             
                 </div>
                 <div class="modal-footer">   
                     <button class="btn btn-success" type="submit"> Submit </button>                
@@ -410,7 +515,7 @@
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-4">
-                                <label for="TxtReqDate">Requested Date :</label>
+                                <label for="TxtReqDate">Proposed Date :</label>
                                 <input type="text" id="TxtReqDate" name="TxtReqDate" class="form-control" readonly ClientIdMode="static">
                             </div>
                             <div class="col-lg-4">

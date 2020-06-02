@@ -49,6 +49,7 @@
 
         if('{{project_id}}' !=0)
         { 
+            $('#hdn_project_id').val('{{project_id}}');
             $('#headProject').text("Project Details");
             $('#divBtns').show();  
             document.getElementById("PlannedStartDate").disabled = true;
@@ -91,6 +92,7 @@
                                 $('#isactive').prop('checked',false);
                             }
                         }
+                        $('#spnProjectName').text(data.ProjectDetail.Project_Name);
                     } 
                 },
                 error:function(x){
@@ -661,22 +663,36 @@
         $('#target_percentage_'+id).removeAttr('required');        
         $('#target_percentage_'+id).removeAttr('min');
         $('#percentage_billing_milestone_'+id).removeAttr('required');
+        if(id=='7')
+        {
+            $('#is_percentage_wise_target_rate_'+id).prop( "disabled", false );
+        }
+        else
+        {
+            $('#is_percentage_wise_target_rate_'+id).prop( "disabled", true );
+        }
         LoadPercentBillingMilestones('percentage_billing_milestone_'+id,'',id);
         console.log(MilestoneObject);
     }
     function removeMilestone(e) {
-        let position = e.currentTarget.getAttribute('data-value');
-        let val=$('#billing_milestone_'+position).val();
-        $("#ddlBillingMilestones").append('<option value='+position+'>'+val+'</option>');
-            $('#div_milestone_'+position).remove();
-        delete MilestoneObject[position];
-        console.log(MilestoneObject);
+        let isBoss = confirm("Are you sure you want to remove milestone?");
+        if( isBoss){
+            let position = e.currentTarget.getAttribute('data-value');
+            let val=$('#billing_milestone_'+position).val();
+            $("#ddlBillingMilestones").append('<option value='+position+'>'+val+'</option>');
+                $('#div_milestone_'+position).remove();
+            delete MilestoneObject[position];
+            console.log(MilestoneObject);
+        }
+        return false;
+        
     }
     function SaveProjectMilestones()
     {
         var varJson='';
         $('#divProjectMilestones').children('div').each(function(){
         var varDiv=$(this).children('div');
+        let is_per=0;
         let milestone_id,unit_type_id,rr_percentage,stage_id,order=0,is_target_percentage_req=0,per_val_for_target=0,per_of_milestone=0;                
             $(varDiv).children('div').each(function(){
                 let id=$(this).attr("id").toString();                
@@ -696,17 +712,24 @@
                         break;
                     case 'is-percentage-wise-target-container-':
                         if($('#'+id).children('input').is(":checked"))
-                            is_target_percentage_req=1;
+                            {is_target_percentage_req=1;is_per=1}
                         else
                             is_target_percentage_req=0;
                         break;
                     case 'target-percentage-container-':
                         if($('#'+id).children('input').val()!=undefined)
-                            per_val_for_target =$('#'+id).children('input').val();
+                        {
+                            if(is_per==1)
+                                per_val_for_target =$('#'+id).children('input').val()==''?0:$('#'+id).children('input').val();
+                        }
+                            
                         break;
                     case 'percentage-billing-milestone-container-':
                         if($('#'+id).children('select').val()!=undefined & $('#'+id).children('select').val()!='')
+                        {
+                            if(is_per==1)
                             per_of_milestone =$('#'+id).children('select').val();
+                        }
                         break;
                 }                
             });
@@ -735,7 +758,9 @@
                             icon:"success",
                             confirmButtonClass:"btn btn-confirm mt-2"
                             }).then(function(){
-                                GetProjectMilestone();
+                                //GetProjectMilestone();
+                                $('#form1').submit();
+                                //window.location.href = '/assign_project_add_edit_to_home';
                             }
                             );
             },
@@ -807,26 +832,45 @@
                             varHtml+= '</div>';
                             
                             $('#divProjectMilestones').append(varHtml);
-                            LoadPercentBillingMilestones('percentage_billing_milestone_'+id,data.MileStones[i].Per_Of_Milestone,id);
+                            //LoadPercentBillingMilestones('percentage_billing_milestone_'+id,data.MileStones[i].Per_Of_Milestone,id);
                             //LoadUnitTypes('unit_type_'+id,data.MileStones[i].Unit_Type_Id);
-                            if(data.MileStones[i].Is_Target_Percentage_Req)
+                            if(id=='7')
                             {
-                                $('#is_percentage_wise_target_rate_'+id).prop("checked",true);
-                                $('#target-percentage-container-'+id).show();
-                                $('#percentage-billing-milestone-container-'+id).show();
-                                $('#target_percentage_'+id).attr('required');
-                                $('#target_percentage_'+id).attr('min','1');
-                                $('#percentage_billing_milestone_'+id).attr('required');
+                                $('#is_percentage_wise_target_rate_'+id).prop( "disabled", false );
+                                if(data.MileStones[i].Is_Target_Percentage_Req)
+                                {
+                                    $('#is_percentage_wise_target_rate_'+id).prop("checked",true);
+                                    $('#target-percentage-container-'+id).show();
+                                    $('#percentage-billing-milestone-container-'+id).show();
+                                    $('#target_percentage_'+id).attr('required','');
+                                    $('#target_percentage_'+id).attr('min','1');
+                                    $('#percentage_billing_milestone_'+id).attr('required','');
+                                }
+                                else 
+                                {
+                                    $('#is_percentage_wise_target_rate_'+id).prop("checked",false);
+                                    $('#target-percentage-container-'+id).hide();
+                                    $('#percentage-billing-milestone-container-'+id).hide();
+                                    $('#target_percentage_'+id).removeAttr('required');
+                                    $('#target_percentage_'+id).removeAttr('min');
+                                    $('#percentage_billing_milestone_'+id).removeAttr('required');
+                                }
                             }
-                            else 
+                            else
                             {
-                                $('#is_percentage_wise_target_rate_'+id).prop("checked",false);
+                                $('#is_percentage_wise_target_rate_'+id).prop( "disabled", true );
                                 $('#target-percentage-container-'+id).hide();
-                                $('#percentage-billing-milestone-container-'+id).hide();
-                                $('#target_percentage_'+id).removeAttr('required');
-                                $('#target_percentage_'+id).removeAttr('min');
-                                $('#percentage_billing_milestone_'+id).removeAttr('required');
+                                    $('#percentage-billing-milestone-container-'+id).hide();
+                                    $('#target_percentage_'+id).removeAttr('required');
+                                    $('#target_percentage_'+id).removeAttr('min');
+                                    $('#percentage_billing_milestone_'+id).removeAttr('required');
                             }
+                            
+                        }
+                        for(var i=0;i<count;i++)
+                        {
+                            let id=data.MileStones[i].Milestone_Id;
+                            LoadPercentBillingMilestones('percentage_billing_milestone_'+id,data.MileStones[i].Per_Of_Milestone,id);
                         }
                     }
                 }
@@ -847,9 +891,10 @@
         {
             $('#target-percentage-container-'+id).show();
             $('#percentage-billing-milestone-container-'+id).show();
-            $('#target_percentage_'+id).attr('required');            
+            $('#target_percentage_'+id).attr('required','');            
             $('#target_percentage_'+id).attr('min','1')
-            $('#percentage_billing_milestone_'+id).attr('required');
+            $('#percentage_billing_milestone_'+id).attr('required','');
+            LoadPercentBillingMilestones('percentage_billing_milestone_'+id,'',id);
         }
         else
         {
@@ -862,6 +907,7 @@
     }
     function LoadPercentBillingMilestones(DivName,needed,id)
     {
+        $('#'+DivName).empty();
         $('#'+DivName).append(new Option('Choose billing milestone',''));
         $.each(MilestoneObject, function(key,val){
             //console.log("key : "+key+" ; value : "+val);
@@ -1121,9 +1167,9 @@
         <div class="row" id="divBillingMetrics" >
             <div class="col-12">
                 <div class="card-box">
-                    <!-- <h4 class="header-title">Billing Metrics</h4> -->
-                    <br/>  
-                                                 
+                    <!-- <h4 class="header-title">Billing Metrics</h4> -->                      
+                    <h4><span id="spnProjectName"></span></h4>   
+                    <br/>                          
                     <form id="formBillingMetrics" name="formBillingMetrics" data-parsley-validate="" action="javascript:SaveProjectMilestones()">
                         <div class="form-group">
                             <div class="row">
@@ -1151,7 +1197,7 @@
                                 </div>
                             </div>
                         </div> 
-                        <div id="divProjectMilestones">
+                        <div class="form-group">
                             <div class="row">
                                 <div class="col-lg-2" id="milestone-container">
                                    <h5> Milestone*:</h5>
@@ -1160,9 +1206,12 @@
                                 <h5>RR Percentage*:</h5>
                                 </div>
                                 <div class="col-lg-2" id="milestone-container">
-                                <h5>Is Percentage Wise*:</h5>
+                                <h5>Is Percentage Wise:</h5>
                                 </div>
                             </div>
+                        </div>
+                        <div id="divProjectMilestones">
+                            
                         </div> 
                         <div class="form-group mb-0">
                             <button class="btn btn-primary" type="submit">Save</button>
@@ -1174,7 +1223,9 @@
         <!-- end row-->
 
     </form>
-    
+    <form id='form1' method="POST" action="/assign_project_add_edit_to_home">
+        <input type="hidden" id="hdn_project_id" name="hdn_project_id" value="0">
+    </form>
     </div> <!-- end container -->
 
 <script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>

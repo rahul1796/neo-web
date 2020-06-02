@@ -8,6 +8,7 @@
 <script type="text/javascript">
     $(document).ready(function(){
         LoadPartnerTypes();
+        LoadAssessmentPartnerTypes();
         if('{{partner_id}}' !=0)
         {
             var URL=$('#hdn_web_url').val()+ "/get_partner_details";
@@ -31,6 +32,14 @@
                                 $('#isactive').prop('checked',false);
                             }
                            $('#ddlPartnerTypes').val(data.PartnerDetail.Partner_Type_Id);
+                           $('#ddlAssessmentPartnerTypes').val(data.PartnerDetail.Assessment_Partner_Type_Id);
+                           if( data.PartnerDetail.Partner_Type_Id==2)
+                            {
+                                $('#partnertype').show();
+                            }
+                            else{
+                                $('#partnertype').hide();
+                            }
                        }
                    } 
                 },
@@ -54,6 +63,7 @@
                 data:{
                     "PartnerName" : $('#PartnerName').val(),
                     "ddlPartnerTypes" : $('#ddlPartnerTypes').val(),
+                    "ddlAssessmentPartnerTypes" : $('#ddlAssessmentPartnerTypes').val(),
                     "Address" : $('#Address').val(),
                     "isactive" : $('#isactive').prop('checked'),
                     "PartnerId":'{{partner_id}}'
@@ -119,6 +129,54 @@
             });
             return false;
     }
+
+    function ShowAssessmentPartnerType()
+    {
+        LoadAssessmentPartnerTypes();
+        if( $('#ddlPartnerTypes').val()==2)
+        {
+            $('#partnertype').show();
+        }
+        else{
+            $('#partnertype').hide();
+        }
+    }
+
+    function LoadAssessmentPartnerTypes()
+    {
+        var URL=$('#hdn_web_url').val()+ "/GetAssessmentPartnerTypes";
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.AssessmentPartnerTypes != null)
+                    {
+                        $('#ddlAssessmentPartnerTypes').empty();
+                        var count=data.AssessmentPartnerTypes.length;
+                        if( count> 0)
+                        {
+                            $('#ddlAssessmentPartnerTypes').append(new Option('Choose Assessment Partner Type',''));
+                            for(var i=0;i<count;i++)
+                                $('#ddlAssessmentPartnerTypes').append(new Option(data.AssessmentPartnerTypes[i].Assessment_Partner_Type_Name,data.AssessmentPartnerTypes[i].Assessment_Partner_Type_Id));
+                            
+                        }
+                        else
+                        {
+                            $('#ddlAssessmentPartnerTypes').append(new Option('ALL',''));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
+    }
     
 </script>
         <div class="container-fluid">
@@ -163,7 +221,7 @@
                                         <label for="PartnerName">Partner Name * :</label>
                                     </div>
                                     <div class="col-lg-6">
-                                        <input type="text" class="form-control" name="PartnerName" id="PartnerName" required placeholder="PartnerName name">
+                                        <input type="text" class="form-control" name="PartnerName" id="PartnerName" required placeholder="Partner Name">
                                     </div>
                                 </div>
                             </div>
@@ -173,8 +231,20 @@
                                         <label for="ddlPartnerTypes">Partner Type *:</label>
                                     </div>
                                     <div class="col-lg-6">
-                                        <select id="ddlPartnerTypes" class="form-control dropdown-search-filter" name="ddlPartnerTypes" ClientIdMode="static" required="">
+                                        <select id="ddlPartnerTypes" class="form-control dropdown-search-filter" name="ddlPartnerTypes"  onchange="ShowAssessmentPartnerType();"ClientIdMode="static" required="">
                                             <option value="">Choose Partner Type</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" id = "partnertype" style ="display: none;">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <label for="ddlAssessmentPartnerTypes">Assessment Partner Type *:</label>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <select id="ddlAssessmentPartnerTypes" class="form-control dropdown-search-filter" name="ddlPartnerTypes" ClientIdMode="static" required="">
+                                            <option value="">Choose Assessment Partner Type</option>
                                         </select>
                                     </div>
                                 </div>

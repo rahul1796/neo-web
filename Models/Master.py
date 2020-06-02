@@ -152,7 +152,8 @@ class Master:
         return Database.GetSubProjectsForCenter(center_id)
     def GetSubProjectsForCenter_course(user_id,user_role_id,center_id, course_id, sub_project_id):
         return Database.GetSubProjectsForCenter_course(user_id,user_role_id,center_id, course_id, sub_project_id)
-    
+    def GetBatchDetailsAssessment(batch_code):
+        return Database.GetBatchDetailsAssessment(batch_code)
     def GetProjectsForCourse(CourseId):
         return Database.GetProjectsForCourse(CourseId)
     def GetSubProjectsForCourse(CourseId):
@@ -227,10 +228,14 @@ class Master:
     def GetPartnerTypes():
         response={"PartnerTypes":Database.GetPartnerTypes()}
         return response
+    def GetAssessmentPartnerTypes():
+        response={"AssessmentPartnerTypes":Database.GetAssessmentPartnerTypes()}
+        print(response)
+        return response
     def partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         return Database.partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-    def add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id):
-        popupMessage = {"PopupMessage": Database.add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id)}
+    def add_partner_details(partner_name,user_id,is_active,partner_type_id,assessment_partner_type_id,address,partner_id):
+        popupMessage = {"PopupMessage": Database.add_partner_details(partner_name,user_id,is_active,partner_type_id,assessment_partner_type_id,address,partner_id)}
         return popupMessage
     def get_partner_details(partner_id):
         return {"PartnerDetail":Database.get_partner_details(partner_id)}
@@ -239,8 +244,8 @@ class Master:
     def add_edit_partner_user(UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId):
         popupMessage = {"PopupMessage": Database.add_edit_partner_user(UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId)}
         return popupMessage
-    def GetPartners():
-        return {'Partners':Database.GetPartners()}
+    def GetPartners(PartnerTypeId):
+        return {'Partners':Database.GetPartners(PartnerTypeId)}
 
     def untag_users_from_sub_project(user_ids,sub_project_id):
         popupMessage = {"PopupMessage": Database.untag_users_from_sub_project(user_ids,sub_project_id)}
