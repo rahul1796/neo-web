@@ -930,7 +930,7 @@ class Database:
         sql = 'exec [batches].[sp_get_batch_list_assessment] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?'
 
         values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
-        print(values)
+        #print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -1093,14 +1093,14 @@ class Database:
         cur.close()
         con.close()
         return content
-    def candidate_enrolled_in_batch(batch_id):
+    def candidate_enrolled_in_batch(batch_id,assessment_id):
         h = {}
         response = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_enrolled_in_batch] ?'
+        sql = 'exec [candidate_details].[sp_get_candidate_enrolled_in_batch] ?,?'
        
-        values = (batch_id,)
+        values = (batch_id,assessment_id)
         cur.execute(sql,(values))
         #print(values)
         #print(cur2.description)
@@ -3818,6 +3818,27 @@ SELECT					cb.name as candidate_name,
         con.close()       
         return out
 
+    def GetBatchAssessmentsHistory(AssessentId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [assessments].[get_batch_assessments_history] ?'
+        values = (AssessentId,)
+        print("Hii")
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = {'Assessments':response}
+        cur.commit()
+        cur.close()
+        con.close()   
+        print(response)    
+        return out
+
 
     def Get_all_ProjectType_db():
         response=[]
@@ -3885,14 +3906,14 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return out
-    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile):
+    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag):
         try:
             response=[]
             h={}
             con = pyodbc.connect(conn_str)
             cur = con.cursor()
-            sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
-            values = (batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile)
+            sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
+            values = (batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag)
             print(values)
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]

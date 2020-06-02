@@ -1089,8 +1089,9 @@ class candidates_enrolled_in_batch(Resource):
     @staticmethod
     def get():
          if request.method == 'GET':  
-            batch_id=request.args.get('batch_id',0,type=int)          
-            return Batch.candidate_enrolled_in_batch(batch_id)
+            batch_id=request.args.get('batch_id',0,type=int)  
+            assessment_id=request.args.get('assessmentId',0,type=int)          
+            return Batch.candidate_enrolled_in_batch(batch_id,assessment_id)
 
 
 class add_edit_map_candidate_batch(Resource):
@@ -4575,6 +4576,18 @@ class GetBatchAssessments(Resource):
                 return {'exception':str(e)}
 api.add_resource(GetBatchAssessments,'/GetBatchAssessments')
 
+class GetBatchAssessmentsHistory(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                AssessmentId=request.args.get('AssessmentId',0,type=int)               
+                response = Assessments.GetBatchAssessmentsHistory(AssessmentId)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetBatchAssessmentsHistory,'/GetBatchAssessmentsHistory')
+
 class GetAssessmentTypes(Resource):
     @staticmethod
     def get():
@@ -4616,7 +4629,8 @@ class ScheduleAssessment(Resource):
             assessor_name=request.form['Assessor_Name']
             assessor_email=request.form['Assessor_Email']
             assessor_mobile=request.form['Assessor_Mobile']
-            return Assessments.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile)
+            reassessment_flag=request.form['reassessment_flag']
+            return Assessments.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag)
 api.add_resource(ScheduleAssessment,'/ScheduleAssessment')
 
 api.add_resource(DownloadAssessmentResult,'/DownloadAssessmentResult')
