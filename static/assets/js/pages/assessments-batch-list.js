@@ -881,7 +881,10 @@ function add_map_message(){
                                 varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Agency_Name +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Partner_Name +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Stage_Name +'</td>';
-                                attempt+=  '<a onclick="AssessmentListHistory(\'' + data.Assessments[i].Assessment_Id + '\')" style="color:blue;cursor:pointer" >'+data.Assessments[i].Attempt+'</a>';
+                                if(data.Assessments[i].Attempt >1)
+                                    attempt+=  '<a onclick="AssessmentListHistory(\'' + data.Assessments[i].Assessment_Id + '\')" style="color:blue;cursor:pointer" >'+data.Assessments[i].Attempt+'</a>';
+                                else
+                                    attempt+= data.Assessments[i].Attempt
                                 varHtml+='  <td style="text-align:center;">'+ attempt +'</td>';
                                 varHtml+='</tr>';
 
