@@ -969,7 +969,8 @@ class batch_list_assessment(Resource):
             course_ids=''
             if 'course_ids' in request.form:
                 course_ids=request.form['course_ids']
-
+            if 'assessment_stage_id' in request.form:
+                assessment_stage_id=request.form['assessment_stage_id']
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
@@ -979,7 +980,7 @@ class batch_list_assessment(Resource):
 
             #print(order_by_column_position)
             
-            return Batch.batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
+            return Batch.batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, assessment_stage_id,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
 
 class add_batch_details(Resource):
     @staticmethod
@@ -3026,6 +3027,20 @@ class AllRegionsBasedOnUser(Resource):
                 return {'exception':str(e)}
 
 api.add_resource(AllRegionsBasedOnUser,'/AllRegionsBasedOnUser')
+class AllAssessmentStages(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=[]
+            try:
+                UserId=request.args.get('user_id',0,type=int)
+                UserRoleId=request.args.get('user_role_id',0,type=int)
+                response=Report.AllAssessmentStages(UserId,UserRoleId)
+                return {'AssessmentStages':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(AllAssessmentStages,'/AllAssessmentStages')
 
 class GetAllCentersBasedOnRegion_User(Resource):
     @staticmethod

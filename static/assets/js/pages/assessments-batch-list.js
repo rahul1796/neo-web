@@ -43,6 +43,45 @@ function LoadRegionddl(){
     });
     return false;
 }
+function LoadAssessmentStages(){
+    var URL=$('#hdn_web_url').val()+ "/AllAssessmentStages"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id" : $('#hdn_home_user_role_id').val()
+        },
+
+        success: function (data){
+            if(data.AssessmentStages != null)
+            {
+                $('#ddlAssessmentStages').empty();
+                $('#ddlAssessmentStages').append(new Option('ALL Stages','0'));
+                var count=data.AssessmentStages.length;
+                if( count> 0)
+                {
+                  
+                   for(var i=0;i<count;i++)
+                        $('#ddlAssessmentStages').append(new Option(data.AssessmentStages[i].Assessment_Stage_Name,data.AssessmentStages[i].Assessment_Stage_Id));
+                }
+                else
+                {
+                    $('#ddlAssessmentStages').append(new Option('ALL',''));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading Assessment Stages! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
 
 
 function loadClient(){
@@ -230,6 +269,7 @@ function LoadTable()
                 d.center = $('#ddlCenter').val().toString();
                 d.center_type = $('#ddlCenterType').val().toString();
                 d.course_ids= $('#ddlCourse').val().toString();
+                d.assessment_stage_id= $('#ddlAssessmentStages').val().toString();
             },
             error: function (e) {
                 $("#tbl_batchs tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -545,7 +585,7 @@ function GetBatchDetails(BatchCode)
                                 varHtml+='  <td style="text-align:center;">'+ data.Batches[i].S_No +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ BatchCode +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Batches[i].Batch_Name +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+ data.Batches[i].Product_Name +'</td>';                    
+                                varHtml+='  <td style="text-align:center;">'+ data.Batches[i].Candidate_Count +'</td>';                    
                                 varHtml+='  <td style="text-align:center;">'+ data.Batches[i].Center_Name +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Batches[i].Course_Name +'</td>';  
                                 varHtml+='  <td style="text-align:center;">'+ data.Batches[i].Sub_Project_Name +'</td>'; 
@@ -862,9 +902,12 @@ function add_map_message(){
                                 varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].S_No +'</td>';
                                 if(data.Assessments[i].Assessment_Stage_Id==4) // Assessment Result Uploaded
                                     txt+='<a onclick="DownloadAssessmentResult(\'' + data.Assessments[i].Assessment_Id + '\')" class="user-btn" style="cursor:pointer" ><i title="Download Assessment Result" class="fe-download" ></i></a>';
-                                if( !($("#hdn_home_user_role_id ").val() == "7" & (data.Assessments[i].Assessment_Types_Name=="Final Summative" || data.Assessments[i].Assessment_Types_Name=="Summative" )))  
-									txt+='<a onclick="EditAssessmentDetails(\'' + data.Assessments[i].Assessment_Id + '\',\''+ data.Assessments[i].Partner_Category_Id +'\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Edit Assessment Detail" class="fe-edit-1" ></i></a>';
-                                if (data.Assessments[i].Assessment_Stage_Id>=3 & $('#hdn_home_user_role_id').val()!='5'  & $('#hdn_home_user_role_id').val()!='14')
+                                if (data.Assessments[i].Assessment_Stage_Id<3  )
+                                {
+                                    if( !(($("#hdn_home_user_role_id ").val() == "7" ||$("#hdn_home_user_role_id ").val() == "5"||$("#hdn_home_user_role_id ").val() == "14") & (data.Assessments[i].Assessment_Types_Name=="Final Summative" || data.Assessments[i].Assessment_Types_Name=="Summative" )))  
+									    txt+='<a onclick="EditAssessmentDetails(\'' + data.Assessments[i].Assessment_Id + '\',\''+ data.Assessments[i].Partner_Category_Id +'\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Edit Assessment Detail" class="fe-edit-1" ></i></a>';
+                                }
+                                if (data.Assessments[i].Assessment_Stage_Id==3 & $('#hdn_home_user_role_id').val()!='5'  & $('#hdn_home_user_role_id').val()!='14')
                                 {
                                     if( !($("#hdn_home_user_role_id ").val() == "7"  & (data.Assessments[i].Assessment_Types_Name=="Final Summative" || data.Assessments[i].Assessment_Types_Name=="Summative") ))
                                         txt+='<a onclick="UploadResult(\'' + data.Assessments[i].Assessment_Id + '\',\'' + data.Assessments[i].Batch_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Batch_Code + '\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Upload Result" class="fe-upload" ></i></a>';
@@ -959,6 +1002,7 @@ function add_map_message(){
         $('#ddlAssessmentType').attr('disabled', true);
         $('#ddlAssessmentAgency').attr('disabled', true);
         $('#ddlPartner').attr('disabled', true);
+        $('#ddlPartnerType').attr('disabled', true);
         $('#TxtRequestedDate').attr('disabled', false);
         $('#mdl_create_batch_assessments').modal('show');
     }
@@ -1203,8 +1247,9 @@ function add_map_message(){
                                 icon:icon,
                                 confirmButtonClass:"btn btn-confirm mt-2"
                                 }).then(function(){
-                                    GetAssessments($('#hdn_batch_assessment_id').val(),$('#hdn_current_stage_id').val()+1);
-                                    LoadTable();
+                                    //GetAssessments($('#hdn_batch_assessment_id').val(),$('#hdn_current_stage_id').val());
+                                   // LoadTable();
+                                    window.location.href = '/assessment';
                                     $('#mdl_create_batch_assessments').modal('hide');
                                 }); 
                 },
@@ -1369,7 +1414,7 @@ function add_map_message(){
                                 if(data.Candidates[i].Is_Absent==0) 
                                     txt+='<input id="addedchk" name="checkcase" type="checkbox" value="'+data.Candidates[i].Candidate_Id+'" >';
                                 else{
-                                    $("#lblCandidateTable").text("Select Candidats For Reassessmnet");
+                                    $("#lblCandidateTable").text("Select Candidates For Re-Assessment");
                                     txt+='<input id="addedchk" name="checkcase" type="checkbox" value="'+data.Candidates[i].Candidate_Id+'" checked>';
                                     }
                                 varHtml+='  <td style="text-align:center;">'+ txt +'</td>';
