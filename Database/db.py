@@ -919,7 +919,7 @@ class Database:
         cur.close()
         con.close()
         return content
-    def batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
+    def batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids,assessment_stage_id, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
         #print(status, customer, project, course, region, center)
         content = {}
         d = []
@@ -927,9 +927,9 @@ class Database:
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
 
-        sql = 'exec [batches].[sp_get_batch_list_assessment] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?'
+        sql = 'exec [batches].[sp_get_batch_list_assessment] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?,?, ?, ?, ?, ?, ?'
 
-        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids,assessment_stage_id, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
         #print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
@@ -2553,7 +2553,26 @@ SELECT					cb.name as candidate_name,
         con.close()
         return data
        
-    
+    def AllAssessmentStages(UserId,UserRoleId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[assessments].[sp_get_assessment_stages] ?, ?'
+        values = (UserId,UserRoleId)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i] 
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h.copy())
+        cur.commit()
+        cur.close()
+        con.close()
+        print(response)
+        return response
+     
     def AllRegionsBasedOnUser(UserId,UserRoleId,UserRegionId):
         response=[]
         h={}

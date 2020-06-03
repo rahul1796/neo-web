@@ -71,6 +71,7 @@
             LoadCenterType();
             LoadRegionddl();
             loadClient();
+            LoadAssessmentStages();
             //LoadTable(); 
             role_id=parseInt($('#hdn_home_user_role_id').val());
             if(role_id == 1 || role_id ==5 || role_id ==15 || role_id  ==27)
@@ -161,6 +162,11 @@
 											<option selected="" value="">All</option>
 										</select>
                                     </div>
+                                    <div class="col-lg-3">
+										<label for="ddlAssessmentStages" class="mr-2">Assessment Stages</label>
+										<select class="form-control dropdown-search-filter" id="ddlAssessmentStages">
+											</select>
+                                    </div>
                                     <div class="col-lg-1" style="float: center; margin-top: 30px">
                                         <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTable()">Search</button>
                                     </div>
@@ -184,7 +190,7 @@
                                     </div>
                                     <br/>
                                     <div class="col-lg-12">
-                                        <table id="tbl_batchs" class="table w-100 nowrap dataTable no-footer">
+                                        <table id="tbl_batchs" class="table w-100 wrap dataTable no-footer">
                                             <thead>
                                                 <tr>
                                                     <th>S No</th>
@@ -306,13 +312,13 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 </div>                    
                 <div class="modal-body">
-                    <table id="tblBatchDetails" class="table table-bordered dt-responsive wrap w-100" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                    <table id="tblBatchDetails" class="table table-bordered dt-responsive wrap " style="border-color: lightgray;font-size: 10px;">
                         <thead>
                             <tr style="background-color: #f5f6f8;">
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th> 
                                  <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch Code</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch Name</th>
-                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Product</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Candidate Count</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project</th>
