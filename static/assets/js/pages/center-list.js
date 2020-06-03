@@ -561,11 +561,12 @@ function GetRoomCenters(CenterId,CenterName)
                                 td_close=   '</td>';       
                                 varHtml+='<tr>';
                                 varHtml+='  <td style="text-align:center;">'+ data.CenterRooms[i].S_No +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+'<a onclick="beforeEditModal(\'' + data.CenterRooms[i].Room_Name + '\',\'' + data.CenterRooms[i].Room_Type + '\',\'' + data.CenterRooms[i].Room_Size + '\',\'' + data.CenterRooms[i].Room_Capacity + '\',\'' + data.CenterRooms[i].Is_Active + '\',\'' + data.CenterRooms[i].Room_Id + '\',\'' + data.CenterRooms[i].Center_Id + '\',\'' + data.CenterRooms[i].Center_Name + '\',\'' + data.CenterRooms[i].Course_Ids  + '\')" class="btn" style="cursor:pointer" ><i title="Edit Partner User" class="fas fa-edit" ></i></a>'+'</td>';
+                                varHtml+='  <td style="text-align:center;">'+'<a onclick="beforeEditModal(\'' + data.CenterRooms[i].Room_Name + '\',\'' + data.CenterRooms[i].Room_Type + '\',\'' + data.CenterRooms[i].Room_Size + '\',\'' + data.CenterRooms[i].Room_Capacity + '\',\'' + data.CenterRooms[i].Is_Active + '\',\'' + data.CenterRooms[i].Room_Id + '\',\'' + data.CenterRooms[i].Center_Id + '\',\'' + data.CenterRooms[i].Center_Name + '\',\'' + data.CenterRooms[i].Course_Ids  + '\')" class="btn" style="cursor:pointer" ><i title="Edit Room" class="fas fa-edit" ></i></a>'+'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.CenterRooms[i].Room_Name +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.CenterRooms[i].Room_Type +'</td>';                    
                                 varHtml+='  <td style="text-align:center;">'+ data.CenterRooms[i].Room_Size +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.CenterRooms[i].Room_Capacity +'</td>';  
+                                varHtml+='  <td style="text-align:center; white-space:normal;">'+ data.CenterRooms[i].Course_Name +'</td>';  
                                 varHtml+='</tr>';                            
                             }
                             $("#tbl_rooms tbody").append(varHtml);
@@ -613,11 +614,15 @@ function GetRoomCenters(CenterId,CenterName)
         $('#Room_Type').append(new Option('Others','Others'));
 
         LoadmapCourseddl();
-
+        $('#ddl_If_Others').hide();
         $('#isactive').prop('checked',true);
+        $('#Room_Name').val('');
+        $('#Room_Size').val('');
+        $('#Room_Capacity').val('');
+        $('#hdn_room_id').val("0");
         $('#hdn_center_id_m2').val($('#hdn_modal_center_id').val()); 
-        $('#mdl_room_center').modal('hide');
         
+        //$('#mdl_room_center').modal('hide');
         $('#mdl_add_edit_rooms').modal('show');
     }
     function beforeEditModal(Room_Name, Room_Type, Room_Size, Room_Capacity, Is_Active, Room_Id, Center_id, Center_Name,Course_Ids){
@@ -658,7 +663,7 @@ function GetRoomCenters(CenterId,CenterName)
         var ar = Course_Ids.split(",")
         $('#map_course').val(ar).trigger('change');
 
-        $('#mdl_Partner_Users').modal('hide');
+        //$('#mdl_room_center').modal('hide');
         $('#mdl_add_edit_rooms').modal('show');
         
     }
@@ -674,8 +679,20 @@ function GetRoomCenters(CenterId,CenterName)
         var form_data = new FormData(); //$('#formUpload')[0]
         var ins = document.getElementById('images').files.length;
         //alert(ins);
+        var validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
+        var imstatus=1;
+        var sizestatus=1;
         for (var x = 0; x < ins; x++) {
             form_data.append("fileToUpload[]", document.getElementById('images').files[x]);
+            var file = document.getElementById('images').files[x]
+            if (file.size > 1024) { 
+                sizestatus=0;
+            }
+            alert()
+
+            if (!validImageTypes.includes(file['type'])) {
+                imstatus=0;
+            }
             }
             form_data.append('Room_Name',$('#Room_Name').val());
             form_data.append('Room_Type',room_type);
@@ -685,8 +702,16 @@ function GetRoomCenters(CenterId,CenterName)
             form_data.append('center_id',$('#hdn_center_id_m2').val());
             form_data.append('room_id',$('#hdn_room_id').val());
             form_data.append('course_ids',$('#map_course').val().toString());
-        
-        var URL=$('#hdn_web_url').val()+ "/add_edit_center_room";
+
+        if (imstatus==0){
+            alert('Image format is not valid')
+        }
+        else if (sizestatus==0){
+            alert('Image size is not valid')
+        }
+        else{
+
+            var URL=$('#hdn_web_url').val()+ "/add_edit_center_room";
         $.ajax({
             type:"POST",
             url:URL,
@@ -732,6 +757,9 @@ function GetRoomCenters(CenterId,CenterName)
                 alert('error');
             }
         });
+
+        }
+        
     }
     function onchange_roomtype(){
         if ($('#Room_Type').val() == 'Others'){

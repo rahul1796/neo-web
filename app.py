@@ -1005,8 +1005,9 @@ class add_batch_details(Resource):
             Course=request.form['Course']
             SubProject=request.form['SubProject']
             Cofunding=request.form['Cofunding']
+            room_ids=request.form['room_ids']
         
-            return Batch.add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id)
+            return Batch.add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids)
 
 
 class get_batch_details(Resource):
@@ -5594,7 +5595,7 @@ class upload_bulk_upload(Resource):
                         Column('Middle Name',null_validation),
                         Column('Last Name',null_validation),
                         Column('Secondary Contact  No',null_validation),
-                        Column('Email id*',null_validation),
+                        Column('Email id*',str_validation + null_validation),
                         Column('Present Panchayat',null_validation),
                         Column('Present Taluk/Block',null_validation),
                         Column('Present Address line1',null_validation),
@@ -5679,7 +5680,7 @@ class upload_bulk_upload(Resource):
                         Column('Middle Name',null_validation),
                         Column('Last Name',null_validation),
                         Column('Secondary Contact  No',null_validation),
-                        Column('Email id*',null_validation),
+                        Column('Email id*',str_validation + null_validation),
                         Column('Present Panchayat',null_validation),
                         Column('Present Taluk/Block',null_validation),
                         Column('Present Address line2',null_validation),
