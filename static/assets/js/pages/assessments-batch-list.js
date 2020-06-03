@@ -1409,7 +1409,7 @@ function add_map_message(){
     }
     function AssessmentListHistory(AssessmentId)
     { 
-        //$('#mdl_batch_assessments').modal('hide');
+        $('#mdl_batch_assessments').modal('hide');
         $('#mdl_batch_assessments_history').modal('show'); 
         var URL=$('#hdn_web_url').val()+ "/GetBatchAssessmentsHistory?AssessmentId="+AssessmentId;
         $.ajax({
