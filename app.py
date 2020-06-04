@@ -6490,5 +6490,66 @@ class add_edit_center_room(Resource):
 
 api.add_resource(add_edit_center_room,'/add_edit_center_room')
 
-if __name__ == '__main__':
+class upload_batch_target_plan(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                f = request.files['filename']
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
+                f.save(file_name)
+                df= pd.read_excel(file_name,sheet_name='Template',dtype={'E Planned Start Date': str, 'E Planned End Date': str,'C Planned Date': str,'P Planned Start Date': str, 'P Planned End Date': str})
+                df = df.fillna('')
+                schema = Schema([
+                        #null check
+                        Column('Planned Batch Code'),
+                        Column('Sub Project Code*',str_validation+null_validation),
+                        Column('Sub Project Name*',str_validation+null_validation),
+                        Column('Course Code*',str_validation+null_validation),
+                        Column('Course Name*',str_validation+null_validation),
+                        Column('E Planned Start Date'),
+                        Column('E Planned End Date'),
+                        Column('E Target'),
+                        Column('C Planned Date'),
+                        Column('C Target'),
+                        Column('P Planned Start Date'),
+                        Column('P Planned End Date'),
+                        Column('P Target')
+                        ])
+                errors = schema.validate(df)
+                errors_index_rows = [e.row for e in errors]
+                len_error = len(errors_index_rows)
+                if len_error>0:
+                    file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                    pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                    return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                else:
+                    df.columns = df.columns.str.replace(" ", "_")
+                    df.columns = df.columns.str.replace("*", "")
+                    df.insert(0, 'row_index', range(len(df)))
+                    out = Database.upload_batch_target_plan(df,user_id,user_role_id)
+                    if out['Status']==False:
+                        file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                        pd.DataFrame(out['data']).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                        return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                    else:
+                        return out
+                
+            except Exception as e:
+                 return {"Status":False, "message":"Unable to upload " + str(e)}  
+             
+api.add_resource(upload_batch_target_plan,'/upload_batch_target_plan')
+
+class GetSubProjectPlannedBatches(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sub_project_id=request.args.get('sub_project_id',0,type=int)
+            response=Master.GetSubProjectPlannedBatches(sub_project_id)
+            return response
+api.add_resource(GetSubProjectPlannedBatches,'/GetSubProjectPlannedBatches')
+
+if __name__ == '__main__':    
     app.run(debug=True)
