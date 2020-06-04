@@ -34,13 +34,19 @@ if ('{{status}}'==1)
 $('#ddlStatus').val('2');
 role_id=parseInt($('#hdn_home_user_role_id').val());
 if(role_id == 1)
-$('#btn_create').show();
+{
+    $('#btn_create').show();
+    $('#btn_upload').show();
+    $('#btn_create2').show();
+}
 else 
-$('#btn_create').hide();
-if(role_id == 1)
-$('#btn_create2').show();
-else 
-$('#btn_create2').hide();
+{
+    $('#btn_create').hide();
+    $('#btn_upload').hide();
+    $('#btn_create2').hide();
+}
+
+
 
 LoadTable(); 
 if ('{{project_id}}'>0)
@@ -140,7 +146,10 @@ GetSub_project('{{project_id}}')
                                 <option selected="" value="">All</option>
                             </select>
                         </div>
-                           <div class="col-lg-7" >
+                        <div class="col-lg-6" >                                        
+                            <button style="float: right; margin-top: 30px;"  id="btn_upload" onclick="UploadBatchTargetMdl()" type="button" class="btn btn-info waves-effect waves-light">Upload Batch Target Plan</a>
+                        </div>
+                           <div class="col-lg-1" >
                                
                                <button style="float: right; margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
                                onclick="LoadTable()">Search</button>
@@ -150,7 +159,7 @@ GetSub_project('{{project_id}}')
                                onclick="Download()">Download</button-->
                            </div>
                            <div class="col-lg-2" >                                        
-                               <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-primary">Create Sub Project</a>
+                               <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-primary waves-effect">Create Sub Project</a>
                            </div>
                        </div>
                    </div>
@@ -187,6 +196,7 @@ GetSub_project('{{project_id}}')
                                            <th>Center</th>
                                            <th>Course</th>
                                            <th>Users</th>
+                                           <th>Planned Batches</th>
                                            <th>Group</th>
                                            <th>Type</th>
                                            <th>Block</th>
@@ -454,6 +464,41 @@ GetSub_project('{{project_id}}')
         </div>
     </div>
  </div>
+ <div id="mdl_planned_batches" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title" id="HdPlannedBatches"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>                    
+            <div class="modal-body">
+                <table id="tbl_planned_batches" class="table table-bordered wrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                    <thead>
+                        <tr style="background-color: #f5f6f8;">
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Planned Batch Code</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">E_Planned Start Date</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">E_Planned End Date</th>                            
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">E_Target</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">C_Planned Date</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">C_Target</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">P_Planned Start Date</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">P_Planned End Date</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">P_Target</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+            </div>
+        </div>
+    </div>
+
+</div><!--/.modal-->
 <div id="mdl_Centes" class="modal fade" role="dialog">
    <div class="modal-dialog modal-xl">
        <div class="modal-content ">
@@ -486,3 +531,42 @@ GetSub_project('{{project_id}}')
    </div>
 
 </div><!--/.modal-->
+
+<div id="mdl_upload_batch_target_plan" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content ">
+            <form id="formUpload" action="javascript:UploadFileData()">
+            <div class="modal-header">
+                <h4 class="modal-title"><span id="HduploadFile"></span></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <label for="myFile">Upload File* :</label>
+                        </div>
+                        <div class="col-lg-4">
+                            <input type="file" id="myFile" name="filename">
+                        </div>
+                        <div class="col-lg-4">
+                            <button class="btn btn-info btn-sm waves-effect waves-light" type="button" onclick="DownloadBatchTargetPlanTemplate()">Download Template</button>
+                        </div>
+                    </div>
+                </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary waves-effect" type="submit" >Upload</button>
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Close</button>
+            </div>
+            <div id="imgSpinner1">
+                <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                <label style="display:inline-block;">Please wait while uploading...</label>
+            </div> 
+        </form>
+        </div>
+    </div>
+</div><!--/.modal-->
+
+
+
+

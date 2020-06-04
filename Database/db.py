@@ -5445,3 +5445,52 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return response
+    def upload_batch_target_plan(df,user_id,user_role_id):
+        try:            
+            print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            h=[]           
+            d={} 
+            json_str=df.to_json(orient='records')
+            sql = 'exec	[masters].[sp_validate_upload_batch_target_plan]  ?,?,?'
+            values = (json_str,user_id,user_role_id)
+            cur.execute(sql,(values))
+            columns = [column[0].title() for column in cur.description]
+            col_len=len(columns)
+            pop=0
+            for row in cur:
+                pop=row[0]
+                for i in range(col_len):
+                    d[columns[i]]=row[i]
+                h.append(d.copy())
+            cur.commit()
+            if pop==0 :
+                Status=False
+                msg="Error"
+                return {"Status":Status,'message':msg,'data':h}
+            else:
+                msg="Uploaded Successfully"
+                Status=True
+                return {"Status":Status,'message':msg}
+            cur.close()
+            con.close()
+        except Exception as e:
+            print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+    def GetSubProjectPlannedBatches(sub_project_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_sub_project_planned_batches]  ?'
+        values = (sub_project_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response

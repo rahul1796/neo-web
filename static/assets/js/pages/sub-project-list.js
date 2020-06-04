@@ -474,6 +474,19 @@ function LoadTable()
                 return varButtons;
                 }
             },
+            { "visible":true,
+            "data": function (row, type, val, meta) {
+                var varButtons = ""; 
+                if(row.Planned_Batches=="")
+                    varButtons=row.Planned_Batches;
+                else
+                {
+                    varButtons += '<a onclick="GetPlannedBatches(\'' + row.Sub_Project_Id + '\',\''+row.Sub_Project_Name+ '\')"  style="color:blue;cursor:pointer" >' + row.Planned_Batches + '</a>';
+                }
+                
+                return varButtons;
+                }
+            },
             { "data": "Project_Group_Name"},
             { "data": "Project_Type_Name"},
             { "data": "Block_Name"},
@@ -1024,6 +1037,163 @@ function GetCenters(SubProjectId,SubProjectName)
                 varHtml='<tr><td colspan="6" style="text-align:center;">No records found</td></tr>'
                 $("#tbl_proj_centers tbody").append(varHtml);
                 $('#mdl_Centes').modal('show');
+            }   
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+function UploadBatchTargetMdl()
+{
+    
+    $('#HduploadFile').text('Upload Batch Target Plan.');
+    $('#imgSpinner1').hide();
+    $('#mdl_upload_batch_target_plan').modal('show');
+    $('#myFile').val('');
+}
+function DownloadBatchTargetPlanTemplate()
+{
+    window.location='/Bulk Upload/'+'BatchTargetPlanTemplate.xlsx';
+}
+function UploadFileData()
+{
+    
+    if ($('#myFile').get(0).files.length === 0) {
+        console.log("No files selected.");
+    }
+    else
+    {
+        var fileExtension = ['xlsx']
+        if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            alert("Formats allowed are : "+fileExtension.join(', '));
+            return false;
+        }
+        else
+        {
+            $("#imgSpinner1").show();
+            var form_data = new FormData($('#formUpload')[0]);
+            form_data.append('user_id',$('#hdn_home_user_id').val());
+            form_data.append('user_role_id',$('#hdn_home_user_role_id').val());
+            $.ajax({
+                type: 'POST',
+                url: $('#hdn_web_url').val()+ "/upload_batch_target_plan",
+                enctype: 'multipart/form-data',
+                data: form_data,
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function(data) 
+                {
+                    var message="",title="",icon="";
+                    if(data.Status){
+                        message=data.message;
+                        title="Success";
+                        icon="success";
+                    }
+                    else{
+                        if (data.message=="Validation_Error"){
+                            message=data.error;
+                            title="Error";
+                            icon="error";
+                        }
+                        else {
+                            message=data.message;
+                            title="Error";
+                            icon="error";
+                        }
+                    }
+                    var span = document.createElement("span");
+                    span.innerHTML = message;
+                    swal({   
+                                title:title,
+                                content: span,
+                                //text:message,
+                                icon:icon,
+                                confirmButtonClass:"btn btn-confirm mt-2"
+                                }).then(function(){
+                                    window.location.href = '/sub_project';
+                                }); 
+                
+                        
+                },
+                error:function(err)
+                {
+                    swal({   
+                        title:"Error",
+                        text:'Error! Please try again',
+                        icon:"error",
+                        confirmButtonClass:"btn btn-confirm mt-2"
+                        }).then(function(){
+                            window.location.href = '/sub_project';
+                        }); 
+                    
+                }
+            });
+        }
+    }
+}
+
+function GetPlannedBatches(SubProjectId,SubProjectName)
+{
+    $('#HdPlannedBatches').text(SubProjectName);
+    var URL=$('#hdn_web_url').val()+ "/GetSubProjectPlannedBatches?sub_project_id="+SubProjectId;
+    
+    $.ajax({
+        type:"GET",
+        url:URL,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            varHtml='';
+            
+            $("#tbl_planned_batches").dataTable().fnDestroy();
+            $("#tbl_planned_batches tbody").empty();
+            if(!jQuery.isEmptyObject(data))
+            {   if (data.PlannedBatches != null){
+                    count=data.PlannedBatches.length;
+                    if (count>0)
+                    {   varHtml='';
+                        for(var i=0;i<count;i++)
+                        {
+                            td_open= '  <td style="text-align:center;">' ;
+                            td_close=   '</td>';       
+                            varHtml+='<tr>';
+                            varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].S_No +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].Planned_Batch_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].E_Planned_Start_Date +'</td>';                    
+                            varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].E_Planned_End_Date +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].E_Target +'</td>'; 
+                            varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].C_Planned_Start_Date +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].C_Target +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].P_Planned_Start_Date +'</td>';                    
+                            varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].P_Planned_End_Date +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].P_Target +'</td>';     
+                            varHtml+='</tr>';                            
+                        }
+                            $("#tbl_planned_batches tbody").append(varHtml);
+                            $("#tbl_planned_batches").DataTable();
+                            $('#mdl_planned_batches').modal('show');
+                            varHtml='';
+                    }
+                    else
+                    {
+                        varHtml='<tr><td colspan="10" style="text-align:center;">No records found</td></tr>'
+                        $("#tbl_planned_batches tbody").append(varHtml);
+                        $('#mdl_planned_batches').modal('show');
+                    } 
+                    
+                }
+            }
+            else
+            {
+                varHtml='<tr><td colspan="10" style="text-align:center;">No records found</td></tr>'
+                $("#tbl_planned_batches tbody").append(varHtml);
+                $('#mdl_planned_batches').modal('show');
             }   
         },
         error:function(err)
