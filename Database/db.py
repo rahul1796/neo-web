@@ -5247,7 +5247,7 @@ SELECT					cb.name as candidate_name,
                 Status=True
                 msg="Uploaded Successfully"
             else:
-                msg="Error"
+                msg="Wrong Batch code/Enrollment Id"
                 Status=False
             return {"Status":Status,'message':msg}
         except Exception as e:
