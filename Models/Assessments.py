@@ -8,12 +8,14 @@ import xlsxwriter,re,os,zipfile,zlib
 class Assessments:
     def GetBatchAssessments(BatchId,Stage):
         return Database.GetBatchAssessments(BatchId,Stage)
+    def GetBatchAssessmentsHistory(AssessmentId):
+        return Database.GetBatchAssessmentsHistory(AssessmentId)
     def GetAssessmentTypes():
         return Database.GetAssessmentTypes()
     def GetAssessmentAgency():
         return Database.GetAssessmentAgency()
-    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile):
-        return Database.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile)
+    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag):
+        return Database.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag)
 
 class DownloadAssessmentResultUploadTemplate(Resource):
     DownloadPath=config.DownloadcandidateResultPathLocal
@@ -41,7 +43,7 @@ class DownloadAssessmentResultUploadTemplate(Resource):
 
 class DownloadAssessmentResult(Resource):
     DownloadPath=config.DownloadcandidateResultPathLocal
-    print(DownloadPath)
+    #print(DownloadPath)
     report_name = config.AssessmentCandidateResult+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"   
 
     @staticmethod
@@ -49,9 +51,10 @@ class DownloadAssessmentResult(Resource):
         if request.method=='GET':
             try:
                 AssessmentId=request.args.get('AssessmentId',0,type=int)
+                #print(AssessmentId)
                 r=re.compile(config.AssessmentCandidateResult + ".*")
                 lst=os.listdir(DownloadAssessmentResult.DownloadPath)
-                print(DownloadAssessmentResult.DownloadPath)
+                #print(DownloadAssessmentResult.DownloadPath)
                 newlist = list(filter(r.match, lst))
                 for i in newlist:
                     os.remove( DownloadAssessmentResult.DownloadPath + i)

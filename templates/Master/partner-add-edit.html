@@ -56,6 +56,11 @@
 
     });
     function add_popup_message(){
+        if($('#ddlPartnerTypes').val()=='2' & $('#ddlAssessmentPartnerTypes').val()=='')
+        {
+            alert("Please select Assessment Partner Type.");
+            return false;
+        }
         var URL=$('#hdn_web_url').val()+ "/add_partner_details";
             $.ajax({
                 type:"POST",
@@ -180,7 +185,7 @@
     
 </script>
         <div class="container-fluid">
-            <form action="javascript:add_popup_message();"> <!--method="POST" action="/add_center_category_details"-->
+            <form action="javascript:add_popup_message();" > <!--method="POST" action="/add_center_category_details"-->
             <!-- start page title -->
             <div class="row">
                 <div class="col-12">
@@ -243,7 +248,7 @@
                                         <label for="ddlAssessmentPartnerTypes">Assessment Partner Type *:</label>
                                     </div>
                                     <div class="col-lg-6">
-                                        <select id="ddlAssessmentPartnerTypes" class="form-control dropdown-search-filter" name="ddlPartnerTypes" ClientIdMode="static" required="">
+                                        <select id="ddlAssessmentPartnerTypes" class="form-control dropdown-search-filter" name="ddlAssessmentPartnerTypes"  ClientIdMode="static" >
                                             <option value="">Choose Assessment Partner Type</option>
                                         </select>
                                     </div>

@@ -24,7 +24,7 @@
          <script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
          <script src="static/assets/libs/datatables/dataTables.select.min.js"></script>        
          <!-- third party js ends -->
-         <script src="static/assets/js/pages/assessments-batch-list.js"></script>
+        
 
         <style>
             .center {
@@ -71,6 +71,7 @@
             LoadCenterType();
             LoadRegionddl();
             loadClient();
+            LoadAssessmentStages();
             //LoadTable(); 
             role_id=parseInt($('#hdn_home_user_role_id').val());
             if(role_id == 1 || role_id ==5 || role_id ==15 || role_id  ==27)
@@ -85,6 +86,7 @@
             else
             {
                 $('#get0').show();
+                LoadTable();
             }
             });
         </script>
@@ -160,6 +162,11 @@
 											<option selected="" value="">All</option>
 										</select>
                                     </div>
+                                    <div class="col-lg-3">
+										<label for="ddlAssessmentStages" class="mr-2">Assessment Stages</label>
+										<select class="form-control dropdown-search-filter" id="ddlAssessmentStages">
+											</select>
+                                    </div>
                                     <div class="col-lg-1" style="float: center; margin-top: 30px">
                                         <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTable()">Search</button>
                                     </div>
@@ -183,7 +190,7 @@
                                     </div>
                                     <br/>
                                     <div class="col-lg-12">
-                                        <table id="tbl_batchs" class="table w-100 nowrap dataTable no-footer">
+                                        <table id="tbl_batchs" class="table w-100 wrap dataTable no-footer">
                                             <thead>
                                                 <tr>
                                                     <th>S No</th>
@@ -192,9 +199,9 @@
                                                     <th>Batch Code</th>
                                                     
                                                     <th>Status</th>
-                                                    <th>Proposed</th>
-                                                    <th>Confirmed</th>
-                                                    <th>Assessed</th>
+                                                    <th>Assessment Proposed</th>
+                                                    <th>Assessment Confirmed</th>
+                                                    <th>Assessment Completed</th>
                                                     <th>Result Uploaded</th>
                                                 </tr>
                                             </thead>
@@ -275,12 +282,12 @@
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Actions</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch Code</th>
-                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Request Date</th>
-                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Requested On</th>
-                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Scheduled Date</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Proposed Date</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Proposed On</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Confirmed Date</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Date</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Type</th>
-                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Agency</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Awarding Body</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Partner</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Stage</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Attempt</th>
@@ -292,7 +299,7 @@
                     </table>	
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Close</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="Back()" >Close</button>
                 </div>
             </div>
         </div>
@@ -305,13 +312,13 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 </div>                    
                 <div class="modal-body">
-                    <table id="tblBatchDetails" class="table table-bordered dt-responsive wrap w-100" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                    <table id="tblBatchDetails" class="table table-bordered dt-responsive wrap " style="border-color: lightgray;font-size: 10px;">
                         <thead>
                             <tr style="background-color: #f5f6f8;">
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th> 
                                  <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch Code</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch Name</th>
-                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Product</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Candidate Count</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project</th>
@@ -338,13 +345,14 @@
             <div class="modal-content " >
                 <form id="frScheduleAssessment" data-parsley-validate="" action="javascript:ScheduleAssessment()">
                 <div class="modal-header">
-                    <h4 class="modal-title" ><span id="hdBatchName">Schedule Assessment</span></h4>
+                    <h4 class="modal-title" ><span id="hdBatchName">Assessment Details</span></h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 </div>                    
                 <div class="modal-body" style="overflow: auto;width: 100%;height:400px;">  
                     <input type="hidden" id="hdn_batch_assessment_id" name="hdn_batch_assessment_id" value="0"> 
                     <input type="hidden" id="hdn_assessment_id" name="hdn_assessment_id" value="0"> 
-                    <input type="hidden" id="hdn_current_stage_id" name="hdn_current_stage_id" value="0">                  
+                    <input type="hidden" id="hdn_current_stage_id" name="hdn_current_stage_id" value="0">
+                    <input type="hidden" id="hdn_reassessment_flag" name="hdn_reassessment_flag" value="0">                  
                     <div >
                         <div class="form-group">
                             <div class="row">
@@ -397,10 +405,10 @@
                         <div class="form-group" id="DivRequestDate">
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <label for="TxtRequestedDate">Requested Date*:</label>
+                                    <label for="TxtRequestedDate">Proposed Date*:</label>
                                 </div>
                                 <div class="col-lg-4">
-                                    <input type="text" id="TxtRequestedDate" name="TxtRequestedDate" class="form-control date-picker" required placeholder="Requested Date">
+                                    <input type="text" id="TxtRequestedDate" name="TxtRequestedDate" class="form-control date-picker" required placeholder="Proposed Date">
                                 </div>
                                 <div class="col-lg-4"></div>
                             </div>
@@ -408,10 +416,10 @@
                         <div class="form-group" id="DivScheduleDate">
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <label for="TxtScheduledDate">Scheduled Date:</label>
+                                    <label for="TxtScheduledDate">Assessment Confirmed Date*:</label>
                                 </div>
                                 <div class="col-lg-4">
-                                    <input type="text" id="TxtScheduledDate" name="TxtScheduledDate" class="form-control date-picker" ClientIdMode="static" placeholder="Scheduled Date" >
+                                    <input type="text" id="TxtScheduledDate" name="TxtScheduledDate" class="form-control date-picker" ClientIdMode="static" placeholder="Assessment Confirmed Date" >
                                 </div>
                                 <div class="col-lg-4"></div>
                             </div>
@@ -419,7 +427,7 @@
                         <div class="form-group" id="DivAssessmentDate">
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <label for="TxtAssessmnetDate">Assessment Date:</label>
+                                    <label for="TxtAssessmnetDate">Actual Assessment Date*:</label>
                                 </div>
                                 <div class="col-lg-4">
                                     <input type="text" id="TxtAssessmnetDate" name="TxtAssessmnetDate" class="form-control date-picker" ClientIdMode="static" placeholder="Actual Assessment Date" >
@@ -463,7 +471,7 @@
                         <div class="form-group" id="DivCandidates">
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <label> Select Absent Candidates :</label>
+                                    <b><label id = "lblCandidateTable"> Select Absent Candidates :</label></b>
                                 </div>
                                 <div class="col-lg-4">
                                 </div>
@@ -475,7 +483,7 @@
                                     <thead>
                                         <tr>
                                             <th>S No</th>
-                                            <th>ABSENT</th>
+                                            <th>SELECT</th>
                                             <th>Candidate Id</th>
                                             <th>Candidate Name</th>
                                             <th>Mobile Number</th>
@@ -497,6 +505,41 @@
             </div>
         </div>
     </div><!--/.modal-->
+    <div id="mdl_batch_assessments_history" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content ">
+                <div class="modal-header">
+                    <h4 class="modal-title" >Assessment History</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>                    
+                <div class="modal-body">
+                    <table id="tbl_batch_assessment_history" class="table table-bordered dt-responsive nowrap w-100" style="border-color: lightgray;width:100% !important;font-size: 10px;">
+                        <thead>
+                            <tr style="background-color: #f5f6f8;">
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch Code</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Proposed Date</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Proposed On</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Confirmed Date</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Date</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Type</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Awarding Body</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Partner</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Stage</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Attempt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                    </table>	
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="OpenAssessmentList()"  >Close</button>
+                </div>
+            </div>
+        </div>
+    </div><!--/.modal-->
 
     <div id="mdl_candidate_result_upload" class="modal fade" role="dialog">
         <div class="modal-dialog modal-lg">
@@ -515,7 +558,7 @@
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-4">
-                                <label for="TxtReqDate">Requested Date :</label>
+                                <label for="TxtReqDate">Proposed Date :</label>
                                 <input type="text" id="TxtReqDate" name="TxtReqDate" class="form-control" readonly ClientIdMode="static">
                             </div>
                             <div class="col-lg-4">
@@ -553,3 +596,6 @@
             </div>
         </div>
     </div><!--/.modal-->
+   
+
+    <script src="static/assets/js/pages/assessments-batch-list.js"></script>

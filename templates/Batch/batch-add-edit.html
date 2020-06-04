@@ -2,7 +2,6 @@
 <link href="static/assets/libs/clockpicker/bootstrap-clockpicker.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" />
 
-
 <script type="text/javascript">
 var Candidates = {};
     $(document).ready(function(){
@@ -20,9 +19,6 @@ var Candidates = {};
         $('#EndDate').flatpickr({
             minDate: "today"
         });
-
-        
-        
 
         document.getElementById("PlannedStartDate").disabled = false;
         document.getElementById("PlannedEndDate").disabled = false;
@@ -43,7 +39,7 @@ var Candidates = {};
                     {
                         if(data.BatchDetail!="")
                         {   
-                            //alert(data.BatchDetail);
+                            //alert(data.BatchDetail.Room_Ids);
                             $('#BatchName').val(data.BatchDetail.Batch_Name);                            
                             //LoadProductList(data.BatchDetail.Product_Id);
                             LoadCenterList(data.BatchDetail.Center_Id);
@@ -57,6 +53,8 @@ var Candidates = {};
                             $('#ActualEndDate').val(data.BatchDetail.Actual_End_Date);
                             $('#StartTime').val(data.BatchDetail.Training_Start_Time);
                             $("#EndTime").val(data.BatchDetail.Training_End_Time);
+                            
+                            $('#ddlRoom').val(data.BatchDetail.Room_Ids.split(",")).trigger('change');
                             if(data.BatchDetail.Is_Active)
                             {
                                 $('#isactive').prop('checked',true);
@@ -174,9 +172,49 @@ var Candidates = {};
             });
             return false;
         }
-
+        function loadroomlist(CenterId)
+        {
+            var URL=$('#hdn_web_url').val()+ "/GetCenterRooms"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{  "center_id":CenterId,
+                        "user_id": $('#hdn_home_user_id').val(),
+                        "user_role_id": $('#hdn_home_user_role_id').val()
+                    },
+                success: function (data){
+                    if(data.CenterRooms != null)
+                    {
+                        $('#ddlRoom').empty();
+                        var count=data.CenterRooms.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlCenter').append(new Option('Choose Center',''));
+                            for(var i=0;i<count;i++)
+                                $('#ddlRoom').append(new Option(data.CenterRooms[i].Room_Name,data.CenterRooms[i].Room_Id));
+                        }
+                        else
+                        {
+                            $('#ddlRoom').append(new Option('No Rooms','-1'));
+                        }
+                    }
+                    else{
+                        $('#ddlRoom').append(new Option('No Rooms','-1'));
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
         function LoadCourseList(needed,CenterId)
-        {console.log(CenterId);
+        {   loadroomlist(CenterId);
             var URL=$('#hdn_web_url').val()+ "/All_Course_basedon_center"
             $.ajax({
                 type:"GET",
@@ -423,6 +461,7 @@ var Candidates = {};
                             //"BatchCode" : $('#BatchCode').val(),
                             "Product" : 0,
                             "Center" : $('#ddlCenter').val(),
+                            "room_ids" : $('#ddlRoom').val().toString(),
                             "Course":$('#ddlCourse').val(),
                             "SubProject":$('#ddlSubProject').val(),
                             "Cofunding":$('#ddlCofunding').val(),
@@ -551,6 +590,18 @@ var Candidates = {};
                             <div class="col-lg-6">
                                 <select id="ddlCenter" class="form-control dropdown-search-filter"  onchange="LoadCourseList('0',this.value)" name="CenterId" ClientIdMode="static" required=""> <!-- myfunction(this.value) -->>
                                     <option value="">Center</option>
+                                </select>
+                            </div> 
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="RoomId">Room*:</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <select id="ddlRoom" class="form-control dropdown-search-filter" name="RoomId" ClientIdMode="static" required="" multiple> <!-- myfunction(this.value) -->>
+                                    <option value="">Room</option>
                                 </select>
                             </div> 
                         </div>

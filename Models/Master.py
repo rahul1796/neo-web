@@ -52,8 +52,8 @@ class Master:
     def center_list(center_id,user_id,user_role_id,user_region_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses):
         center_l = Database.center_list(center_id,user_id,user_role_id,user_region_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses)
         return center_l
-    def add_center(center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pincode,District,partner_id):
-        popupMessage = {"PopupMessage": Database.add_center_details(center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pincode,District,partner_id)}
+    def add_center(center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pincode,District,partner_id,geolocation):
+        popupMessage = {"PopupMessage": Database.add_center_details(center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pincode,District,partner_id,geolocation)}
         return popupMessage
     def AllCenters(glob_center_id):
         indi_center={"CenterDetail":Database.GetCenter(glob_center_id)}
@@ -234,8 +234,8 @@ class Master:
         return response
     def partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         return Database.partner_list(partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-    def add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id):
-        popupMessage = {"PopupMessage": Database.add_partner_details(partner_name,user_id,is_active,partner_type_id,address,partner_id)}
+    def add_partner_details(partner_name,user_id,is_active,partner_type_id,assessment_partner_type_id,address,partner_id):
+        popupMessage = {"PopupMessage": Database.add_partner_details(partner_name,user_id,is_active,partner_type_id,assessment_partner_type_id,address,partner_id)}
         return popupMessage
     def get_partner_details(partner_id):
         return {"PartnerDetail":Database.get_partner_details(partner_id)}
@@ -253,8 +253,13 @@ class Master:
     def tag_users_from_sub_project(user_id,sub_project_id,tagged_by):
         popupMessage = {"PopupMessage": Database.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)}
         return popupMessage
+
     def GetSubProjectPlannedBatches(sub_project_id):
         return {"PlannedBatches":Database.GetSubProjectPlannedBatches(sub_project_id)}
-    #def upload_batch_target_plan(user_id,user_role_id,file_name):
-        
 
+    def GetCenerRoom(center_id):
+        return {"CenterRooms":Database.Getcenterroom(center_id)}
+    def add_edit_center_room(Room_Name, user_id, is_active, Room_Type, Room_Size, Room_Capacity, center_id, room_id, file_name, course_ids):
+        popupMessage = {"PopupMessage": Database.add_edit_center_room(Room_Name, user_id, is_active, Room_Type, Room_Size, Room_Capacity, center_id, room_id, file_name, course_ids)}
+        return popupMessage
+    
