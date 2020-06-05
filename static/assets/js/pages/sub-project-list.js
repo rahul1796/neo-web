@@ -1165,6 +1165,9 @@ function GetPlannedBatches(SubProjectId,SubProjectName)
                             varHtml+='<tr>';
                             varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].S_No +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].Planned_Batch_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].Batch_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].Course_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].Course_Name +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].E_Planned_Start_Date +'</td>';                    
                             varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].E_Planned_End_Date +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].E_Target +'</td>'; 
