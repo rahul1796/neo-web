@@ -1006,8 +1006,10 @@ class add_batch_details(Resource):
             SubProject=request.form['SubProject']
             Cofunding=request.form['Cofunding']
             room_ids=request.form['room_ids']
-        
-            return Batch.add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids)
+            planned_batch_id=0
+            if 'PlannedBatchId' in request.form:
+                planned_batch_id=request.form['PlannedBatchId']
+            return Batch.add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id)
 
 
 class get_batch_details(Resource):
@@ -6547,7 +6549,9 @@ class GetSubProjectPlannedBatches(Resource):
     def get():
         if request.method=='GET':
             sub_project_id=request.args.get('sub_project_id',0,type=int)
-            response=Master.GetSubProjectPlannedBatches(sub_project_id)
+            course_id=request.args.get('course_id',0,type=int)
+            is_assigned=request.args.get('is_assigned',0,type=int)
+            response=Master.GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned)
             return response
 api.add_resource(GetSubProjectPlannedBatches,'/GetSubProjectPlannedBatches')
 

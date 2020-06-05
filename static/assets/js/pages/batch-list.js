@@ -380,7 +380,8 @@ function LoadTable()
             { "data": "Center_Manager_Email" },
             
             { "data": "Start_Time"},
-            { "data": "End_Time"}
+            { "data": "End_Time"},
+            { "data": "Planned_Batch_Code"}
             
         ],
         'columnDefs': [ {

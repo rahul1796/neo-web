@@ -3,8 +3,11 @@
 <link href="static/assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" />
 
 <script type="text/javascript">
+const months = ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const months_no = ["01", "02", "03","04", "05", "06", "07", "08", "09", "10", "11", "12"];
 var Candidates = {};
     $(document).ready(function(){
+        
          $('.dropdown-search-filter').select2();
         $(".date-picker").flatpickr();             
         $(".time-picker").flatpickr({
@@ -20,8 +23,8 @@ var Candidates = {};
             minDate: "today"
         });
 
-        document.getElementById("PlannedStartDate").disabled = false;
-        document.getElementById("PlannedEndDate").disabled = false;
+        //document.getElementById("PlannedStartDate").disabled = false;
+        //document.getElementById("PlannedEndDate").disabled = false;
 
         // alert('{{batch_id}}')
         if('{{batch_id}}' !=0)
@@ -39,7 +42,7 @@ var Candidates = {};
                     {
                         if(data.BatchDetail!="")
                         {   
-                            //alert(data.BatchDetail.Room_Ids);
+                            console.log(data.BatchDetail);
                             $('#BatchName').val(data.BatchDetail.Batch_Name);                            
                             //LoadProductList(data.BatchDetail.Product_Id);
                             LoadCenterList(data.BatchDetail.Center_Id);
@@ -47,6 +50,7 @@ var Candidates = {};
                             LoadsubProject(data.BatchDetail.Sub_Project_Id,data.BatchDetail.Center_Id,data.BatchDetail.Course_Id);
                             LoadCoFunding(data.BatchDetail.Co_Funding_Project_Id);
                             TrainersBasedOnSubProject(data.BatchDetail.Trainer_Id,data.BatchDetail.Sub_Project_Id);
+                            LoadPlannedBatches(data.BatchDetail.Sub_Project_Id,data.BatchDetail.Course_Id,data.BatchDetail.Planned_Batch_Id)
                             $('#PlannedStartDate').val(data.BatchDetail.Planned_Start_Date);
                             $('#PlannedEndDate').val(data.BatchDetail.Planned_End_Date);
                             $('#ActualStartDate').val(data.BatchDetail.Actual_Start_Date);
@@ -194,7 +198,11 @@ var Candidates = {};
                         {
                             //$('#ddlCenter').append(new Option('Choose Center',''));
                             for(var i=0;i<count;i++)
-                                $('#ddlRoom').append(new Option(data.CenterRooms[i].Room_Name,data.CenterRooms[i].Room_Id));
+                            {    
+                                var varHtml='<option value="'+data.CenterRooms[i].Room_Id +'" data-value="'+data.CenterRooms[i].Room_Capacity+'">'+data.CenterRooms[i].Room_Name+'</option>';
+                                $('#ddlRoom').append(varHtml);
+                                //new Option(data.CenterRooms[i].Room_Name,data.CenterRooms[i].Room_Id)
+                            }
                         }
                         else
                         {
@@ -436,6 +444,88 @@ var Candidates = {};
             
             return false;
         }
+        function SubProjectOnChange()
+        {
+            TrainersBasedOnSubProject('0',$('#ddlSubProject').val());
+            LoadPlannedBatches($('#ddlSubProject').val(),$('#ddlCourse').val(),'0');
+        }
+        function LoadPlannedBatches(SubProjectId,CourseId,needed)
+        {
+            var URL=$('#hdn_web_url').val()+ "/GetSubProjectPlannedBatches"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                        "sub_project_id": SubProjectId,
+                        "course_id":CourseId,
+                        "is_assigned":1
+                        //"user_id": $('#hdn_home_user_id').val(),
+                       // "user_role_id": $('#hdn_home_user_role_id').val()
+                    },
+                success: function (data){
+                    if(data.PlannedBatches != null)
+                    {
+                        $('#ddlPlannedBatchCode').empty();
+                        var count=data.PlannedBatches.length;
+                        if( count> 0)
+                        {
+                            $('#ddlPlannedBatchCode').append(new Option('Choose Planned Batch Code',''));
+                            for(var i=0;i<count;i++)
+                            {
+                                var varHtml='<option value="'+data.PlannedBatches[i].Planned_Batch_Id +'" data-value="'+data.PlannedBatches[i].E_Target+'" data-start-date="'+data.PlannedBatches[i].E_Planned_Start_Date+'" data-end-date="'+data.PlannedBatches[i].E_Planned_End_Date+'">'+data.PlannedBatches[i].Planned_Batch_Code+ '(E Target-'+data.PlannedBatches[i].E_Target+')</option>';
+                                $('#ddlPlannedBatchCode').append(varHtml);
+                            }      
+                                //new Option(data.PlannedBatches[i].Planned_Batch_Code,data.PlannedBatches[i].Planned_Batch_Id)
+                                
+                                if (parseInt(needed) !=0)
+                                {
+                                    $('#ddlPlannedBatchCode').val(needed);
+                                }
+                        }
+                        else
+                        {
+                            $('#ddlPlannedBatchCode').append(new Option('Choose Planned Batch Code',''));
+                        }
+                        
+
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            
+            return false;
+        }
+        function LoadCapacity()
+        {
+            var TotalCapacity=0;
+            $('#ddlRoom option:selected').each(function(){
+                TotalCapacity+=parseInt($(this).attr('data-value'));
+            })
+            TotalCapacity=isNaN(TotalCapacity)?0:TotalCapacity;
+            $('#TxtCapacity').val(TotalCapacity);
+            return false;
+        }
+        function LoadPlannedDates()
+        {
+            var StartDate=$('#ddlPlannedBatchCode option:selected').attr('data-start-date');
+            var EndDate=$('#ddlPlannedBatchCode option:selected').attr('data-end-date');
+            var s_dates=StartDate.split('-');
+            let s_mon= months_no[months.indexOf(s_dates[1])];
+            var e_dates=EndDate.split('-');
+            let e_mon=months_no[months.indexOf(e_dates[1])];
+            //console.log(months.indexOf(s_dates[1])+1);
+            $('#PlannedStartDate').val(s_dates[2]+'-'+s_mon+'-'+s_dates[0]);
+            $('#PlannedEndDate').val(e_dates[2]+'-'+e_mon+'-'+e_dates[0]);
+
+            return false;
+        }
         function add_popup_message(){
 			
             if(($('#StartTime').val() < $("#EndTime").val()) && ($('#ActualStartDate').val() <= $('#ActualEndDate').val()) && ($('#PlannedStartDate').val() <= $('#PlannedEndDate').val()))
@@ -450,9 +540,24 @@ var Candidates = {};
                 // {
                 //     centertype = $('#ddlCenter').val()
                 // }
-
+                
+                
+                var PlannedTarget = parseInt($('#ddlPlannedBatchCode option:selected').attr('data-value'));
+                
+                var TotalCapacity=parseInt($('#TxtCapacity').val());
+                
+                console.log(PlannedTarget,TotalCapacity);
+                if(TotalCapacity< PlannedTarget)
+                {
+                    alert('Batch capacity/target should be less than or equal to the room capacity');
+                    return false;
+                }
+                else
+                {
+                    console.log('target is less than or equal to room capacity.');
+                }
+                
                 var URL=$('#hdn_web_url').val()+ "/add_batch_details";
-                //alert($('#ddlCourse').val());
                     $.ajax({
                         type:"POST",
                         url:URL,
@@ -473,7 +578,8 @@ var Candidates = {};
                             "ActualEndDate":$('#ActualEndDate').val(),
                             "StartTime":$('#StartTime').val(),
                             "EndTime":$("#EndTime").val(),
-                            "BatchId":'{{batch_id}}'
+                            "BatchId":'{{batch_id}}',
+                            "PlannedBatchId":$('#ddlPlannedBatchCode').val()
                         },
                         success:function(data){
                             var message="",title="",icon="";
@@ -503,6 +609,7 @@ var Candidates = {};
                             alert('Error! Please try again');
                         }
                     });
+                
             }
             else{
                 swal({  title:"Error",
@@ -600,10 +707,20 @@ var Candidates = {};
                                 <label for="RoomId">Room*:</label>
                             </div>
                             <div class="col-lg-6">
-                                <select id="ddlRoom" class="form-control dropdown-search-filter" name="RoomId" ClientIdMode="static" required="" multiple> <!-- myfunction(this.value) -->>
+                                <select id="ddlRoom" class="form-control dropdown-search-filter" name="RoomId" ClientIdMode="static" onchange="LoadCapacity()" required="" multiple> <!-- myfunction(this.value) -->>
                                     <option value="">Room</option>
                                 </select>
                             </div> 
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="TxtCapacity">Capacity:</label>   <!-- * : -->
+                            </div>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control" name="TxtCapacity" id="TxtCapacity" disabled ClientIdMode="static" placeholder="Capacity">
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -624,12 +741,24 @@ var Candidates = {};
                                 <label for="SubProjectId">Sub Project*:</label>
                             </div>
                             <div class="col-lg-6">
-                                <select id="ddlSubProject" class="form-control dropdown-search-filter" name="SubProjectId" onchange="TrainersBasedOnSubProject('0',$('#ddlSubProject').val())" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                <select id="ddlSubProject" class="form-control dropdown-search-filter" name="SubProjectId" onchange="SubProjectOnChange()" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
                                     <option value="">Choose Sub Project</option>
                                 </select>
                             </div>
                         </div>
                     </div> 
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="ddlPlannedBatchCode">Planned Batch Code*:</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <select id="ddlPlannedBatchCode" class="form-control dropdown-search-filter" name="ddlPlannedBatchCode" onchange="LoadPlannedDates()" ClientIdMode="static" required="">
+                                    <option value="">Choose Planned Batch Code</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
@@ -660,7 +789,7 @@ var Candidates = {};
                                     <label for="PlannedStartDate">Planned Start Date*:</label>
                                 </div>
                                 <div class="col-lg-6">
-                            <input type="text" id="PlannedStartDate" name="PlannedStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required="">
+                            <input type="text" id="PlannedStartDate" name="PlannedStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required="" disabled>
                         </div>
                     </div>
                     <div class="form-group row ">
@@ -668,7 +797,7 @@ var Candidates = {};
                                     <label for="PlannedEndDate">Planned End Date*:</label>
                                 </div>
                                 <div class="col-lg-6">
-                            <input type="text" id="PlannedEndDate" name="PlannedEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date" required="">
+                            <input type="text" id="PlannedEndDate" name="PlannedEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date" required="" disabled>
                         </div>
                     </div>
                     <div class="form-group row ">
