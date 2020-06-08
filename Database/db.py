@@ -5527,13 +5527,13 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
-    def GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned):
+    def GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec [masters].[sp_get_sub_project_planned_batches]  ?,?,?'
-        values = (sub_project_id,course_id,is_assigned)
+        sql = 'exec [masters].[sp_get_sub_project_planned_batches]  ?,?,?,?'
+        values = (sub_project_id,course_id,is_assigned,planned_batch_id)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
