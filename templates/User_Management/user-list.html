@@ -8,8 +8,30 @@
         <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />        
         <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+        <!-- <link href="static\assets\libs\DemoMonth\MonthPicker.min.css" rel="stylesheet" type="text/css" />
+        <script src="static\assets\libs\DemoMonth\MonthPicker.min.js"></script> -->
+        <!-- <link href="static\assets\libs\DemoMonth\MonthPicker.css" rel="stylesheet" type="text/css" />
+        <script src="static\assets\libs\DemoMonth\MonthPicker.js"></script> -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+
         <script type="text/javascript">
             $(document).ready(function () {
+                // $('#From_Date').MonthPicker({
+                //                             ShowIcon: false,
+                //                             StartYear: 2020
+                //                         });
+                // $('#To_Date').MonthPicker({
+                //     ShowIcon: false,
+                //     StartYear: 2020
+                // });
+                // $(".month-picker").flatpickr(
+                //     {
+                //         dateFormat: "M-Y" // Displays: 2017-01-22Z
+                       
+                //     }
+                // );
+
             $("#tbl_users").dataTable().fnDestroy();
             $('.dropdown-search-filter').select2({
                 placeholder:''
@@ -197,6 +219,114 @@
                 </div>
             </div>
         </div><!--/.modal-->  
+
+        
+<div id="mdl_user_target" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title" ><span id="headertarget"></span></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>                    
+            <div class="modal-body">
+                <input type="hidden" id="hdn_modal_user_id" name="hdn_modal_user_id" value="0">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button style="float: right;" type="button" id="btn_add" onclick="AddModal()" class="btn btn-primary">Add Target</a>
+                    </div>
+                </div>
+            </br>
+                <div >
+                    <table id="tbl_target" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                        <thead>
+                            <tr style="background-color: #f5f6f8;">
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Action</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">From</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">To</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Target</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+            </div>
+        </div>
+    </div>
+</div><!--/.modal-->
+
+<div id="mdl_add_edit_targets" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <form enctype="multipart/form-data" action="javascript:AddeEdittUserTarget();" method="POST" >
+                <div class="modal-header">
+                    <h4 class="modal-title" ><span id="header">Target Details</span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>                    
+                <div class="modal-body">
+                    <div class="col-12">
+                        <input type="hidden" id="hdn_user_target_id" name="hdn_user_target_id" value="0">
+                        <input type="hidden" id="hdn_user_id_m2" name="hdn_user_id_m2" value="0">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="From_Date">From Date :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="month" class="form-control" name="From_Date" id="From_Date" required placeholder="From Date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="To_Date">To Date * :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="month" class="form-control" name="To_Date" id="To_Date" required placeholder="To Date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="target">Target :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="number" class="form-control" name="target" id="target" required placeholder="Target">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label>Is Active :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="checkbox checkbox-pink mb-0">
+                                        <input type="checkbox" name="isactive" id="isactive" ClientIdMode="static" 
+                                                        value="1" data-parsley-mincheck="1" >
+                                        <label for="isactive"> Is active </label>
+                                    </div>
+                                </div>   
+                            </div>                                     
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary waves-effect" > Save</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div><!--/.modal-->
 
         
         <!-- third party js -->
