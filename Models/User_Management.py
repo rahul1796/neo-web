@@ -24,4 +24,8 @@ class UsersM:
     def add_ex_treiner(first_name, last_name, email, mobile, trainer_tyoe, Partner, is_active, created_id):
         popupMessage = {"PopupMessage": Database.add_ex_triner_details(first_name, last_name, email, mobile, trainer_tyoe, Partner, is_active, created_id)}
         return popupMessage
-    
+    def GetUserTargets(user_id):
+        return {"UserTarget":Database.GetUserTarget(user_id)}
+    def add_edit_user_targer(created_by, From_Date, To_Date, target, is_active, user_id, user_target_id):
+        popupMessage = {"PopupMessage": Database.add_edit_user_targer(created_by, From_Date, To_Date, target, is_active, user_id, user_target_id)}
+        return popupMessage

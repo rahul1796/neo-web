@@ -5484,3 +5484,39 @@ SELECT					cb.name as candidate_name,
         else:
             msg={"message":"Created", "status":True}
         return msg
+    
+    def GetUserTarget(user_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec users.[sp_get_user_target]  ?'
+        values = (user_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i] 
+            #h["Course_Ids"] = row[i] # .split(',')#list(map(lambda x : int(x), row[i].split(',')))  
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    
+    def add_edit_user_targer(created_by, From_Date, To_Date, target, is_active, user_id, user_target_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[users].[sp_add_edit_user_target] ?, ?, ?, ?, ?, ?,?'
+        values = (created_by, From_Date, To_Date, int(target), is_active, int(user_id), int(user_target_id))
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated", "status":True}
+        else:
+            msg={"message":"Created", "status":True}
+        return msg
+    
