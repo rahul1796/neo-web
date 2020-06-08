@@ -6551,7 +6551,8 @@ class GetSubProjectPlannedBatches(Resource):
             sub_project_id=request.args.get('sub_project_id',0,type=int)
             course_id=request.args.get('course_id',0,type=int)
             is_assigned=request.args.get('is_assigned',0,type=int)
-            response=Master.GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned)
+            planned_batch_id=request.args.get('planned_batch_id',0,type=int)
+            response=Master.GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id)
             return response
 api.add_resource(GetSubProjectPlannedBatches,'/GetSubProjectPlannedBatches')
 
