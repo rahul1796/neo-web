@@ -344,7 +344,7 @@ function LoadTable(FilterRoleId)
                 "data": 
                 function (row, type, val, meta) {
                     var varButtons = ""; 
-                    if(row.User_Role_Id!='2'&&row.User_Role_Id!='24')
+                    if((row.User_Role_Id!='2'&&row.User_Role_Id!='24')||$('#hdn_home_user_role_id').val()!='1')
                         varButtons=row.User_Name;
                     else
                     {
