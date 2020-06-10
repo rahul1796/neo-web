@@ -1090,8 +1090,9 @@ function add_map_message(){
                     $('#ddlAssessmentType').append(new Option('Select',''));
                     if( count> 0)
                     {
-                        for(var i=0;i<count;i++)
+                        for(var i=0;i<count;i++)                           
                             $('#ddlAssessmentType').append(new Option(data.AssessmentTypes[i].Assessment_Types_Name,data.AssessmentTypes[i].Assessment_Types_Id));
+                          
                     }
                     else
                     {
@@ -1407,6 +1408,7 @@ function add_map_message(){
                         if( count> 0)
                         {
                             $("#lblCandidateTable").text("Select Absent Candidates:");
+                            $("#thSelect").text("Select Absentees");
                             for(var i=0;i<count;i++)
                             {   
                                 
@@ -1417,6 +1419,7 @@ function add_map_message(){
                                     txt+='<input id="addedchk" name="checkcase" type="checkbox" value="'+data.Candidates[i].Candidate_Id+'" >';
                                 else{
                                     $("#lblCandidateTable").text("Select Candidates For Re-Assessment");
+                                    $("#thSelect").text("Select");
                                     txt+='<input id="addedchk" name="checkcase" type="checkbox" value="'+data.Candidates[i].Candidate_Id+'" checked>';
                                     }
                                 varHtml+='  <td style="text-align:center;">'+ txt +'</td>';
