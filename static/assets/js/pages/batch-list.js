@@ -295,6 +295,7 @@ function LoadTable()
                 }
             },
             { "data": "Batch_Code"},
+            { "data": "Planned_Batch_Code"},
             { "data": "Start_Date" },
             { "data": "End_Date" },
             {
@@ -380,13 +381,12 @@ function LoadTable()
             { "data": "Center_Manager_Email" },
             
             { "data": "Start_Time"},
-            { "data": "End_Time"},
-            { "data": "Planned_Batch_Code"}
+            { "data": "End_Time"}
             
         ],
         'columnDefs': [ {
 
-            'targets': [1,3,4], /* column index */
+            'targets': [1,5,4], /* column index */
     
             'orderable': false, /* true or false */
     
