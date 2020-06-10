@@ -952,16 +952,18 @@ class Database:
         sql = 'exec	batches.sp_add_edit_batches ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
         values = (BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id)
         cur.execute(sql,(values))
+        batch_code=""
         for row in cur:
             pop=row[1]
+            batch_code=row[2]
         cur.commit()
         cur.close()
         con.close()
         if pop ==1:
-            msg={"message":"Updated Successfully","batch_flag":1}
+            msg={"message":"{} Updated Successfully".format(batch_code),"batch_flag":1}
         else: 
                 if pop==0:
-                    msg={"message":"Created Successfully","batch_flag":0}
+                    msg={"message":batch_code+" Created Successfully","batch_flag":0}
                 else:
                     if pop==2:
                         msg={"message":"Batch with the Batch code already exists","batch_flag":2}
