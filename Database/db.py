@@ -5613,3 +5613,20 @@ SELECT					cb.name as candidate_name,
         else:
             msg={"message":"Created", "status":True}
         return msg
+    
+    @classmethod
+    def AllCourse_basedon_rooms_db(cls, user_id,user_role_id,center_id, room_ids):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_course_basedon_rooms] ?,?,?,?'
+        values = (user_id,user_role_id,center_id, room_ids)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
+        return response

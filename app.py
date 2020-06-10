@@ -6588,5 +6588,21 @@ class GetSubProjectPlannedBatches(Resource):
             return response
 api.add_resource(GetSubProjectPlannedBatches,'/GetSubProjectPlannedBatches')
 
+class All_Course_basedon_rooms(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                center_id=request.args['center_id']
+                room_ids=request.args['room_ids']
+                response = Database.AllCourse_basedon_rooms_db(user_id,user_role_id,center_id, room_ids)
+                return {'Courses':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(All_Course_basedon_rooms,'/All_Course_basedon_rooms')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
