@@ -1,6 +1,6 @@
 from Database import Database
 from flask_restful import Resource
-
+import pandas as pd
 class Master:
     ##Center_type##
     def center_type_list(center_type_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
@@ -253,6 +253,10 @@ class Master:
     def tag_users_from_sub_project(user_id,sub_project_id,tagged_by):
         popupMessage = {"PopupMessage": Database.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)}
         return popupMessage
+
+    def GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id):
+        return {"PlannedBatches":Database.GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id)}
+
     def GetCenerRoom(center_id):
         return {"CenterRooms":Database.Getcenterroom(center_id)}
     def add_edit_center_room(Room_Name, user_id, is_active, Room_Type, Room_Size, Room_Capacity, center_id, room_id, file_name, course_ids):

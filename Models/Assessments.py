@@ -8,33 +8,38 @@ import xlsxwriter,re,os,zipfile,zlib
 class Assessments:
     def GetBatchAssessments(BatchId,Stage):
         return Database.GetBatchAssessments(BatchId,Stage)
+    def GetBatchAssessmentsHistory(AssessmentId):
+        return Database.GetBatchAssessmentsHistory(AssessmentId)
     def GetAssessmentTypes():
         return Database.GetAssessmentTypes()
     def GetAssessmentAgency():
         return Database.GetAssessmentAgency()
-    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile):
-        return Database.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile)
+    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag):
+        return Database.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag)
 
 class DownloadAssessmentResultUploadTemplate(Resource):
     DownloadPath=config.DownloadcandidateResultPathLocal
-    report_name = config.AssessmentCandidateResultUploadTemplate+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"   
-
+    
     @staticmethod
     def get():
         if request.method=='GET':
             try:
+                
                 AssessmentId=request.args.get('AssessmentId',0,type=int)
                 BatchId=request.args.get('BatchId',0,type=int)
+                Batch_Code=request.args.get('Batch_Code','',type=str)
+                print(Batch_Code)
+                report_name = config.AssessmentCandidateResultUploadTemplate+'_'+Batch_Code+'_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"   
                 r=re.compile(config.DumpFileName + ".*")
                 lst=os.listdir(DownloadAssessmentResultUploadTemplate.DownloadPath)
                 newlist = list(filter(r.match, lst))
                 for i in newlist:
                     os.remove( DownloadAssessmentResultUploadTemplate.DownloadPath + i)
-                path = '{}{}'.format(DownloadAssessmentResultUploadTemplate.DownloadPath,DownloadAssessmentResultUploadTemplate.report_name)
+                path = '{}{}'.format(DownloadAssessmentResultUploadTemplate.DownloadPath,report_name)
                 response=Database.GetAssessmentCandidateResultUploadTemplate(AssessmentId,BatchId)
                 res=DownloadAssessmentResult.CreateExcelForDump(response,path,'Template')
                 ImagePath=config.DownloadcandidateResultPathWeb
-                return {'FileName':DownloadAssessmentResultUploadTemplate.report_name,'FilePath':ImagePath}
+                return {'FileName':report_name,'FilePath':ImagePath}
             except Exception as e:
                 print(str(e))
                 return {"exception":str(e),"File":"HI"}
@@ -42,13 +47,15 @@ class DownloadAssessmentResultUploadTemplate(Resource):
 class DownloadAssessmentResult(Resource):
     DownloadPath=config.DownloadcandidateResultPathLocal
     #print(DownloadPath)
-    report_name = config.AssessmentCandidateResult+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"   
-
+    
     @staticmethod
     def get():
         if request.method=='GET':
             try:
                 AssessmentId=request.args.get('AssessmentId',0,type=int)
+                Batch_Code=request.args.get('Batch_Code','',type=str)
+                report_name = config.AssessmentCandidateResult+'_'+Batch_Code+'_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"   
+
                 #print(AssessmentId)
                 r=re.compile(config.AssessmentCandidateResult + ".*")
                 lst=os.listdir(DownloadAssessmentResult.DownloadPath)
@@ -56,11 +63,11 @@ class DownloadAssessmentResult(Resource):
                 newlist = list(filter(r.match, lst))
                 for i in newlist:
                     os.remove( DownloadAssessmentResult.DownloadPath + i)
-                path = '{}{}'.format(DownloadAssessmentResult.DownloadPath,DownloadAssessmentResult.report_name)
+                path = '{}{}'.format(DownloadAssessmentResult.DownloadPath,report_name)
                 response=Database.GetAssessmentCandidateResults(AssessmentId)
                 res=DownloadAssessmentResult.CreateExcelForDump(response,path,'Result')
                 ImagePath=config.DownloadcandidateResultPathWeb
-                return {'FileName':DownloadAssessmentResult.report_name,'FilePath':ImagePath}
+                return {'FileName':report_name,'FilePath':ImagePath}
             except Exception as e:
                 print(str(e))
                 return {"exception":str(e),"File":"HI"}

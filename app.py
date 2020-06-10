@@ -971,7 +971,8 @@ class batch_list_assessment(Resource):
             course_ids=''
             if 'course_ids' in request.form:
                 course_ids=request.form['course_ids']
-
+            if 'assessment_stage_id' in request.form:
+                assessment_stage_id=request.form['assessment_stage_id']
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
@@ -981,7 +982,7 @@ class batch_list_assessment(Resource):
 
             #print(order_by_column_position)
             
-            return Batch.batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
+            return Batch.batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, assessment_stage_id,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
 
 class add_batch_details(Resource):
     @staticmethod
@@ -1005,8 +1006,10 @@ class add_batch_details(Resource):
             SubProject=request.form['SubProject']
             Cofunding=request.form['Cofunding']
             room_ids=request.form['room_ids']
-        
-            return Batch.add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids)
+            planned_batch_id=0
+            if 'PlannedBatchId' in request.form:
+                planned_batch_id=request.form['PlannedBatchId']
+            return Batch.add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id)
 
 
 class get_batch_details(Resource):
@@ -1093,8 +1096,9 @@ class candidates_enrolled_in_batch(Resource):
     @staticmethod
     def get():
          if request.method == 'GET':  
-            batch_id=request.args.get('batch_id',0,type=int)          
-            return Batch.candidate_enrolled_in_batch(batch_id)
+            batch_id=request.args.get('batch_id',0,type=int)  
+            assessment_id=request.args.get('assessmentId',0,type=int)          
+            return Batch.candidate_enrolled_in_batch(batch_id,assessment_id)
 
 
 class add_edit_map_candidate_batch(Resource):
@@ -3029,6 +3033,20 @@ class AllRegionsBasedOnUser(Resource):
                 return {'exception':str(e)}
 
 api.add_resource(AllRegionsBasedOnUser,'/AllRegionsBasedOnUser')
+class AllAssessmentStages(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=[]
+            try:
+                UserId=request.args.get('user_id',0,type=int)
+                UserRoleId=request.args.get('user_role_id',0,type=int)
+                response=Report.AllAssessmentStages(UserId,UserRoleId)
+                return {'AssessmentStages':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(AllAssessmentStages,'/AllAssessmentStages')
 
 class GetAllCentersBasedOnRegion_User(Resource):
     @staticmethod
@@ -4579,6 +4597,18 @@ class GetBatchAssessments(Resource):
                 return {'exception':str(e)}
 api.add_resource(GetBatchAssessments,'/GetBatchAssessments')
 
+class GetBatchAssessmentsHistory(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                AssessmentId=request.args.get('AssessmentId',0,type=int)               
+                response = Assessments.GetBatchAssessmentsHistory(AssessmentId)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetBatchAssessmentsHistory,'/GetBatchAssessmentsHistory')
+
 class GetAssessmentTypes(Resource):
     @staticmethod
     def get():
@@ -4620,7 +4650,8 @@ class ScheduleAssessment(Resource):
             assessor_name=request.form['Assessor_Name']
             assessor_email=request.form['Assessor_Email']
             assessor_mobile=request.form['Assessor_Mobile']
-            return Assessments.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile)
+            reassessment_flag=request.form['reassessment_flag']
+            return Assessments.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag)
 api.add_resource(ScheduleAssessment,'/ScheduleAssessment')
 
 api.add_resource(DownloadAssessmentResult,'/DownloadAssessmentResult')
@@ -6461,6 +6492,7 @@ class add_edit_center_room(Resource):
 
 api.add_resource(add_edit_center_room,'/add_edit_center_room')
 
+
 class GetUserTargets(Resource):
     @staticmethod
     def get():
@@ -6492,6 +6524,69 @@ class AddeEdittUserTarget(Resource):
 
 api.add_resource(AddeEdittUserTarget,'/AddeEdittUserTarget')
 
+class upload_batch_target_plan(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                f = request.files['filename']
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
+                f.save(file_name)
+                df= pd.read_excel(file_name,sheet_name='Template',dtype={'E Planned Start Date': str, 'E Planned End Date': str,'C Planned Date': str,'P Planned Start Date': str, 'P Planned End Date': str})
+                df = df.fillna('')
+                schema = Schema([
+                        #null check
+                        Column('Planned Batch Code'),
+                        Column('Sub Project Code*',str_validation+null_validation),
+                        Column('Sub Project Name*',str_validation+null_validation),
+                        Column('Course Code*',str_validation+null_validation),
+                        Column('Course Name*',str_validation+null_validation),
+                        Column('E Planned Start Date'),
+                        Column('E Planned End Date'),
+                        Column('E Target'),
+                        Column('C Planned Date'),
+                        Column('C Target'),
+                        Column('P Planned Start Date'),
+                        Column('P Planned End Date'),
+                        Column('P Target')
+                        ])
+                errors = schema.validate(df)
+                errors_index_rows = [e.row for e in errors]
+                len_error = len(errors_index_rows)
+                if len_error>0:
+                    file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                    pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                    return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                else:
+                    df.columns = df.columns.str.replace(" ", "_")
+                    df.columns = df.columns.str.replace("*", "")
+                    df.insert(0, 'row_index', range(len(df)))
+                    out = Database.upload_batch_target_plan(df,user_id,user_role_id)
+                    if out['Status']==False:
+                        file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                        pd.DataFrame(out['data']).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                        return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                    else:
+                        return out
+                
+            except Exception as e:
+                 return {"Status":False, "message":"Unable to upload " + str(e)}  
+             
+api.add_resource(upload_batch_target_plan,'/upload_batch_target_plan')
+
+class GetSubProjectPlannedBatches(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sub_project_id=request.args.get('sub_project_id',0,type=int)
+            course_id=request.args.get('course_id',0,type=int)
+            is_assigned=request.args.get('is_assigned',0,type=int)
+            planned_batch_id=request.args.get('planned_batch_id',0,type=int)
+            response=Master.GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id)
+            return response
+api.add_resource(GetSubProjectPlannedBatches,'/GetSubProjectPlannedBatches')
 
 if __name__ == '__main__':
     app.run(debug=True)
