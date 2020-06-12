@@ -244,7 +244,7 @@ var Candidates = {};
                         var count=data.Courses.length;
                         if( count> 0)
                         {
-                            //$('#ddlCourse').append(new Option('Choose Course',''));
+                            $('#ddlCourse').append(new Option('Choose Course',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
                                 if (needed !=0)
