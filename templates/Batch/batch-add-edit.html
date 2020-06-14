@@ -31,7 +31,6 @@ var Candidates = {};
         {   
             document.getElementById("PlannedStartDate").disabled = true;
             document.getElementById("PlannedEndDate").disabled = true;
-
             var URL=$('#hdn_web_url').val()+ "/GetBatchDetails";
             $.ajax({
                 type:"GET",
@@ -46,7 +45,8 @@ var Candidates = {};
                             $('#BatchName').val(data.BatchDetail.Batch_Name);                            
                             //LoadProductList(data.BatchDetail.Product_Id);
                             LoadCenterList(data.BatchDetail.Center_Id);
-                            LoadCourseList(data.BatchDetail.Course_Id,data.BatchDetail.Center_Id);
+                            loadroomlist(data.BatchDetail.Center_Id);
+                            //LoadCourseList(data.BatchDetail.Course_Id,data.BatchDetail.Center_Id);
                             LoadsubProject(data.BatchDetail.Sub_Project_Id,data.BatchDetail.Center_Id,data.BatchDetail.Course_Id);
                             LoadCoFunding(data.BatchDetail.Co_Funding_Project_Id);
                             TrainersBasedOnSubProject(data.BatchDetail.Trainer_Id,data.BatchDetail.Sub_Project_Id);
@@ -59,6 +59,7 @@ var Candidates = {};
                             $("#EndTime").val(data.BatchDetail.Training_End_Time);
                             
                             $('#ddlRoom').val(data.BatchDetail.Room_Ids.split(",")).trigger('change');
+                            $('#ddlCourse').val(data.BatchDetail.Course_Id);//.trigger('change')
                             if(data.BatchDetail.Is_Active)
                             {
                                 $('#isactive').prop('checked',true);
@@ -84,6 +85,7 @@ var Candidates = {};
         }
         else
         {
+            //alert('in else')
             //LoadProductList('0');
             LoadCenterList('0');
             LoadCourseList('0','');
@@ -224,6 +226,9 @@ var Candidates = {};
         function LoadCourseList(needed,CenterId)
         {   //loadroomlist(CenterId);
             LoadCapacity();
+            //alert(needed);
+            //alert(CenterId);
+            //console.log(needed);
             var URL=$('#hdn_web_url').val()+ "/All_Course_basedon_rooms"
             $.ajax({
                 type:"GET",
@@ -247,10 +252,8 @@ var Candidates = {};
                             $('#ddlCourse').append(new Option('Choose Course',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
-                                if (needed !=0)
-                                {
-                                    $('#ddlCourse').val(needed);
-                                }
+                            if(needed!='' & needed!='0')
+                                $('#ddlCourse').val(needed);                                
                         }
                         else
                         {
@@ -485,6 +488,8 @@ var Candidates = {};
                                 if (parseInt(PlannedBatchId) !=0)
                                 {
                                     $('#ddlPlannedBatchCode').val(PlannedBatchId);
+                                    
+                                    LoadPlannedDates();
                                 }
                         }
                         else

@@ -968,7 +968,7 @@ class Database:
                     if pop==2:
                         msg={"message":"Batch with the Batch code already exists","batch_flag":2}
         return msg
-
+        
     def get_batch_details(batch_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
