@@ -114,6 +114,40 @@ function LoadCourseddl(){
     return false;
 }
 
+function LoadmapCourseddl(){
+    var URL=$('#hdn_web_url').val()+ "/Get_All_Courses"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Courses != null)
+            {
+                $('#map_course').empty();
+                var count=data.Courses.length;
+                if( count> 0)
+                {
+                    //$('#map_course').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#map_course').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
+                    //$('#ddlCourse').val('-1');
+                }
+                else
+                {
+                    $('#map_course').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
 
 function LoadRegionddl(){
     var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
@@ -203,7 +237,8 @@ function LoadTable()
         "paging": true,
         "pageLength": 10,
         "sPaginationType": "full_numbers",
-        "scrollX": false,
+        "table-layout": "fixed",
+        "scrollX": true,
         "destroy": true,
         "processing": true,
         "language": { "processing": 'Loading..!' },
@@ -268,7 +303,33 @@ function LoadTable()
                     return varButtons;
                 }
             },
-            { "data": "Location" },
+            { 
+                "data": function (row, type, val, meta) {
+                    var varButtons = ""; /*
+                    if(row.User_Count=="")
+                        varButtons=row.User_Count;
+                    else
+                    {
+                        varButtons += '<a onclick="GetPartnerUsers(\'' + row.Partner_Id + '\',\''+row.Partner_Type_Id+ '\')"  style="color:blue;cursor:pointer" >' + row.User_Count + '</a>';
+                    }*/
+                    varButtons += '<a onclick="GetRoomCenters(\'' + row.Center_Id + '\',\'' + row.Center_Name +'\')"  style="color:blue;cursor:pointer" >' + row.Room_Count + '</a>';
+                    return varButtons;
+                    }
+            },
+            { 
+                "data": 
+                function (row, type, val, meta) {
+                    var varButtons = "";
+                    if(row.Geo_Location=="" || row.Geo_Location=="null")
+                        varButtons=row.Geo_Location;
+                    else
+                    {
+                        varButtons += '<a href="' + row.Geo_Location +  '" target="_blank" title="View location map"><img src="static/images/location.png" style="height:20px;"/></a>';
+                    }                    
+                    return varButtons;
+                }
+            },
+            { "data": "Location"},
             { "data": "District_Name"},
             { "data": "State_Name" },                       
             { "data": "Region_Name"},
@@ -280,9 +341,14 @@ function LoadTable()
         "ColumnDefs":[
             {
                 orderable:false,
-                targets:[1]
+                targets:1
+            },
+            {
+                orderable:false,
+                targets:7
             }
         ],
+
         drawCallback: function(){
             $('#tbl_centers_paginate ul.pagination').addClass("pagination-rounded");
         }
@@ -466,3 +532,240 @@ function GetCourseDetails(CenterId,CenterName)
     });
     return false;
 }
+
+function GetRoomCenters(CenterId,CenterName)
+    {
+        $('#hdn_modal_center_id').val(CenterId);
+        $('#headerRooms').text(CenterName);
+        var URL=$('#hdn_web_url').val()+ "/GetCenterRooms?center_id="+CenterId;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            overflow:true,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                varHtml='';
+                $("#tbl_rooms").dataTable().fnDestroy();
+                $("#tbl_rooms tbody").empty();
+                if(!jQuery.isEmptyObject(data))
+                {   if (data.CenterRooms != null){
+                        count=data.CenterRooms.length;
+                        if (count>0)
+                        {   varHtml='';
+                            //console.log(data.CenterRooms[0].Course_Ids);
+                            for(var i=0;i<count;i++)
+                            {
+                                td_open= '  <td style="text-align:center;">' ;
+                                td_close=   '</td>';       
+                                varHtml+='<tr>';
+                                varHtml+='  <td style="text-align:center;">'+ data.CenterRooms[i].S_No +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+'<a onclick="beforeEditModal(\'' + data.CenterRooms[i].Room_Name + '\',\'' + data.CenterRooms[i].Room_Type + '\',\'' + data.CenterRooms[i].Room_Size + '\',\'' + data.CenterRooms[i].Room_Capacity + '\',\'' + data.CenterRooms[i].Is_Active + '\',\'' + data.CenterRooms[i].Room_Id + '\',\'' + data.CenterRooms[i].Center_Id + '\',\'' + data.CenterRooms[i].Center_Name + '\',\'' + data.CenterRooms[i].Course_Ids  + '\')" class="btn" style="cursor:pointer" ><i title="Edit Room" class="fas fa-edit" ></i></a>'+'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.CenterRooms[i].Room_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.CenterRooms[i].Room_Type +'</td>';                    
+                                varHtml+='  <td style="text-align:center;">'+ data.CenterRooms[i].Room_Size +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.CenterRooms[i].Room_Capacity +'</td>';  
+                                varHtml+='  <td style="text-align:center; white-space:normal;">'+ data.CenterRooms[i].Course_Name +'</td>';  
+                                varHtml+='</tr>';                            
+                            }
+                            $("#tbl_rooms tbody").append(varHtml);
+                                $("#tbl_rooms").DataTable({
+                                drawCallback: function(){
+                                    $('#tbl_users_paginate ul.pagination').addClass("pagination-rounded");
+                                }
+                            });
+                                $('#mdl_room_center').modal('show');
+                                varHtml='';
+                        }
+                        else
+                        {
+                            //varHtml='<tr><td colspan="4" style="text-align:center;">No records found</td></tr>'                            
+                            //$("#tbl_users tbody").append(varHtml);
+                            $("#tbl_rooms").DataTable();
+                            $('#mdl_room_center').modal('show');
+                        } 
+                        
+                    }
+                }
+                else
+                {
+                    //varHtml='<tr><td colspan="4" style="text-align:center;">No records found</td></tr>'
+                    //$("#tbl_users tbody").append(varHtml);
+                    $("#tbl_rooms").DataTable();
+                    $('#mdl_room_center').modal('show');
+                }   
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+
+    function AddModal()
+    {   
+        $('#Room_Type').empty();
+        $('#Room_Type').append(new Option('Class room','Class room'));
+        $('#Room_Type').append(new Option('Lab','Lab'));
+        $('#Room_Type').append(new Option('Reception','Reception'));
+        $('#Room_Type').append(new Option('Others','Others'));
+
+        LoadmapCourseddl();
+        $('#ddl_If_Others').hide();
+        $('#isactive').prop('checked',true);
+        $('#Room_Name').val('');
+        $('#Room_Size').val('');
+        $('#Room_Capacity').val('');
+        $('#hdn_room_id').val("0");
+        $('#hdn_center_id_m2').val($('#hdn_modal_center_id').val()); 
+        
+        //$('#mdl_room_center').modal('hide');
+        $('#mdl_add_edit_rooms').modal('show');
+    }
+    function beforeEditModal(Room_Name, Room_Type, Room_Size, Room_Capacity, Is_Active, Room_Id, Center_id, Center_Name,Course_Ids){
+        LoadmapCourseddl();
+        
+        $('#Room_Type').empty();
+        $('#Room_Type').append(new Option('Class room','Class room'));
+        $('#Room_Type').append(new Option('Lab','Lab'));
+        $('#Room_Type').append(new Option('Reception','Reception'));
+        $('#Room_Type').append(new Option('Others','Others'));
+
+        EditModal(Room_Name, Room_Type, Room_Size, Room_Capacity, Is_Active, Room_Id, Center_id, Center_Name,Course_Ids);
+    }
+    function EditModal(Room_Name, Room_Type, Room_Size, Room_Capacity, Is_Active, Room_Id, Center_id, Center_Name,Course_Ids)
+    {   
+        if(Is_Active)
+            $('#isactive').prop('checked',true);
+        else 
+            $('#isactive').prop('checked',false);
+        //alert(Room_Type)
+        var rt=''
+        if ((Room_Type=='Class room')|(Room_Type=='Lab')|(Room_Type=='Reception')){
+            $('#Room_Type').val(Room_Type);
+            $('#ddl_If_Others').hide();
+        }
+        else{
+            $('#ddl_If_Others').show();
+            $('#Room_Type').val('Others');
+            $('#If_Others').val(Room_Type);
+        }
+        
+        
+        $('#Room_Name').val(Room_Name);
+        $('#Room_Size').val(Room_Size);
+        $('#Room_Capacity').val(Room_Capacity);
+        $('#hdn_room_id').val(Room_Id);
+        $('#hdn_center_id_m2').val(Center_id);
+        var ar = Course_Ids.split(",")
+        $('#map_course').val(ar).trigger('change');
+
+        //$('#mdl_room_center').modal('hide');
+        $('#mdl_add_edit_rooms').modal('show');
+        
+    }
+    function AddeEditCenterRoom()
+    {   var room_type=''
+        if ($('#Room_Type').val() == 'Others'){
+            room_type = $('#If_Others').val()
+        }
+        else{
+            room_type = $('#Room_Type').val()
+        }
+
+        var form_data = new FormData(); //$('#formUpload')[0]
+        var ins = document.getElementById('images').files.length;
+        //alert(ins);
+        var validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
+        var imstatus=1;
+        var sizestatus=1;
+        for (var x = 0; x < ins; x++) {
+            form_data.append("fileToUpload[]", document.getElementById('images').files[x]);
+            var file = document.getElementById('images').files[x]
+            if (file.size > 1024) { 
+                sizestatus=0;
+            }
+            alert()
+
+            if (!validImageTypes.includes(file['type'])) {
+                imstatus=0;
+            }
+            }
+            form_data.append('Room_Name',$('#Room_Name').val());
+            form_data.append('Room_Type',room_type);
+            form_data.append('Room_Size',$('#Room_Size').val());
+            form_data.append('Room_Capacity',$('#Room_Capacity').val());
+            form_data.append('isactive',$('#isactive').prop('checked'));
+            form_data.append('center_id',$('#hdn_center_id_m2').val());
+            form_data.append('room_id',$('#hdn_room_id').val());
+            form_data.append('course_ids',$('#map_course').val().toString());
+
+        if (imstatus==0){
+            alert('Image format is not valid')
+        }
+        else if (sizestatus==0){
+            alert('Image size is not valid')
+        }
+        else{
+
+            var URL=$('#hdn_web_url').val()+ "/add_edit_center_room";
+        $.ajax({
+            type:"POST",
+            url:URL,
+            enctype: 'multipart/form-data',
+            data: form_data,
+            contentType: false,
+            cache: false,
+            processData: false,
+            
+            // data:{
+            //     "Room_Name" : $('#Room_Name').val(),
+            //     "Room_Type" : room_type,
+            //     "Room_Size" : $('#Room_Size').val(),
+            //     "Room_Capacity" : $('#Room_Capacity').val(),
+            //     "isactive" : $('#isactive').prop('checked'),
+            //     "center_id":$('#hdn_center_id_m2').val(),
+            //     "room_id":$('#hdn_room_id').val(),
+            // },
+            success:function(data){
+                var message="",title="",icon="";
+                if(data.PopupMessage.status){
+                    message=data.PopupMessage.message;
+                    title="Success";
+                    icon="success";
+                }
+                else{
+                    message=data.PopupMessage.message;
+                    title="Error";
+                    icon="error";
+                }
+                swal({   
+                            title:title,
+                            text:message,
+                            icon:icon,
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                window.location.href = '/center';
+                                // $('#mdl_add_edit_Users').modal('hide');
+                                // LoadTable();
+                            }); 
+            },
+            error:function(x){
+                alert('error');
+            }
+        });
+
+        }
+        
+    }
+    function onchange_roomtype(){
+        if ($('#Room_Type').val() == 'Others'){
+            $('#ddl_If_Others').show()
+        }
+        else{
+            $('#ddl_If_Others').hide()
+        }
+    }

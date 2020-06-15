@@ -7,6 +7,8 @@ import xlsxwriter,re,os
 class Report:
     def AllRegionsBasedOnUser(UserId,UserRoleId,UserRegionId):
         return Database.AllRegionsBasedOnUser(UserId,UserRoleId,UserRegionId)
+    def AllAssessmentStages(UserId,UserRoleId):
+        return Database.AllAssessmentStages(UserId,UserRoleId)
     def GetAllCentersBasedOnRegion_User(UserId,UserRoleId,RegionId):
         return Database.GetAllCentersBasedOnRegion_User(UserId,UserRoleId,RegionId)
     def GetAllCoursesBasedOnCenter_User(UserId,UserRoleId,CenterId):

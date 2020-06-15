@@ -473,11 +473,11 @@ class Database:
         con.close()
         return content
 
-    def add_center_details(center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pincode,District,partner_id):
+    def add_center_details(center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pincode,District,partner_id,geolocation):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_centers] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?'
-        values = (center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pincode,District,partner_id)
+        sql = 'exec	[masters].[sp_add_edit_centers] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, ?'
+        values = (center_name,user_id,is_active,center_id,center_type_id,country_id,satet_id,location_name,address,pincode,District,partner_id, geolocation)
         #print(values)
         cur.execute(sql,(values))
         for row in cur:
@@ -557,7 +557,7 @@ class Database:
         countries = []
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        cur2.execute("SELECT * FROM [masters].[tbl_countries]")
+        cur2.execute("SELECT country_id, country_name FROM [masters].[tbl_countries]")
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
             h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
@@ -919,7 +919,7 @@ class Database:
         cur.close()
         con.close()
         return content
-    def batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
+    def batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids,assessment_stage_id, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
         #print(status, customer, project, course, region, center)
         content = {}
         d = []
@@ -927,10 +927,10 @@ class Database:
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
 
-        sql = 'exec [batches].[sp_get_batch_list_assessment] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?'
+        sql = 'exec [batches].[sp_get_batch_list_assessment] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?,?, ?, ?, ?, ?, ?'
 
-        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
-        print(values)
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids,assessment_stage_id, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
+        #print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -946,39 +946,45 @@ class Database:
         con.close()
         return content
 
-    def add_batch_details(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id):
+    def add_batch_details(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	batches.sp_add_edit_batches ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id)
+        sql = 'exec	batches.sp_add_edit_batches ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
+        values = (BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id)
         cur.execute(sql,(values))
+        batch_code=""
         for row in cur:
             pop=row[1]
+            batch_code=row[2]
         cur.commit()
         cur.close()
         con.close()
         if pop ==1:
-            msg={"message":"Updated Successfully","batch_flag":1}
+            msg={"message":"{} Updated Successfully".format(batch_code),"batch_flag":1}
         else: 
                 if pop==0:
-                    msg={"message":"Created Successfully","batch_flag":0}
+                    msg={"message":batch_code+" Created Successfully","batch_flag":0}
                 else:
                     if pop==2:
                         msg={"message":"Batch with the Batch code already exists","batch_flag":2}
         return msg
-
+        
     def get_batch_details(batch_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'select batch_name, product_id, center_id, course_id, sub_project_id, coalesce(co_funding_project_id,-1) as co_funding_project_id, trainer_id, cast(actual_start_date as varchar(MAX)), cast(actual_end_date as varchar(MAX)), training_start_time, training_end_time, is_active, cast(planned_start_date as varchar(MAX)), cast(planned_end_date as varchar(MAX)) from batches.tbl_batches where batch_id =?'
+        h={}
+        sql = 'exec	[batches].[sp_get_batch_details] ?'
         values = (batch_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[12]+"":row[12],""+columns[11]+"":row[11],""+columns[13]+"":row[13]}
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[12]+"":row[12],""+columns[11]+"":row[11],""+columns[13]+"":row[13],""+columns[14]+"":row[14]}
         cur.close()
         con.close()
         return h
+
     def GetCourse():
         course = []
         con = pyodbc.connect(conn_str)
@@ -1093,14 +1099,14 @@ class Database:
         cur.close()
         con.close()
         return content
-    def candidate_enrolled_in_batch(batch_id):
+    def candidate_enrolled_in_batch(batch_id,assessment_id):
         h = {}
         response = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_enrolled_in_batch] ?'
+        sql = 'exec [candidate_details].[sp_get_candidate_enrolled_in_batch] ?,?'
        
-        values = (batch_id,)
+        values = (batch_id,assessment_id)
         cur.execute(sql,(values))
         #print(values)
         #print(cur2.description)
@@ -2553,7 +2559,26 @@ SELECT					cb.name as candidate_name,
         con.close()
         return data
        
-    
+    def AllAssessmentStages(UserId,UserRoleId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[assessments].[sp_get_assessment_stages] ?, ?'
+        values = (UserId,UserRoleId)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i] 
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h.copy())
+        cur.commit()
+        cur.close()
+        con.close()
+        print(response)
+        return response
+     
     def AllRegionsBasedOnUser(UserId,UserRoleId,UserRegionId):
         response=[]
         h={}
@@ -3818,6 +3843,27 @@ SELECT					cb.name as candidate_name,
         con.close()       
         return out
 
+    def GetBatchAssessmentsHistory(AssessentId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [assessments].[get_batch_assessments_history] ?'
+        values = (AssessentId,)
+        print("Hii")
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = {'Assessments':response}
+        cur.commit()
+        cur.close()
+        con.close()   
+        print(response)    
+        return out
+
 
     def Get_all_ProjectType_db():
         response=[]
@@ -3885,14 +3931,14 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return out
-    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile):
+    def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag):
         try:
             response=[]
             h={}
             con = pyodbc.connect(conn_str)
             cur = con.cursor()
-            sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
-            values = (batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile)
+            sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
+            values = (batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag)
             print(values)
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]
@@ -4878,7 +4924,7 @@ SELECT					cb.name as candidate_name,
         out = df.values.tolist()
                                                                                                                                                                                                                                                                                                                                                                                                 
         quer1 = '''
-        update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=2,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1 where candidate_id='{}';
+        update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=2,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1 where candidate_id='{}';
         '''
         quer2='''
         update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where UPPER(identification_name)=UPPER('{}')),identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',present_address_line1='{}',permanaet_address_line1='{}',created_by={},created_on=GETDATE(),is_active=1 where candidate_id='{}';
@@ -4889,7 +4935,7 @@ SELECT					cb.name as candidate_name,
         query = ""
         for row in out:
             #row[42]=1
-            query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[55]),row[0])
+            query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[55]),row[0])
             query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[23],row[32],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[55]),row[0])
             query += '\n' + quer3.format(row[24],row[25],row[26],row[27],row[33],row[34],row[35],row[36],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[55]),row[0])
         
@@ -4913,7 +4959,7 @@ SELECT					cb.name as candidate_name,
             df['Date of Birth*'] = df['Date of Birth*'].astype(str)
             out = df.values.tolist()
             quer1 = '''
-            update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1 where candidate_id='{}';
+            update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1 where candidate_id='{}';
             '''
             quer2='''
             update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',present_address_line1='{}',permanaet_address_line1='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where UPPER(identification_name)=UPPER('{}')),identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',highest_qualification='{}',stream_specialization='{}',computer_knowledge='{}',technical_knowledge='{}',family_salutation='{}',member_name='{}',gender='{}',education_qualification='{}',relationship='{}',occupation='{}',average_household_income='{}',bank_name='{}',account_number='{}',created_by={},created_on=GETDATE(),is_active=1 where candidate_id='{}';
@@ -4955,7 +5001,7 @@ SELECT					cb.name as candidate_name,
                     b.append(row[80])
                     temp += '\n' + "({},'SAE',GETDATE(),{},1),".format(row[0],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[81]))
                 
-                query += '\n' + quer1.format(1 if str(row[1]).lower()=='Fresher' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[81]),row[0])
+                query += '\n' + quer1.format(1 if str(row[1]).lower()=='Fresher' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[81]),row[0])
                 query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[23],row[32],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[55],row[56],row[61],row[62],row[63],row[64],row[69],row[70],row[71],row[72],row[73],row[74],row[78],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[81]),row[0])
                 query += '\n' + quer3.format(row[24],row[25],row[26],row[27],row[33],row[34],row[35],row[36],row[57],row[58],row[59],row[60],row[65],row[66],row[67],row[68],row[75],row[76],row[77],row[79],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[81]),row[0])
             #print(query)
@@ -5206,7 +5252,7 @@ SELECT					cb.name as candidate_name,
                 Status=True
                 msg="Uploaded Successfully"
             else:
-                msg="Error"
+                msg="Wrong Batch code/Enrollment Id"
                 Status=False
             return {"Status":Status,'message':msg}
         except Exception as e:
@@ -5448,4 +5494,139 @@ SELECT					cb.name as candidate_name,
         response = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
+        return response
+
+    def upload_batch_target_plan(df,user_id,user_role_id):
+        try:            
+            print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            h=[]           
+            d={} 
+            json_str=df.to_json(orient='records')
+            sql = 'exec	[masters].[sp_validate_upload_batch_target_plan]  ?,?,?'
+            values = (json_str,user_id,user_role_id)
+            cur.execute(sql,(values))
+            columns = [column[0].title() for column in cur.description]
+            col_len=len(columns)
+            pop=0
+            for row in cur:
+                pop=row[0]
+                for i in range(col_len):
+                    d[columns[i]]=row[i]
+                h.append(d.copy())
+            cur.commit()
+            if pop==0 :
+                Status=False
+                msg="Error"
+                return {"Status":Status,'message':msg,'data':h}
+            else:
+                msg="Uploaded Successfully"
+                Status=True
+                return {"Status":Status,'message':msg}
+            cur.close()
+            con.close()
+        except Exception as e:
+            print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+    def GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_sub_project_planned_batches]  ?,?,?,?'
+        values = (sub_project_id,course_id,is_assigned,planned_batch_id)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def Getcenterroom(center_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_center_room]  ?'
+        values = (center_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i] 
+            #h["Course_Ids"] = row[i] # .split(',')#list(map(lambda x : int(x), row[i].split(',')))  
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def add_edit_center_room(Room_Name, user_id, is_active, Room_Type, Room_Size, Room_Capacity, center_id, room_id, file_name, course_ids):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_add_edit_center_room] ?, ?, ?, ?, ?, ?,?, ?, ?, ?'
+        values = (Room_Name, user_id, is_active, Room_Type, Room_Size, Room_Capacity, center_id, room_id, file_name, course_ids)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated", "status":True}
+        else:
+            msg={"message":"Created", "status":True}
+        return msg
+
+    def GetUserTarget(user_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec users.[sp_get_user_target]  ?'
+        values = (user_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i] 
+            #h["Course_Ids"] = row[i] # .split(',')#list(map(lambda x : int(x), row[i].split(',')))  
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    
+    def add_edit_user_targer(created_by, From_Date, To_Date, target, is_active, user_id, user_target_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[users].[sp_add_edit_user_target] ?, ?, ?, ?, ?, ?,?'
+        values = (created_by, From_Date, To_Date, int(target), is_active, int(user_id), int(user_target_id))
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated", "status":True}
+        else:
+            msg={"message":"Created", "status":True}
+        return msg
+    
+    @classmethod
+    def AllCourse_basedon_rooms_db(cls, user_id,user_role_id,center_id, room_ids):
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_course_basedon_rooms] ?,?,?,?'
+        values = (user_id,user_role_id,center_id, room_ids)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()       
         return response

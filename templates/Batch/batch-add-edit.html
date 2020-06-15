@@ -2,10 +2,12 @@
 <link href="static/assets/libs/clockpicker/bootstrap-clockpicker.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" />
 
-
 <script type="text/javascript">
+const months = ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const months_no = ["01", "02", "03","04", "05", "06", "07", "08", "09", "10", "11", "12"];
 var Candidates = {};
     $(document).ready(function(){
+        
          $('.dropdown-search-filter').select2();
         $(".date-picker").flatpickr();             
         $(".time-picker").flatpickr({
@@ -21,18 +23,14 @@ var Candidates = {};
             minDate: "today"
         });
 
-        
-        
-
-        document.getElementById("PlannedStartDate").disabled = false;
-        document.getElementById("PlannedEndDate").disabled = false;
+        //document.getElementById("PlannedStartDate").disabled = false;
+        //document.getElementById("PlannedEndDate").disabled = false;
 
         // alert('{{batch_id}}')
         if('{{batch_id}}' !=0)
         {   
             document.getElementById("PlannedStartDate").disabled = true;
             document.getElementById("PlannedEndDate").disabled = true;
-
             var URL=$('#hdn_web_url').val()+ "/GetBatchDetails";
             $.ajax({
                 type:"GET",
@@ -43,20 +41,25 @@ var Candidates = {};
                     {
                         if(data.BatchDetail!="")
                         {   
-                            //alert(data.BatchDetail);
+                            //console.log(data.BatchDetail);
                             $('#BatchName').val(data.BatchDetail.Batch_Name);                            
                             //LoadProductList(data.BatchDetail.Product_Id);
                             LoadCenterList(data.BatchDetail.Center_Id);
-                            LoadCourseList(data.BatchDetail.Course_Id,data.BatchDetail.Center_Id);
+                            loadroomlist(data.BatchDetail.Center_Id);
+                            //LoadCourseList(data.BatchDetail.Course_Id,data.BatchDetail.Center_Id);
                             LoadsubProject(data.BatchDetail.Sub_Project_Id,data.BatchDetail.Center_Id,data.BatchDetail.Course_Id);
                             LoadCoFunding(data.BatchDetail.Co_Funding_Project_Id);
                             TrainersBasedOnSubProject(data.BatchDetail.Trainer_Id,data.BatchDetail.Sub_Project_Id);
+                            LoadPlannedBatches(data.BatchDetail.Sub_Project_Id,data.BatchDetail.Course_Id,data.BatchDetail.Planned_Batch_Id)
                             $('#PlannedStartDate').val(data.BatchDetail.Planned_Start_Date);
                             $('#PlannedEndDate').val(data.BatchDetail.Planned_End_Date);
                             $('#ActualStartDate').val(data.BatchDetail.Actual_Start_Date);
                             $('#ActualEndDate').val(data.BatchDetail.Actual_End_Date);
                             $('#StartTime').val(data.BatchDetail.Training_Start_Time);
                             $("#EndTime").val(data.BatchDetail.Training_End_Time);
+                            
+                            $('#ddlRoom').val(data.BatchDetail.Room_Ids.split(",")).trigger('change');
+                            $('#ddlCourse').val(data.BatchDetail.Course_Id);//.trigger('change')
                             if(data.BatchDetail.Is_Active)
                             {
                                 $('#isactive').prop('checked',true);
@@ -82,6 +85,7 @@ var Candidates = {};
         }
         else
         {
+            //alert('in else')
             //LoadProductList('0');
             LoadCenterList('0');
             LoadCourseList('0','');
@@ -174,10 +178,58 @@ var Candidates = {};
             });
             return false;
         }
-
+        function loadroomlist(CenterId)
+        {
+            var URL=$('#hdn_web_url').val()+ "/GetCenterRooms"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{  "center_id":CenterId,
+                        "user_id": $('#hdn_home_user_id').val(),
+                        "user_role_id": $('#hdn_home_user_role_id').val()
+                    },
+                success: function (data){
+                    if(data.CenterRooms != null)
+                    {
+                        $('#ddlRoom').empty();
+                        var count=data.CenterRooms.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlCenter').append(new Option('Choose Center',''));
+                            for(var i=0;i<count;i++)
+                            {    
+                                var varHtml='<option value="'+data.CenterRooms[i].Room_Id +'" data-value="'+data.CenterRooms[i].Room_Capacity+'">'+data.CenterRooms[i].Room_Name+'</option>';
+                                $('#ddlRoom').append(varHtml);
+                                //new Option(data.CenterRooms[i].Room_Name,data.CenterRooms[i].Room_Id)
+                            }
+                        }
+                        else
+                        {
+                            $('#ddlRoom').append(new Option('No Rooms','-1'));
+                        }
+                    }
+                    else{
+                        $('#ddlRoom').append(new Option('No Rooms','-1'));
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
         function LoadCourseList(needed,CenterId)
-        {console.log(CenterId);
-            var URL=$('#hdn_web_url').val()+ "/All_Course_basedon_center"
+        {   //loadroomlist(CenterId);
+            LoadCapacity();
+            //alert(needed);
+            //alert(CenterId);
+            //console.log(needed);
+            var URL=$('#hdn_web_url').val()+ "/All_Course_basedon_rooms"
             $.ajax({
                 type:"GET",
                 url:URL,
@@ -185,7 +237,8 @@ var Candidates = {};
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
                 data:{
-                        "Center_id": CenterId,
+                        "room_ids": $('#ddlRoom').val().toString(),
+                        "center_id": $('#ddlCenter').val(),
                         "user_id": $('#hdn_home_user_id').val(),
                         "user_role_id": $('#hdn_home_user_role_id').val()
                     },
@@ -199,14 +252,12 @@ var Candidates = {};
                             $('#ddlCourse').append(new Option('Choose Course',''));
                             for(var i=0;i<count;i++)
                                 $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
-                                if (needed !=0)
-                                {
-                                    $('#ddlCourse').val(needed);
-                                }
+                            if(needed!='' & needed!='0')
+                                $('#ddlCourse').val(needed);                                
                         }
                         else
                         {
-                            $('#ddlCourse').append(new Option('Choose Course',''));
+                            $('#ddlCourse').append(new Option('All',''));
                         }
                         
 
@@ -222,7 +273,7 @@ var Candidates = {};
             return false;
         }
         function LoadsubProject(needed,CenterId,CourseId)
-        {console.log(CenterId,CourseId);
+        {//console.log(CenterId,CourseId);
             var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForCenter_Course"
             
             $.ajax({
@@ -398,6 +449,90 @@ var Candidates = {};
             
             return false;
         }
+        function SubProjectOnChange()
+        {
+            TrainersBasedOnSubProject('0',$('#ddlSubProject').val());
+            LoadPlannedBatches($('#ddlSubProject').val(),$('#ddlCourse').val(),'0');
+        }
+        function LoadPlannedBatches(SubProjectId,CourseId,PlannedBatchId)
+        {
+            var URL=$('#hdn_web_url').val()+ "/GetSubProjectPlannedBatches"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                        "sub_project_id": SubProjectId,
+                        "course_id":CourseId,
+                        "planned_batch_id":PlannedBatchId,
+                        "is_assigned":1
+                        //"user_id": $('#hdn_home_user_id').val(),
+                       // "user_role_id": $('#hdn_home_user_role_id').val()
+                    },
+                success: function (data){
+                    if(data.PlannedBatches != null)
+                    {
+                        $('#ddlPlannedBatchCode').empty();
+                        var count=data.PlannedBatches.length;
+                        if( count> 0)
+                        {
+                            $('#ddlPlannedBatchCode').append(new Option('Choose Planned Batch Code',''));
+                            for(var i=0;i<count;i++)
+                            {
+                                var varHtml='<option value="'+data.PlannedBatches[i].Planned_Batch_Id +'" data-value="'+data.PlannedBatches[i].E_Target+'" data-start-date="'+data.PlannedBatches[i].E_Planned_Start_Date+'" data-end-date="'+data.PlannedBatches[i].E_Planned_End_Date+'">'+data.PlannedBatches[i].Planned_Batch_Code+'</option>';
+                                $('#ddlPlannedBatchCode').append(varHtml);
+                            }      
+                                //new Option(data.PlannedBatches[i].Planned_Batch_Code,data.PlannedBatches[i].Planned_Batch_Id)
+                                if (parseInt(PlannedBatchId) !=0)
+                                {
+                                    $('#ddlPlannedBatchCode').val(PlannedBatchId);
+                                    
+                                    LoadPlannedDates();
+                                }
+                        }
+                        else
+                        {
+                            $('#ddlPlannedBatchCode').append(new Option('Choose Planned Batch Code',''));
+                        }
+                        
+
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            
+            return false;
+        }
+        function LoadCapacity()
+        {
+            var TotalCapacity=0;
+            $('#ddlRoom option:selected').each(function(){
+                TotalCapacity+=parseInt($(this).attr('data-value'));
+            })
+            TotalCapacity=isNaN(TotalCapacity)?0:TotalCapacity;
+            $('#TxtCapacity').val(TotalCapacity);
+            return false;
+        }
+        function LoadPlannedDates()
+        {
+            var StartDate=$('#ddlPlannedBatchCode option:selected').attr('data-start-date');
+            var EndDate=$('#ddlPlannedBatchCode option:selected').attr('data-end-date');
+            var s_dates=StartDate.split('-');
+            let s_mon= months_no[months.indexOf(s_dates[1])];
+            var e_dates=EndDate.split('-');
+            let e_mon=months_no[months.indexOf(e_dates[1])];
+            //console.log(months.indexOf(s_dates[1])+1);
+            $('#PlannedStartDate').val(s_dates[2]+'-'+s_mon+'-'+s_dates[0]);
+            $('#PlannedEndDate').val(e_dates[2]+'-'+e_mon+'-'+e_dates[0]);
+            $('#TxtTarget').val($('#ddlPlannedBatchCode option:selected').attr('data-value'));
+            return false;
+        }
         function add_popup_message(){
 			
             if(($('#StartTime').val() < $("#EndTime").val()) && ($('#ActualStartDate').val() <= $('#ActualEndDate').val()) && ($('#PlannedStartDate').val() <= $('#PlannedEndDate').val()))
@@ -412,9 +547,24 @@ var Candidates = {};
                 // {
                 //     centertype = $('#ddlCenter').val()
                 // }
-
+                
+                
+                var PlannedTarget = parseInt($('#ddlPlannedBatchCode option:selected').attr('data-value'));
+                
+                var TotalCapacity=parseInt($('#TxtCapacity').val());
+                
+                //console.log(PlannedTarget,TotalCapacity);
+                if(TotalCapacity< PlannedTarget)
+                {
+                    alert('Batch capacity/target should be less than or equal to the room capacity');
+                    return false;
+                }
+                else
+                {
+                    console.log('target is less than or equal to room capacity.');
+                }
+                
                 var URL=$('#hdn_web_url').val()+ "/add_batch_details";
-                //alert($('#ddlCourse').val());
                     $.ajax({
                         type:"POST",
                         url:URL,
@@ -423,6 +573,7 @@ var Candidates = {};
                             //"BatchCode" : $('#BatchCode').val(),
                             "Product" : 0,
                             "Center" : $('#ddlCenter').val(),
+                            "room_ids" : $('#ddlRoom').val().toString(),
                             "Course":$('#ddlCourse').val(),
                             "SubProject":$('#ddlSubProject').val(),
                             "Cofunding":$('#ddlCofunding').val(),
@@ -434,7 +585,8 @@ var Candidates = {};
                             "ActualEndDate":$('#ActualEndDate').val(),
                             "StartTime":$('#StartTime').val(),
                             "EndTime":$("#EndTime").val(),
-                            "BatchId":'{{batch_id}}'
+                            "BatchId":'{{batch_id}}',
+                            "PlannedBatchId":$('#ddlPlannedBatchCode').val()
                         },
                         success:function(data){
                             var message="",title="",icon="";
@@ -464,6 +616,7 @@ var Candidates = {};
                             alert('Error! Please try again');
                         }
                     });
+                
             }
             else{
                 swal({  title:"Error",
@@ -510,17 +663,6 @@ var Candidates = {};
                 </div>
 
                 <form id="demo-form" data-parsley-validate="">
-                    
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <label for="BatchName">Batch External Code:</label>   <!-- * : -->
-                            </div>
-                            <div class="col-lg-6">
-                                <input type="text" class="form-control" name="BatchName" id="BatchName"  ClientIdMode="static" placeholder="Batch External Code">
-                            </div>
-                        </div>
-                    </div>
                     <!-- <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
@@ -549,10 +691,32 @@ var Candidates = {};
                                 <label for="CenterId">Center*:</label>
                             </div>
                             <div class="col-lg-6">
-                                <select id="ddlCenter" class="form-control dropdown-search-filter"  onchange="LoadCourseList('0',this.value)" name="CenterId" ClientIdMode="static" required=""> <!-- myfunction(this.value) -->>
+                                <select id="ddlCenter" class="form-control dropdown-search-filter"  onchange="loadroomlist(this.value)" name="CenterId" ClientIdMode="static" required=""> <!-- onchange="LoadCourseList('0',this.value)" -->
                                     <option value="">Center</option>
                                 </select>
                             </div> 
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="RoomId">Room*:</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <select id="ddlRoom" class="form-control dropdown-search-filter" name="RoomId" ClientIdMode="static" onchange="LoadCourseList('0',this.value)" required="" multiple> <!-- "LoadCapacity()" myfunction(this.value) -->>
+                                    <option value="">Room</option>
+                                </select>
+                            </div> 
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="TxtCapacity">Capacity:</label>   <!-- * : -->
+                            </div>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control" name="TxtCapacity" id="TxtCapacity" disabled ClientIdMode="static" placeholder="Capacity">
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -573,12 +737,34 @@ var Candidates = {};
                                 <label for="SubProjectId">Sub Project*:</label>
                             </div>
                             <div class="col-lg-6">
-                                <select id="ddlSubProject" class="form-control dropdown-search-filter" name="SubProjectId" onchange="TrainersBasedOnSubProject('0',$('#ddlSubProject').val())" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                <select id="ddlSubProject" class="form-control dropdown-search-filter" name="SubProjectId" onchange="SubProjectOnChange()" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
                                     <option value="">Choose Sub Project</option>
                                 </select>
                             </div>
                         </div>
                     </div> 
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="ddlPlannedBatchCode">Planned Batch Code*:</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <select id="ddlPlannedBatchCode" class="form-control dropdown-search-filter" name="ddlPlannedBatchCode" onchange="LoadPlannedDates()" ClientIdMode="static" required="">
+                                    <option value="">Choose Planned Batch Code</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="TxtTarget">Planned Batch Target:</label>   <!-- * : -->
+                            </div>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control" name="TxtTarget" id="TxtTarget" disabled ClientIdMode="static" placeholder="Target">
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">
@@ -592,24 +778,13 @@ var Candidates = {};
                         </div>
                     </div>
                     <!--onchange="myfunction(this.value)"-->
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <label for="TrainerId">Trainer*:</label>
-                            </div>
-                            <div class="col-lg-6">
-                                <select id="ddlTrainer" class="form-control dropdown-search-filter" name="TrainerId" ClientIdMode="static"  required="">
-                                    <option value="">Choose Trainer</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+                    
                     <div class="form-group row ">
                             <div class="col-lg-6">
                                     <label for="PlannedStartDate">Planned Start Date*:</label>
                                 </div>
                                 <div class="col-lg-6">
-                            <input type="text" id="PlannedStartDate" name="PlannedStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required="">
+                            <input type="text" id="PlannedStartDate" name="PlannedStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required="" disabled>
                         </div>
                     </div>
                     <div class="form-group row ">
@@ -617,7 +792,7 @@ var Candidates = {};
                                     <label for="PlannedEndDate">Planned End Date*:</label>
                                 </div>
                                 <div class="col-lg-6">
-                            <input type="text" id="PlannedEndDate" name="PlannedEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date" required="">
+                            <input type="text" id="PlannedEndDate" name="PlannedEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date" required="" disabled>
                         </div>
                     </div>
                     <div class="form-group row ">
@@ -650,6 +825,28 @@ var Candidates = {};
                                 </div>
                                 <div class="col-lg-6">
                             <input type="text" id="EndTime" name="EndTime" class="form-control time-picker" ClientIdMode="static" placeholder="End Time" required="">
+                        </div>
+                    </div>                    
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="TrainerId">Trainer*:</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <select id="ddlTrainer" class="form-control dropdown-search-filter" name="TrainerId" ClientIdMode="static"  required="">
+                                    <option value="">Choose Trainer</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="BatchName">Batch External Code:</label>   <!-- * : -->
+                            </div>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control" name="BatchName" id="BatchName"  ClientIdMode="static" placeholder="Batch External Code">
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
