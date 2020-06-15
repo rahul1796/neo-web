@@ -13,3 +13,5 @@ CANDIDATE_REG_ENROLL_NON_MANDATORY_DETAILS = "CandidateRegEnrollNonMandatoryDeta
 CANDIDATE_INTERVENTIONS = "CandidateInterventions"
 CANDIDATE_INTERVENTION_TRACKER = "CandidateInterventionTracker"
 MAP_CANDIDATE_INTERVENTION_SKILLING = "MapCandidateInterventionSkilling"
+ECP_COUNT = "ECPCount"
+CANDIDATE_AGE_RANGE = "CandidateAgeRange"
