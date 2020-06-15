@@ -41,6 +41,10 @@ class MsSql:
             tables = config.CANDIDATE_INTERVENTION_TRACKER_TABLE
         elif param == CONST.MAP_CANDIDATE_INTERVENTION_SKILLING:
             tables = config.MAP_CANDIDATE_INTERVENTION_SKILLING_TABLE
+        elif param == CONST.ECP_COUNT:
+            tables = config.ECP_COUNT_TABLE
+        elif param == CONST.CANDIDATE_AGE_RANGE:
+            tables = config.CANDIDATE_AGE_RANGE_TABLE
         else:
             tables = config.SQL_GENERAL_TABLES
         for table in tables:
