@@ -898,39 +898,41 @@ function add_map_message(){
                             for(var i=0;i<count;i++)
                             {   var txt=''
                                 var attempt=''
-                                varHtml+='<tr>';
-                                varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].S_No +'</td>';
-                                if(data.Assessments[i].Assessment_Stage_Id==4) // Assessment Result Uploaded
-                                    txt+='<a onclick="DownloadAssessmentResult(\'' + data.Assessments[i].Assessment_Id + '\')" class="user-btn" style="cursor:pointer" ><i title="Download Assessment Result" class="fe-download" ></i></a>';
-                                if (data.Assessments[i].Assessment_Stage_Id<3  )
+                                if(!($("#hdn_home_user_role_id ").val() == "25" & data.Assessments[i].Assessment_Agency_Id==1))
                                 {
-                                    if( !(($("#hdn_home_user_role_id ").val() == "7" ||$("#hdn_home_user_role_id ").val() == "5"||$("#hdn_home_user_role_id ").val() == "14") & (data.Assessments[i].Assessment_Types_Name=="Final Summative" || data.Assessments[i].Assessment_Types_Name=="Summative" )))  
-									    txt+='<a onclick="EditAssessmentDetails(\'' + data.Assessments[i].Assessment_Id + '\',\''+ data.Assessments[i].Partner_Category_Id +'\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Edit Assessment Detail" class="fe-edit-1" ></i></a>';
+                                    varHtml+='<tr>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].S_No +'</td>';
+                                    if(data.Assessments[i].Assessment_Stage_Id==4) // Assessment Result Uploaded
+                                        txt+='<a onclick="DownloadAssessmentResult(\'' + data.Assessments[i].Assessment_Id + '\',\'' + data.Assessments[i].Batch_Code + '\')" class="user-btn" style="cursor:pointer" ><i title="Download Assessment Result" class="fe-download" ></i></a>';
+                                    if (data.Assessments[i].Assessment_Stage_Id<3  )
+                                    {
+                                        if( !(($("#hdn_home_user_role_id ").val() == "7" ||$("#hdn_home_user_role_id ").val() == "5"||$("#hdn_home_user_role_id ").val() == "14") & (data.Assessments[i].Assessment_Types_Name=="Final Summative" || data.Assessments[i].Assessment_Types_Name=="Summative" )))  
+                                            txt+='<a onclick="EditAssessmentDetails(\'' + data.Assessments[i].Assessment_Id + '\',\''+ data.Assessments[i].Partner_Category_Id +'\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Edit Assessment Detail" class="fe-edit-1" ></i></a>';
+                                    }
+                                    if (data.Assessments[i].Assessment_Stage_Id==3 & $('#hdn_home_user_role_id').val()!='5'  & $('#hdn_home_user_role_id').val()!='14')
+                                    {
+                                        if( !($("#hdn_home_user_role_id ").val() == "7"  & (data.Assessments[i].Assessment_Types_Name=="Final Summative" || data.Assessments[i].Assessment_Types_Name=="Summative") ))
+                                            txt+='<a onclick="UploadResult(\'' + data.Assessments[i].Assessment_Id + '\',\'' + data.Assessments[i].Batch_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Batch_Code + '\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Upload Result" class="fe-upload" ></i></a>';
+                                    }                                     
+                                    if (data.Assessments[i].Assessment_Stage_Id>=3 & $('#hdn_home_user_role_id').val()!='25' )
+                                        txt+='<a onclick="Reassessment(\'' + data.Assessments[i].Assessment_Id + '\',\''+ data.Assessments[i].Batch_Id +'\',\''+ data.Assessments[i].Partner_Category_Id +'\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Schedule Reassessment" class="fe-edit" ></i></a>';
+                                    varHtml+='  <td style="text-align:center;">'+ txt +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Batch_Code +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Requested_Date +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Requested_On +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Scheduled_Date +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Date +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Types_Name +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Agency_Name +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Partner_Name +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Stage_Name +'</td>';
+                                    if(data.Assessments[i].Attempt >1)
+                                        attempt+=  '<a onclick="AssessmentListHistory(\'' + data.Assessments[i].Assessment_Id + '\')" style="color:blue;cursor:pointer" >'+data.Assessments[i].Attempt+'</a>';
+                                    else
+                                        attempt+= data.Assessments[i].Attempt
+                                    varHtml+='  <td style="text-align:center;">'+ attempt +'</td>';
+                                    varHtml+='</tr>';
                                 }
-                                if (data.Assessments[i].Assessment_Stage_Id==3 & $('#hdn_home_user_role_id').val()!='5'  & $('#hdn_home_user_role_id').val()!='14')
-                                {
-                                    if( !($("#hdn_home_user_role_id ").val() == "7"  & (data.Assessments[i].Assessment_Types_Name=="Final Summative" || data.Assessments[i].Assessment_Types_Name=="Summative") ))
-                                        txt+='<a onclick="UploadResult(\'' + data.Assessments[i].Assessment_Id + '\',\'' + data.Assessments[i].Batch_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Batch_Code + '\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Upload Result" class="fe-upload" ></i></a>';
-                                }                                     
-                                if (data.Assessments[i].Assessment_Stage_Id>=3 & $('#hdn_home_user_role_id').val()!='25' )
-                                    txt+='<a onclick="Reassessment(\'' + data.Assessments[i].Assessment_Id + '\',\''+ data.Assessments[i].Batch_Id +'\',\''+ data.Assessments[i].Partner_Category_Id +'\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Schedule Reassessment" class="fe-edit" ></i></a>';
-                                varHtml+='  <td style="text-align:center;">'+ txt +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Batch_Code +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Requested_Date +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Requested_On +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Scheduled_Date +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Date +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Types_Name +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Agency_Name +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Partner_Name +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Stage_Name +'</td>';
-                                if(data.Assessments[i].Attempt >1)
-                                    attempt+=  '<a onclick="AssessmentListHistory(\'' + data.Assessments[i].Assessment_Id + '\')" style="color:blue;cursor:pointer" >'+data.Assessments[i].Attempt+'</a>';
-                                else
-                                    attempt+= data.Assessments[i].Attempt
-                                varHtml+='  <td style="text-align:center;">'+ attempt +'</td>';
-                                varHtml+='</tr>';
-
                             }                        
                         }
                         $("#tbl_batch_assessment tbody").append(varHtml);
@@ -1088,8 +1090,9 @@ function add_map_message(){
                     $('#ddlAssessmentType').append(new Option('Select',''));
                     if( count> 0)
                     {
-                        for(var i=0;i<count;i++)
+                        for(var i=0;i<count;i++)                           
                             $('#ddlAssessmentType').append(new Option(data.AssessmentTypes[i].Assessment_Types_Name,data.AssessmentTypes[i].Assessment_Types_Id));
+                          
                     }
                     else
                     {
@@ -1260,10 +1263,10 @@ function add_map_message(){
     
     }
 
-    function DownloadAssessmentResult(AssessmentId)
+    function DownloadAssessmentResult(AssessmentId,Batch_Code)
     {         
         //$('#divLoader').show();        
-        var URL=$('#hdn_web_url').val()+ "/DownloadAssessmentResult?AssessmentId="+AssessmentId;            
+        var URL=$('#hdn_web_url').val()+ "/DownloadAssessmentResult?AssessmentId="+AssessmentId+"&Batch_Code="+Batch_Code ;            
         $.ajax({
             type:"GET",
             url:URL,
@@ -1405,6 +1408,7 @@ function add_map_message(){
                         if( count> 0)
                         {
                             $("#lblCandidateTable").text("Select Absent Candidates:");
+                            $("#thSelect").text("Select Absentees");
                             for(var i=0;i<count;i++)
                             {   
                                 
@@ -1415,6 +1419,7 @@ function add_map_message(){
                                     txt+='<input id="addedchk" name="checkcase" type="checkbox" value="'+data.Candidates[i].Candidate_Id+'" >';
                                 else{
                                     $("#lblCandidateTable").text("Select Candidates For Re-Assessment");
+                                    $("#thSelect").text("Select");
                                     txt+='<input id="addedchk" name="checkcase" type="checkbox" value="'+data.Candidates[i].Candidate_Id+'" checked>';
                                     }
                                 varHtml+='  <td style="text-align:center;">'+ txt +'</td>';
@@ -1532,6 +1537,7 @@ function add_map_message(){
         $('#TxtAssessDate').val(AssessDate);
         $('#hdn_upl_assessment_id').val(AssessmentId);
         $('#hdn_upl_batch_id').val(BatchId);
+        $('#hdn_upl_batch_code').val(BatchCode);
         $('#hdn_upl_stage_id').val(StageId);
 
         $('#hdn_home_user_id_modal').val($('#hdn_home_user_id').val());
@@ -1540,7 +1546,7 @@ function add_map_message(){
         $('#mdl_candidate_result_upload').modal('show');
         $('#myFile').val('');
     }
-    function DownloadResultTemplate(AssessmentId,BatchId,StageId)
+    function DownloadResultTemplate(AssessmentId,BatchId,StageId,Batch_Code)
     {
         console.log(AssessmentId,BatchId,StageId);
         var URL=$('#hdn_web_url').val()+ "/DownloadAssessmentResultUploadTemplate";            
@@ -1552,7 +1558,8 @@ function add_map_message(){
             datatype:"json",
             data:{  
                      "AssessmentId":AssessmentId,
-                     "BatchId":BatchId
+                     "BatchId":BatchId,
+                     "Batch_Code":Batch_Code
             },
             success:function(data){
                 if(data!=null)

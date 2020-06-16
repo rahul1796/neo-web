@@ -483,7 +483,7 @@
                                     <thead>
                                         <tr>
                                             <th>S No</th>
-                                            <th>SELECT</th>
+                                            <th id="thSelect">SELECT</th>
                                             <th>Candidate Id</th>
                                             <th>Candidate Name</th>
                                             <th>Mobile Number</th>
@@ -549,6 +549,7 @@
                     <input type="hidden" id="hdn_home_user_role_id_modal" name="hdn_home_user_role_id_modal" value="0">
                     <input type="hidden" id="hdn_upl_assessment_id" name="hdn_assessment_id" value="0">
                     <input type="hidden" id="hdn_upl_batch_id" name="hdn_batch_id" value="0">
+                    <input type="hidden" id="hdn_upl_batch_code" name="hdn_upl_batch_code" value="">
                     <input type="hidden" id="hdn_upl_stage_id" name="hdn_stage_id" value="0">
                 <div class="modal-header">
                     <h4 class="modal-title"><span id="HduploadFile"></span></h4>
@@ -580,7 +581,7 @@
                                 <input type="file" id="myFile" name="filename">
                             </div>
                             <div class="col-lg-4">
-                                <button class="btn btn-blue btn-sm waves-effect waves-light" type="button" onclick="DownloadResultTemplate($('#hdn_upl_assessment_id').val(),$('#hdn_upl_batch_id').val(),$('#hdn_upl_stage_id').val())">Download Template</button>
+                                <button class="btn btn-blue btn-sm waves-effect waves-light" type="button" onclick="DownloadResultTemplate($('#hdn_upl_assessment_id').val(),$('#hdn_upl_batch_id').val(),$('#hdn_upl_stage_id').val(),$('#hdn_upl_batch_code').val())">Download Template</button>
                             </div>
                         </div>
                     </div>

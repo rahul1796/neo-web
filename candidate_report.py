@@ -51,7 +51,7 @@ def create_report(candidate_id, user_id, user_role_id, status, customer, project
                   'Candidate STATE','Candidate DISTRICT','Candidate PINCODE','EDUCATION','VOTERID','AADHAARNUMBER',
                   'FAMILYINCOME','Source of Info','COURSE Name','QP Name','BATCHDURATION','CANDIDATESTATUS','ENROLLEDDATE',
                   'DROPPEDDATE','DROPPEDREASON','BATCH STATUS','No of Day Training Attended','Training Attendance %',
-                  'Assessment Scheduled Date','Assessment Actual Date','Assessment Agency','Assessment Type','CERTIFICATION STATUS',
+                  'Assessment Confirmed Date','Assessment Actual Date','Awarding Body','Partner Name','Assessment Type','CERTIFICATION STATUS',
                   'GRADE','SCORE','Assessment ATTENDANCE','ASSESSMENT UPLOADED DATE','EMPLOYER NAME','DESIGNATION','JOINED STATUS',
                   'CTC','DOJ','OFFERLETTERUPLOADEDON','EMPLOYEMENT TYPE','Program Manager NAME','PROJECT STATUS','PRACTICE',
                   'OJT Completed Date']

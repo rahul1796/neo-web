@@ -6496,6 +6496,38 @@ class add_edit_center_room(Resource):
 
 api.add_resource(add_edit_center_room,'/add_edit_center_room')
 
+
+class GetUserTargets(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            user_id=request.args.get('user_id',0,type=int)
+            response=UsersM.GetUserTargets(user_id)
+            return jsonify(response)
+api.add_resource(GetUserTargets,'/GetUserTargets')
+
+class AddeEdittUserTarget(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            try:
+                created_by=g.user_id
+                From_Date=request.form['From_Date']
+                To_Date=request.form['To_Date']
+                target=request.form['target']
+                is_active=request.form['isactive']
+                user_id=request.form['user_id']
+                user_target_id=request.form['user_target_id']
+                for i in (created_by, From_Date, To_Date, target, is_active, user_id, user_target_id):
+                    print(i)
+                out = UsersM.add_edit_user_targer(created_by, From_Date, To_Date, target, is_active, user_id, user_target_id)
+            except Exception as e:
+                out = {"PopupMessage":{"message":"Error " + str(e), "status":False}}
+            finally:
+                return out
+
+api.add_resource(AddeEdittUserTarget,'/AddeEdittUserTarget')
+
 class upload_batch_target_plan(Resource):
     @staticmethod
     def post():
@@ -6561,6 +6593,7 @@ class GetSubProjectPlannedBatches(Resource):
 api.add_resource(GetSubProjectPlannedBatches,'/GetSubProjectPlannedBatches')
 
 
+
 class get_enrolled_candidates_for_multiple_intervention(Resource):
     @staticmethod
     def get():
@@ -6603,5 +6636,22 @@ class get_candidate_details(Resource):
 #Base URL + "/get_candidate_list" api will provide all the unzynched QP data as response
 api.add_resource(get_candidate_details, '/get_candidate_details')
 
-if __name__ == '__main__':    
+
+class All_Course_basedon_rooms(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                center_id=request.args['center_id']
+                room_ids=request.args['room_ids']
+                response = Database.AllCourse_basedon_rooms_db(user_id,user_role_id,center_id, room_ids)
+                return {'Courses':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(All_Course_basedon_rooms,'/All_Course_basedon_rooms')
+
+
+if __name__ == '__main__':
     app.run(debug=True)
