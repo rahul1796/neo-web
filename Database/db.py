@@ -4490,10 +4490,10 @@ SELECT					cb.name as candidate_name,
         else:
             return {'success': False, 'description': 'stored procedure not return true/false','app_status':False}
     
-    def otp_send_db(otp, mobile_no, app_name, flag):
+    def otp_send_db(otp, mobile_no, app_name, flag,candidate_id):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
-        quer = "call [masters].[sp_mobile_otp_verification]('{}','{}',{},'{}')".format(mobile_no, otp, flag, app_name)
+        quer = "call [masters].[sp_mobile_otp_verification]('{}','{}',{},'{}',{})".format(mobile_no, otp, flag, app_name,candidate_id)
         quer = "{"+ quer + "}"
         curs.execute(quer)
         data = curs.fetchall()[0]
@@ -5417,12 +5417,13 @@ SELECT					cb.name as candidate_name,
         print(out)
         return out
 
-    def app_email_validation(email):
+    def app_email_validation(email, candidate_id=0):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
-        quer = "select count(*) as email_count from candidate_details.tbl_candidates where coalesce(email_id,'')!='' and is_active=1 and email_id like '{}'".format(email)
+        quer = "EXEC [candidate_details].[sp_app_email_validation] ?,?"
         #quer = "{"+ quer + "}"
-        curs.execute(quer)
+        values=(email, candidate_id)
+        curs.execute(quer,values)
         return curs.fetchall()[0][0]<=0
 
 
@@ -5579,6 +5580,56 @@ SELECT					cb.name as candidate_name,
             msg={"message":"Created", "status":True}
         return msg
 
+    def get_enrolled_candidates_for_multiple_intervention(user_id,app_version,cand_name,cand_mobile,cand_email,candidate_id):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "SELECT TOP (1) version_code FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        curs.execute(quer)
+        data=curs.fetchall()
+        data = '' if data==[] else data[0][0]
+        if int(app_version) < int(data):
+            curs.close()
+            conn.close()
+            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            return out
+        sql = 'exec [candidate_details].[sp_get_enrolled_candidates_for_mutiple_intervention]  ?, ?,?,?,?'        
+        values = (user_id,cand_name,cand_mobile,cand_email,candidate_id)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        response = []
+        h={}
+        for row in curs:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        curs.close()
+        conn.close()
+        out = {'success': True, 'description': "Successful", 'app_status':True, 'candidates':response}
+        return out
+    def get_candidate_details(user_id,candidate_id):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        sql = 'exec [candidate_details].[sp_get_candidate_details]  ?, ?'
+        filenmae = 'candidate_detail_'+str(candidate_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xml'
+        
+        values = (user_id,candidate_id)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        response = []
+        h={}
+        for row in curs:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        df = pd.DataFrame(response)
+        df = df.fillna('')
+        curs.close()
+        conn.close()
+        df.to_xml(candidate_xmlPath + filenmae)
+        out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
+        return out
+
+
     def GetUserTarget(user_id):
         response = []
         h={}
@@ -5630,3 +5681,4 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return response
+
