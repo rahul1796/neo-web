@@ -137,6 +137,8 @@ class Report:
     
     def GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date):
         return Database.GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date)
+    def GetMobilizerReportData(user_id,user_role_id,Role, Date):
+        return Database.GetMobilizerReportData(user_id,user_role_id,Role, Date)
 
     def GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
         return {"Data":Database.GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)}

@@ -24,6 +24,7 @@ import candidate_report
 import user_subproject_download
 import batch_report
 import ecp_report_down
+import mobilizer_report_down
 import batch_candidate_download
 from Models import DownloadDump
 from lib.ms_sql import MsSql
@@ -6203,7 +6204,6 @@ class batch_download_report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(batch_download_report,'/batch_download_report')
 
-
 class GetECPReportDonload(Resource):
     @staticmethod
     def post():
@@ -6602,6 +6602,65 @@ class All_Course_basedon_rooms(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(All_Course_basedon_rooms,'/All_Course_basedon_rooms')
+
+#ECP REPORT PAGE
+@app.route("/mobilizer_producticity_report_page")
+def mobilizer_producticity_report_page():
+    if g.user:
+        return render_template("Reports/Mobilizer_Productivity_report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/mobilizer_producticity_report")
+def mobilizer_producticity_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="mobilizer_producticity_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class GetMobilizerReportData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                Role=request.args.get('Role','',type=str)
+                Date=request.args.get('Date','',type=str)
+                #print(user_id,user_role_id,Role, Date)
+                response = Report.GetMobilizerReportData(user_id,user_role_id,Role, Date)
+                
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetMobilizerReportData,'/GetMobilizerReportData')
+
+class GetMobilizerReportDownload(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            #try:
+                #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
+            
+            user_id = request.form["user_id"]
+            user_role_id = request.form["user_role_id"]
+            Role = request.form["Role"]
+            Date = request.form["Date"]
+            
+            file_name='mobilizer_report_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
+            
+            resp = mobilizer_report_down.create_report(user_id, user_role_id, Role, Date, file_name)
+            
+            return resp
+            #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            # except Exception as e:
+            #     #print(str(e))
+            #     return {"exceptione":str(e)}
+api.add_resource(GetMobilizerReportDownload,'/GetMobilizerReportDownload')
+
+###############################################################################
+
 
 
 if __name__ == '__main__':
