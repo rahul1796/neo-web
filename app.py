@@ -6387,7 +6387,7 @@ class app_email_validation(Resource):
             client_id = request.args['client_id']
             client_key = request.args['client_key']
             email = request.args['email']
-            candidate_id=request.get.args('candidate_id',0,type=int)
+            candidate_id=request.args.get('candidate_id',0,type=int)
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
                 if Database.app_email_validation(email,candidate_id):
                     out = {'success': True, 'description': "Email validation successfully"}  
