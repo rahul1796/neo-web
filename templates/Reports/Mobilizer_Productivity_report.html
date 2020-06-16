@@ -25,7 +25,9 @@
             {
                 alert("Please select date.");
             }
-            
+            else
+            {
+                
             var to_date = new Date($('#To_Date').val());
             to_date = new Date(to_date.getFullYear(), to_date.getMonth() + 1, 0);
             to_date = moment(to_date).format('YYYY/MM/DD');
@@ -116,6 +118,7 @@
                     return false;
                 }
             });
+            }
         }
         
     function DownloadTableBasedOnSearch(){
