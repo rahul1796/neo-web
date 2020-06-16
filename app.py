@@ -5240,6 +5240,9 @@ class otp_send(Resource):
                     is_otp=1
                     if 'is_otp' in request.form:
                         is_otp=int(request.form['is_otp'])
+                    candidate_id=0
+                    if 'candidate_id' in request.form:
+                        candidate_id=int(request.form['candidate_id'])
                 except Exception as e:
                     res = {'success': False, 'description': "unable to read data " + str(e)}
                     return jsonify(res)
@@ -5247,7 +5250,7 @@ class otp_send(Resource):
                 for i in range(6):
                     otp += str(random.randint(0,9))
 
-                out = Database.otp_send_db(otp, mobile_no, app_name, flag)
+                out = Database.otp_send_db(otp, mobile_no, app_name, flag,candidate_id)
 
                 if out[0]==True:
                     res = {'success': False, 'description': "Mobile number already registered"}
@@ -6384,8 +6387,9 @@ class app_email_validation(Resource):
             client_id = request.args['client_id']
             client_key = request.args['client_key']
             email = request.args['email']
+            candidate_id=request.get.args('candidate_id',0,type=int)
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
-                if Database.app_email_validation(email):
+                if Database.app_email_validation(email,candidate_id):
                     out = {'success': True, 'description': "Email validation successfully"}  
                 else:
                     out = {'success': False, 'description': "Email validation failed(already exists)"}
@@ -6587,6 +6591,51 @@ class GetSubProjectPlannedBatches(Resource):
             response=Master.GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id)
             return response
 api.add_resource(GetSubProjectPlannedBatches,'/GetSubProjectPlannedBatches')
+
+
+
+class get_enrolled_candidates_for_multiple_intervention(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            client_id = str(request.args['client_id'])
+            client_key = str(request.args['client_key'])            
+            user_id = request.args.get('user_id',0,type=int)
+            candidate_id = request.args.get('candidate_id',0,type=int)
+            app_version =request.args.get('app_version',0,type=int)
+            cand_name = request.args.get('cand_name','',type=str)
+            cand_mobile = request.args.get('cand_mobile','',type=str)
+            cand_email = request.args.get('cand_email','',type=str)
+            
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                out = Database.get_enrolled_candidates_for_multiple_intervention(user_id,app_version,cand_name,cand_mobile,cand_email,candidate_id)
+                return jsonify(out)
+                
+            else:
+                res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
+                return jsonify(res)
+
+api.add_resource(get_enrolled_candidates_for_multiple_intervention, '/get_enrolled_candidates_for_multiple_intervention')
+
+class get_candidate_details(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            client_id = str(request.args['client_id'])
+            client_key = str(request.args['client_key'])
+            user_id = request.args.get('user_id',0,type=int)
+            candidate_id = request.args.get('candidate_id',0,type=int)
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                out = Database.get_candidate_details(user_id,candidate_id)
+                return jsonify(out)
+                
+            else:
+                res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
+                return jsonify(res)
+
+#Base URL + "/get_candidate_list" api will provide all the unzynched QP data as response
+api.add_resource(get_candidate_details, '/get_candidate_details')
+
 
 class All_Course_basedon_rooms(Resource):
     @staticmethod
