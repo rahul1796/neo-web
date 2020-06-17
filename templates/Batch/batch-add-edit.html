@@ -29,6 +29,10 @@ var Candidates = {};
         // alert('{{batch_id}}')
         if('{{batch_id}}' !=0)
         {   
+			if('{{batch_id}}'<5147)
+				$('#ddlPlannedBatchCode').removeAttr('required');
+            else
+				$('#ddlPlannedBatchCode').attr('required');
             document.getElementById("PlannedStartDate").disabled = true;
             document.getElementById("PlannedEndDate").disabled = true;
             var URL=$('#hdn_web_url').val()+ "/GetBatchDetails";
