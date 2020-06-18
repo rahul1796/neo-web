@@ -2,6 +2,44 @@ var varTable;
 var varTable1;
 var flag = "";
 var role_id;
+var check_list = [];
+
+function toggleCheckbox(e)
+    {
+        //let id = e.target.getAttribute('value');
+        
+        //console.log(e.target.getAttribute('name'));
+        var temp=e.target.getAttribute('value');
+        //check_list.push(e.target.getAttribute('value'));
+
+        //console.log(e.target.getAttribute('name').checked)
+        //console.log(e.target.getAttribute('name').checked())
+        //console.log($('#'+e.target.getAttribute('id')).is(':checked')) 
+
+
+
+        //console.log($('#'+e.target.getAttribute('name')).is(':checked'))
+
+        //console.log(e.currentTarget.getAttribute('id'));
+        if($('#'+e.target.getAttribute('id')).is(':checked'))
+        {
+            if(jQuery.inArray( temp, check_list )==-1){
+                check_list.push(temp);
+            }
+        }
+        else
+        {
+            if(jQuery.inArray( temp, check_list )!=-1){
+                check_list = $.grep(check_list, function(value) {
+                    return value != temp;
+                  })
+                //check_list = check_list.pop(temp);
+            }
+        }
+        //console.log(check_list)
+    }
+
+
 
 function UploadFileData()
 {   $("#imgSpinner1").show();
@@ -231,7 +269,7 @@ function LoadTable()
                 "data": function (row, type, val, meta) {
                     var varButtons = "";
                     if(row.Is_Check)
-                        varButtons += '<input id="addedchk" name="checkcase" type="checkbox" value="'+row.Candidate_Id+'" >';
+                        varButtons += '<input id="addedchk_' + row.S_No + '" name="checkcase" type="checkbox" value="'+row.Candidate_Id+'" onclick="toggleCheckbox(event)">';      
                     return varButtons;
                 }
             },
@@ -251,6 +289,7 @@ function LoadTable()
             }
         ],
         drawCallback: function(){
+            check_list.forEach(function(value, index){  $('[value='+ value +']').prop('checked',true); });
             $('#tbl_candidate_paginate ul.pagination').addClass("pagination-rounded");
         }
     });
@@ -306,13 +345,8 @@ function CandidateContactDetails(primary_contact,SecondaryContact,Email,PresnetA
 
 function DownloadEnrTemplate(){
     $("#imgSpinner").show();
-    var cands='';
-    //alert(flag)
-    $('[name=checkcase]:checked').each(function () {
-        cands+= $(this).val()+',';
-    });
-    cands=cands.substring(0,cands.length-1)
-    
+    var cands=check_list.toString();
+    //cands=cands.substring(0,cands.length-1)
     if ((cands.toString().length)==0)
     {
         alert('Please select candidates:')

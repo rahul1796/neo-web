@@ -495,7 +495,7 @@ function Getusertarget(UserId,UserName)
                                 td_close=   '</td>';       
                                 varHtml+='<tr>';
                                 varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].S_No +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+'<a onclick="EditModal(\'' + data.UserTarget[i].From_Date_Form + '\',\'' + data.UserTarget[i].To_Date_Form + '\',\'' + data.UserTarget[i].Target + '\',\'' + data.UserTarget[i].User_Id + '\',\'' + data.UserTarget[i].Is_Active + '\',\'' + data.UserTarget[i].User_Target_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Room" class="fas fa-edit" ></i></a>'+'</td>';
+                                varHtml+='  <td style="text-align:center;">'+'<a onclick="EditModal(\'' + data.UserTarget[i].From_Date_Form + '\',\'' + data.UserTarget[i].To_Date_Form + '\',\'' + data.UserTarget[i].Target + '\',\'' + data.UserTarget[i].User_Id + '\',\'' + data.UserTarget[i].Is_Active + '\',\'' + data.UserTarget[i].User_Target_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Monthly Target" class="fas fa-edit" ></i></a>'+'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].From_Date +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].To_Date +'</td>';                    
                                 varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].Target +'</td>';
@@ -546,7 +546,7 @@ function Getusertarget(UserId,UserName)
         $('#hdn_user_target_id').val("0");
         $('#hdn_user_id_m2').val($('#hdn_modal_user_id').val()); 
         
-        //$('#mdl_room_center').modal('hide');
+        $('#mdl_user_target').modal('hide');
         $('#mdl_add_edit_targets').modal('show');
     }
     
@@ -561,7 +561,7 @@ function Getusertarget(UserId,UserName)
         $('#target').val(Target);
         $('#hdn_user_target_id').val(User_Target_Id);
         $('#hdn_user_id_m2').val($('#hdn_modal_user_id').val()); 
-        //$('#mdl_room_center').modal('hide');
+        $('#mdl_user_target').modal('hide');
         $('#mdl_add_edit_targets').modal('show');
         
     }
