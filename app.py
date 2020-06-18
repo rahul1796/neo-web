@@ -6660,7 +6660,7 @@ def mobilizer_producticity_report_page():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
-@app.route("/mobilizer_producticity_report")
+@app.route("/mobilizer_productivity_report")
 def mobilizer_producticity_report():
     if g.user:
         return render_template("home.html",values=g.User_detail_with_ids,html="mobilizer_producticity_report_page")
