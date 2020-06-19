@@ -244,6 +244,7 @@
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Action</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">From</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">To</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Product</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Target</th>
                             </tr>
                         </thead>
@@ -289,6 +290,20 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <input type="month" class="form-control" name="To_Date" id="To_Date" required placeholder="To Date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="ddlproduct">Product :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <select id="ddlproduct" class="form-control" name="ddlproduct" ClientIdMode="static">   <!--dropdown-search-filter data-live-search="true" -->
+                                        <option  value="1">Training</option>
+                                        <option  value="5">Certification</option>
+                                        <option  value="7">Placement</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>

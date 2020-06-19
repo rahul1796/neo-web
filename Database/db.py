@@ -5648,11 +5648,11 @@ SELECT					cb.name as candidate_name,
         con.close()
         return response
     
-    def add_edit_user_targer(created_by, From_Date, To_Date, target, is_active, user_id, user_target_id):
+    def add_edit_user_targer(created_by, From_Date, To_Date, product, target, is_active, user_id, user_target_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[users].[sp_add_edit_user_target] ?, ?, ?, ?, ?, ?,?'
-        values = (created_by, From_Date, To_Date, int(target), is_active, int(user_id), int(user_target_id))
+        sql = 'exec	[users].[sp_add_edit_user_target] ?, ?, ?, ?, ?, ?, ?,?'
+        values = (created_by, From_Date, To_Date, product, int(target), is_active, int(user_id), int(user_target_id))
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
