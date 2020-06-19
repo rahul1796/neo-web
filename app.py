@@ -6514,13 +6514,14 @@ class AddeEdittUserTarget(Resource):
                 created_by=g.user_id
                 From_Date=request.form['From_Date']
                 To_Date=request.form['To_Date']
+                product=request.form['product']
                 target=request.form['target']
                 is_active=request.form['isactive']
                 user_id=request.form['user_id']
                 user_target_id=request.form['user_target_id']
-                for i in (created_by, From_Date, To_Date, target, is_active, user_id, user_target_id):
-                    print(i)
-                out = UsersM.add_edit_user_targer(created_by, From_Date, To_Date, target, is_active, user_id, user_target_id)
+                # for i in (created_by, From_Date, To_Date, target, is_active, user_id, user_target_id):
+                #     print(i)
+                out = UsersM.add_edit_user_targer(created_by, From_Date, To_Date, product, target, is_active, user_id, user_target_id)
             except Exception as e:
                 out = {"PopupMessage":{"message":"Error " + str(e), "status":False}}
             finally:
