@@ -500,6 +500,8 @@ function Getusertarget(UserId,UserName)
                                 varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].To_Date +'</td>'; 
                                 varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].Product_Name +'</td>';                   
                                 varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].Target +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].User_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].Created_On +'</td>';
                                 varHtml+='</tr>';                            
                             }
                             $("#tbl_target tbody").append(varHtml);
@@ -578,10 +580,11 @@ function Getusertarget(UserId,UserName)
         to_date = moment(to_date).format('YYYY/MM/DD');
         //alert(to_date);
 
-        //alert($('#target').val())
-        //alert($('#ddlproduct').val())
-
-        var URL=$('#hdn_web_url').val()+ "/AddeEdittUserTarget";
+        if (from_date>to_date){
+            alert('Please select valid month-year')
+        }
+        else{
+            var URL=$('#hdn_web_url').val()+ "/AddeEdittUserTarget";
         $.ajax({
             type:"POST",
             url:URL,
@@ -621,6 +624,7 @@ function Getusertarget(UserId,UserName)
                 alert('error');
             }
         });
+        }
     }
     
     function onchange_roomtype(){

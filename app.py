@@ -6697,7 +6697,7 @@ class GetMobilizerReportDownload(Resource):
             Role = request.form["Role"]
             Date = request.form["Date"]
             
-            file_name='mobilizer_report_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            file_name='Mobilizer_Productivity_Report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
             #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
             
             resp = mobilizer_report_down.create_report(user_id, user_role_id, Role, Date, file_name)
