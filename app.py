@@ -6709,6 +6709,35 @@ class GetMobilizerReportDownload(Resource):
             #     return {"exceptione":str(e)}
 api.add_resource(GetMobilizerReportDownload,'/GetMobilizerReportDownload')
 
+#################################################################################################################################
+#OPS Productivity REPORT PAGE
+@app.route("/ops_productivity_report_page")
+def ops_productivity_report_page():
+    if g.user:
+        return render_template("Reports/ops-productivity-report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/ops_productivity_report")
+def ops_productivity_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="ops_productivity_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class DownloadOpsProductivityReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            month = request.form["month"]
+            role_id = request.form["role_id"]
+            customer_ids = request.form["customer_ids"]
+            contract_ids = request.form["contract_ids"]
+            print(month,role_id)
+            resp = Report.DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id)
+            return resp
+
+api.add_resource(DownloadOpsProductivityReport,'/DownloadOpsProductivityReport')
 ###############################################################################
 
 
