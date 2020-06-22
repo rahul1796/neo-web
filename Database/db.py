@@ -5659,7 +5659,9 @@ SELECT					cb.name as candidate_name,
         cur.commit()
         cur.close()
         con.close()
-        if pop ==1:
+        if pop ==2:
+            msg={"message":"Duplicate Month Target", "status":False}
+        elif pop ==1:
             msg={"message":"Updated", "status":True}
         else:
             msg={"message":"Created", "status":True}
