@@ -349,15 +349,15 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='sheet1') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Userwise') 
 
             df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Sub Project') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Sub Project') 
 
             df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Course') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Course') 
 
-            worksheet = writer.sheets['sheet1']
+            worksheet = writer.sheets['Userwise']
             default_column = ['COO']
             first_row = ['Enrolment', 'New Batch Start','Training Nos', 'Certification','Placement']
             second_row = ['Target', 'Actual','Target', 'Actual','Actual','Target', 'Actual','Target', 'Actual']
@@ -390,7 +390,7 @@ class Report:
             for col_num, value in enumerate(third_row):
                 worksheet.write(2, 1+col_num, value, header_format)
 
-            worksheet = writer.sheets['Sub Project']
+            worksheet = writer.sheets['User-Sub Project']
             default_column = ['COO','Sub Project']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
@@ -416,7 +416,7 @@ class Report:
             for col_num, value in enumerate(third_row):
                 worksheet.write(2, 2+col_num, value, header_format)
 
-            worksheet = writer.sheets['Course']            
+            worksheet = writer.sheets['User-Course']            
             default_column = ['COO','Course']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
@@ -457,15 +457,15 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='sheet1') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Userwise') 
 
             df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Sub Project') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Sub Project') 
 
             df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Course') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Course') 
 
-            worksheet = writer.sheets['sheet1']
+            worksheet = writer.sheets['Userwise']
             default_column = ['COO','TM']
             first_row = ['Enrolment', 'New Batch Start','Training Nos', 'Certification','Placement']
             second_row = ['Target', 'Actual','Target', 'Actual','Actual','Target', 'Actual','Target', 'Actual']
@@ -498,7 +498,7 @@ class Report:
             for col_num, value in enumerate(third_row):
                 worksheet.write(2, 2+col_num, value, header_format)
 
-            worksheet = writer.sheets['Sub Project']
+            worksheet = writer.sheets['User-Sub Project']
             default_column = ['COO','TM','Sub Project']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
@@ -524,7 +524,7 @@ class Report:
             for col_num, value in enumerate(third_row):
                 worksheet.write(2, 3+col_num, value, header_format)
 
-            worksheet = writer.sheets['Course']            
+            worksheet = writer.sheets['User-Course']            
             default_column = ['COO','TM','Course']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
@@ -565,15 +565,15 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='sheet1') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Userwise') 
 
             df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Sub Project') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Sub Project') 
 
             df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Course') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Course') 
 
-            worksheet = writer.sheets['sheet1']
+            worksheet = writer.sheets['Userwise']
             default_column = ['COO','TM','CM']
             first_row = ['Enrolment', 'New Batch Start','Training Nos', 'Certification','Placement']
             second_row = ['Target', 'Actual','Target', 'Actual','Actual','Target', 'Actual','Target', 'Actual']
@@ -606,7 +606,7 @@ class Report:
             for col_num, value in enumerate(third_row):
                 worksheet.write(2, 3+col_num, value, header_format)
 
-            worksheet = writer.sheets['Sub Project']
+            worksheet = writer.sheets['User-Sub Project']
             default_column = ['COO','TM','CM','Sub Project']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
@@ -632,7 +632,7 @@ class Report:
             for col_num, value in enumerate(third_row):
                 worksheet.write(2, 4+col_num, value, header_format)
 
-            worksheet = writer.sheets['Course']            
+            worksheet = writer.sheets['User-Course']            
             default_column = ['COO','TM','CM','Course']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
