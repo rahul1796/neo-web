@@ -83,6 +83,7 @@
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
                             $('#Batch_Status_report').show();
+                            $('#ops_productivity_report').show();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -116,6 +117,7 @@
                             $('#ECP_report').hide();
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -149,6 +151,7 @@
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
                             $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -181,6 +184,7 @@
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
                             $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -213,6 +217,7 @@
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
                             $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -241,10 +246,12 @@
                         $('#Insight_Menu').show();
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
+                            $('#AnchorCustomers').hide();
                         $('#Report_Menu').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -277,6 +284,7 @@
                             $('#ECP_report').show();
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -309,6 +317,7 @@
                             $('#ECP_report').hide();
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -341,6 +350,7 @@
                             $('#ECP_report').hide();
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -373,6 +383,7 @@
                             $('#ECP_report').hide();
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -405,6 +416,7 @@
                             $('#ECP_report').hide();
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -438,6 +450,7 @@
                             $('#ECP_report').hide();
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -472,6 +485,7 @@
                             $('#ECP_report').hide();
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
                         console.log(goto);
                         if(goto !="" && goto!="dashboard")
                             $("#box").load(goto);
@@ -507,6 +521,7 @@
                             $('#ECP_report').hide();
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
                         console.log(goto);
                         if(goto !="" && goto!="dashboard")
                             $("#box").load(goto);
@@ -634,6 +649,9 @@
 									<li  id="Mobilization_report_Menu" style="display:none">
                                         <a href="/MobilizationReport" id="Mobilization_report" class="active"> Mobilization Report<div class="button"></div></a>
                                     </li>
+                                    <li>
+										<a href="/ops_productivity_report" id="Ops_Productivity_Report" class="active">Ops Productivity Report<div class="button"></div></a>
+                                    </li>
                                     <li class="has-submenu"  id="TMA_content" style="display:none">
                                         <a href="#">Training Report <div class="arrow-down"></div></a>
                                         <ul class="submenu">                                    
@@ -688,6 +706,9 @@
                                     </li>
                                     <li id="Sector_Menu">
                                         <a id="AnchorSectors"  href="/trainer_dashboard" >Trainer Dashboard</a>
+                                    </li>
+                                    <li id="Customer_Dashboard_Menu">
+                                        <a id="AnchorCustomers"  href="/Customer_Dashboard" >Customer Dashboard</a>
                                     </li>
                                 </ul>
                             </li>
