@@ -4702,6 +4702,20 @@ def trainer_dashboard():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+@app.route("/Customer_Dashboard_Page")
+def Customer_Dashboard_Page():
+    if g.user:
+        return render_template("Report-powerbi/Customer_Dashboard.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/Customer_Dashboard")
+def Customer_Dashboard():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="Customer_Dashboard_Page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
 
 class Getcandidatebybatch(Resource):
     @staticmethod
