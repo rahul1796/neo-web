@@ -24,6 +24,7 @@ import candidate_report
 import user_subproject_download
 import batch_report
 import ecp_report_down
+import mobilizer_report_down
 import batch_candidate_download
 from Models import DownloadDump
 from lib.ms_sql import MsSql
@@ -4701,6 +4702,20 @@ def trainer_dashboard():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+@app.route("/Customer_Dashboard_Page")
+def Customer_Dashboard_Page():
+    if g.user:
+        return render_template("Report-powerbi/Customer_Dashboard.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/Customer_Dashboard")
+def Customer_Dashboard():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="Customer_Dashboard_Page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
 
 class Getcandidatebybatch(Resource):
     @staticmethod
@@ -5239,6 +5254,9 @@ class otp_send(Resource):
                     is_otp=1
                     if 'is_otp' in request.form:
                         is_otp=int(request.form['is_otp'])
+                    candidate_id=0
+                    if 'candidate_id' in request.form:
+                        candidate_id=int(request.form['candidate_id'])
                 except Exception as e:
                     res = {'success': False, 'description': "unable to read data " + str(e)}
                     return jsonify(res)
@@ -5246,7 +5264,7 @@ class otp_send(Resource):
                 for i in range(6):
                     otp += str(random.randint(0,9))
 
-                out = Database.otp_send_db(otp, mobile_no, app_name, flag)
+                out = Database.otp_send_db(otp, mobile_no, app_name, flag,candidate_id)
 
                 if out[0]==True:
                     res = {'success': False, 'description': "Mobile number already registered"}
@@ -6203,7 +6221,6 @@ class batch_download_report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(batch_download_report,'/batch_download_report')
 
-
 class GetECPReportDonload(Resource):
     @staticmethod
     def post():
@@ -6384,8 +6401,9 @@ class app_email_validation(Resource):
             client_id = request.args['client_id']
             client_key = request.args['client_key']
             email = request.args['email']
+            candidate_id=request.args.get('candidate_id',0,type=int)
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
-                if Database.app_email_validation(email):
+                if Database.app_email_validation(email,candidate_id):
                     out = {'success': True, 'description': "Email validation successfully"}  
                 else:
                     out = {'success': False, 'description': "Email validation failed(already exists)"}
@@ -6510,13 +6528,14 @@ class AddeEdittUserTarget(Resource):
                 created_by=g.user_id
                 From_Date=request.form['From_Date']
                 To_Date=request.form['To_Date']
+                product=request.form['product']
                 target=request.form['target']
                 is_active=request.form['isactive']
                 user_id=request.form['user_id']
                 user_target_id=request.form['user_target_id']
-                for i in (created_by, From_Date, To_Date, target, is_active, user_id, user_target_id):
-                    print(i)
-                out = UsersM.add_edit_user_targer(created_by, From_Date, To_Date, target, is_active, user_id, user_target_id)
+                # for i in (created_by, From_Date, To_Date, target, is_active, user_id, user_target_id):
+                #     print(i)
+                out = UsersM.add_edit_user_targer(created_by, From_Date, To_Date, product, target, is_active, user_id, user_target_id)
             except Exception as e:
                 out = {"PopupMessage":{"message":"Error " + str(e), "status":False}}
             finally:
@@ -6588,6 +6607,51 @@ class GetSubProjectPlannedBatches(Resource):
             return response
 api.add_resource(GetSubProjectPlannedBatches,'/GetSubProjectPlannedBatches')
 
+
+
+class get_enrolled_candidates_for_multiple_intervention(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            client_id = str(request.args['client_id'])
+            client_key = str(request.args['client_key'])            
+            user_id = request.args.get('user_id',0,type=int)
+            candidate_id = request.args.get('candidate_id',0,type=int)
+            app_version =request.args.get('app_version',0,type=int)
+            cand_name = request.args.get('cand_name','',type=str)
+            cand_mobile = request.args.get('cand_mobile','',type=str)
+            cand_email = request.args.get('cand_email','',type=str)
+            
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                out = Database.get_enrolled_candidates_for_multiple_intervention(user_id,app_version,cand_name,cand_mobile,cand_email,candidate_id)
+                return jsonify(out)
+                
+            else:
+                res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
+                return jsonify(res)
+
+api.add_resource(get_enrolled_candidates_for_multiple_intervention, '/get_enrolled_candidates_for_multiple_intervention')
+
+class get_candidate_details(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            client_id = str(request.args['client_id'])
+            client_key = str(request.args['client_key'])
+            user_id = request.args.get('user_id',0,type=int)
+            candidate_id = request.args.get('candidate_id',0,type=int)
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                out = Database.get_candidate_details(user_id,candidate_id)
+                return jsonify(out)
+                
+            else:
+                res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
+                return jsonify(res)
+
+#Base URL + "/get_candidate_list" api will provide all the unzynched QP data as response
+api.add_resource(get_candidate_details, '/get_candidate_details')
+
+
 class All_Course_basedon_rooms(Resource):
     @staticmethod
     def get():
@@ -6602,6 +6666,94 @@ class All_Course_basedon_rooms(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(All_Course_basedon_rooms,'/All_Course_basedon_rooms')
+
+#ECP REPORT PAGE
+@app.route("/mobilizer_producticity_report_page")
+def mobilizer_producticity_report_page():
+    if g.user:
+        return render_template("Reports/Mobilizer_Productivity_report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/mobilizer_productivity_report")
+def mobilizer_producticity_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="mobilizer_producticity_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class GetMobilizerReportData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                Role=request.args.get('Role','',type=str)
+                Date=request.args.get('Date','',type=str)
+                #print(user_id,user_role_id,Role, Date)
+                response = Report.GetMobilizerReportData(user_id,user_role_id,Role, Date)
+                
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetMobilizerReportData,'/GetMobilizerReportData')
+
+class GetMobilizerReportDownload(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            #try:
+                #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
+            
+            user_id = request.form["user_id"]
+            user_role_id = request.form["user_role_id"]
+            Role = request.form["Role"]
+            Date = request.form["Date"]
+            
+            file_name='Mobilizer_Productivity_Report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
+            
+            resp = mobilizer_report_down.create_report(user_id, user_role_id, Role, Date, file_name)
+            
+            return resp
+            #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            # except Exception as e:
+            #     #print(str(e))
+            #     return {"exceptione":str(e)}
+api.add_resource(GetMobilizerReportDownload,'/GetMobilizerReportDownload')
+
+#################################################################################################################################
+#OPS Productivity REPORT PAGE
+@app.route("/ops_productivity_report_page")
+def ops_productivity_report_page():
+    if g.user:
+        return render_template("Reports/ops-productivity-report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/ops_productivity_report")
+def ops_productivity_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="ops_productivity_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class DownloadOpsProductivityReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            month = request.form["month"]
+            role_id = request.form["role_id"]
+            customer_ids = request.form["customer_ids"]
+            contract_ids = request.form["contract_ids"]
+            print(month,role_id)
+            resp = Report.DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id)
+            return resp
+
+api.add_resource(DownloadOpsProductivityReport,'/DownloadOpsProductivityReport')
+###############################################################################
+
 
 
 if __name__ == '__main__':

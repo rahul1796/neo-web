@@ -1,0 +1,339 @@
+<link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
+
+<script type="text/javascript">
+    var Candidates = {};
+        $(document).ready(function(){  
+            $("#imgSpinner").hide();
+
+            $("#tbl_list").dataTable().fnDestroy();
+            $("#tbl_list tbody").empty();
+            //$("#tbl_list tbody").append('<tr><td colspan="22" style="text-align:center;">No records found</td></tr>');
+
+            $("#tbl_list").DataTable({
+                //"overflow": "auto"
+                //"white-space": "nowrap",
+                "scrollX": true
+                });
+
+            //$('.dropdown-search-filter').select2();
+        });
+
+        function LoadTableBasedOnSearch()
+        {
+            if($('#To_Date').val()=='')
+            {
+                alert("Please select date.");
+            }
+            else
+            {
+                
+            var to_date = new Date($('#To_Date').val());
+            to_date = new Date(to_date.getFullYear(), to_date.getMonth() + 1, 0);
+            to_date = moment(to_date).format('YYYY/MM/DD');
+            var URL=$('#hdn_web_url').val()+ "/GetMobilizerReportData";
+            //alert(to_date)
+
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                overflow:true,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                        "user_id": $('#hdn_home_user_id').val(),
+                        "user_role_id" : $('#hdn_home_user_role_id').val(),
+                        "Role": $('#ddlRole').val(),
+                        "Date" : to_date
+                    },
+                success: function (data){
+                    varHtml='';
+                    let varTxt='';
+                    $("#tbl_list").dataTable().fnDestroy();
+                    $("#tbl_list tbody").empty();
+                    if(!jQuery.isEmptyObject(data))
+                    {   
+                        if (data.Data != null){
+                            var count=data.Data.length;
+                            if( count> 0)
+                            {
+                                for(var i=0;i<count;i++)
+                                {
+                                
+                                    varHtml+='<tr>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].User_Name +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Email +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].User_Role_Name +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Product +'</td>';
+                                    //let varLink='<a onclick="GetContractProjectTargets(\'' + data.Data[i].Region_Id + '\',\'' + data.Data[i].Contract_Id + '\',\'' + data.Data[i].Contract_Name + '\')"  style="color:blue;cursor:pointer" >' + data.Data[i].Contract_Name + '</a>';
+                                    //varHtml+='  <td style="text-align:center;">'+ varLink +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Conversion_Criteria +'</td>';
+
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].U_M_Target +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].E_M_Count +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Mper +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].P_M_Target +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].E_M_Count +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Mpper +'</td>';
+
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].U_Q_Target +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].E_Q_Count +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Qper +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].P_Q_Target +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].E_Q_Count +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Qpper +'</td>';
+
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].U_Y_Target +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].E_Y_Count +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Yper +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].P_Y_Target +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].E_Y_Count +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Ypper +'</td>';
+                                    varHtml+='</tr>';
+                                }
+                            }
+                            $("#tbl_list tbody").append(varHtml);
+                            $("#tbl_list").DataTable({
+                                "scrollX": true,
+                                drawCallback: function(){
+                                            $('#tbl_list_paginate ul.pagination').addClass("pagination-rounded");
+                                        }
+                            });
+                        }
+                        else
+                        {
+                            varHtml='<tr><td colspan="23" style="text-align:center;">No records found</td></tr>'
+                            $("#tbl_list tbody").append(varHtml);
+                        }
+                    }
+                    else
+                    {
+                        varHtml='<tr><td colspan="23" style="text-align:center;">No records found</td></tr>'
+                        $("#tbl_list tbody").append(varHtml);
+                    }   
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            }
+        }
+        
+    function DownloadTableBasedOnSearch(){
+        $("#imgSpinner").show();
+        // from candidate
+        if($('#To_Date').val()=='')
+            {
+                alert("Please select date.");
+                $("#imgSpinner").hide();
+            }
+        else{
+            var to_date = new Date($('#To_Date').val());
+            to_date = new Date(to_date.getFullYear(), to_date.getMonth() + 1, 0);
+            to_date = moment(to_date).format('YYYY/MM/DD');
+            
+            var URL=$('#hdn_web_url').val()+ "/GetMobilizerReportDownload"
+            $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: URL, 
+                        data: {
+                            "user_id": $('#hdn_home_user_id').val(),
+                            "user_role_id" : $('#hdn_home_user_role_id').val(),
+                            "Role": $('#ddlRole').val(),
+                            "Date" : to_date
+                        },
+                        success: function(resp) 
+                        {
+    
+                            if (resp.Status){
+                                var varAnchor = document.getElementById('lnkDownload');
+                                varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
+                                $("#imgSpinner").hide();
+                                try 
+                                    { 
+                                        //in firefox
+                                        varAnchor.click();
+                                        return;
+                                    } catch(ex) {}
+                                    
+                                    try 
+                                    { 
+                                        // in chrome
+                                        if(document.createEvent) 
+                                        {
+                                            var e = document.createEvent('MouseEvents');
+                                            e.initEvent( 'click', true, true );
+                                            varAnchor.dispatchEvent(e);
+                                            return;
+                                        }
+                                    } catch(ex) {}
+                                    
+                                    try 
+                                    { 
+                                        // in IE
+                                        if(document.createEventObject) 
+                                        {
+                                             var evObj = document.createEventObject();
+                                             varAnchor.fireEvent("onclick", evObj);
+                                             return;
+                                        }
+                                    } catch(ex) {}
+                                
+                            }
+                            else{
+                                console.log(resp)
+                                //alert('Not success')
+                                $("#imgSpinner").hide();
+                                
+                            }
+                        },
+                        error:function()
+                        {
+                            //$("#imgSpinner").hide();
+                        }
+                    });
+            
+        }
+        //$("#imgSpinner").hide();
+    }
+    
+    function ForceDownload(varUrl, varFileName)
+            {
+                var link = document.createElement('a');
+                link.setAttribute('href', varUrl);
+                link.setAttribute('download', varFileName);
+                link.setAttribute('target', '_blank');
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+</script>
+</br>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card-box">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label for="ddlRole" class="mr-2">Role</label>
+                        <select class="form-control"  id="ddlRole"> <!-- dropdown-search-filter-->>
+                            <option selected="" value="">All</option>
+                            <option  value="2">Mobilizer</option>
+                            <option  value="24">Counsellor</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="To_Date" class="mr-2">Month Year</label>
+                        <input type="month" class="form-control" name="To_Date" id="To_Date" placeholder="To Date" ClientIdMode="static" required>
+                    </div>
+                    <div class="col-lg-1" >
+                        <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" 
+                                onclick="LoadTableBasedOnSearch()">Search</button>
+                    </div>
+                    <div class="form-group col-lg-2">                                         
+                        <a class="btn btn-primary" style="float: right; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
+                        <a id="lnkDownload" style="display:none;"></a>
+                    </div>
+                    <div class="form-group col-lg-3">
+                        <div id="imgSpinner">
+                            <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-block;"/>
+                            <label style="display:inline-block;">Please wait while downloading report...</label>
+                        </div> 
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <h4 class="header-title"></h4>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="col-lg-12">
+                        <table id="tbl_list" class="table w-100 nowrap dataTable no-footer">
+                            <thead>
+                                <tr>
+                                    <th rowspan="3" style="text-align:center;">User</th>
+                                    <th rowspan="3" style="text-align:center;">Email</th>
+                                    <th rowspan="3" style="text-align:center;">Role</th>
+                                    <th rowspan="3" style="text-align:center;">Product</th>
+                                    <th rowspan="3" style="text-align:center;">Conversion Criteria</th>
+                                    <th colspan="6" style="text-align:center;">MTD</th>
+                                    <th colspan="6" style="text-align:center;">QTD</th>
+                                    <th colspan="6" style="text-align:center;">YTD</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="3" style="text-align:center;">Mobilization</th>
+                                    <th colspan="3" style="text-align:center;">Conversion</th>
+                                    <th colspan="3" style="text-align:center;">Mobilization</th>
+                                    <th colspan="3" style="text-align:center;">Conversion</th>
+                                    <th colspan="3" style="text-align:center;">Mobilization</th>
+                                    <th colspan="3" style="text-align:center;">Conversion</th>
+                                </tr>
+                                
+                                <tr>
+                                <!--
+                                    <th style="text-align:center;">Mobilizer</th>
+                                    <th style="text-align:center;">Role</th>
+                                    <th style="text-align:center;">Product</th>
+                                    <th style="text-align:center;">Conversion Criteria</th>
+                                -->
+                                    <th style="text-align:center;">Target</th>
+                                    <th style="text-align:center;">Actuals</th>
+                                    <th style="text-align:center;">%</th>
+                                    <th style="text-align:center;">Project Mandate</th>
+                                    <th style="text-align:center;">Actuals</th>
+                                    <th style="text-align:center;">%</th>
+                                    <th style="text-align:center;">Target</th>
+                                    <th style="text-align:center;">Actuals</th>
+                                    <th style="text-align:center;">%</th>
+                                    <th style="text-align:center;">Project Mandate</th>
+                                    <th style="text-align:center;">Actuals</th>
+                                    <th style="text-align:center;">%</th>
+                                    <th style="text-align:center;">Target</th>
+                                    <th style="text-align:center;">Actuals</th>
+                                    <th style="text-align:center;">%</th>
+                                    <th style="text-align:center;">Project Mandate</th>
+                                    <th style="text-align:center;">Actuals</th>
+                                    <th style="text-align:center;">%</th>
+                                    
+                                </tr>
+                            </thead>                        
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div> <!-- end card body-->                
+            </div> <!-- end card -->
+        </div><!-- end col-->
+    </div>
+</div>
+
+<!-- third party js -->
+<script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
+<script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>  
+<!-- third party js ends -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>

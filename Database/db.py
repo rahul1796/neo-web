@@ -4490,10 +4490,10 @@ SELECT					cb.name as candidate_name,
         else:
             return {'success': False, 'description': 'stored procedure not return true/false','app_status':False}
     
-    def otp_send_db(otp, mobile_no, app_name, flag):
+    def otp_send_db(otp, mobile_no, app_name, flag,candidate_id):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
-        quer = "call [masters].[sp_mobile_otp_verification]('{}','{}',{},'{}')".format(mobile_no, otp, flag, app_name)
+        quer = "call [masters].[sp_mobile_otp_verification]('{}','{}',{},'{}',{})".format(mobile_no, otp, flag, app_name,candidate_id)
         quer = "{"+ quer + "}"
         curs.execute(quer)
         data = curs.fetchall()[0]
@@ -5417,12 +5417,13 @@ SELECT					cb.name as candidate_name,
         print(out)
         return out
 
-    def app_email_validation(email):
+    def app_email_validation(email, candidate_id=0):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
-        quer = "select count(*) as email_count from candidate_details.tbl_candidates where coalesce(email_id,'')!='' and is_active=1 and email_id like '{}'".format(email)
+        quer = "EXEC [candidate_details].[sp_app_email_validation] ?,?"
         #quer = "{"+ quer + "}"
-        curs.execute(quer)
+        values=(email, candidate_id)
+        curs.execute(quer,values)
         return curs.fetchall()[0][0]<=0
 
 
@@ -5579,6 +5580,56 @@ SELECT					cb.name as candidate_name,
             msg={"message":"Created", "status":True}
         return msg
 
+    def get_enrolled_candidates_for_multiple_intervention(user_id,app_version,cand_name,cand_mobile,cand_email,candidate_id):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "SELECT TOP (1) version_code FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        curs.execute(quer)
+        data=curs.fetchall()
+        data = '' if data==[] else data[0][0]
+        if int(app_version) < int(data):
+            curs.close()
+            conn.close()
+            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            return out
+        sql = 'exec [candidate_details].[sp_get_enrolled_candidates_for_mutiple_intervention]  ?, ?,?,?,?'        
+        values = (user_id,cand_name,cand_mobile,cand_email,candidate_id)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        response = []
+        h={}
+        for row in curs:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        curs.close()
+        conn.close()
+        out = {'success': True, 'description': "Successful", 'app_status':True, 'candidates':response}
+        return out
+    def get_candidate_details(user_id,candidate_id):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        sql = 'exec [candidate_details].[sp_get_candidate_details]  ?, ?'
+        filenmae = 'candidate_detail_'+str(candidate_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xml'
+        
+        values = (user_id,candidate_id)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        response = []
+        h={}
+        for row in curs:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        df = pd.DataFrame(response)
+        df = df.fillna('')
+        curs.close()
+        conn.close()
+        df.to_xml(candidate_xmlPath + filenmae)
+        out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
+        return out
+
+
     def GetUserTarget(user_id):
         response = []
         h={}
@@ -5597,18 +5648,20 @@ SELECT					cb.name as candidate_name,
         con.close()
         return response
     
-    def add_edit_user_targer(created_by, From_Date, To_Date, target, is_active, user_id, user_target_id):
+    def add_edit_user_targer(created_by, From_Date, To_Date, product, target, is_active, user_id, user_target_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[users].[sp_add_edit_user_target] ?, ?, ?, ?, ?, ?,?'
-        values = (created_by, From_Date, To_Date, int(target), is_active, int(user_id), int(user_target_id))
+        sql = 'exec	[users].[sp_add_edit_user_target] ?, ?, ?, ?, ?, ?, ?,?'
+        values = (created_by, From_Date, To_Date, product, int(target), is_active, int(user_id), int(user_target_id))
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
         cur.commit()
         cur.close()
         con.close()
-        if pop ==1:
+        if pop ==2:
+            msg={"message":"Duplicate Month Target", "status":False}
+        elif pop ==1:
             msg={"message":"Updated", "status":True}
         else:
             msg={"message":"Created", "status":True}
@@ -5630,3 +5683,66 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return response
+
+    def GetMobilizerReportData(user_id,user_role_id,Role, Date):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [reports].[sp_get_mobilization_report_data] ?, ?, ?, ?'
+        values = (user_id,user_role_id,Role, Date)
+        #print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return {"Data":response}
+    
+    def DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        sheet2=[]
+        sheet2_columns=[]
+        sheet3=[]
+        sheet3_columns=[]
+        sql=''
+        sql1=''
+        sql2=''
+        if int(role_id)==11:
+            sql = 'exec [reports].[sp_get_ops_productivity_report_data_coo] ?, ?, ?'
+            sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_sub_project] ?, ?, ?'
+            sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_course] ?, ?, ?'
+        if int(role_id)==14:
+            sql = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager] ?, ?, ?'
+            sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_sub_project] ?, ?, ?'
+            sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_course] ?, ?, ?'
+        if int(role_id)==5:
+            sql = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager] ?, ?, ?'
+            sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_sub_project] ?, ?, ?'
+            sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_course] ?, ?, ?'
+        values = (customer_ids, contract_ids, month)
+        
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))
+        
+
+        curs.execute(sql1,(values))
+        sheet2_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet2 = list(map(lambda x:list(x), data))
+
+        curs.execute(sql2,(values))
+        sheet3_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet3 = list(map(lambda x:list(x), data))
+        return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
+        cur2.close()
+        con.close()

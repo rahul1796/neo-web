@@ -26,6 +26,6 @@ class UsersM:
         return popupMessage
     def GetUserTargets(user_id):
         return {"UserTarget":Database.GetUserTarget(user_id)}
-    def add_edit_user_targer(created_by, From_Date, To_Date, target, is_active, user_id, user_target_id):
-        popupMessage = {"PopupMessage": Database.add_edit_user_targer(created_by, From_Date, To_Date, target, is_active, user_id, user_target_id)}
+    def add_edit_user_targer(created_by, From_Date, To_Date, product, target, is_active, user_id, user_target_id):
+        popupMessage = {"PopupMessage": Database.add_edit_user_targer(created_by, From_Date, To_Date, product, target, is_active, user_id, user_target_id)}
         return popupMessage

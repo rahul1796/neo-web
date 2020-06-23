@@ -495,10 +495,13 @@ function Getusertarget(UserId,UserName)
                                 td_close=   '</td>';       
                                 varHtml+='<tr>';
                                 varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].S_No +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+'<a onclick="EditModal(\'' + data.UserTarget[i].From_Date_Form + '\',\'' + data.UserTarget[i].To_Date_Form + '\',\'' + data.UserTarget[i].Target + '\',\'' + data.UserTarget[i].User_Id + '\',\'' + data.UserTarget[i].Is_Active + '\',\'' + data.UserTarget[i].User_Target_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Room" class="fas fa-edit" ></i></a>'+'</td>';
+                                varHtml+='  <td style="text-align:center;">'+'<a onclick="EditModal(\'' + data.UserTarget[i].From_Date_Form + '\',\'' + data.UserTarget[i].To_Date_Form + '\',\'' +  data.UserTarget[i].Product + '\',\'' + data.UserTarget[i].Target + '\',\'' + data.UserTarget[i].User_Id + '\',\'' + data.UserTarget[i].Is_Active + '\',\'' + data.UserTarget[i].User_Target_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Monthly Target" class="fas fa-edit" ></i></a>'+'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].From_Date +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].To_Date +'</td>';                    
+                                varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].To_Date +'</td>'; 
+                                varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].Product_Name +'</td>';                   
                                 varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].Target +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].User_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.UserTarget[i].Created_On +'</td>';
                                 varHtml+='</tr>';                            
                             }
                             $("#tbl_target tbody").append(varHtml);
@@ -542,15 +545,16 @@ function Getusertarget(UserId,UserName)
         $('#isactive').prop('checked',true);
         $('#From_Date').val('');
         $('#To_Date').val('');
+        $('#ddlproduct').val('1');
         $('#target').val('');
         $('#hdn_user_target_id').val("0");
         $('#hdn_user_id_m2').val($('#hdn_modal_user_id').val()); 
         
-        //$('#mdl_room_center').modal('hide');
+        $('#mdl_user_target').modal('hide');
         $('#mdl_add_edit_targets').modal('show');
     }
     
-    function EditModal(From_Date, To_Date, Target, User_Id, Is_Active, User_Target_Id)
+    function EditModal(From_Date, To_Date, Product, Target, User_Id, Is_Active, User_Target_Id)
     {   
         if(Is_Active)
             $('#isactive').prop('checked',true);
@@ -558,10 +562,11 @@ function Getusertarget(UserId,UserName)
             $('#isactive').prop('checked',false);
         $('#From_Date').val(From_Date);
         $('#To_Date').val(To_Date);
+        $('#ddlproduct').val(Product);
         $('#target').val(Target);
         $('#hdn_user_target_id').val(User_Target_Id);
         $('#hdn_user_id_m2').val($('#hdn_modal_user_id').val()); 
-        //$('#mdl_room_center').modal('hide');
+        $('#mdl_user_target').modal('hide');
         $('#mdl_add_edit_targets').modal('show');
         
     }
@@ -575,9 +580,11 @@ function Getusertarget(UserId,UserName)
         to_date = moment(to_date).format('YYYY/MM/DD');
         //alert(to_date);
 
-        //alert($('#target').val())
-
-        var URL=$('#hdn_web_url').val()+ "/AddeEdittUserTarget";
+        if (from_date>to_date){
+            alert('Please select valid month-year')
+        }
+        else{
+            var URL=$('#hdn_web_url').val()+ "/AddeEdittUserTarget";
         $.ajax({
             type:"POST",
             url:URL,
@@ -587,7 +594,8 @@ function Getusertarget(UserId,UserName)
                 "target" : $('#target').val(),
                 "isactive" : $('#isactive').prop('checked'),
                 "user_id":$('#hdn_user_id_m2').val(),
-                "user_target_id":$('#hdn_user_target_id').val()
+                "user_target_id":$('#hdn_user_target_id').val(),
+                "product":$('#ddlproduct').val()
             },
             success:function(data){
                 var message="",title="",icon="";
@@ -616,6 +624,7 @@ function Getusertarget(UserId,UserName)
                 alert('error');
             }
         });
+        }
     }
     
     function onchange_roomtype(){
