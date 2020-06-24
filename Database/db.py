@@ -5235,8 +5235,8 @@ SELECT					cb.name as candidate_name,
             print(str(e))
         return out
     def upload_assessment_result(df,user_id,assessment_id,batch_id,stage_id):
-        try:            
-            print(str(df.to_json(orient='records')))
+        try: 
+            # print(str(df.to_json(orient='records')))
             con = pyodbc.connect(conn_str)
             cur = con.cursor()            
             json_str=df.to_json(orient='records')
@@ -5245,18 +5245,25 @@ SELECT					cb.name as candidate_name,
             cur.execute(sql,(values))
             for row in cur:
                 pop=row[0]
+
             cur.commit()
             cur.close()
             con.close()
             if pop >0 :
                 Status=True
                 msg="Uploaded Successfully"
+            elif pop==-1:
+                msg="Only one batch data allowed at a time"
+                Status=False
+            elif pop==-2:
+                msg="Wrong batch to upoload assesment"
+                Status=False
             else:
                 msg="Wrong Batch code/Enrollment Id"
                 Status=False
             return {"Status":Status,'message':msg}
         except Exception as e:
-            print(str(e))
+            # print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
 
     def GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
