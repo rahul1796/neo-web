@@ -1319,6 +1319,7 @@ class candidate_list(Resource):
         if request.method == 'POST':
             candidate_id = request.form['candidate_id']
             sub_project = request.form['sub_project']
+            batch_id = request.form['batch_id']
             project = request.form['project']
             region = request.form['region']
             customer = request.form['customer']
@@ -1341,7 +1342,7 @@ class candidate_list(Resource):
             draw=request.form['draw']
             
             #print(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-            return Candidate.candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, Contracts, candidate_stage, from_date, to_date)
+            return Candidate.candidate_list(candidate_id,customer,project,sub_project,batch_id,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, Contracts, candidate_stage, from_date, to_date)
 
 class user_sub_project_list(Resource):
     @staticmethod
@@ -4419,6 +4420,21 @@ class get_subproject_basedon_proj_multiple(Resource):
             return {"Sub_Project": Database.get_subproject_basedon_proj_multiple(user_id,user_role_id,project_id)} 
 api.add_resource(get_subproject_basedon_proj_multiple,'/get_subproject_basedon_proj_multiple')
 
+class get_batches_basedon_sub_proj_multiple(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            sub_project_id=request.form['SubProjectId']
+            user_id=0
+            if 'user_id' in request.form:
+                user_id=request.form['user_id']
+            user_role_id=0
+            if 'user_role_id' in request.form:
+                user_role_id=request.form['user_role_id']
+            return {"Batches": Database.get_batches_basedon_sub_proj_multiple(user_id,user_role_id,sub_project_id)} 
+api.add_resource(get_batches_basedon_sub_proj_multiple,'/get_batches_basedon_sub_proj_multiple')
+
+
 #QP_API's
 @app.route("/sales_dashboard_page")
 def sales_dashboard_page():
@@ -4729,6 +4745,18 @@ class Getcandidatebybatch(Resource):
                 return {'exception':str(e)}
 api.add_resource(Getcandidatebybatch,'/Getcandidatebybatch')
 
+class CandidateFamilyDetails(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                candidate_id=request.args.get('candidate_id',0,type=int)
+                response = Database.CandidateFamilyDetails(candidate_id)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(CandidateFamilyDetails,'/CandidateFamilyDetails')
+
 #####################################################################################################
 #Project_API's
 @app.route("/my_project_list_page")
@@ -4973,6 +5001,7 @@ class candidate_download_report(Resource):
                 customer = request.form["customer"]
                 project = request.form["project"]
                 sub_project = request.form["sub_project"]
+                batch = request.form["batch"]
                 region = request.form["region"]
                 center = request.form["center"]
                 center_type = request.form["center_type"]
@@ -4985,7 +5014,7 @@ class candidate_download_report(Resource):
                 file_name='candidate_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
                 #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
 
-                resp = candidate_report.create_report(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name,Contracts, candidate_stage, from_date, to_date)
+                resp = candidate_report.create_report(candidate_id, user_id, user_role_id, status, customer, project, sub_project, batch, region, center, center_type, file_name,Contracts, candidate_stage, from_date, to_date)
                 
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}

@@ -1238,15 +1238,16 @@ class Database:
         con.close()
         return h
 
-    def candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, Contracts, candidate_stage, from_date, to_date):
+    def candidate_list(candidate_id,customer,project,sub_project,batch,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, Contracts, candidate_stage, from_date, to_date):
         content = {}
         d = []
         h={}
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?'
-        values = (candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,Contracts, candidate_stage, from_date, to_date)
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new] ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?'
+        values = (candidate_id,customer,project,sub_project,batch,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,Contracts, candidate_stage, from_date, to_date)
+        print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -3734,6 +3735,25 @@ SELECT					cb.name as candidate_name,
         con.close()
         return courses
 
+    def get_batches_basedon_sub_proj_multiple(user_id,user_role_id,sub_project_id):
+        Batches = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+
+        sql = 'exec [masters].[sp_get_batches_based_on_sub_projects] ?,?,?'
+        values=(user_id,user_role_id,sub_project_id)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for r in cur2:
+            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            Batches.append(h)
+        cur2.close()
+        con.close()
+        #print(Batches)
+        return Batches
+
+
     def Get_all_industry_db():
         response=[]
         con = pyodbc.connect(conn_str)
@@ -4166,7 +4186,26 @@ SELECT					cb.name as candidate_name,
         con.close() 
         print(response)      
         return out
-
+    def CandidateFamilyDetails(candidate_id):
+        response = []
+        
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        h={}
+        sql = 'exec [candidate_details].[sp_get_candidate_family_details]  ?'
+        values = (candidate_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+            response.append(h.copy())
+        out = {"Members":response}
+        cur.close()
+        con.close() 
+        print(out)      
+        return out
     def GetSubProjectsForuser(user_id):
         response = []
         h={}

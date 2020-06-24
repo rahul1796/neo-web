@@ -1,4 +1,4 @@
-def create_report(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name, Contracts, candidate_stage, from_date, to_date):
+def create_report(candidate_id, user_id, user_role_id, status, customer, project, sub_project,batch, region, center, center_type, file_name, Contracts, candidate_stage, from_date, to_date):
     '''from datetime import datetime
     start_time = datetime.now()
     
@@ -39,8 +39,8 @@ def create_report(candidate_id, user_id, user_role_id, status, customer, project
 
         cnxn=pyodbc.connect(config.conn_str) #
         curs = cnxn.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_download_list_new] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (candidate_id, customer, project, sub_project, region, center, center_type, status, user_id, user_role_id, Contracts, candidate_stage, from_date, to_date)
+        sql = 'exec [candidate_details].[sp_get_candidate_download_list_new] ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (candidate_id, customer, project, sub_project,batch, region, center, center_type, status, user_id, user_role_id, Contracts, candidate_stage, from_date, to_date)
         curs.execute(sql,(values))
 
         #columns = [column[0].title() for column in curs.description]
