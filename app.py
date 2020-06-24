@@ -80,6 +80,8 @@ mob_validation = [CustomElementValidation(lambda d: check_mob_number(d), 'invali
 pincode_validation = [CustomElementValidation(lambda d: check_pincode(d), 'invalid pincode')]
 null_validation = [CustomElementValidation(lambda d: d is not np.nan, 'this field cannot be null')]
 dob_validation = [CustomElementValidation(lambda d: check_dob(d), 'either date or age is not valid')]
+status_validation = [CustomElementValidation(lambda d: d.lower() in ['certified','notcertified'], 'invalid status (certified, notcertified allowed)')]
+flt_validation = [CustomElementValidation(lambda d: d.replace('.', '', 1).isdigit(), 'invalid score (number allowed)')]
 
 
 #from lib.log import Log
@@ -6156,6 +6158,13 @@ class upload_assessment_result(Resource):
 
                 df= pd.read_excel(file_name,sheet_name='Template')
                 df = df.fillna('')
+                def check_dob(date_age):
+                    try:
+                        date_age = str(date_age)
+                        return re.match(r"[A-Za-z0-9!@#$%\\&\*\.\,\+-_\s]+",date_age).group()==date_age
+                    except:
+                        return False
+
                 schema = Schema([
                         #str+null check
                         Column('Enrolment_No',str_validation + null_validation),
@@ -6166,9 +6175,9 @@ class upload_assessment_result(Resource):
                         Column('Assessment_Type',str_validation + null_validation),
                         Column('Assessment_Date',str_validation + null_validation),
                         Column('Attendance(Absent_Present)',str_validation + null_validation),
-                        Column('Score',str_validation + null_validation),
+                        Column('Score',flt_validation),
                         Column('Grade',str_validation + null_validation),
-                        Column('Status(Certified_Notcertified)',str_validation + null_validation)
+                        Column('Status(Certified_Notcertified)',status_validation)
                         ])
                 errors = schema.validate(df)
                 errors_index_rows = [e.row for e in errors]
