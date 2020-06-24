@@ -270,6 +270,46 @@ function LoadSubProject(){
     return false;
 }
 
+function LoadBatches(){
+    //alert($('#ddlProject').val().toString())
+    var URL=$('#hdn_web_url').val()+ "/get_batches_basedon_sub_proj_multiple"
+    $.ajax({
+        type:"POST",
+        url:URL,
+        async:false,
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "SubProjectId":$('#ddlSubProject').val().toString(),
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
+        },
+        success: function (data){
+            if(data.Batches != null)
+            {
+                $('#ddlBatches').empty();
+                var count=data.Batches.length;
+                if( count> 0)
+                {
+                    //$('#ddlCourse').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlBatches').append(new Option(data.Batches[i].Batch_Code,data.Batches[i].Batch_Id));
+                }
+                else
+                {
+                    $('#ddlBatches').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
 function LoadCenter(){
     var URL=$('#hdn_web_url').val()+ "/get_cand_center_basedon_course_multiple"
     $.ajax({
@@ -336,6 +376,7 @@ function LoadTable()
                 d.customer = $('#ddlClient').val().toString();
                 d.project = $('#ddlProject').val().toString();
                 d.sub_project = $('#ddlSubProject').val().toString();
+                d.batch_id =  $('#ddlBatches').val().toString();
                 d.region = $('#ddlRegion').val().toString();
                 d.center = $('#ddlCenter').val().toString();
                 d.center_type = $('#ddlCenterType').val().toString();
@@ -372,7 +413,12 @@ function LoadTable()
                     return varButtons;
                 }
             },
-            
+            {      
+                "data": function (row, type, val, meta) {
+                    var varButtons='<a onclick="CandidateFamilyDetails(\'' + row.Candidate_Id+ '\')"  style="color:blue;cursor:pointer" >Click Here</a>';
+                    return varButtons;
+                }
+            },
             {      
                 "data": function (row, type, val, meta) {
                     var varButtons='<a onclick="CandidateIDDetails(\'' + row.Aadhar_No+ '\',\'' + row.Identifier_Type+ '\',\'' + row.Identity_Numbe+ '\')"  style="color:blue;cursor:pointer" >Click Here</a>';
@@ -469,6 +515,69 @@ function CandidateIDDetails(Aadhar_No,    Identifier_Type,    Identity_Numbe)
     $('#mdl_cand_identity').modal('show');
 }
 
+function CandidateFamilyDetails(Candidate_Id)
+{    
+   
+    var URL=$('#hdn_web_url').val()+ "/CandidateFamilyDetails?candidate_id="+Candidate_Id;
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            varHtml='';
+            let varTxt='';
+            $("#tbl_candidate_family tbody").empty();
+            if(!jQuery.isEmptyObject(data))
+            {   
+                if (data.Members != null){
+                    var count=data.Members.length;
+                    if( count> 0)
+                    {
+                        for(var i=0;i<count;i++)
+                        {                            
+                            var txt=''
+                            varHtml+='<tr>';
+                            varHtml+='  <td style="text-align:left;">'+ data.Members[i].S_No +'</td>';
+                            varHtml+='  <td style="text-align:left;">'+ data.Members[i].Member_Name +'</td>';
+                            varHtml+='  <td style="text-align:left;">'+ data.Members[i].Relation +'</td>';
+                            varHtml+='  <td style="text-align:left;">'+ data.Members[i].Dob +'</td>';
+                            varHtml+='  <td style="text-align:left;">'+ data.Members[i].Age +'</td>';
+                            varHtml+='  <td style="text-align:left;">'+ data.Members[i].Occupation +'</td>';
+                            varHtml+='  <td style="text-align:left;">'+ data.Members[i].Gender +'</td>';
+                            varHtml+='  <td style="text-align:left;">'+ data.Members[i].Contact +'</td>';
+                            varHtml+='</tr>';
+
+                        }                        
+                    }
+                    $("#tbl_candidate_family tbody").append(varHtml);
+                    
+                }
+                else
+                {
+                    varHtml='<tr><td colspan="8" style="text-align:center;">No records found</td></tr>'
+                    $("#tbl_candidate_family tbody").append(varHtml);
+                    
+                }
+            }
+            else
+            {
+                varHtml='<tr><td colspan="8" style="text-align:center;">No records found</td></tr>'
+                $("#tbl_candidate_family tbody").append(varHtml);
+                
+            }   
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    $('#mdl_cand_family').modal('show');
+}
+
 
 function DownloadTableBasedOnSearch(){
     $("#imgSpinner").show();
@@ -504,6 +613,7 @@ function DownloadTableBasedOnSearch(){
                             'customer':$('#ddlClient').val().toString(),
                             'project': $('#ddlProject').val().toString(),
                             'sub_project':$('#ddlSubProject').val().toString(),
+                            'batch':$('#ddlBatches').val().toString(),
                             'region':$('#ddlRegion').val().toString(),
                             'center':$('#ddlCenter').val().toString(),
                             'center_type':$('#ddlCenterType').val().toString(),
