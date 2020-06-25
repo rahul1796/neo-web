@@ -81,7 +81,7 @@ pincode_validation = [CustomElementValidation(lambda d: check_pincode(d), 'inval
 null_validation = [CustomElementValidation(lambda d: d is not np.nan, 'this field cannot be null')]
 dob_validation = [CustomElementValidation(lambda d: check_dob(d), 'either date or age is not valid')]
 status_validation = [CustomElementValidation(lambda d: d.lower() in ['certified','notcertified'], 'invalid status (certified, notcertified allowed)')]
-flt_validation = [CustomElementValidation(lambda d: d.replace('.', '', 1).isdigit(), 'invalid score (number allowed)')]
+flt_validation = [CustomElementValidation(lambda d: str(d).replace('.', '', 1).isdigit(), 'invalid score (number allowed)')]
 
 
 #from lib.log import Log
