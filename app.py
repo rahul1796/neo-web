@@ -6768,6 +6768,20 @@ def ops_productivity_report():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+@app.route("/region_productivity_report_page")
+def region_productivity_report_page():
+    if g.user:
+        return render_template("Reports/region_wise_productivity_report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/region_productivity_report")
+def region_productivity_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="region_productivity_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
 class DownloadOpsProductivityReport(Resource):
     @staticmethod
     def post():
@@ -6781,6 +6795,19 @@ class DownloadOpsProductivityReport(Resource):
             return resp
 
 api.add_resource(DownloadOpsProductivityReport,'/DownloadOpsProductivityReport')
+
+class DownloadRegionProductivityReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            month = request.form["month"]
+            region_ids = request.form["region_ids"]
+            customer_ids = request.form["customer_ids"]
+            contract_ids = request.form["contract_ids"]
+            resp = Report.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids)
+            return resp
+
+api.add_resource(DownloadRegionProductivityReport,'/DownloadRegionProductivityReport')
 ###############################################################################
 
 

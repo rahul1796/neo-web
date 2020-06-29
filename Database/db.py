@@ -810,7 +810,7 @@ class Database:
         sql = 'exec [users].[sp_get_trainer_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?'
         values = (user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids,TrainerType)
         cur.execute(sql,(values))
-        #print(values)
+        print(values)
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
@@ -5268,7 +5268,7 @@ SELECT					cb.name as candidate_name,
             cur.close()
             con.close()
             response= {"columns":col,"data":df}
-            #print(response)
+            print(response)
             return response
         except Exception as e:
             print(str(e))
@@ -5770,6 +5770,42 @@ SELECT					cb.name as candidate_name,
         data = curs.fetchall()
         sheet1 = list(map(lambda x:list(x), data))
         
+
+        curs.execute(sql1,(values))
+        sheet2_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet2 = list(map(lambda x:list(x), data))
+
+        curs.execute(sql2,(values))
+        sheet3_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet3 = list(map(lambda x:list(x), data))
+        return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
+        cur2.close()
+        con.close()    
+    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        sheet2=[]
+        sheet2_columns=[]
+        sheet3=[]
+        sheet3_columns=[]
+        sql=''
+        sql1=''
+        sql2=''
+        
+        sql = 'exec [reports].[sp_get_region_productivity_report_data] ?, ?, ?,?'
+        sql1 = 'exec [reports].[sp_get_region_productivity_report_data_batch] ?, ?, ?,?'
+        sql2 = 'exec [reports].[sp_get_region_productivity_report_data_customer] ?, ?, ?,?'
+        values = (customer_ids, contract_ids, region_ids,month)
+        #print(values)
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))
+        #print(data)
 
         curs.execute(sql1,(values))
         sheet2_columns = [column[0].title() for column in curs.description]        
