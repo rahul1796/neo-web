@@ -217,6 +217,7 @@ def index():
     else:
         return render_template("login.html",error=config.displaymsg)
 
+
 @app.route("/dashboard")
 def dashboard():
     if g.user:
@@ -236,21 +237,22 @@ def home():
     else:        
         return redirect(url_for('index'))
 
-
 @app.route("/login", methods=['POST'])
 def login():
     if request.method == 'POST':
         tr = []
         email = request.form['inemailaddress']
         passw = request.form['inpassword']
+        role_id = request.form['hdn_login_userrole_id']
+        #return(role_id)
         tr = Database.Login(email,passw)
         if tr != []:
             if tr[0]['Is_Active'] == 1:
                 session['user_name'] = tr[0]['User_Name']            
                 session['user_id'] = tr[0]['User_Id']
-                session['user_role_id'] = tr[0]['User_Role_Id']
+                session['user_role_id'] = role_id #tr[0]['User_Role_Id']
                 session['user_region_id'] = tr[0]['Region_Id']  
-                session['base_url'] = config.Base_URL         
+                session['base_url'] = config.Base_URL
                 config.displaymsg=""
                 return redirect(url_for('home'))
                 #assign_sessions()
@@ -266,8 +268,6 @@ def login():
             return redirect(url_for('index'))
         
 ####################################################################################################
-
-        
 
 #Center_API's
 @app.route("/center_list_page")
@@ -5359,6 +5359,7 @@ class get_candidate_list_updated(Resource):
             client_key = str(request.args['client_key'])
             
             user_id = int(request.args['user_id'])
+            role_id = int(request.args['role_id'])
             #user_id = 'NULL' if user_id==0 else user_id
             cand_stage = int(request.args['cand_stage'])
             #cand_stage = 'NULL' if cand_stage==0 else cand_stage
@@ -5392,6 +5393,7 @@ class submit_candidate_updated(Resource):
             client_key = str(request.form['client_key'])
             
             user_id = int(request.form['user_id'])
+            role_id = int(request.form['role_id'])
             cand_stage = int(request.form['cand_stage'])
             xml = str(request.form['xml'])
             latitude = str(request.form['latitude'])
@@ -5447,7 +5449,7 @@ class get_batch_list_updated(Resource):
             client_key = str(request.args['client_key'])
             
             user_id = int(request.args['user_id'])
-            
+            role_id = int(request.args['role_id'])
             
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
 
@@ -5866,7 +5868,6 @@ class AllCreatedByBasedOnUser(Resource):
 
 api.add_resource(AllCreatedByBasedOnUser,'/AllCreatedByBasedOnUser')
 
-
 class DownloadRegTemplate(Resource):
     report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
     @staticmethod
@@ -5908,8 +5909,11 @@ class SaveCandidateActivityStatus(Resource):
                     if 'JsonString' in request.form:
                         json_string=request.form["JsonString"] 
                     user_id=0
+                    role_id=0
                     if 'user_id' in request.form:
-                        user_id=request.form["user_id"] 
+                        user_id=request.form["user_id"]
+                    if 'role_id' in request.form:
+                        role_id = int(request.form['role_id'])
                     latitude = str(request.form['latitude'])
                     longitude = str(request.form['longitude'])
                     timestamp = str(request.form['timestamp'])
@@ -6762,8 +6766,33 @@ class DownloadOpsProductivityReport(Resource):
 
 api.add_resource(DownloadOpsProductivityReport,'/DownloadOpsProductivityReport')
 ###############################################################################
+class All_role_user(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                email_id=request.args.get('email_id','',type=str)
+                password=request.args.get('password','',type=str)
+                user_id=request.args.get('user_id','',type=str)
+                response = Database.All_role_user(email_id,password,user_id)
+                #print(email_id,password)
+                return response
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(All_role_user,'/All_role_user')
 
-
+class SetNewUserRole(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_role_id=request.args.get('user_role_id','',type=str)
+                session['user_role_id'] = int(user_role_id)
+                return {'Status':True,'Description':'Success'}
+            except Exception as e:
+                return {'Status':False,'Description':'Error: '+str(e)}
+                
+api.add_resource(SetNewUserRole,'/SetNewUserRole')
 
 if __name__ == '__main__':
     app.run(debug=True)
