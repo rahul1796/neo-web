@@ -29,7 +29,7 @@ class DownloadAssessmentResultUploadTemplate(Resource):
                 BatchId=request.args.get('BatchId',0,type=int)
                 Batch_Code=request.args.get('Batch_Code','',type=str)
                 print(Batch_Code)
-                report_name = config.AssessmentCandidateResultUploadTemplate+'_'+Batch_Code+'_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"   
+                report_name = config.AssessmentCandidateResultUploadTemplate+'_'+Batch_Code.replace('/','_')+'_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"   
                 r=re.compile(config.DumpFileName + ".*")
                 lst=os.listdir(DownloadAssessmentResultUploadTemplate.DownloadPath)
                 newlist = list(filter(r.match, lst))
@@ -54,7 +54,7 @@ class DownloadAssessmentResult(Resource):
             try:
                 AssessmentId=request.args.get('AssessmentId',0,type=int)
                 Batch_Code=request.args.get('Batch_Code','',type=str)
-                report_name = config.AssessmentCandidateResult+'_'+Batch_Code+'_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"   
+                report_name = config.AssessmentCandidateResult+'_'+Batch_Code.replace('/','_')+'_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"   
 
                 #print(AssessmentId)
                 r=re.compile(config.AssessmentCandidateResult + ".*")
