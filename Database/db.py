@@ -60,7 +60,7 @@ class Database:
         cur = con.cursor()
         sql = 'exec [users].[sp_user_login] ?, ?'
         values = (email,passw)
-        print(values)
+        #print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         #cur.execute("SELECT u.user_id,u.user_name,u.user_role_id FROM users.tbl_users AS u LEFT JOIN users.tbl_user_details AS ud ON ud.user_id=u.user_id where ud.email='"+email+"' AND u.password='"+passw+"';")
@@ -4523,7 +4523,10 @@ SELECT					cb.name as candidate_name,
             if str.lower(data[1])=='false':
                 return {'success': False, 'description': data[2],'app_status':True}
             elif str.lower(data[1])=='true':
-                return {'app_status':True, 'success': True, 'description': data[2], 'role_id':data[3],'user_id':data[4],'user_name':data[5],'user_email':data[6]}
+                res=[]
+                for i in range(len(data[3].split(','))):
+                    res.append({'id':data[3].split(',')[i],'name':data[4].split(',')[i]})
+                return {'app_status':True, 'success': True, 'description': data[2], 'user_role':res,'user_id':data[5],'user_name':data[6],'user_email':data[7]}
             else:
                 return {'success': False, 'description': 'stored procedure not return true/false','app_status':True}
         else:
@@ -5274,8 +5277,8 @@ SELECT					cb.name as candidate_name,
             print(str(e))
         return out
     def upload_assessment_result(df,user_id,assessment_id,batch_id,stage_id):
-        try:            
-            print(str(df.to_json(orient='records')))
+        try: 
+            # print(str(df.to_json(orient='records')))
             con = pyodbc.connect(conn_str)
             cur = con.cursor()            
             json_str=df.to_json(orient='records')
@@ -5284,18 +5287,25 @@ SELECT					cb.name as candidate_name,
             cur.execute(sql,(values))
             for row in cur:
                 pop=row[0]
+
             cur.commit()
             cur.close()
             con.close()
             if pop >0 :
                 Status=True
                 msg="Uploaded Successfully"
+            elif pop==-1:
+                msg="Only one batch data allowed at a time"
+                Status=False
+            elif pop==-2:
+                msg="Wrong batch to upoload assesment"
+                Status=False
             else:
                 msg="Wrong Batch code/Enrollment Id"
                 Status=False
             return {"Status":Status,'message':msg}
         except Exception as e:
-            print(str(e))
+            # print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
 
     def GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
@@ -5698,7 +5708,9 @@ SELECT					cb.name as candidate_name,
         cur.commit()
         cur.close()
         con.close()
-        if pop ==1:
+        if pop ==2:
+            msg={"message":"Duplicate Month Target", "status":False}
+        elif pop ==1:
             msg={"message":"Updated", "status":True}
         else:
             msg={"message":"Created", "status":True}
@@ -5819,3 +5831,21 @@ SELECT					cb.name as candidate_name,
         return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
         cur2.close()
         con.close()
+        con.close()
+
+    def All_role_user(email_id,password,user_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [users].All_role_user ?, ?, ?'
+        values = (email_id,password,user_id)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return {"User":response} if response!=[] else None
