@@ -60,7 +60,7 @@ class Database:
         cur = con.cursor()
         sql = 'exec [users].[sp_user_login] ?, ?'
         values = (email,passw)
-        print(values)
+        #print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         #cur.execute("SELECT u.user_id,u.user_name,u.user_role_id FROM users.tbl_users AS u LEFT JOIN users.tbl_user_details AS ud ON ud.user_id=u.user_id where ud.email='"+email+"' AND u.password='"+passw+"';")
@@ -4523,7 +4523,10 @@ SELECT					cb.name as candidate_name,
             if str.lower(data[1])=='false':
                 return {'success': False, 'description': data[2],'app_status':True}
             elif str.lower(data[1])=='true':
-                return {'app_status':True, 'success': True, 'description': data[2], 'role_id':data[3],'user_id':data[4],'user_name':data[5],'user_email':data[6]}
+                res=[]
+                for i in range(len(data[3].split(','))):
+                    res.append({'id':data[3].split(',')[i],'name':data[4].split(',')[i]})
+                return {'app_status':True, 'success': True, 'description': data[2], 'user_role':res,'user_id':data[5],'user_name':data[6],'user_email':data[7]}
             else:
                 return {'success': False, 'description': 'stored procedure not return true/false','app_status':True}
         else:
@@ -5792,3 +5795,20 @@ SELECT					cb.name as candidate_name,
         return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
         cur2.close()
         con.close()
+
+    def All_role_user(email_id,password,user_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [users].All_role_user ?, ?, ?'
+        values = (email_id,password,user_id)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return {"User":response} if response!=[] else None
