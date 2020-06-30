@@ -59,6 +59,8 @@
                     {   
                         ids=data.User[0].Role_Ids;
                         var names=data.User[0].Role_Names;
+                        $('#ddlRole').empty();
+
                         if (ids.split(',').length==1){
                             $('#hdn_login_userrole_id').val(ids);
                             $( "#login_from" ).submit();
@@ -67,16 +69,20 @@
                             $('#hdn_home_role_names_modal').val(names);
                             $('#hdn_home_role_ids_modal').val(ids);
                             $('#mdl_user_role').modal('show');
-                            document.getElementById('container').innerHTML = "";
+
                             for (i = 0; i < ids.split(',').length; i++) {
-                                //i++;  
-                                var node = document.createElement('div');        
-                                //node.innerHTML = '<input type="checkbox" id="check' + i + '" name="check' + i + '"><label for="check' + i + '">'+ title +'</label>';
+                            $('#ddlRole').append(new Option(names.split(',')[i],ids.split(',')[i]));
+                            }
+
+                            // for (i = 0; i < ids.split(',').length; i++) {
+                            //     //i++;  
+                            //     var node = document.createElement('div');        
+                            //     //node.innerHTML = '<input type="checkbox" id="check' + i + '" name="check' + i + '"><label for="check' + i + '">'+ title +'</label>';
                                 
-                                //node.innerHTML ='<div class="form-group"> <div class="row"> <div class="col-lg-6"> <label for="RoomId">'+ names.split(',')[i] +'</label> </div> <div class="col-lg-6"> </div> </div> </div>'
-                                node.innerHTML ='<div class="col-lg-3" style="float: center; margin-top: 30px"> <button  type="button" class="btn btn-success waves-effect waves-light" id="'+'role'+'" value="'+ids.split(',')[i]+'" onclick="multisubmit(this.value)">'+names.split(',')[i]+'</button> </div>'
-                                document.getElementById('container').appendChild(node);
-                                }
+                            //     //node.innerHTML ='<div class="form-group"> <div class="row"> <div class="col-lg-6"> <label for="RoomId">'+ names.split(',')[i] +'</label> </div> <div class="col-lg-6"> </div> </div> </div>'
+                            //     node.innerHTML ='<div class="col-lg-3" style="float: center; margin-top: 30px"> <button  type="button" class="btn btn-success waves-effect waves-light" id="'+'role'+'" value="'+ids.split(',')[i]+'" onclick="multisubmit(this.value)">'+names.split(',')[i]+'</button> </div>'
+                            //     document.getElementById('container').appendChild(node);
+                            //     }
 
                                 
                                 // <div class="col-lg-1" style="float: center; margin-top: 30px">
@@ -97,13 +103,11 @@
                             //     }
 
                             //alert('create button')
-                        }
-                        
+                        }                        
                     }
                     else{
                         alert('error')
                     }
-
                 },
                 error:function(err)
                 {
@@ -113,10 +117,9 @@
             });
             return false;
             }
-            function multisubmit(role_id){
-                $('#hdn_login_userrole_id').val(role_id);
+            function multisubmit(){
+                $('#hdn_login_userrole_id').val($('#ddlRole').val());
                 $( "#login_from" ).submit();
-
             }
         </script>
     </head>
@@ -203,8 +206,7 @@
         <script src="static/assets/js/vendor.min.js"></script>
 
         <!-- App js -->
-        <script src="static/assets/js/app.min.js"></script>
-        
+        <script src="static/assets/js/app.min.js"></script>    
     </body>
     
     <div id="mdl_user_role" class="modal fade" role="dialog">
@@ -218,19 +220,24 @@
                     <div class="modal-body">
                         <input type="hidden" id="hdn_home_role_names_modal" name="hdn_home_role_names_modal" value="">
                         <input type="hidden" id="hdn_home_role_ids_modal" name="hdn_home_role_ids_modal" value="">
-                        <div id="container"></div>
+                        <div>
+                            <label for="ddlRole" class="mr-2">Role</label>
+                            <select class="form-control"  id="ddlRole"> </select> <!-- dropdown-search-filter-->
+                        </div>
+                        <br>
+                        <div>
+                            <div>
+                                <button  type="button" class="btn btn-success waves-effect waves-light" 
+                                    onclick="multisubmit()">Submit</button>
+                            </div> <!-- style="margin-top: 30px" -->
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <!-- <button type="submit" class="btn btn-primary waves-effect" > Save</button> -->
                         <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
                     </div>
             </form>
             </div>
         </div>
     </div><!--/.modal-->
-    
-
-
-
 <!-- Mirrored from coderthemes.com/ubold/layouts/light-horizontal/pages-login.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 28 Aug 2019 07:52:51 GMT -->
 </html>
