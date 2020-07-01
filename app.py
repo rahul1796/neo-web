@@ -5395,7 +5395,7 @@ class get_candidate_list_updated(Resource):
             app_version = request.args['app_version']
             
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
-                out = Database.get_candidate_list_updated(user_id,cand_stage,app_version)
+                out = Database.get_candidate_list_updated(user_id,role_id,cand_stage,app_version)
                 return jsonify(out)
                 
             else:
@@ -5435,11 +5435,11 @@ class submit_candidate_updated(Resource):
 
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
                 if cand_stage==1:
-                    out = Database.get_submit_candidate_mobi(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                    out = Database.get_submit_candidate_mobi(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 elif cand_stage==2:
-                    out = Database.get_submit_candidate_reg(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                    out = Database.get_submit_candidate_reg(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 elif cand_stage==3:
-                    out = Database.get_submit_candidate_enr(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                    out = Database.get_submit_candidate_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 else:
                     out = {'success': False, 'description': "incorrect stage", 'app_status':True}
                 return jsonify(out)
@@ -5950,7 +5950,7 @@ class SaveCandidateActivityStatus(Resource):
                     device_model = str(request.form['device_model'])
                     imei_num = str(request.form['imei_num'])
                     android_version = str(request.form['android_version'])
-                    return Master.SaveCandidateActivityStatus(json_string,user_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version)
+                    return Master.SaveCandidateActivityStatus(json_string,user_id,role_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version)
                 except Exception as e:
                     res = {'success': False, 'description': "unable to read data " + str(e)}
                     return jsonify(res)
