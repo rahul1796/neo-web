@@ -49,7 +49,7 @@
             if(parseInt($('#hdn_home_user_role_id').val())>0)
             {
                 var role_id=parseInt($('#hdn_home_user_role_id').val());
-                
+                //alert(role_id);
                 switch(role_id)
 				{   
                     case 1:             //Admin
@@ -216,8 +216,8 @@
                         $('#Report_Menu').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
-                            $('#Batch_Status_report').hide();
-                            $('#ops_productivity_report').hide();
+							$('#Batch_Status_report').show();
+							$('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -250,7 +250,7 @@
                         $('#Report_Menu').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').hide();
-                            $('#Batch_Status_report').hide();
+							$('#Batch_Status_report').show();
                             $('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
