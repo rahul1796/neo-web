@@ -810,7 +810,7 @@ class Database:
         sql = 'exec [users].[sp_get_trainer_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?'
         values = (user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids,TrainerType)
         cur.execute(sql,(values))
-        #print(values)
+        print(values)
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
@@ -1238,15 +1238,16 @@ class Database:
         con.close()
         return h
 
-    def candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, Contracts, candidate_stage, from_date, to_date):
+    def candidate_list(candidate_id,customer,project,sub_project,batch,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, Contracts, candidate_stage, from_date, to_date):
         content = {}
         d = []
         h={}
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?'
-        values = (candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,Contracts, candidate_stage, from_date, to_date)
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new] ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?'
+        values = (candidate_id,customer,project,sub_project,batch,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,Contracts, candidate_stage, from_date, to_date)
+        print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -3734,6 +3735,25 @@ SELECT					cb.name as candidate_name,
         con.close()
         return courses
 
+    def get_batches_basedon_sub_proj_multiple(user_id,user_role_id,sub_project_id):
+        Batches = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+
+        sql = 'exec [masters].[sp_get_batches_based_on_sub_projects] ?,?,?'
+        values=(user_id,user_role_id,sub_project_id)
+        print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for r in cur2:
+            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            Batches.append(h)
+        cur2.close()
+        con.close()
+        #print(Batches)
+        return Batches
+
+
     def Get_all_industry_db():
         response=[]
         con = pyodbc.connect(conn_str)
@@ -4166,7 +4186,26 @@ SELECT					cb.name as candidate_name,
         con.close() 
         print(response)      
         return out
-
+    def CandidateFamilyDetails(candidate_id):
+        response = []
+        
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        h={}
+        sql = 'exec [candidate_details].[sp_get_candidate_family_details]  ?'
+        values = (candidate_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+            response.append(h.copy())
+        out = {"Members":response}
+        cur.close()
+        con.close() 
+        print(out)      
+        return out
     def GetSubProjectsForuser(user_id):
         response = []
         h={}
@@ -5232,7 +5271,7 @@ SELECT					cb.name as candidate_name,
             cur.close()
             con.close()
             response= {"columns":col,"data":df}
-            #print(response)
+            print(response)
             return response
         except Exception as e:
             print(str(e))
@@ -5755,6 +5794,43 @@ SELECT					cb.name as candidate_name,
         sheet3 = list(map(lambda x:list(x), data))
         return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
         cur2.close()
+        con.close()    
+    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        sheet2=[]
+        sheet2_columns=[]
+        sheet3=[]
+        sheet3_columns=[]
+        sql=''
+        sql1=''
+        sql2=''
+        
+        sql = 'exec [reports].[sp_get_region_productivity_report_data] ?, ?, ?,?'
+        sql1 = 'exec [reports].[sp_get_region_productivity_report_data_batch] ?, ?, ?,?'
+        sql2 = 'exec [reports].[sp_get_region_productivity_report_data_customer] ?, ?, ?,?'
+        values = (customer_ids, contract_ids, region_ids,month)
+        #print(values)
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))
+        #print(data)
+
+        curs.execute(sql1,(values))
+        sheet2_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet2 = list(map(lambda x:list(x), data))
+
+        curs.execute(sql2,(values))
+        sheet3_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet3 = list(map(lambda x:list(x), data))
+        return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
+        cur2.close()
+        con.close()
         con.close()
 
     def All_role_user(email_id,password,user_id):
