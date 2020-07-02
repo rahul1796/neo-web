@@ -7,7 +7,6 @@ from datetime import datetime
 from flask import request,make_response
 import requests
 import xml.etree.ElementTree as ET
-import requests
 import io
 import csv
 
@@ -4611,7 +4610,6 @@ SELECT					cb.name as candidate_name,
             conn.close()
             out = {'success': False, 'description': "Lower App Version", 'app_status':False}
             return out
-        
         try:
             '''
             insert into candidate_details.tbl_candidate_interventions
@@ -4640,11 +4638,12 @@ SELECT					cb.name as candidate_name,
             data = r.text
             root = ET.fromstring(data)
             out = []
+            
             for child in root:
                 data = child.attrib
                 out.append(data)
                 #quer1_a + = 
-                quer = "({},'{}','{}','{}','{}','{}',{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},1,'m','{}','{}','{}','{}'),".format(1 if data['isFresher']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],
+                quer = "({},'{}','{}','{}','{}','{}',{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},{},1,'m','{}','{}','{}','{}'),".format(1 if data['isFresher']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],
                             data['candDob'],1 if data['dobEntered']=='true' else 0,data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'], data['disableStatus'], data['candReligion'],
                             data['candSource'], data['presPincode'],data['presDistrict'],data['permDistrict'],data['permPincode'],user_id,role_id,data['permState'],data['permCountry'] ,data['presState'],data['presCountry'])
                 quer1 += '\n'+quer
