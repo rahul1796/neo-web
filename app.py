@@ -6847,8 +6847,31 @@ class SetNewUserRole(Resource):
                 return {'Status':True,'Description':'Success'}
             except Exception as e:
                 return {'Status':False,'Description':'Error: '+str(e)}
-                
 api.add_resource(SetNewUserRole,'/SetNewUserRole')
+
+########################################## TMA APIS #########################################
+class GetBatchCandidateList(Resource):
+    @staticmethod
+    def get():
+        try:
+            if request.method=='GET':
+                batch_id = int(request.args['batch_id'])
+                session_id = int(request.args['session_id'])
+                if batch_id<1:
+                    res = {'status':0,'message':'Missing or invalid batch_id'}
+                    return jsonify(res)
+                
+                candidate_list = Database.GetBatchCandidateList_db(batch_id,session_id)
+                if candidate_list[0]==False:
+                    res = {'status':0, 'message':'No stage found' }
+                else:
+                    res = {'status':1,'message':'Success','candidate_list':candidate_list}
+                return jsonify(res)
+        except Exception as e:
+            res={'status':-1,'message':'Error : '+ str(e)}
+            response=jsonify(res)
+            return response
+api.add_resource(GetBatchCandidateList, '/GetBatchCandidateList')
 
 if __name__ == '__main__':
     app.run(debug=True)

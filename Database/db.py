@@ -5077,7 +5077,7 @@ SELECT					cb.name as candidate_name,
             conn.close()
             return out
 
-    def SaveCandidateActivityStatus(json_string,user_id,role_idlatitude,longitude,timestamp,app_version,device_model,imei_num,android_version):
+    def SaveCandidateActivityStatus(json_string,user_id,role_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec	[candidate_details].[sp_store_sub_candidate_activity_status]  ?, ?,?,?,?,?,?,?,?,?'
