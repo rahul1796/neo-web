@@ -5432,7 +5432,7 @@ class submit_candidate_updated(Resource):
             device_model = str(request.form['device_model'])
             imei_num = str(request.form['imei_num'])
             android_version = str(request.form['android_version'])
-
+            
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
                 if cand_stage==1:
                     out = Database.get_submit_candidate_mobi(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
