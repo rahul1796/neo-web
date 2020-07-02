@@ -80,6 +80,8 @@ mob_validation = [CustomElementValidation(lambda d: check_mob_number(d), 'invali
 pincode_validation = [CustomElementValidation(lambda d: check_pincode(d), 'invalid pincode')]
 null_validation = [CustomElementValidation(lambda d: d is not np.nan, 'this field cannot be null')]
 dob_validation = [CustomElementValidation(lambda d: check_dob(d), 'either date or age is not valid')]
+status_validation = [CustomElementValidation(lambda d: d.lower() in ['certified','notcertified'], 'invalid status (certified, notcertified allowed)')]
+flt_validation = [CustomElementValidation(lambda d: str(d).replace('.', '', 1).isdigit(), 'invalid score (number allowed)')]
 
 
 #from lib.log import Log
@@ -215,6 +217,7 @@ def index():
     else:
         return render_template("login.html",error=config.displaymsg)
 
+
 @app.route("/dashboard")
 def dashboard():
     if g.user:
@@ -234,21 +237,22 @@ def home():
     else:        
         return redirect(url_for('index'))
 
-
 @app.route("/login", methods=['POST'])
 def login():
     if request.method == 'POST':
         tr = []
         email = request.form['inemailaddress']
         passw = request.form['inpassword']
+        role_id = request.form['hdn_login_userrole_id']
+        #return(role_id)
         tr = Database.Login(email,passw)
         if tr != []:
             if tr[0]['Is_Active'] == 1:
                 session['user_name'] = tr[0]['User_Name']            
                 session['user_id'] = tr[0]['User_Id']
-                session['user_role_id'] = tr[0]['User_Role_Id']
+                session['user_role_id'] = role_id #tr[0]['User_Role_Id']
                 session['user_region_id'] = tr[0]['Region_Id']  
-                session['base_url'] = config.Base_URL         
+                session['base_url'] = config.Base_URL
                 config.displaymsg=""
                 return redirect(url_for('home'))
                 #assign_sessions()
@@ -264,8 +268,6 @@ def login():
             return redirect(url_for('index'))
         
 ####################################################################################################
-
-        
 
 #Center_API's
 @app.route("/center_list_page")
@@ -1319,6 +1321,7 @@ class candidate_list(Resource):
         if request.method == 'POST':
             candidate_id = request.form['candidate_id']
             sub_project = request.form['sub_project']
+            batch_id = request.form['batch_id']
             project = request.form['project']
             region = request.form['region']
             customer = request.form['customer']
@@ -1341,7 +1344,7 @@ class candidate_list(Resource):
             draw=request.form['draw']
             
             #print(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-            return Candidate.candidate_list(candidate_id,customer,project,sub_project,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, Contracts, candidate_stage, from_date, to_date)
+            return Candidate.candidate_list(candidate_id,customer,project,sub_project,batch_id,region,center,center_type,status,user_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, Contracts, candidate_stage, from_date, to_date)
 
 class user_sub_project_list(Resource):
     @staticmethod
@@ -4419,6 +4422,21 @@ class get_subproject_basedon_proj_multiple(Resource):
             return {"Sub_Project": Database.get_subproject_basedon_proj_multiple(user_id,user_role_id,project_id)} 
 api.add_resource(get_subproject_basedon_proj_multiple,'/get_subproject_basedon_proj_multiple')
 
+class get_batches_basedon_sub_proj_multiple(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            sub_project_id=request.form['SubProjectId']
+            user_id=0
+            if 'user_id' in request.form:
+                user_id=request.form['user_id']
+            user_role_id=0
+            if 'user_role_id' in request.form:
+                user_role_id=request.form['user_role_id']
+            return {"Batches": Database.get_batches_basedon_sub_proj_multiple(user_id,user_role_id,sub_project_id)} 
+api.add_resource(get_batches_basedon_sub_proj_multiple,'/get_batches_basedon_sub_proj_multiple')
+
+
 #QP_API's
 @app.route("/sales_dashboard_page")
 def sales_dashboard_page():
@@ -4729,6 +4747,18 @@ class Getcandidatebybatch(Resource):
                 return {'exception':str(e)}
 api.add_resource(Getcandidatebybatch,'/Getcandidatebybatch')
 
+class CandidateFamilyDetails(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                candidate_id=request.args.get('candidate_id',0,type=int)
+                response = Database.CandidateFamilyDetails(candidate_id)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(CandidateFamilyDetails,'/CandidateFamilyDetails')
+
 #####################################################################################################
 #Project_API's
 @app.route("/my_project_list_page")
@@ -4973,6 +5003,7 @@ class candidate_download_report(Resource):
                 customer = request.form["customer"]
                 project = request.form["project"]
                 sub_project = request.form["sub_project"]
+                batch = request.form["batch"]
                 region = request.form["region"]
                 center = request.form["center"]
                 center_type = request.form["center_type"]
@@ -4985,7 +5016,7 @@ class candidate_download_report(Resource):
                 file_name='candidate_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
                 #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
 
-                resp = candidate_report.create_report(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name,Contracts, candidate_stage, from_date, to_date)
+                resp = candidate_report.create_report(candidate_id, user_id, user_role_id, status, customer, project, sub_project, batch, region, center, center_type, file_name,Contracts, candidate_stage, from_date, to_date)
                 
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
@@ -5357,13 +5388,14 @@ class get_candidate_list_updated(Resource):
             client_key = str(request.args['client_key'])
             
             user_id = int(request.args['user_id'])
+            role_id = int(request.args['role_id'])
             #user_id = 'NULL' if user_id==0 else user_id
             cand_stage = int(request.args['cand_stage'])
             #cand_stage = 'NULL' if cand_stage==0 else cand_stage
             app_version = request.args['app_version']
             
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
-                out = Database.get_candidate_list_updated(user_id,cand_stage,app_version)
+                out = Database.get_candidate_list_updated(user_id,role_id,cand_stage,app_version)
                 return jsonify(out)
                 
             else:
@@ -5390,6 +5422,7 @@ class submit_candidate_updated(Resource):
             client_key = str(request.form['client_key'])
             
             user_id = int(request.form['user_id'])
+            role_id = int(request.form['role_id'])
             cand_stage = int(request.form['cand_stage'])
             xml = str(request.form['xml'])
             latitude = str(request.form['latitude'])
@@ -5402,11 +5435,11 @@ class submit_candidate_updated(Resource):
 
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
                 if cand_stage==1:
-                    out = Database.get_submit_candidate_mobi(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                    out = Database.get_submit_candidate_mobi(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 elif cand_stage==2:
-                    out = Database.get_submit_candidate_reg(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                    out = Database.get_submit_candidate_reg(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 elif cand_stage==3:
-                    out = Database.get_submit_candidate_enr(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                    out = Database.get_submit_candidate_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 else:
                     out = {'success': False, 'description': "incorrect stage", 'app_status':True}
                 return jsonify(out)
@@ -5445,7 +5478,7 @@ class get_batch_list_updated(Resource):
             client_key = str(request.args['client_key'])
             
             user_id = int(request.args['user_id'])
-            
+            role_id = int(request.args['role_id'])
             
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
 
@@ -5864,7 +5897,6 @@ class AllCreatedByBasedOnUser(Resource):
 
 api.add_resource(AllCreatedByBasedOnUser,'/AllCreatedByBasedOnUser')
 
-
 class DownloadRegTemplate(Resource):
     report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
     @staticmethod
@@ -5906,8 +5938,11 @@ class SaveCandidateActivityStatus(Resource):
                     if 'JsonString' in request.form:
                         json_string=request.form["JsonString"] 
                     user_id=0
+                    role_id=0
                     if 'user_id' in request.form:
-                        user_id=request.form["user_id"] 
+                        user_id=request.form["user_id"]
+                    if 'role_id' in request.form:
+                        role_id = int(request.form['role_id'])
                     latitude = str(request.form['latitude'])
                     longitude = str(request.form['longitude'])
                     timestamp = str(request.form['timestamp'])
@@ -5915,7 +5950,7 @@ class SaveCandidateActivityStatus(Resource):
                     device_model = str(request.form['device_model'])
                     imei_num = str(request.form['imei_num'])
                     android_version = str(request.form['android_version'])
-                    return Master.SaveCandidateActivityStatus(json_string,user_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version)
+                    return Master.SaveCandidateActivityStatus(json_string,user_id,role_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version)
                 except Exception as e:
                     res = {'success': False, 'description': "unable to read data " + str(e)}
                     return jsonify(res)
@@ -6156,6 +6191,13 @@ class upload_assessment_result(Resource):
 
                 df= pd.read_excel(file_name,sheet_name='Template')
                 df = df.fillna('')
+                def check_dob(date_age):
+                    try:
+                        date_age = str(date_age)
+                        return re.match(r"[A-Za-z0-9!@#$%\\&\*\.\,\+-_\s]+",date_age).group()==date_age
+                    except:
+                        return False
+
                 schema = Schema([
                         #str+null check
                         Column('Enrolment_No',str_validation + null_validation),
@@ -6166,9 +6208,9 @@ class upload_assessment_result(Resource):
                         Column('Assessment_Type',str_validation + null_validation),
                         Column('Assessment_Date',str_validation + null_validation),
                         Column('Attendance(Absent_Present)',str_validation + null_validation),
-                        Column('Score',str_validation + null_validation),
+                        Column('Score',flt_validation),
                         Column('Grade',str_validation + null_validation),
-                        Column('Status(Certified_Notcertified)',str_validation + null_validation)
+                        Column('Status(Certified_Notcertified)',status_validation)
                         ])
                 errors = schema.validate(df)
                 errors_index_rows = [e.row for e in errors]
@@ -6739,6 +6781,20 @@ def ops_productivity_report():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+@app.route("/region_productivity_report_page")
+def region_productivity_report_page():
+    if g.user:
+        return render_template("Reports/region_wise_productivity_report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/region_productivity_report")
+def region_productivity_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="region_productivity_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
 class DownloadOpsProductivityReport(Resource):
     @staticmethod
     def post():
@@ -6752,9 +6808,47 @@ class DownloadOpsProductivityReport(Resource):
             return resp
 
 api.add_resource(DownloadOpsProductivityReport,'/DownloadOpsProductivityReport')
+
+class DownloadRegionProductivityReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            month = request.form["month"]
+            region_ids = request.form["region_ids"]
+            customer_ids = request.form["customer_ids"]
+            contract_ids = request.form["contract_ids"]
+            resp = Report.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids)
+            return resp
+
+api.add_resource(DownloadRegionProductivityReport,'/DownloadRegionProductivityReport')
 ###############################################################################
+class All_role_user(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                email_id=request.args.get('email_id','',type=str)
+                password=request.args.get('password','',type=str)
+                user_id=request.args.get('user_id','',type=str)
+                response = Database.All_role_user(email_id,password,user_id)
+                #print(email_id,password)
+                return response
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(All_role_user,'/All_role_user')
 
-
+class SetNewUserRole(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_role_id=request.args.get('user_role_id','',type=str)
+                session['user_role_id'] = int(user_role_id)
+                return {'Status':True,'Description':'Success'}
+            except Exception as e:
+                return {'Status':False,'Description':'Error: '+str(e)}
+                
+api.add_resource(SetNewUserRole,'/SetNewUserRole')
 
 if __name__ == '__main__':
     app.run(debug=True)
