@@ -4781,7 +4781,11 @@ SELECT					cb.name as candidate_name,
                 query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['presAddrOne'],data['permAddrOne'],data['highQuali'],data['candStream'],data['compKnow'],data['techKnow'],data['houseIncome'],data['bankName'],data['accNum'],user_id,data['cand_id'])
                 query += '\n' + quer3.format(data['presAddrTwo'],data['presVillage'],data['presPanchayat'],data['presTaluk'],data['permAddrTwo'],data['permVillage'],data['permPanchayat'],data['permTaluk'],data['instiName'],data['university'],data['yrPass'],data['percentage'],data['branchName'],data['ifscCode'],data['accType'],data['bankCopy'],user_id,data['cand_id'])
 
-                quer = "({},'SAE',GETDATE(),{},1),".format(data['cand_id'],user_id)
+                intervention_category="SAE"
+                if data['candProduct']=="Placement":
+                    intervention_category="EAL"                
+                quer = "({},'{}',GETDATE(),{},1),".format(data['cand_id'],intervention_category,user_id)
+                #quer = "({},'SAE',GETDATE(),{},1),".format(data['cand_id'],user_id)
                 quer4 += '\n'+quer
                 
                 for fam in child.findall('family_details'):
