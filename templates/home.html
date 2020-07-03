@@ -46,10 +46,11 @@
                     $('#hdn_web_url').val('{{values[3]}}');
                     $('#hdn_user_region_id').val('{{values[4]}}');
                 }
+
             if(parseInt($('#hdn_home_user_role_id').val())>0)
             {
                 var role_id=parseInt($('#hdn_home_user_role_id').val());
-                
+                //alert(role_id);
                 switch(role_id)
 				{   
                     case 1:             //Admin
@@ -216,8 +217,8 @@
                         $('#Report_Menu').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
-                            $('#Batch_Status_report').hide();
-                            $('#ops_productivity_report').hide();
+							$('#Batch_Status_report').show();
+							$('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -246,10 +247,11 @@
                         $('#Insight_Menu').show();
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
+                            $('#AnchorCustomers').hide();
                         $('#Report_Menu').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').hide();
-                            $('#Batch_Status_report').hide();
+							$('#Batch_Status_report').show();
                             $('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
@@ -526,10 +528,86 @@
                             $("#box").load(goto);
                         break;
                 }
-                   
-                
             }
-        });        
+        });      
+
+        function select_roles(){
+            var ids=''
+            //document.getElementById('container').innerHTML = "";
+            var URL="/All_role_user"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,       
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json", 
+                data:{
+                    "password" : '',
+                    "email_id" : '',
+                    "user_id" : $('#hdn_home_user_id').val()
+                    //$('#ddlRM_role').val().toString()//$('#ddlProject option:selected').val()
+                },
+                success: function (data){
+                    if(data != 'null')
+                    {   
+                        ids=data.User[0].Role_Ids;
+                        var names=data.User[0].Role_Names;
+                        $('#ddlRole').empty();
+                        
+                        for (i = 0; i < ids.split(',').length; i++) {
+                            $('#ddlRole').append(new Option(names.split(',')[i],ids.split(',')[i]));
+                            }
+                    }
+                    else{
+                        alert('error')
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading Cluster! Please try again');
+                    return false;
+                }
+            });
+            $('#mdl_user_role').modal('show');
+        }
+
+        function LoadRoleWisePage(){
+            if ($('#ddlRole').val()==''){
+                alert('please select role');
+            }
+            else{
+                var URL=$('#hdn_web_url').val()+ "/SetNewUserRole?user_role_id="+$('#ddlRole').val();
+                $.ajax({
+                    type:"GET",
+                    url:URL,
+                    async:false,
+                    overflow:true,        
+                    beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                    datatype:"json",
+                    success: function (data){
+                    if(!jQuery.isEmptyObject(data))
+                    {   if (data.Status){
+                            window.location.href = '/';
+                            }
+                        else{
+                            alert('unable to change role');
+                            window.location.href = '/';
+                            }
+                    }
+                    else
+                    {
+                        alert('unable to change role');
+                        window.location.href = '/';
+                    }   
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+                })
+            }   
+        }
         </script>
     </head>
 
@@ -539,6 +617,9 @@
             <input type="hidden" id="hdn_home_user_name" name="hdn_home_user_name" value="0">
             <input type="hidden" id="hdn_web_url" name="hdn_web_url" value="">
             <input type="hidden" id="hdn_user_region_id" name="hdn_user_region_id" value="">
+            <input type="hidden" id="hdn_home_alluserrole_id" name="hdn_home_user_id" value="">
+            <input type="hidden" id="hdn_home_alluserrole_name" name="hdn_home_user_id" value="">
+            
 			
         <header id="topnav" style="background-color:#1C2A43;min-height: 10%; font-size: 15px; z-index: 1000;" >
 
@@ -567,6 +648,9 @@
                             <ul class="submenu">
                                 <li id="My_Projects_Menu">
                                     <a href="/my_projects" >My Projects</a>
+                                </li>
+                                <li id="changerole_Menu">
+                                    <a href="javascript:select_roles()" >Change Role</a>
                                 </li>
                                 <li id="changepass_Menu">
                                     <a href="/change_password" >Change Password</a>
@@ -651,6 +735,9 @@
                                     <li>
 										<a href="/ops_productivity_report" id="Ops_Productivity_Report" class="active">Ops Productivity Report<div class="button"></div></a>
                                     </li>
+                                    <li>
+										<a href="/region_productivity_report" id="region_productivity_report" class="active">Region-wise Productivity Report<div class="button"></div></a>
+                                    </li>
                                     <li class="has-submenu"  id="TMA_content" style="display:none">
                                         <a href="#">Training Report <div class="arrow-down"></div></a>
                                         <ul class="submenu">                                    
@@ -705,6 +792,9 @@
                                     </li>
                                     <li id="Sector_Menu">
                                         <a id="AnchorSectors"  href="/trainer_dashboard" >Trainer Dashboard</a>
+                                    </li>
+                                    <li id="Customer_Dashboard_Menu">
+                                        <a id="AnchorCustomers"  href="/Customer_Dashboard" >Customer Dashboard</a>
                                     </li>
                                 </ul>
                             </li>
@@ -823,6 +913,36 @@
          <script src="static/assets/js/app.min.js"></script>
 		 <script type="text/javascript" src="static/assets/js/bootstrap.min.js" ></script>
     </body>
+
+    <div id="mdl_user_role" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content ">
+                <form id="tempformUpload" action="javascript:UploadFileData()">
+                    <div class="modal-header">
+                        <h4 class="modal-title" ><span id="header">User Roles</span></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>                    
+                    <div class="modal-body">
+                        <div >
+                            <label for="ddlRole" class="mr-2">Role</label>
+                            <select class="form-control"  id="ddlRole"> </select> <!-- dropdown-search-filter-->
+                        </div>
+                        <br>
+                        <div >
+                            <div>
+                                <button  type="button" class="btn btn-success waves-effect waves-light" 
+                                    onclick="LoadRoleWisePage()">Submit</button>
+                            </div> <!-- style="margin-top: 30px" -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <button type="submit" class="btn btn-primary waves-effect" > Save</button> -->
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+                    </div>
+            </form>
+            </div>
+        </div>
+    </div><!--/.modal-->
 
 <!-- Mirrored from coderthemes.com/ubold/layouts/light-horizontal/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 28 Aug 2019 07:51:37 GMT -->
 </html>

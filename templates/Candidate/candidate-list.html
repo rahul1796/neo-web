@@ -53,7 +53,7 @@
                         </div>
                         <div class="col-lg-3">
                             <label for="ddlSubProject" class="mr-2">Sub Project</label>
-                            <select class="form-control dropdown-search-filter" id="ddlSubProject" multiple>  <!-- onchange="LoadCenter();"-->>
+                            <select class="form-control dropdown-search-filter" id="ddlSubProject" onchange="LoadBatches();" multiple>  <!-- onchange="LoadCenter();"-->>
                                 <!-- <option selected="" value="">All</option> -->
                             </select>
                         </div>
@@ -88,6 +88,12 @@
                     </div>
                     <div class="row"> 
                         <div class="col-lg-3">
+                            <label for="ddlBatches" class="mr-2">Batch Code:</label>
+                            <select class="form-control dropdown-search-filter" id="ddlBatches" multiple>
+                                <!-- <option selected="" value="">All</option> -->
+                            </select>
+                        </div>
+                        <div class="col-lg-3">
                             <label for="FromDate" class="mr-2">From Date</label>
                             <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
                             onchange="Loadcandidatestatusddl();" ClientIdMode="static" placeholder="From Date">
@@ -103,15 +109,16 @@
                                 <option selected="" value="">All</option>
                             </select>
                         </div>
+                        
+                    </div>
+                    <div class="row"> 
                         <div class="col-lg-1" style="float: center; margin-top: 30px">
                             <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTable()">Search</button>
                         </div>
                         <div class="form-group col-lg-2">                                         
                             <a class="btn btn-primary" style="float: right; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
                             <a id="lnkDownload" style="display:none;"></a>
-                        </div>
-                    </div>
-                    <div class="row">  
+                        </div> 
                         <div class="form-group col-lg-4">
                             <div id="imgSpinner">
                                 <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-block;"/>
@@ -695,6 +702,46 @@
                 <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
                 <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
             </div>
+        </div>
+    </div>
+</div><!--/.modal-->
+<div id="mdl_cand_family" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content " >
+             <div class="modal-header">
+                <h4 class="modal-title" ><span id="hdBatchName">Candidate Family Details</span></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>                    
+            <div class="modal-body" >  
+                <div>
+                    <div class="form-group" id="DivCandidates">
+                       
+                        <div class="row">
+                            <table id="tbl_candidate_family"  class="table dt-responsive nowrap" >
+                                <thead>
+                                    <tr>
+                                        <th>S No</th>
+                                        <th>Member Name</th>
+                                        <th> Relation</th> 
+                                        <th> DOB</th>
+                                        <th> Age</th>
+                                        <th>Occupation</th>
+                                        <th>Gender</th>
+                                        <th>Contact</th>
+                                    </tr>
+                                </thead>
+                            
+                            <tbody></tbody>
+                            </table>  
+                        </div>
+                    </div>    
+                </div>             
+            </div>
+            <div class="modal-footer">   
+                             
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Back</button>                    
+            </div>
+           
         </div>
     </div>
 </div><!--/.modal-->
