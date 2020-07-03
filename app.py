@@ -80,6 +80,8 @@ mob_validation = [CustomElementValidation(lambda d: check_mob_number(d), 'invali
 pincode_validation = [CustomElementValidation(lambda d: check_pincode(d), 'invalid pincode')]
 null_validation = [CustomElementValidation(lambda d: d is not np.nan, 'this field cannot be null')]
 dob_validation = [CustomElementValidation(lambda d: check_dob(d), 'either date or age is not valid')]
+status_validation = [CustomElementValidation(lambda d: d.lower() in ['certified','notcertified'], 'invalid status (certified, notcertified allowed)')]
+flt_validation = [CustomElementValidation(lambda d: str(d).replace('.', '', 1).isdigit(), 'invalid score (number allowed)')]
 
 
 #from lib.log import Log
@@ -215,6 +217,7 @@ def index():
     else:
         return render_template("login.html",error=config.displaymsg)
 
+
 @app.route("/dashboard")
 def dashboard():
     if g.user:
@@ -234,21 +237,22 @@ def home():
     else:        
         return redirect(url_for('index'))
 
-
 @app.route("/login", methods=['POST'])
 def login():
     if request.method == 'POST':
         tr = []
         email = request.form['inemailaddress']
         passw = request.form['inpassword']
+        role_id = request.form['hdn_login_userrole_id']
+        #return(role_id)
         tr = Database.Login(email,passw)
         if tr != []:
             if tr[0]['Is_Active'] == 1:
                 session['user_name'] = tr[0]['User_Name']            
                 session['user_id'] = tr[0]['User_Id']
-                session['user_role_id'] = tr[0]['User_Role_Id']
+                session['user_role_id'] = role_id #tr[0]['User_Role_Id']
                 session['user_region_id'] = tr[0]['Region_Id']  
-                session['base_url'] = config.Base_URL         
+                session['base_url'] = config.Base_URL
                 config.displaymsg=""
                 return redirect(url_for('home'))
                 #assign_sessions()
@@ -264,8 +268,6 @@ def login():
             return redirect(url_for('index'))
         
 ####################################################################################################
-
-        
 
 #Center_API's
 @app.route("/center_list_page")
@@ -5386,13 +5388,14 @@ class get_candidate_list_updated(Resource):
             client_key = str(request.args['client_key'])
             
             user_id = int(request.args['user_id'])
+            role_id = int(request.args['role_id'])
             #user_id = 'NULL' if user_id==0 else user_id
             cand_stage = int(request.args['cand_stage'])
             #cand_stage = 'NULL' if cand_stage==0 else cand_stage
             app_version = request.args['app_version']
             
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
-                out = Database.get_candidate_list_updated(user_id,cand_stage,app_version)
+                out = Database.get_candidate_list_updated(user_id,role_id,cand_stage,app_version)
                 return jsonify(out)
                 
             else:
@@ -5419,6 +5422,7 @@ class submit_candidate_updated(Resource):
             client_key = str(request.form['client_key'])
             
             user_id = int(request.form['user_id'])
+            role_id = int(request.form['role_id'])
             cand_stage = int(request.form['cand_stage'])
             xml = str(request.form['xml'])
             latitude = str(request.form['latitude'])
@@ -5428,14 +5432,14 @@ class submit_candidate_updated(Resource):
             device_model = str(request.form['device_model'])
             imei_num = str(request.form['imei_num'])
             android_version = str(request.form['android_version'])
-
+            
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
                 if cand_stage==1:
-                    out = Database.get_submit_candidate_mobi(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                    out = Database.get_submit_candidate_mobi(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 elif cand_stage==2:
-                    out = Database.get_submit_candidate_reg(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                    out = Database.get_submit_candidate_reg(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 elif cand_stage==3:
-                    out = Database.get_submit_candidate_enr(user_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                    out = Database.get_submit_candidate_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 else:
                     out = {'success': False, 'description': "incorrect stage", 'app_status':True}
                 return jsonify(out)
@@ -5474,7 +5478,7 @@ class get_batch_list_updated(Resource):
             client_key = str(request.args['client_key'])
             
             user_id = int(request.args['user_id'])
-            
+            role_id = int(request.args['role_id'])
             
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
 
@@ -5893,7 +5897,6 @@ class AllCreatedByBasedOnUser(Resource):
 
 api.add_resource(AllCreatedByBasedOnUser,'/AllCreatedByBasedOnUser')
 
-
 class DownloadRegTemplate(Resource):
     report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
     @staticmethod
@@ -5935,8 +5938,11 @@ class SaveCandidateActivityStatus(Resource):
                     if 'JsonString' in request.form:
                         json_string=request.form["JsonString"] 
                     user_id=0
+                    role_id=0
                     if 'user_id' in request.form:
-                        user_id=request.form["user_id"] 
+                        user_id=request.form["user_id"]
+                    if 'role_id' in request.form:
+                        role_id = int(request.form['role_id'])
                     latitude = str(request.form['latitude'])
                     longitude = str(request.form['longitude'])
                     timestamp = str(request.form['timestamp'])
@@ -5944,7 +5950,7 @@ class SaveCandidateActivityStatus(Resource):
                     device_model = str(request.form['device_model'])
                     imei_num = str(request.form['imei_num'])
                     android_version = str(request.form['android_version'])
-                    return Master.SaveCandidateActivityStatus(json_string,user_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version)
+                    return Master.SaveCandidateActivityStatus(json_string,user_id,role_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version)
                 except Exception as e:
                     res = {'success': False, 'description': "unable to read data " + str(e)}
                     return jsonify(res)
@@ -6185,6 +6191,13 @@ class upload_assessment_result(Resource):
 
                 df= pd.read_excel(file_name,sheet_name='Template')
                 df = df.fillna('')
+                def check_dob(date_age):
+                    try:
+                        date_age = str(date_age)
+                        return re.match(r"[A-Za-z0-9!@#$%\\&\*\.\,\+-_\s]+",date_age).group()==date_age
+                    except:
+                        return False
+
                 schema = Schema([
                         #str+null check
                         Column('Enrolment_No',str_validation + null_validation),
@@ -6195,9 +6208,9 @@ class upload_assessment_result(Resource):
                         Column('Assessment_Type',str_validation + null_validation),
                         Column('Assessment_Date',str_validation + null_validation),
                         Column('Attendance(Absent_Present)',str_validation + null_validation),
-                        Column('Score',str_validation + null_validation),
+                        Column('Score',flt_validation),
                         Column('Grade',str_validation + null_validation),
-                        Column('Status(Certified_Notcertified)',str_validation + null_validation)
+                        Column('Status(Certified_Notcertified)',status_validation)
                         ])
                 errors = schema.validate(df)
                 errors_index_rows = [e.row for e in errors]
@@ -6740,7 +6753,7 @@ class GetMobilizerReportDownload(Resource):
             Role = request.form["Role"]
             Date = request.form["Date"]
             
-            file_name='mobilizer_report_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            file_name='Mobilizer_Productivity_Report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
             #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
             
             resp = mobilizer_report_down.create_report(user_id, user_role_id, Role, Date, file_name)
@@ -6809,8 +6822,56 @@ class DownloadRegionProductivityReport(Resource):
 
 api.add_resource(DownloadRegionProductivityReport,'/DownloadRegionProductivityReport')
 ###############################################################################
+class All_role_user(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                email_id=request.args.get('email_id','',type=str)
+                password=request.args.get('password','',type=str)
+                user_id=request.args.get('user_id','',type=str)
+                response = Database.All_role_user(email_id,password,user_id)
+                #print(email_id,password)
+                return response
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(All_role_user,'/All_role_user')
 
+class SetNewUserRole(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_role_id=request.args.get('user_role_id','',type=str)
+                session['user_role_id'] = int(user_role_id)
+                return {'Status':True,'Description':'Success'}
+            except Exception as e:
+                return {'Status':False,'Description':'Error: '+str(e)}
+api.add_resource(SetNewUserRole,'/SetNewUserRole')
 
+########################################## TMA APIS #########################################
+class GetBatchCandidateList(Resource):
+    @staticmethod
+    def get():
+        try:
+            if request.method=='GET':
+                batch_id = int(request.args['batch_id'])
+                session_id = int(request.args['session_id'])
+                if batch_id<1:
+                    res = {'status':0,'message':'Missing or invalid batch_id'}
+                    return jsonify(res)
+                
+                candidate_list = Database.GetBatchCandidateList_db(batch_id,session_id)
+                if candidate_list[0]==False:
+                    res = {'status':0, 'message':'No stage found' }
+                else:
+                    res = {'status':1,'message':'Success','candidate_list':candidate_list}
+                return jsonify(res)
+        except Exception as e:
+            res={'status':-1,'message':'Error : '+ str(e)}
+            response=jsonify(res)
+            return response
+api.add_resource(GetBatchCandidateList, '/GetBatchCandidateList')
 
 if __name__ == '__main__':
     app.run(debug=True)

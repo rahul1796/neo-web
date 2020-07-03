@@ -1576,7 +1576,6 @@ function add_map_message(){
 
     function UploadFileData()
     {
-        
         if ($('#myFile').get(0).files.length === 0) {
             console.log("No files selected.");
         }

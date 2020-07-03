@@ -63,6 +63,7 @@
                                 
                                     varHtml+='<tr>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].User_Name +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Email +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].User_Role_Name +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].Product +'</td>';
                                     //let varLink='<a onclick="GetContractProjectTargets(\'' + data.Data[i].Region_Id + '\',\'' + data.Data[i].Contract_Id + '\',\'' + data.Data[i].Contract_Name + '\')"  style="color:blue;cursor:pointer" >' + data.Data[i].Contract_Name + '</a>';
@@ -102,13 +103,13 @@
                         }
                         else
                         {
-                            varHtml='<tr><td colspan="7" style="text-align:center;">No records found</td></tr>'
+                            varHtml='<tr><td colspan="23" style="text-align:center;">No records found</td></tr>'
                             $("#tbl_list tbody").append(varHtml);
                         }
                     }
                     else
                     {
-                        varHtml='<tr><td colspan="7" style="text-align:center;">No records found</td></tr>'
+                        varHtml='<tr><td colspan="23" style="text-align:center;">No records found</td></tr>'
                         $("#tbl_list tbody").append(varHtml);
                     }   
                 },
@@ -264,7 +265,8 @@
                         <table id="tbl_list" class="table w-100 nowrap dataTable no-footer">
                             <thead>
                                 <tr>
-                                    <th rowspan="3" style="text-align:center;">Mobilizer</th>
+                                    <th rowspan="3" style="text-align:center;">User</th>
+                                    <th rowspan="3" style="text-align:center;">Email</th>
                                     <th rowspan="3" style="text-align:center;">Role</th>
                                     <th rowspan="3" style="text-align:center;">Product</th>
                                     <th rowspan="3" style="text-align:center;">Conversion Criteria</th>
