@@ -4816,16 +4816,12 @@ SELECT					cb.name as candidate_name,
             conn.close()
             return out
           
-    def get_batch_list_updated(user_id):
+    def get_batch_list_updated(user_id,candidate_id):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
-        quer = """
-        SELECT	distinct b.batch_id, b.batch_name, batch_code FROM [masters].[tbl_map_sub_project_user] as mspb inner join	batches.tbl_batches as b on b.sub_project_id=mspb.sub_project_id where mspb.user_id={} and CONVERT(DATE, GETDATE(), 102) <= b.actual_end_date
-        UNION
-        SELECT	distinct b.batch_id, b.batch_name, batch_code FROM [masters].[tbl_map_sub_project_user] as mspb inner join	batches.tbl_batches as b on b.co_funding_project_id=mspb.sub_project_id where mspb.user_id={} and CONVERT(DATE, GETDATE(), 102) <= b.actual_end_date
-        """.format(user_id,user_id)
-        
-        curs.execute(quer)
+        quer = 'exec  [batches].[sp_get_batch_list_for_app]  ?,?'
+        values=(user_id,candidate_id)
+        curs.execute(quer,(values))
         columns = [column[0].title() for column in curs.description]
         response = []
         h={}
