@@ -128,3 +128,19 @@ class TMADatabase:
         else:
             res={'status':1,'message':'Failed lower app version','app_status':False}
         return res
+        
+    def LogTrainerStageDetails(session_id,user_id,batch_id,stage_id,latitude,longitude,image_file_name,mark_candidate_attendance,attendance_data,group_attendance_image_data,app_version):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        if TMADatabase.AppVersionCheck(curs, app_version):
+            quer = "call [masters].[sp_tma_log_trainer_stage_details]({},'{}',{},{},'{}','{}','{}',{},'{}','{}')".format(batch_id,session_id,user_id,stage_id,latitude,longitude,image_file_name,mark_candidate_attendance,attendance_data,group_attendance_image_data)
+            quer = "{"+ quer + "}"
+            curs.execute(quer)
+            data = curs.fetchall()[0]
+            if len(data)==0:
+                return {'status':0, 'message':'Not able to log','app_status':True}
+            else:
+                return {'status':1,'message':'Success','app_status':True}
+        else:
+            res={'status':1,'message':'Failed lower app version','app_status':False}
+        return res
