@@ -6861,17 +6861,196 @@ class GetBatchCandidateList(Resource):
                     res = {'status':0,'message':'Missing or invalid batch_id'}
                     return jsonify(res)
                 
-                candidate_list = Database.GetBatchCandidateList_db(batch_id,session_id)
+                candidate_list = TMA.GetBatchCandidateList_db(batch_id,session_id)
+                res = {'status':1,'message':'Success','candidate_list':candidate_list}
+                """
                 if candidate_list[0]==False:
                     res = {'status':0, 'message':'No stage found' }
                 else:
                     res = {'status':1,'message':'Success','candidate_list':candidate_list}
+                """
                 return jsonify(res)
         except Exception as e:
             res={'status':-1,'message':'Error : '+ str(e)}
             response=jsonify(res)
             return response
 api.add_resource(GetBatchCandidateList, '/GetBatchCandidateList')
+
+class UploadCandidateAttendanceImages(Resource):
+    # secret_id = 'L4b0urN3t'
+    # secret_key='N304pp5'
+    # if (client_id==UploadCandidateAttendanceImages.secret_id) and (client_key==UploadCandidateAttendanceImages.secret_key):
+    upload_path = config.tmapath + 'attendance_images/'
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            client_id = str(request.form['client_id'])
+            client_key = str(request.form['client_key'])
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                try:
+                    files = request.files.getlist('files[]')
+                except Exception as e:
+                    res = {'status':0,'message':"unable to read image " + str(e)}
+                    return jsonify(res)
+                if len(files)==0:
+                    res = {'status':0,'message':"Please select atleast one image"}
+                    return jsonify(res)
+                for file in files:
+                    try:
+                        name = file.filename
+                        file.save(UploadCandidateAttendanceImages.upload_path + name)
+                    except Exception as e:
+                        res = {'status':0,'message':"uploaded failed " + str(e)}
+                        return jsonify(res)
+                res = {'status':1,'message':"uploaded succesfully"}
+                return jsonify(res)
+            else:
+                res = {'status':0,'message':"client name and password not matching"}
+                return jsonify(res)
+        else:
+            res = {'status':-1,'message':"Method is wrong"}
+            return jsonify(res)
+api.add_resource(UploadCandidateAttendanceImages, '/UploadCandidateAttendanceImages')
+
+class UploadTrainerStageImage(Resource):
+    upload_path = config.tmapath + 'trainer_stage_images/'
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            client_id = request.form['client_id']
+            client_key = request.form['client_key']
+
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                try:
+                    file = request.files['file']
+                    name = file.filename
+                except Exception as e:
+                    res = {'status':0,'message':"unable to read image " + str(e)}
+                    return jsonify(res)
+                if file:
+                    try:
+                        f=open(UploadTrainerStageImage.upload_path + name,'wb')
+                        f.write(file.read())
+                        f.close()
+                        res = {'status':1,'message':"uploaded succesfully"}
+                        #res = {'success': True, 'description': "uploaded succesfully"}
+                        return jsonify(res)
+                    except Exception as e:
+                        res = {'status':0,'message':"uploaded failed " + str(e)}
+                        #res = {'success': False, 'description': "uploaded failed " + str(e)}
+                        return jsonify(res)        
+            else:
+                res = {'status':0,'message':"client name and password not matching {}, {}".format(client_id, client_key)}
+                #res = {'success': False, 'description': "client name and password not matching"}
+                return jsonify(res)
+        else:
+            res = {'status':-1,'message':"wrong method"}
+            return jsonify(res)
+api.add_resource(UploadTrainerStageImage, '/UploadTrainerStageImage')
+
+class GetSessionPlanModuleDetailsForCourse(Resource):
+    @staticmethod
+    def get():
+        try:
+            if request.method=='GET':
+                client_id=str(request.args.get("client_id"))
+                client_key=str(request.args.get("client_key"))
+                if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                    course_id=request.args.get("course_id",0,type=int)
+                    qp_id=request.args.get("qp_id",0,type=int)
+                    session_plan_module_list = TMA.GetSessionPlanModuleDetailsForCourse(course_id,qp_id)
+                    if session_plan_module_list!=None:
+                        res={'success':True,'description':'Session Plan(s) are available','session_plan_module_list':session_plan_module_list}
+                    else:
+                        res={'success':False,'description':'NO response from DB'}
+                else:
+                    res={'success':False,'description':'Invalid Request'}
+                response=jsonify(res)
+                return response
+        except Exception as e:
+            res={'success':False,'description':'Error : '+ str(e)}
+            response=jsonify(res)
+            return response
+api.add_resource(GetSessionPlanModuleDetailsForCourse,'/GetSessionPlanModuleDetailsForCourse')
+
+class GetBatchSessionCurrentStageDetails(Resource):
+    @staticmethod
+    def post():
+        try:
+            if request.method=='POST':
+                batch_id = int(request.form['batch_id'])
+                session_id = int(request.form['session_id'])
+                user_id = int(request.form['user_id'])
+                if batch_id<1:
+                    res = {'status':0,'message':'Missing or invalid batch_id'}
+                    return jsonify(res)
+                if session_id<1:
+                    res = {'status':0,'message':'Missing or invalid session_id'}
+                    return jsonify(res)
+                current_stage = TMA.GetBatchSessionCurrentStageDetails(batch_id,session_id,user_id)
+                #print(current_stage)
+                if current_stage ==None:
+                    res = {'status':0, 'message':'No stage found' }
+                else:
+                    res = {'status':1,'message':'Success','user_id':user_id,'batch_id':batch_id,'session_id':session_id,'stage_id':current_stage}
+                return jsonify(res)
+        except Exception as e:
+            res={'status':-1,'message':'Error : '+ str(e)}
+            response=jsonify(res)
+            return response
+api.add_resource(GetBatchSessionCurrentStageDetails, '/GetBatchSessionCurrentStageDetails')
+
+class GetBatchList(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=None
+            try:
+                #app_version_details=Database.GetAppVersionDetails()
+                BatchStatusId=request.args.get('batch_stage_id',2,type=int)
+                UserId=request.args.get('user_id',0,type=int)
+                CenterId=request.args.get('center_id',0,type=int)
+                role_id = request.args.get('role_id',0,type=int)
+                app_version = request.args.get('app_version',0,type=str)
+                if UserId == 0:
+                    res={'status':0,'message':'Invalid User Id','app_status':True}
+                    response=jsonify(res)
+                    return response
+                res = TMA.GetBatchListForTMA(BatchStatusId,UserId,CenterId,role_id,app_version)
+                response=jsonify(res)
+                return response
+            except Exception as e:
+                res={'status':-1,'message':'Error : '+ str(e),'app_status':True}
+                response=jsonify(res)
+                return response
+api.add_resource(GetBatchList,'/GetBatchList')
+
+
+class GetBatchSessionList(Resource):
+    @staticmethod
+    def get():
+        try:
+            if request.method=='GET':
+                BatchId=request.args.get('batch_id',0,type=int)
+                UserId=request.args.get('user_id',0,type=int)
+                SessionPlanId=request.args.get('session_plan_id',0,type=int)
+                ModuleId=request.args.get('module_id',0,type=int)
+                StatusId=request.args.get('status_id',0,type=int)
+                SessionName=request.args.get('session_name','')
+                app_version = request.args.get('app_version',0,type=str)
+
+                if UserId == 0:
+                    res={'status':0,'message':'Invalid User Id','app_status':True}
+                    response=jsonify(res)
+                    return response
+                res = TMA.GetBatchSessionListForTMA(BatchId,UserId,SessionPlanId,ModuleId,StatusId,SessionName,app_version)
+                response=jsonify(res)
+                return response
+        except Exception as e:
+            res={'status':-1,'message':'Error : '+ str(e),'app_status':True}
+            response=jsonify(res)
+            return response
+api.add_resource(GetBatchSessionList,'/GetBatchSessionList')
 
 if __name__ == '__main__':
     app.run(debug=True)
