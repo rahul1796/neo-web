@@ -7052,5 +7052,41 @@ class GetBatchSessionList(Resource):
             return response
 api.add_resource(GetBatchSessionList,'/GetBatchSessionList')
 
+class LogTrainerStageDetails(Resource):
+    @staticmethod
+    def post():
+        try:
+            if request.method=='POST':
+                session_id = str(request.form['session_id'])
+                user_id = int(request.form['user_id'])
+                batch_id = int(request.form['batch_id'])
+                stage_id = int(request.form['stage_id'])
+                latitude = request.form['latitude']
+                longitude = request.form['longitude']
+                image_file_name = request.form['image_file_name']
+                mark_candidate_attendance = int(request.form['mark_candidate_attendance'])
+                attendance_data = request.form['attendance_data']
+                group_attendance_image_data = request.form['group_attendance_image_data']
+                app_version = request.form['app_version']
+
+                if batch_id<1:
+                    res = {'status':0,'message':'Missing or invalid batch_id','app_status':True}
+                    return jsonify(res)
+                if session_id=='':
+                    res = {'status':0,'message':'Missing or invalid session_id','app_status':True}
+                    return jsonify(res)
+                if (stage_id<1 or stage_id>4):
+                    res = {'status':0,'message':'Missing or invalid stage_id','app_status':True}
+                    return jsonify(res)
+                res = TMA.LogTrainerStageDetails(session_id,user_id,batch_id,stage_id,latitude,longitude,image_file_name,mark_candidate_attendance,attendance_data,group_attendance_image_data,app_version)
+                response=jsonify(res)
+                return response
+
+        except Exception as e:
+            res={'status':-1,'message':'Error : '+ str(e),'app_status':True}
+            response=jsonify(res)
+            return response
+api.add_resource(LogTrainerStageDetails,'/LogTrainerStageDetails')
+
 if __name__ == '__main__':
     app.run(debug=True)
