@@ -74,6 +74,8 @@ class TMADatabase:
         StageId=0
         if data!=[]:
             StageId=data[0][0]
+        curs.close()
+        con.close()
         return StageId
 
     def GetBatchListForTMA(BatchStatusId,UserId,CenterId,role_id,app_version):
@@ -91,6 +93,8 @@ class TMADatabase:
             res={'status':1,'message':'Success','batch_list':BatchList,'app_status':True}
         else:
             res={'status':1,'message':'Failed lower app version','app_status':False}
+        curs.close()
+        con.close()
         return res
 
     def GetBatchSessionListForTMA(BatchId,UserId,SessionPlanId,ModuleId,StatusId,SessionName,app_version):
@@ -127,6 +131,8 @@ class TMADatabase:
                 res={'status':1,'message':'No session(s) found','session_list':SessionList,'app_status':True}
         else:
             res={'status':1,'message':'Failed lower app version','app_status':False}
+        curs.close()
+        con.close()
         return res
         
     def LogTrainerStageDetails(session_id,user_id,batch_id,stage_id,latitude,longitude,image_file_name,mark_candidate_attendance,attendance_data,group_attendance_image_data,app_version):
@@ -137,10 +143,15 @@ class TMADatabase:
             quer = "{"+ quer + "}"
             curs.execute(quer)
             data = curs.fetchall()[0]
+            
             if len(data)==0:
-                return {'status':0, 'message':'Not able to log','app_status':True}
+                res = {'status':0, 'message':'Not able to log','app_status':True}
             else:
-                return {'status':1,'message':'Success','app_status':True}
+                res = {'status':1,'message':'Success','app_status':True}
         else:
             res={'status':1,'message':'Failed lower app version','app_status':False}
+        curs.commit()
+        curs.close()
+        con.close()
         return res
+        

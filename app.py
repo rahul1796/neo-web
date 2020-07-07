@@ -1806,7 +1806,6 @@ api.add_resource(get_section_type_details,'/GetSectionTypeDetails')
 ############################################################################################################
 
 #TMA_REPORT_API's
-
 @app.route("/tma_report_download_page")
 def tma_report_download_page():
     if g.user:
@@ -1820,8 +1819,6 @@ def tma_report():
         return render_template("home.html",values=g.User_detail_with_ids,html="tma_report_download_page")
     else:
         return render_template("login.html",error="Session Time Out!!")
-
-
 
 @app.route('/tma_report_download_func',methods=['GET', 'POST'])
 def tma_user_download():
@@ -2110,15 +2107,12 @@ def tma_batch():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
-
 @app.route("/tma_session_page")
 def tma_session_page():
     if g.user:
-        #return str(g.session_data)
         return render_template("TMA-Report/tma_session.html", data = g.session_data)
     else:
         return render_template("login.html",error="Session Time Out!!")
-
 
 @app.route('/trainer_sessions', methods=['GET','POST'])
 def trainer_sessions():
@@ -2935,7 +2929,6 @@ api.add_resource(course_api.AllProjectList, '/AllProjectList')
 
 
 #########################################TMA REPORT###################################################################
-
 
 @app.route("/trainer_deployment")
 def trainer_deployment_page():
