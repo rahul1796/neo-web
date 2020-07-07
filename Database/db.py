@@ -3958,7 +3958,8 @@ SELECT					cb.name as candidate_name,
             cur = con.cursor()
             sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
             values = (batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag)
-            print(values)
+            #print(values)
+            #print("kjjkj")
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]
             for row in cur:
@@ -5558,6 +5559,42 @@ SELECT					cb.name as candidate_name,
             d={} 
             json_str=df.to_json(orient='records')
             sql = 'exec	[masters].[sp_validate_upload_batch_target_plan]  ?,?,?'
+            values = (json_str,user_id,user_role_id)
+            cur.execute(sql,(values))
+            columns = [column[0].title() for column in cur.description]
+            col_len=len(columns)
+            pop=0
+            for row in cur:
+                pop=row[0]
+                for i in range(col_len):
+                    d[columns[i]]=row[i]
+                h.append(d.copy())
+            cur.commit()
+            if pop==0 :
+                Status=False
+                msg="Error"
+                return {"Status":Status,'message':msg,'data':h}
+            else:
+                msg="Uploaded Successfully"
+                Status=True
+                return {"Status":Status,'message':msg}
+            cur.close()
+            con.close()
+        except Exception as e:
+            print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+            
+    def upload_user(df,user_id,user_role_id):
+        try:   
+            print("jiofhlovhswvik")         
+            print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            h=[]           
+            d={} 
+            json_str=df.to_json(orient='records')
+            print(json_str)
+            sql = 'exec	[users].[sp_validate_upload_user]  ?,?,?'
             values = (json_str,user_id,user_role_id)
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]

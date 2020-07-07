@@ -6637,6 +6637,61 @@ class upload_batch_target_plan(Resource):
              
 api.add_resource(upload_batch_target_plan,'/upload_batch_target_plan')
 
+class upload_user(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                f = request.files['filename']
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
+                f.save(file_name)
+                df= pd.read_excel(file_name,sheet_name='Template')
+                df = df.fillna('')
+                schema = Schema([
+                        #null check
+                        Column('Employee Code*',str_validation+null_validation),
+                        Column('Employee Name*',str_validation+null_validation),
+                        Column('Employee Email*',str_validation+null_validation),
+                        Column('Reporting Manager Employee Code*',str_validation+null_validation),
+                        Column('Mobile Number*',str_validation+null_validation),
+                        Column('Employee Role*',str_validation+null_validation),
+                        Column('Region*',str_validation+null_validation),
+                        Column('Grade*',str_validation+null_validation),
+                        Column('Designation*',str_validation+null_validation),
+                        Column('Employment Status*',str_validation+null_validation),
+                        Column('Entity*',str_validation+null_validation),
+                        Column('Employee Department*',str_validation+null_validation),
+                        Column('Active Status*',str_validation+null_validation)
+                        ])
+                errors = schema.validate(df)
+                errors_index_rows = [e.row for e in errors]
+                len_error = len(errors_index_rows)
+                if len_error>0:
+                    print("1")
+                    file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                    pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                    return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                else:
+                    print("2")
+                    df.columns = df.columns.str.replace(" ", "_")
+                    df.columns = df.columns.str.replace("*", "")
+                    df.insert(0, 'row_index', range(len(df)))
+                    out = Database.upload_user(df,user_id,user_role_id)
+                    if out['Status']==False:
+                        file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                        pd.DataFrame(out['data']).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                        return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                    else:
+                        return out
+                
+            except Exception as e:
+                 print(e)
+                 return {"Status":False, "message":"Unable to upload " + str(e)}  
+             
+api.add_resource(upload_user,'/upload_user')
+
 class GetSubProjectPlannedBatches(Resource):
     @staticmethod
     def get():
