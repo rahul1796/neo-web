@@ -143,7 +143,6 @@ class TMADatabase:
             quer = "{"+ quer + "}"
             curs.execute(quer)
             data = curs.fetchall()[0]
-            
             if len(data)==0:
                 res = {'status':0, 'message':'Not able to log','app_status':True}
             else:
