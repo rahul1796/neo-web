@@ -45,3 +45,9 @@ class Batch:
     def drop_edit_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark):
         popupMessage = {"PopupMessage": Database.drop_edit_map_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark)}
         return popupMessage
+    def AllTrainersOnSubProject(SubProject_Id):
+        trainers_f={"Trainers":Database.GetTrainersBasedOnSubProject(SubProject_Id)}
+        return trainers_f
+    def AllTrainersOnSubProjects(SubProject_Id):
+        trainers_f={"Trainers":Database.AllTrainersOnSubProjects(SubProject_Id)}
+        return trainers_f
