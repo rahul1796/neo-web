@@ -131,7 +131,11 @@
                                         onclick="LoadTable('-1')">Search</button>
                                         
                                     </div>
+                                    <div class="col-lg-3" >                                        
+                                        <button style="float: left; margin-top: 30px;"  id="btn_upload" onclick="UploadUserMdl()" type="button" class="btn btn-info waves-effect waves-light">Upload Users</a>
+                                    </div>
                                 </div>
+                               
                             </div>
                         </div>
                     </div>
@@ -262,6 +266,42 @@
         </div>
     </div>
 </div><!--/.modal-->
+
+<div id="mdl_upload_user_plan" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content ">
+            <form id="formUpload" action="javascript:UploadFileData()">
+            <div class="modal-header">
+                <h4 class="modal-title"><span id="HduploadFile"></span></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <label for="myFile">Upload File* :</label>
+                        </div>
+                        <div class="col-lg-4">
+                            <input type="file" id="myFile" name="filename">
+                        </div>
+                        <div class="col-lg-4">
+                            <button class="btn btn-info btn-sm waves-effect waves-light" type="button" onclick="DownloadUserTemplate()">Download Template</button>
+                        </div>
+                    </div>
+                </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary waves-effect" type="submit" >Upload</button>
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Close</button>
+            </div>
+            <div id="imgSpinner1">
+                <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                <label style="display:inline-block;">Please wait while uploading...</label>
+            </div> 
+        </form>
+        </div>
+    </div>
+</div><!--/.modal-->
+
 
 <div id="mdl_add_edit_targets" class="modal fade" role="dialog">
     <div class="modal-dialog modal-xl">

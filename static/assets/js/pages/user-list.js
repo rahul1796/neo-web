@@ -626,6 +626,97 @@ function Getusertarget(UserId,UserName)
         });
         }
     }
+
+    function UploadUserMdl()
+    {
+        
+        $('#HduploadFile').text('Upload User Details:');
+        $('#imgSpinner1').hide();
+        $('#mdl_upload_user_plan').modal('show');
+        $('#myFile').val('');
+    }
+    function DownloadUserTemplate()
+    {
+        window.location='/Bulk Upload/'+'User_Add_Edit_Template.xlsx';
+    }
+    function UploadFileData()
+    {
+        
+        if ($('#myFile').get(0).files.length === 0) {
+            console.log("No files selected.");
+        }
+        else
+        {
+            var fileExtension = ['xlsx']
+            if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                alert("Formats allowed are : "+fileExtension.join(', '));
+                return false;
+            }
+            else
+            {
+                $("#imgSpinner1").show();
+                var form_data = new FormData($('#formUpload')[0]);
+                form_data.append('user_id',$('#hdn_home_user_id').val());
+                form_data.append('user_role_id',$('#hdn_home_user_role_id').val());
+                $.ajax({
+                    type: 'POST',
+                    url: $('#hdn_web_url').val()+ "/upload_user",
+                    enctype: 'multipart/form-data',
+                    data: form_data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success: function(data) 
+                    {
+                        var message="",title="",icon="";
+                        if(data.Status){
+                            message=data.message;
+                            title="Success";
+                            icon="success";
+                        }
+                        else{
+                            if (data.message=="Validation_Error"){
+                                message=data.error;
+                                title="Error";
+                                icon="error";
+                            }
+                            else {
+                                message=data.message;
+                                title="Error";
+                                icon="error";
+                            }
+                        }
+                        var span = document.createElement("span");
+                        span.innerHTML = message;
+                        swal({   
+                                    title:title,
+                                    content: span,
+                                    //text:message,
+                                    icon:icon,
+                                    confirmButtonClass:"btn btn-confirm mt-2"
+                                    }).then(function(){
+                                        window.location.href = '/user';
+                                    }); 
+                    
+                            
+                    },
+                    error:function(err)
+                    {
+                        swal({   
+                            title:"Error",
+                            text:'Error! Please try again',
+                            icon:"error",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                window.location.href = '/user';
+                            }); 
+                        
+                    }
+                });
+            }
+        }
+    }
+
     
     function onchange_roomtype(){
         if ($('#Room_Type').val() == 'Others'){
