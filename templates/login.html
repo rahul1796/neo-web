@@ -118,7 +118,12 @@
             return false;
             }
             function multisubmit(){
+                //alert($('#ddlRole').())
+                var user_name = jQuery("#ddlRole option:selected").text()
+                
                 $('#hdn_login_userrole_id').val($('#ddlRole').val());
+                $('#hdn_login_userrole_name').val(user_name);
+
                 $( "#login_from" ).submit();
             }
         </script>
@@ -143,6 +148,7 @@
                                 <form id='login_from' method="POST" action="/login">
 
                                     <input type="hidden" id="hdn_login_userrole_id" name="hdn_login_userrole_id" value="">
+                                    <input type="hidden" id="hdn_login_userrole_name" name="hdn_login_userrole_name" value="">
 
                                     <div class="form-group mb-3">
                                         <label for="emailaddress">Email address</label>

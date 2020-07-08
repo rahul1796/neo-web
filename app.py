@@ -116,6 +116,7 @@ def before_request():
     g.center_id = None
     g.user_id = None
     g.user_role_id = None
+    g.user_role_name = None
     g.web_user_id = None
     g.batch_id = None
     g.qp_id = None
@@ -141,12 +142,14 @@ def before_request():
         g.user = session['user_name']
         g.user_id = session['user_id']
         g.user_role = session['user_role_id']
+        g.user_role_name = session['user_role_name']
         g.user_region_id=session['user_region_id']
         g.base_url = session['base_url']
         # print(g.user,g.user_id,g.user_role)
         g.User_detail_with_ids.append(g.user)
         g.User_detail_with_ids.append(g.user_id)
         g.User_detail_with_ids.append(g.user_role)
+        g.User_detail_with_ids.append(g.user_role_name)
         g.User_detail_with_ids.append(g.base_url)
         g.User_detail_with_ids.append(g.user_region_id)
     if 'course_id' in session.keys():
@@ -244,13 +247,15 @@ def login():
         email = request.form['inemailaddress']
         passw = request.form['inpassword']
         role_id = request.form['hdn_login_userrole_id']
+        role_name = request.form['hdn_login_userrole_name']
         #return(role_id)
         tr = Database.Login(email,passw)
         if tr != []:
             if tr[0]['Is_Active'] == 1:
-                session['user_name'] = tr[0]['User_Name']            
+                session['user_name'] = tr[0]['User_Name'] 
                 session['user_id'] = tr[0]['User_Id']
                 session['user_role_id'] = role_id #tr[0]['User_Role_Id']
+                session['user_role_name'] = role_name
                 session['user_region_id'] = tr[0]['Region_Id']  
                 session['base_url'] = config.Base_URL
                 config.displaymsg=""
@@ -6836,7 +6841,9 @@ class SetNewUserRole(Resource):
         if request.method=='GET':
             try:
                 user_role_id=request.args.get('user_role_id','',type=str)
+                user_role_name=request.args.get('user_role_name','',type=str)
                 session['user_role_id'] = int(user_role_id)
+                session['user_role_name'] = str(user_role_name)
                 return {'Status':True,'Description':'Success'}
             except Exception as e:
                 return {'Status':False,'Description':'Error: '+str(e)}
