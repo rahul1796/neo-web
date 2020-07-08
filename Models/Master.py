@@ -262,4 +262,8 @@ class Master:
     def add_edit_center_room(Room_Name, user_id, is_active, Room_Type, Room_Size, Room_Capacity, center_id, room_id, file_name, course_ids):
         popupMessage = {"PopupMessage": Database.add_edit_center_room(Room_Name, user_id, is_active, Room_Type, Room_Size, Room_Capacity, center_id, room_id, file_name, course_ids)}
         return popupMessage
-    
+
+    def GetSubProjectsForRegionUser(user_id,user_role_id,region_id):
+        return Database.GetSubProjectsForRegionUser(user_id,user_role_id,region_id)
+    def GetCoursesBasedOnSubProjects(sub_project_ids):
+        return Database.GetCoursesBasedOnSubProjects(sub_project_ids)

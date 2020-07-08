@@ -53,9 +53,10 @@
         }
     });
     return false;
-}
-    function LoadCenter(region_id){
-        var URL=$('#hdn_web_url').val()+ "/GetAllCentersBasedOnRegion_User"
+}   
+
+    function LoadSubProject(region_id){
+        var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForRegionUser"
             $.ajax({
             type:"GET",
             url:URL,
@@ -68,20 +69,20 @@
                     "region_id":region_id
             },
             success: function (data){
-                if(data.Centers != null)
+                if(data.SubProjects != null)
                 {
-                    $('#ddlCenter').empty();
-                    var count=data.Centers.length;
+                    $('#ddlSubProject').empty();
+                    var count=data.SubProjects.length;
                     if( count> 0)
                     {
                         //$('#ddlCenter').append(new Option('ALL','0'));
                         for(var i=0;i<count;i++)
-                            $('#ddlCenter').append(new Option(data.Centers[i].Center_Name,data.Centers[i].Center_Id));
-						$('#ddlCenter').val('');
+                            $('#ddlSubProject').append(new Option(data.SubProjects[i].Sub_Project_Name,data.SubProjects[i].Sub_Project_Id));
+						$('#ddlSubProject').val('');
                     }
                     else
                     {
-                        $('#ddlCenter').append(new Option('ALL','0'));
+                        $('#ddlSubProject').append(new Option('ALL','0'));
                     }
                 }
             },
@@ -93,12 +94,13 @@
         });
         return false;
     }
-    function LoadCourse_users(center_id){
-        LoadCourses(center_id);
-        LoadTrainers(center_id);
+    function LoadCourse_users(){
+        var sub_project_ids = $('#ddlSubProject').val().toString();
+        LoadCourses(sub_project_ids);
+        LoadTrainers(sub_project_ids);
     }
-    function LoadCourses(center_id){
-        var URL=$('#hdn_web_url').val()+ "/GetAllCoursesBasedOnCenter_User"
+    function LoadCourses(sub_project_ids){
+        var URL=$('#hdn_web_url').val()+ "/GetCoursesBasedOnSubProjects"
             $.ajax({
             type:"GET",
             url:URL,
@@ -108,7 +110,7 @@
             data:{
                     "user_id": $('#hdn_home_user_id').val(),
                     "user_role_id" : $('#hdn_home_user_role_id').val(),
-                    "center_id":center_id
+                    "sub_project_ids":sub_project_ids
             },
             success: function (data){
                 if(data.Courses != null)
@@ -135,10 +137,10 @@
         });
         return false;
     }
-    function LoadTrainers(center_id){
-        var URL=$('#hdn_web_url').val()+ "/GetAllTrainersBasedOnCenter_User"
+    function LoadTrainers(sub_project_ids){
+        var URL=$('#hdn_web_url').val()+ "/trainers_based_on_sub_projects"
             $.ajax({
-            type:"GET",
+            type:"POST",
             url:URL,
             async:false,        
             beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
@@ -146,7 +148,7 @@
             data:{
                     "user_id": $('#hdn_home_user_id').val(),
                     "user_role_id" : $('#hdn_home_user_role_id').val(),
-                    "center_id":center_id
+                    "sub_project_ids":sub_project_ids
             },
             success: function (data){
                 if(data.Trainers != null)
@@ -200,18 +202,16 @@
             "dataType": "json",
             "data": function (d) {
                 d.region_id = $('#ddlRegion').val();
-                d.center_id =$('#ddlCenter').val();
+                d.sub_project_ids = $('#ddlSubProject').val().toString();  
                 d.course_ids = $('#ddlCourse').val().toString();  
                 d.trainer_ids = $('#ddlTrainer').val().toString();             
                 d.from_date =$('#FromDate').val();
                 d.to_date = $('#ToDate').val();
                 d.batch_stage_id = $('#ddlBatchStage').val();
-                
             },
             error: function (e) {
                 $("#tbl_list tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
             }
-
         },
         "columns": [
             { "data": "S_No"},
@@ -234,8 +234,11 @@
                 $('#tbl_list_paginate ul.pagination').addClass("pagination-rounded");
             }
         });
+        //alert('ending table')
     }
+    
     function BatchModal(QpCode,QpName,CourseCode,CourseName,BatchCode,StartDate,EndDate,ActualStartDate,ActualEndDate,BatchActiveStatus){
+
         $('#txtQPCode').val(QpCode);
         $('#txtQPName').val(QpName);
         $('#txtCourseCode').val(CourseCode);
@@ -258,13 +261,13 @@
                 <div class="row">
                     <div class="col-lg-3">
                         <label for="ddlRegion " class="mr-2">Region</label>
-                        <select class="form-control dropdown-search-filter" onchange="LoadCenter(this.value);" id="ddlRegion" >
+                        <select class="form-control dropdown-search-filter" onchange="LoadSubProject(this.value);" id="ddlRegion" >
                             <option selected="" value="0">All</option>
                         </select>
                     </div>
                     <div class="col-lg-3">
-                        <label for="ddlCenter " class="mr-2">Center</label>
-                        <select class="form-control dropdown-search-filter" id="ddlCenter" onchange="LoadCourse_users(this.value);" >
+                        <label for="ddlSubProject" class="mr-2">Sub Project</label>
+                        <select class="form-control dropdown-search-filter" id="ddlSubProject" onchange="LoadCourse_users();" multiple>
                             <option selected="" value="0">All</option>
                         </select>
                     </div>

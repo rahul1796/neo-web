@@ -3121,7 +3121,7 @@ class TrainerDeploymentBatches(Resource):
         if request.method=='POST':
             try:
                 region_id = request.form['region_id']
-                center_id =request.form['center_id']
+                sub_project_ids = request.form['sub_project_ids']
                 course_ids = request.form['course_ids']
                 trainer_ids =request.form['trainer_ids']
                 from_date =request.form['from_date']
@@ -3145,10 +3145,8 @@ class TrainerDeploymentBatches(Resource):
                     order_by_column_direction = request.form['order[0][dir]']
                 if 'draw' in request.form:
                     draw = request.form['draw']
-                
-                
-                print(region_id,center_id,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-                response=Report.TrainerDeploymentBatches(region_id,center_id,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+                #print(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+                response=Report.TrainerDeploymentBatches(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
                 #print(response)
                 return response
             except Exception as e:
@@ -3163,7 +3161,7 @@ class ReportAttendanceBatches(Resource):
         if request.method=='POST':
             try:
                 region_id = request.form['region_id']
-                center_id =request.form['center_id']
+                sub_project_ids = request.form['sub_project_ids']
                 course_ids = request.form['course_ids']
                 trainer_ids =request.form['trainer_ids']
                 from_date =request.form['from_date']
@@ -3181,12 +3179,12 @@ class ReportAttendanceBatches(Resource):
                     order_by_column_direction = request.form['order[0][dir]']
                 if 'draw' in request.form:
                     draw = request.form['draw']
-                print(region_id,center_id,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-                response=Report.ReportAttendanceBatches(region_id,center_id,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+                #print(region_id,center_id,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+                response=Report.ReportAttendanceBatches(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
                 
                 return response
             except Exception as e:
-                print(str(e))
+                #print(str(e))
                 return {"exceptione":str(e)}
 
 api.add_resource(ReportAttendanceBatches,'/report_attendance_batches')
@@ -3210,7 +3208,7 @@ class ReportBatchSession(Resource):
                     order_by_column_direction = request.form['order[0][dir]']
                 if 'draw' in request.form:
                     draw = request.form['draw']
-                print(batch_id,course_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+                #print(batch_id,course_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
                 response=Report.ReportBatchSession(batch_id,course_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
                 
                 return response
@@ -7142,6 +7140,37 @@ class LogTrainerStageDetails(Resource):
             response=jsonify(res)
             return response
 api.add_resource(LogTrainerStageDetails,'/LogTrainerStageDetails')
+
+class GetSubProjectsForRegionUser(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            user_id=request.args.get('user_id',0,type=int)
+            user_role_id=request.args.get('user_role_id',0,type=int)
+            region_id=request.args.get('region_id',0,type=int)
+            response={"SubProjects":Master.GetSubProjectsForRegionUser(user_id,user_role_id,region_id)}
+            return response
+api.add_resource(GetSubProjectsForRegionUser,'/GetSubProjectsForRegionUser')
+
+class GetCoursesBasedOnSubProjects(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sub_project_ids=request.args.get('sub_project_ids','',type=str)
+            #print('hi')
+            #print(sub_project_ids)
+            response={"Courses":Master.GetCoursesBasedOnSubProjects(sub_project_ids)}
+            return response
+api.add_resource(GetCoursesBasedOnSubProjects,'/GetCoursesBasedOnSubProjects')
+
+class trainers_based_on_sub_projects(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            sub_project_ids=request.form['sub_project_ids']
+            return Batch.AllTrainersOnSubProjects(sub_project_ids)
+api.add_resource(trainers_based_on_sub_projects,'/trainers_based_on_sub_projects')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
