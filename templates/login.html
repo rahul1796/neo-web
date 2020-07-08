@@ -55,12 +55,11 @@
                     //$('#ddlRM_role').val().toString()//$('#ddlProject option:selected').val()
                 },
                 success: function (data){
-                    if(data != 'null')
-                    {   
+                    if(data != 'null' && data != null)
+                    {   //alert('null :'+data+':')
                         ids=data.User[0].Role_Ids;
                         var names=data.User[0].Role_Names;
                         $('#ddlRole').empty();
-
                         if (ids.split(',').length==1){
                             $('#hdn_login_userrole_id').val(ids);
                             $( "#login_from" ).submit();
@@ -103,11 +102,14 @@
                             //     }
 
                             //alert('create button')
-                        }                        
+                        }  
                     }
                     else{
-                        alert('error')
+                        multisubmit()
+                        //alert('error')
                     }
+                    
+                    
                 },
                 error:function(err)
                 {
