@@ -62,6 +62,8 @@
                         $('#ddlRole').empty();
                         if (ids.split(',').length==1){
                             $('#hdn_login_userrole_id').val(ids);
+                            $('#hdn_login_userrole_name').val(names);
+                            //multisubmit();
                             $( "#login_from" ).submit();
                         }
                         else{
@@ -121,10 +123,10 @@
             }
             function multisubmit(){
                 //alert($('#ddlRole').())
-                var user_name = jQuery("#ddlRole option:selected").text()
+                var userrole_name = jQuery("#ddlRole option:selected").text()
                 
                 $('#hdn_login_userrole_id').val($('#ddlRole').val());
-                $('#hdn_login_userrole_name').val(user_name);
+                $('#hdn_login_userrole_name').val(userrole_name);
 
                 $( "#login_from" ).submit();
             }
