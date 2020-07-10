@@ -1910,7 +1910,7 @@ class Database:
         sessionplans = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'SELECT * FROM [content].[tbl_session_plans] AS sp LEFT JOIN [content].[tbl_map_session_plan_course] AS map ON map.session_plan_id=sp.session_plan_id where map.course_id=?'
+        sql = 'SELECT sp.session_plan_id, sp.session_plan_name FROM [content].[tbl_session_plans] AS sp LEFT JOIN [content].[tbl_map_session_plan_course] AS map ON map.session_plan_id=sp.session_plan_id where map.course_id=?'
         values= (course_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
@@ -1924,7 +1924,7 @@ class Database:
         modules = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'SELECT * FROM [content].[tbl_modules] where session_plan_id=?'
+        sql = 'SELECT module_id, module_name FROM [content].[tbl_modules] where session_plan_id=?'
         values= (session_plan_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
