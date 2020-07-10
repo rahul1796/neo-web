@@ -13,11 +13,17 @@ class UsersM:
     def add_user(user_role_id,first_name,last_name,email,mobile,created_id,is_active,user_id,Id,is_reporting_manager):
         popupMessage = {"PopupMessage": Database.add_user_details(user_role_id,first_name,last_name,email,mobile,created_id,is_active,user_id,Id,is_reporting_manager)}
         return popupMessage
+    def tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role):
+        popupMessage = {"PopupMessage": Database.tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role)}
+        return popupMessage
     def AllUserRole():
         userrole_list={"UserRoles":Database.GetUserRole()}
         return userrole_list
     def get_user(glob_user_id):
         indi_user={"UserDetail":Database.get_user_details(glob_user_id)}
+        return indi_user
+    def get_user_role_details_for_role_update(user_id):
+        indi_user={"UserDetail":Database.get_user_role_details_for_role_update(user_id)}
         return indi_user
     def trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids,TrainerType):
         return Database.trainer_list(user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids,TrainerType)
