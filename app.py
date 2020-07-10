@@ -7036,7 +7036,6 @@ class GetBatchSessionList(Resource):
                 StatusId=request.args.get('status_id',0,type=int)
                 SessionName=request.args.get('session_name','')
                 app_version = request.args.get('app_version',0,type=str)
-
                 if UserId == 0:
                     res={'status':0,'message':'Invalid User Id','app_status':True}
                     response=jsonify(res)

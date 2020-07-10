@@ -87,6 +87,10 @@
                             $('#TMA_deployment_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
+                        $('#Productivity_Report').show();
+                            $('#region_productivity_report').show();
+                            $('#mobilizer_productivity_report').show();
+                            $('#Ops_Productivity_Report').show();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -700,9 +704,12 @@
                             <li class="has-submenu active" id="Registration_Menu">
                                 <a id="AnchorRegistration" href="/registration"  class="active"> <i class="fe-edit-2"></i>Registration<div class="button"></div></a>
                             </li>
+                            <li class="has-submenu active" id="Enrollment_Menu">
+                                <a id="AnchorRegistration" href="/enrollment"  class="active"> <i class="fe-edit-2"></i>Enrollment<div class="button"></div></a>
+                            </li>
                             <li class="has-submenu active"  id="training_Report_Menu" style="display:none">
                                 <a href="#" class="active">
-                                    <i class="fe-airplay"></i>Trainer <div class="arrow-down"></div></a>
+                                    <i class="fe-airplay"></i>Training<div class="arrow-down"></div></a>
                                 <ul class="submenu"> 
                                     <li  id="TMA_deployment_Menu">
                                         <a href="/TrainerDeployment" class="active"> Trainer Deployment <div class="button"></div></a>
@@ -711,9 +718,6 @@
                                         <a href="/AttendanceReport" class="active"> Attendance<div class="button"></div></a>
                                     </li>
                                 </ul>
-                            </li>
-                            <li class="has-submenu active" id="Enrollment_Menu">
-                                <a id="AnchorRegistration" href="/enrollment"  class="active"> <i class="fe-edit-2"></i>Enrollment<div class="button"></div></a>
                             </li>
 							<!-- <li class="has-submenu active" id="Batch_Menu">
                                 <a id="AnchorBatch" href="/batch"  class="active"> <i class="fe-tag"></i>Batch<div class="button"></div></a>
@@ -747,12 +751,6 @@
 									<li  id="Mobilization_report_Menu" style="display:none">
                                         <a href="/MobilizationReport" id="Mobilization_report" class="active"> Mobilization Report<div class="button"></div></a>
                                     </li>
-                                    <li>
-										<a href="/ops_productivity_report" id="Ops_Productivity_Report" class="active">Ops Productivity Report<div class="button"></div></a>
-                                    </li>
-                                    <li>
-										<a href="/region_productivity_report" id="region_productivity_report" class="active">Region-wise Productivity Report<div class="button"></div></a>
-                                    </li>
                                     <li class="has-submenu"  id="TMA_content" style="display:none">
                                         <a href="#">Training Report <div class="arrow-down"></div></a>
                                         <ul class="submenu">      
@@ -763,6 +761,23 @@
 												<a href="/tma_report_filter" class="active"> TMA Report<div class="button"></div></a>
 											</li>
                                         </ul>
+                                    </li>
+                                    <li class="has-submenu"  id="Productivity_Report" style="display:none">
+                                        <a href="#">Productivity Report<div class="arrow-down"></div></a>
+                                        <ul class="submenu">      
+                                            <!--<li  id="TMA_batch_Menu">
+												<a href="/tma_batch" class="active"> Trainer Deployment <div class="button"></div></a>
+                                            </li-->
+                                            <li id="region_productivity_report">
+                                                <a href="/region_productivity_report" class="active">Region-wise Productivity Report<div class="button"></div></a>
+                                            </li>
+                                            <li id="mobilizer_productivity_report">
+                                                <a href="/mobilizer_productivity_report" class="active">Mobilizer Productivity Report<div class="button"></div></a>
+                                            </li>
+                                            <li id="Ops_Productivity_Report">
+                                                <a href="/ops_productivity_report" class="active">Ops Productivity Report<div class="button"></div></a>
+                                            </li>
+										</ul>
                                     </li>
 									<li class="has-submenu"  id="CoomplianceReport" style="display:none">
                                         <a href="#">Compliance Reports <div class="arrow-down"></div></a>
@@ -777,10 +792,6 @@
                                     </li>
                                     <li  id="master_data_Menu" style="display:none"> 
 										<a href="/download_master_data" class="active">Download Master Data<div class="button"></div></a>
-                                    </li>
-                                    
-                                    <li>
-										<a href="/mobilizer_productivity_report" id="mobilizer_productivity_report" class="active">Mobilizer Productivity Report<div class="button"></div></a>
                                     </li>
                                 </ul>
                             </li>
