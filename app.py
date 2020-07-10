@@ -1141,6 +1141,15 @@ class tag_users_from_sub_project(Resource):
         sub_project_id=request.form['sub_project_id']
         tagged_by= session['user_id']
         return Master.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)
+class tag_user_roles(Resource):
+    @staticmethod
+    def post():
+        login_user_id=request.form['login_user_id']
+        user_id=request.form['user_id']
+        neo_role=request.form['neo_role']
+        jobs_role=request.form['jobs_role']
+        crm_role=request.form['crm_role']        
+        return UsersM.tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role)
 
 api.add_resource(batch_list, '/batch_list')
 api.add_resource(batch_list_updated, '/batch_list_updated')
@@ -1160,6 +1169,7 @@ api.add_resource(drop_edit_map_candidate_batch,'/drop_edit_candidate_batch')
 api.add_resource(untag_users_from_sub_project,'/untag_users_from_sub_project')
 api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
+api.add_resource(tag_user_roles,'/tag_user_roles')
 ####################################################################################################
 
 #QP_API's
@@ -4175,6 +4185,17 @@ class All_role(Resource):
                 return {'exception':str(e)}
 api.add_resource(All_role,'/All_role')
 
+class All_role_neo(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.All_role_neo_db()
+                return {'Role':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(All_role_neo,'/All_role_neo')
+
 class All_dept(Resource):
     @staticmethod
     def get():
@@ -4468,6 +4489,14 @@ class get_user_details_new(Resource):
             user_id=int(request.args['user_id'])
             return UsersM.get_user(user_id)
 api.add_resource(get_user_details_new,'/get_user_details_new')
+
+class get_user_role_details_new(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            user_id=int(request.args['user_id'])
+            return UsersM.get_user_role_details_for_role_update(user_id)
+api.add_resource(get_user_role_details_new,'/get_user_role_details_new')
 
 class GetProjectsForCourse(Resource):
     @staticmethod
