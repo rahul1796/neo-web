@@ -4037,7 +4037,6 @@ class updated_tma_report(Resource):
     def post():
         if request.method=='POST':
             try:
-                
                 from_date = request.form["from_date"]
                 to_date = request.form["to_date"]
                 Customers = request.form["Customers"]
@@ -4061,19 +4060,17 @@ class updated_new_tma_report(Resource):
     def post():
         if request.method=='POST':
             try:
-                
                 from_date = request.form["from_date"]
                 to_date = request.form["to_date"]
                 Customers = request.form["Customers"]
-                Centers =request.form["Centers"]
+                SubProject =request.form["SubProject"]
                 Courses = request.form["Courses"]
-
+                
                 file_name='tma_report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
 
-                resp = filter_tma_report_new.create_report(from_date, to_date, Customers, Centers, Courses, file_name)
-                
+                resp = filter_tma_report_new.create_report(from_date, to_date, Customers, SubProject, Courses, file_name)
                 return resp
-                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+                
             except Exception as e:
                 #print(str(e))
                 return {"exceptione":str(e)}
@@ -7115,6 +7112,13 @@ class trainers_based_on_sub_projects(Resource):
             return Batch.AllTrainersOnSubProjects(sub_project_ids)
 api.add_resource(trainers_based_on_sub_projects,'/trainers_based_on_sub_projects')
 
-
+class GetSubProjectsForCustomer(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            customer_ids=request.args.get('customer_ids','',type=str)
+            response={"SubProjects":TMA.GetSubProjectsForCustomer(customer_ids)}
+            return response
+api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
 if __name__ == '__main__':
     app.run(debug=True)

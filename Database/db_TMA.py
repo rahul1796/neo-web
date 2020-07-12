@@ -157,3 +157,20 @@ class TMADatabase:
         con.close()
         return res
         
+    def GetSubProjectsForCustomer(customer_ids):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_sub_projects_for_customer]  ?'
+        values = (customer_ids,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        #print(response)
+        return response

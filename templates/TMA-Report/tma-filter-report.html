@@ -13,53 +13,12 @@
             $(".date-picker").flatpickr({
                 dateFormat:'d-M-Y'
             });
-            LoadCustomerddl();
+            LoadCustomerdl();
     
         });
-
-    function LoadCustomerddl(){
-    var URL=$('#hdn_web_url').val()+ "/AllCustomer_report_new"
-    $.ajax({
-        type:"GET",
-        url:URL,
-        async:false,        
-        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-        datatype:"json",
-		/*
-        data:{
-                "user_id": $('#hdn_home_user_id').val(),
-                "user_role_id" : $('#hdn_home_user_role_id').val()
-        },
-		*/
-        success: function (data){
-            if(data.Customer != null)
-            {
-                $('#ddlCustomer').empty();
-                var count=data.Customer.length;
-                if( count> 0)
-                {
-                    $('#ddlCustomer').append(new Option('ALL','0'));
-                    for(var i=0;i<count;i++)
-                        $('#ddlCustomer').append(new Option(data.Customer[i].customer_name,data.Customer[i].customer_name));
-                    $('#ddlCustomer').val('');
-                }
-                else
-                {
-                    $('#ddlCustomer').append(new Option('ALL','0'));
-                }
-            }
-        },
-        error:function(err)
-        {
-            alert('Error! Please try again');
-            return false;
-        }
-    });
-    return false;
-}
-
-    function LoadCenter(Customer_id){
-        var URL=$('#hdn_web_url').val()+ "/All_Center_based_on_customer_new"
+    
+        function LoadCustomerdl(){
+        var URL=$('#hdn_web_url').val()+ "/GetALLClient"
             $.ajax({
             type:"GET",
             url:URL,
@@ -67,23 +26,64 @@
             beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
             datatype:"json",
             data:{
-                    "Customer_id":Customer_id
+                "user_id": $('#hdn_home_user_id').val(),
+                "user_role_id": $('#hdn_home_user_role_id').val()
             },
             success: function (data){
-                if(data.Centers != null)
+                if(data.Clients != null)
                 {
-                    $('#ddlCenter').empty();
-                    var count=data.Centers.length;
+                    $('#ddlCustomer').empty();
+                    var count=data.Clients.length;
                     if( count> 0)
                     {
-                        $('#ddlCenter').append(new Option('ALL','-1'));
+                        //$('#ddlRegion').append(new Option('ALL','-1'));
                         for(var i=0;i<count;i++)
-                            $('#ddlCenter').append(new Option(data.Centers[i].Center_Name,data.Centers[i].Center_Name));
-						$('#ddlCenter').val('');
+                            $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
+                        //$('#ddlCourse').val('-1');
                     }
                     else
                     {
-                        $('#ddlCenter').append(new Option('ALL','-1'));
+                    // $('#ddlCustomer').append(new Option('No Customer','-1'));
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error while loading BU! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+
+    function LoadSubProject(){
+        var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForCustomer"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id" : $('#hdn_home_user_role_id').val(),
+                    "customer_ids": $('#ddlCustomer').val().toString()
+            },
+            success: function (data){
+                if(data.SubProjects != null)
+                {
+                    $('#ddlSubProject').empty();
+                    var count=data.SubProjects.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlCenter').append(new Option('ALL','0'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlSubProject').append(new Option(data.SubProjects[i].Sub_Project_Name,data.SubProjects[i].Sub_Project_Id));
+						$('#ddlSubProject').val('');
+                    }
+                    else
+                    {
+                        $('#ddlSubProject').append(new Option('ALL','0'));
                     }
                 }
             },
@@ -95,10 +95,14 @@
         });
         return false;
     }
-	
-    function LoadCourses(center_id){
-        var URL=$('#hdn_web_url').val()+ "/All_Course_basedon_customer_center_new"
-			
+    function LoadCourse_users(){
+        var sub_project_ids = $('#ddlSubProject').val().toString();
+        LoadCourses(sub_project_ids);
+        //LoadTrainers(sub_project_ids);
+    }
+    function LoadCourses(sub_project_ids){
+
+        var URL=$('#hdn_web_url').val()+ "/GetCoursesBasedOnSubProjects"
             $.ajax({
             type:"GET",
             url:URL,
@@ -106,26 +110,24 @@
             beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
             datatype:"json",
             data:{
-                    "Center_id":center_id,
-					"Customer_id":$('#ddlCustomer').serialize()
-					//"Customer_id":$('#ddlCustomer').toString()
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id" : $('#hdn_home_user_role_id').val(),
+                    "sub_project_ids":sub_project_ids
             },
-
             success: function (data){
-				
-				if(data.Courses != null)
+                if(data.Courses != null)
                 {
                     $('#ddlCourse').empty();
                     var count=data.Courses.length;
                     if( count> 0)
                     {
-                        $('#ddlCourse').append(new Option('ALL','-1'));
+                        //$('#ddlCourse').append(new Option('ALL','0'));
                         for(var i=0;i<count;i++)
-                            $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Name));
+                            $('#ddlCourse').append(new Option(data.Courses[i].Course_Name,data.Courses[i].Course_Id));
                     }
                     else
                     {
-                        $('#ddlCourse').append(new Option('ALL','-1'));
+                        $('#ddlCourse').append(new Option('ALL','0'));
                     }
                 }
             },
@@ -137,8 +139,6 @@
         });
         return false;
     }
-    
-	
     function DownloadTableBasedOnSearch(){
         /*if($('#ddlCustomer').val()==''|| $('#ddlCustomer').val()==null){
             alert("Please select a Customer.");
@@ -159,17 +159,18 @@
 		else{
             
             $("#imgSpinner").show();
-			var URL=$('#hdn_web_url').val()+ "/updated_tma_report_new"
+			var URL=$('#hdn_web_url').val()+ "/updated_new_tma_report"
 			//window.location = URL + "?ActivityDate=2019-09-09"
 			$.ajax({
                         type: "POST",
                         dataType: "json",
                         url: URL, 
-                        data: {
+                        data: { 
+                            
 						'from_date':$('#FromDate').val(),	//.toString()
 						'to_date':$('#ToDate').val(),     	//.toString()
 						'Customers':$('#ddlCustomer').val().toString(),
-						'Centers':$('#ddlCenter').val().toString(),
+						'SubProject':$('#ddlSubProject').val().toString(),
 						'Courses':$('#ddlCourse').val().toString()
 						},
                         success: function(resp) 
@@ -244,14 +245,14 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <label for="ddlCustomer" class="mr-2">Customer</label>
-                        <select class="form-control dropdown-search-filter" onchange="LoadCenter(this.value);" id="ddlCustomer" multiple >
+                        <select class="form-control dropdown-search-filter" onchange="LoadSubProject();" id="ddlCustomer" multiple >
                             <option value="0">All</option>
                         </select>
                     </div>
                     <div class="col-lg-4">
-                        <label for="ddlCenter" class="mr-2">Center</label>
-                        <select class="form-control dropdown-search-filter" id="ddlCenter" onchange="LoadCourses(this.value);" multiple >
-                            <option value="-1">All</option>
+                        <label for="ddlSubProject" class="mr-2">Sub Project</label>
+                        <select class="form-control dropdown-search-filter" id="ddlSubProject" onchange="LoadCourse_users();" multiple>
+                            <option selected="" value="0">All</option>
                         </select>
                     </div>
                     <div class="col-lg-4">
