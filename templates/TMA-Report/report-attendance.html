@@ -220,14 +220,14 @@
             { "data": "Center_Name"},
             { "data": "Course_Name"},
             { "data": "Trainer_Name"},
-            { "data": "Batch_Code"},
-            /*{
+            //{ "data": "Batch_Code"},
+            {
             "data": function (row, type, val, meta) {
                 var varButtons = ""; 
-                varButtons += '<a  onclick="BatchModal(\'' + row.Qp_Code + '\',\'' + row.Qp_Name + '\',\'' + row.Course_Code + '\',\'' + row.Course_Name + '\',\'' + row.Batch_Code + '\',\'' + row.Start_Date + '\',\'' + row.End_Date + '\',\'' + row.Actual_Start_Date + '\',\'' + row.Actual_End_Date + '\',\'' + row.Batch_Active_Status + '\')"  style="cursor:pointer" >' + row.Batch_Code + '</a>';
+                varButtons += '<a  onclick="BatchModal(\'' + row.Qp_Code + '\',\'' + row.Qp_Name + '\',\'' + row.Course_Code + '\',\'' + row.Course_Name + '\',\'' + row.Batch_Code + '\',\'' + row.Start_Date + '\',\'' + row.End_Date + '\',\'' + row.Actual_Start_Date + '\',\'' + row.Actual_End_Date + '\',\'' + row.Batch_Active_Status + '\')"  style="color:blue;cursor:pointer" >' + row.Batch_Code + '</a>';
                 return varButtons;
                 }
-            },*/
+            },
             { "data": "Batch_Stage_Name"},
             { "data": "Candidate_Count"},
             {
@@ -249,8 +249,21 @@
         win.focus();
         console.log(BatchId,CourseId);
     }
+    function BatchModal(QpCode,QpName,CourseCode,CourseName,BatchCode,StartDate,EndDate,ActualStartDate,ActualEndDate,BatchActiveStatus){
+        $('#txtQPCode').val(QpCode);
+        $('#txtQPName').val(QpName);
+        $('#txtCourseCode').val(CourseCode);
+        $('#txtCourseName').val(CourseName);
+        $('#txtBatchCode').val(BatchCode);
+        $('#txtPlannedStartDate').val(StartDate);
+        $('#txtPlannedEndDate').val(EndDate);
+        $('#txtActualStartDate').val(ActualStartDate);
+        $('#txtActualEndDate').val(ActualEndDate);
+        $('#txtBatchActiveStatus').val(BatchActiveStatus);
+        $('#con_close_modal').modal('show');
+        }
 </script>
-   
+
 </br>
 <div class="container-fluid">
     <div class="row">
@@ -327,11 +340,11 @@
                     </div>
                     <br/>
                     <div class="col-lg-12">
-                        <table id="tbl_list" class="table dt-responsive nowrap" >
+                        <table id="tbl_list" class="table w-100 dt-responsive wrap dataTable no-footer" >
                             <thead>
                                 <tr>
                                     <th>S No</th>
-                                    <th>Center</th>
+                                    <th>Sub Project</th>
                                     <th>Course</th>
                                     <th>Trainer</th>
                                     <th>Batch Code</th>
@@ -350,7 +363,142 @@
     </div>
 </div>
 
-
+<div id="con_close_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Batch Details</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtQPCode" class="control-label">QP Code</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtQPCode" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtQPName" class="control-label">QP Name</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtQPName" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtCourseCode" class="control-label">Course Code</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtCourseCode" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtCourseName" class="control-label">Course Name</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtCourseName" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtBatchCode" class="control-label">Batch Code</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtBatchCode" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtPlannedStartDate" class="control-label">Planned Start Date</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtPlannedStartDate" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtPlannedEndDate" class="control-label">Planned End Date</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtPlannedEndDate"disabled >
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtActualStartDate" class="control-label">Actual Start Date</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtActualStartDate" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtActualEndDate" class="control-label">Actual End Date</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtActualEndDate" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="txtBatchActiveStatus" class="control-label">Batch Active Status</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtBatchActiveStatus" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div><!--/.modal-->
 
 
 <!-- third party js -->
