@@ -172,7 +172,7 @@ body {
 	right: 0
 }
 .navigation-menu>li.last-elements .submenu>li.has-submenu .submenu {
-	/*left: auto;*/
+	left: auto;
 	right: 100%;
 	margin-left: 0;
 	margin-right: 10px
@@ -242,7 +242,7 @@ body {
 	margin-top: -1px
 }
 .navigation-menu>li .submenu li .submenu:before {
-	left: -20px;
+	right: -20px;
 	top: 10px;
 	border-top: 12px solid transparent;
 	border-bottom: 12px solid transparent;
