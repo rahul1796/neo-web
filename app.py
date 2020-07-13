@@ -3977,7 +3977,6 @@ class download_trainer_filter(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(download_trainer_filter,'/download_trainer_filter')
 
-
 @app.route("/tma_report_filter_page")
 def tma_report_filter_page():
     if g.user:
