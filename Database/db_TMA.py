@@ -119,10 +119,10 @@ class TMADatabase:
                             stg_id=data[i][11]
                         elif (stg_id<4)and(stg_id==data[i][11]):
                             is_active=True
-                            stg_id=data[i][11]
+                            #stg_id=data[i][11]
                         else:
                             is_active=False
-                            stg_id=data[i][11]
+                            #stg_id=data[i][11]
                         SessionList.append({'session_id':data[i][0],'session_name': data[i][1],'course_id': data[i][2],'course_code': data[i][3],'course_name': data[i][4],'qp_id': data[i][5],'qp_code': data[i][6],'qp_name': data[i][7],'status_id': data[i][8],'status_name': data[i][9],'session_duration': data[i][10],'session_stage_id':data[i][11],'session_stage_name':data[i][12],'session_order':data[i][13],'is_active':is_active})
                     elif data[i][11]==4:
                         stg_id=data[i][11]
