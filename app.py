@@ -6766,7 +6766,6 @@ class get_candidate_details(Resource):
                 res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
                 return jsonify(res)
 
-#Base URL + "/get_candidate_list" api will provide all the unzynched QP data as response
 api.add_resource(get_candidate_details, '/get_candidate_details')
 
 
