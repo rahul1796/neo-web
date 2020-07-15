@@ -14,8 +14,8 @@ import csv
 def to_xml(df, filename=None, mode='w'):
     if len(df)>0:
         if 'Candidate_Family_Details_Id' in df:
-            df1=df[['Candidate_Id','Family_Salutation','Family_Name','Family_Date_Of_Birth','Family_Age','Family_Primary_Contact','Family_Email_Address','Family_Gender','Family_Relationship','Family_Education','Family_Current_Occupation','Candidate_Family_Details_Id']]
-            df2=df.drop(['Family_Salutation','Family_Name','Family_Date_Of_Birth','Family_Age','Family_Primary_Contact','Family_Email_Address','Family_Gender','Family_Relationship','Family_Education','Family_Current_Occupation','Candidate_Family_Details_Id'],axis=1)
+            df1=df[['Candidate_Id','Family_Salutation','Family_Name','Family_Date_Of_Birth','Family_Age','Family_Primary_Contact','Family_Email_Address','Family_Gender','Family_Education','Family_Relationship','Family_Current_Occupation','Candidate_Family_Details_Id']]
+            df2=df.drop(['Family_Salutation','Family_Name','Family_Date_Of_Birth','Family_Age','Family_Primary_Contact','Family_Email_Address','Family_Gender','Family_Education','Family_Relationship','Family_Current_Occupation','Candidate_Family_Details_Id'],axis=1)
             
         else:
             df1=df[['Candidate_Id','Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On']]
