@@ -55,14 +55,15 @@
                     //$('#ddlRM_role').val().toString()//$('#ddlProject option:selected').val()
                 },
                 success: function (data){
-                    if(data != 'null')
-                    {   
+                    if(data != 'null' && data != null)
+                    {   //alert('null :'+data+':')
                         ids=data.User[0].Role_Ids;
                         var names=data.User[0].Role_Names;
                         $('#ddlRole').empty();
-
                         if (ids.split(',').length==1){
                             $('#hdn_login_userrole_id').val(ids);
+                            $('#hdn_login_userrole_name').val(names);
+                            //multisubmit();
                             $( "#login_from" ).submit();
                         }
                         else{
@@ -103,11 +104,14 @@
                             //     }
 
                             //alert('create button')
-                        }                        
+                        }  
                     }
                     else{
-                        alert('error')
+                        multisubmit()
+                        //alert('error')
                     }
+                    
+                    
                 },
                 error:function(err)
                 {
@@ -118,7 +122,12 @@
             return false;
             }
             function multisubmit(){
+                //alert($('#ddlRole').())
+                var userrole_name = jQuery("#ddlRole option:selected").text()
+                
                 $('#hdn_login_userrole_id').val($('#ddlRole').val());
+                $('#hdn_login_userrole_name').val(userrole_name);
+
                 $( "#login_from" ).submit();
             }
         </script>
@@ -143,6 +152,7 @@
                                 <form id='login_from' method="POST" action="/login">
 
                                     <input type="hidden" id="hdn_login_userrole_id" name="hdn_login_userrole_id" value="">
+                                    <input type="hidden" id="hdn_login_userrole_name" name="hdn_login_userrole_name" value="">
 
                                     <div class="form-group mb-3">
                                         <label for="emailaddress">Email address</label>

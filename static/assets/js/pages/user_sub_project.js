@@ -309,7 +309,7 @@ function LoadTable()
             { "data": "Employee_Email" },
             { "data": "Sub_Project_Code"},
             { "data": "Sub_Project_Name" },
-            { "data": "Employee_Role" },
+            { "data": "Employee_Neo_Role" },
             { "data": "Employement_Type" }         
             
         ],

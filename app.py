@@ -116,6 +116,7 @@ def before_request():
     g.center_id = None
     g.user_id = None
     g.user_role_id = None
+    g.user_role_name = None
     g.web_user_id = None
     g.batch_id = None
     g.qp_id = None
@@ -141,12 +142,14 @@ def before_request():
         g.user = session['user_name']
         g.user_id = session['user_id']
         g.user_role = session['user_role_id']
+        g.user_role_name = session['user_role_name']
         g.user_region_id=session['user_region_id']
         g.base_url = session['base_url']
         # print(g.user,g.user_id,g.user_role)
         g.User_detail_with_ids.append(g.user)
         g.User_detail_with_ids.append(g.user_id)
         g.User_detail_with_ids.append(g.user_role)
+        g.User_detail_with_ids.append(g.user_role_name)
         g.User_detail_with_ids.append(g.base_url)
         g.User_detail_with_ids.append(g.user_region_id)
     if 'course_id' in session.keys():
@@ -244,13 +247,15 @@ def login():
         email = request.form['inemailaddress']
         passw = request.form['inpassword']
         role_id = request.form['hdn_login_userrole_id']
+        role_name = request.form['hdn_login_userrole_name']
         #return(role_id)
         tr = Database.Login(email,passw)
         if tr != []:
             if tr[0]['Is_Active'] == 1:
-                session['user_name'] = tr[0]['User_Name']            
+                session['user_name'] = tr[0]['User_Name'] 
                 session['user_id'] = tr[0]['User_Id']
                 session['user_role_id'] = role_id #tr[0]['User_Role_Id']
+                session['user_role_name'] = role_name
                 session['user_region_id'] = tr[0]['Region_Id']  
                 session['base_url'] = config.Base_URL
                 config.displaymsg=""
@@ -1136,6 +1141,15 @@ class tag_users_from_sub_project(Resource):
         sub_project_id=request.form['sub_project_id']
         tagged_by= session['user_id']
         return Master.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)
+class tag_user_roles(Resource):
+    @staticmethod
+    def post():
+        login_user_id=request.form['login_user_id']
+        user_id=request.form['user_id']
+        neo_role=request.form['neo_role']
+        jobs_role=request.form['jobs_role']
+        crm_role=request.form['crm_role']        
+        return UsersM.tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role)
 
 api.add_resource(batch_list, '/batch_list')
 api.add_resource(batch_list_updated, '/batch_list_updated')
@@ -1155,6 +1169,7 @@ api.add_resource(drop_edit_map_candidate_batch,'/drop_edit_candidate_batch')
 api.add_resource(untag_users_from_sub_project,'/untag_users_from_sub_project')
 api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
+api.add_resource(tag_user_roles,'/tag_user_roles')
 ####################################################################################################
 
 #QP_API's
@@ -1806,7 +1821,6 @@ api.add_resource(get_section_type_details,'/GetSectionTypeDetails')
 ############################################################################################################
 
 #TMA_REPORT_API's
-
 @app.route("/tma_report_download_page")
 def tma_report_download_page():
     if g.user:
@@ -1820,8 +1834,6 @@ def tma_report():
         return render_template("home.html",values=g.User_detail_with_ids,html="tma_report_download_page")
     else:
         return render_template("login.html",error="Session Time Out!!")
-
-
 
 @app.route('/tma_report_download_func',methods=['GET', 'POST'])
 def tma_user_download():
@@ -2110,15 +2122,12 @@ def tma_batch():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
-
 @app.route("/tma_session_page")
 def tma_session_page():
     if g.user:
-        #return str(g.session_data)
         return render_template("TMA-Report/tma_session.html", data = g.session_data)
     else:
         return render_template("login.html",error="Session Time Out!!")
-
 
 @app.route('/trainer_sessions', methods=['GET','POST'])
 def trainer_sessions():
@@ -2936,7 +2945,6 @@ api.add_resource(course_api.AllProjectList, '/AllProjectList')
 
 #########################################TMA REPORT###################################################################
 
-
 @app.route("/trainer_deployment")
 def trainer_deployment_page():
     if g.user:
@@ -3123,7 +3131,7 @@ class TrainerDeploymentBatches(Resource):
         if request.method=='POST':
             try:
                 region_id = request.form['region_id']
-                center_id =request.form['center_id']
+                sub_project_ids = request.form['sub_project_ids']
                 course_ids = request.form['course_ids']
                 trainer_ids =request.form['trainer_ids']
                 from_date =request.form['from_date']
@@ -3147,10 +3155,8 @@ class TrainerDeploymentBatches(Resource):
                     order_by_column_direction = request.form['order[0][dir]']
                 if 'draw' in request.form:
                     draw = request.form['draw']
-                
-                
-                print(region_id,center_id,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-                response=Report.TrainerDeploymentBatches(region_id,center_id,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+                #print(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+                response=Report.TrainerDeploymentBatches(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
                 #print(response)
                 return response
             except Exception as e:
@@ -3165,7 +3171,7 @@ class ReportAttendanceBatches(Resource):
         if request.method=='POST':
             try:
                 region_id = request.form['region_id']
-                center_id =request.form['center_id']
+                sub_project_ids = request.form['sub_project_ids']
                 course_ids = request.form['course_ids']
                 trainer_ids =request.form['trainer_ids']
                 from_date =request.form['from_date']
@@ -3183,12 +3189,12 @@ class ReportAttendanceBatches(Resource):
                     order_by_column_direction = request.form['order[0][dir]']
                 if 'draw' in request.form:
                     draw = request.form['draw']
-                print(region_id,center_id,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-                response=Report.ReportAttendanceBatches(region_id,center_id,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+                #print(region_id,center_id,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+                response=Report.ReportAttendanceBatches(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
                 
                 return response
             except Exception as e:
-                print(str(e))
+                #print(str(e))
                 return {"exceptione":str(e)}
 
 api.add_resource(ReportAttendanceBatches,'/report_attendance_batches')
@@ -3212,7 +3218,7 @@ class ReportBatchSession(Resource):
                     order_by_column_direction = request.form['order[0][dir]']
                 if 'draw' in request.form:
                     draw = request.form['draw']
-                print(batch_id,course_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+                #print(batch_id,course_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
                 response=Report.ReportBatchSession(batch_id,course_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
                 
                 return response
@@ -3971,7 +3977,6 @@ class download_trainer_filter(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(download_trainer_filter,'/download_trainer_filter')
 
-
 @app.route("/tma_report_filter_page")
 def tma_report_filter_page():
     if g.user:
@@ -4041,7 +4046,6 @@ class updated_tma_report(Resource):
     def post():
         if request.method=='POST':
             try:
-                
                 from_date = request.form["from_date"]
                 to_date = request.form["to_date"]
                 Customers = request.form["Customers"]
@@ -4065,19 +4069,17 @@ class updated_new_tma_report(Resource):
     def post():
         if request.method=='POST':
             try:
-                
                 from_date = request.form["from_date"]
                 to_date = request.form["to_date"]
                 Customers = request.form["Customers"]
-                Centers =request.form["Centers"]
+                SubProject =request.form["SubProject"]
                 Courses = request.form["Courses"]
-
+                
                 file_name='tma_report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
 
-                resp = filter_tma_report_new.create_report(from_date, to_date, Customers, Centers, Courses, file_name)
-                
+                resp = filter_tma_report_new.create_report(from_date, to_date, Customers, SubProject, Courses, file_name)
                 return resp
-                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+                
             except Exception as e:
                 #print(str(e))
                 return {"exceptione":str(e)}
@@ -4178,6 +4180,17 @@ class All_role(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(All_role,'/All_role')
+
+class All_role_neo(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.All_role_neo_db()
+                return {'Role':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(All_role_neo,'/All_role_neo')
 
 class All_dept(Resource):
     @staticmethod
@@ -4472,6 +4485,14 @@ class get_user_details_new(Resource):
             user_id=int(request.args['user_id'])
             return UsersM.get_user(user_id)
 api.add_resource(get_user_details_new,'/get_user_details_new')
+
+class get_user_role_details_new(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            user_id=int(request.args['user_id'])
+            return UsersM.get_user_role_details_for_role_update(user_id)
+api.add_resource(get_user_role_details_new,'/get_user_role_details_new')
 
 class GetProjectsForCourse(Resource):
     @staticmethod
@@ -5432,7 +5453,7 @@ class submit_candidate_updated(Resource):
             device_model = str(request.form['device_model'])
             imei_num = str(request.form['imei_num'])
             android_version = str(request.form['android_version'])
-
+            
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
                 if cand_stage==1:
                     out = Database.get_submit_candidate_mobi(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
@@ -5478,11 +5499,11 @@ class get_batch_list_updated(Resource):
             client_key = str(request.args['client_key'])
             
             user_id = int(request.args['user_id'])
+            candidate_id = int(request.args['candidate_id'])
             role_id = int(request.args['role_id'])
-            
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
 
-                out = Database.get_batch_list_updated(user_id)
+                out = Database.get_batch_list_updated(user_id,candidate_id,role_id)
                 return jsonify(out)
                 
             else:
@@ -6637,6 +6658,61 @@ class upload_batch_target_plan(Resource):
              
 api.add_resource(upload_batch_target_plan,'/upload_batch_target_plan')
 
+class upload_user(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                f = request.files['filename']
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
+                f.save(file_name)
+                df= pd.read_excel(file_name,sheet_name='Template')
+                df = df.fillna('')
+                schema = Schema([
+                        #null check
+                        Column('Employee Code*',str_validation+null_validation),
+                        Column('Employee Name*',str_validation+null_validation),
+                        Column('Employee Email*',str_validation+null_validation),
+                        Column('Reporting Manager Employee Code*',str_validation+null_validation),
+                        Column('Mobile Number*',str_validation+null_validation),
+                        Column('Employee HR Role*',str_validation+null_validation),
+                        Column('Region*',str_validation+null_validation),
+                        Column('Grade*',str_validation+null_validation),
+                        Column('Designation*',str_validation+null_validation),
+                        Column('Employment Status*',str_validation+null_validation),
+                        Column('Entity*',str_validation+null_validation),
+                        Column('Employee Department*',str_validation+null_validation),
+                        Column('Active Status*',str_validation+null_validation)
+                        ])
+                errors = schema.validate(df)
+                errors_index_rows = [e.row for e in errors]
+                len_error = len(errors_index_rows)
+                if len_error>0:
+                    print("1")
+                    file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                    pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                    return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                else:
+                    print("2")
+                    df.columns = df.columns.str.replace(" ", "_")
+                    df.columns = df.columns.str.replace("*", "")
+                    df.insert(0, 'row_index', range(len(df)))
+                    out = Database.upload_user(df,user_id,user_role_id)
+                    if out['Status']==False:
+                        file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                        pd.DataFrame(out['data']).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                        return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                    else:
+                        return out
+                
+            except Exception as e:
+                 print(e)
+                 return {"Status":False, "message":"Unable to upload " + str(e)}  
+             
+api.add_resource(upload_user,'/upload_user')
+
 class GetSubProjectPlannedBatches(Resource):
     @staticmethod
     def get():
@@ -6690,7 +6766,6 @@ class get_candidate_details(Resource):
                 res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
                 return jsonify(res)
 
-#Base URL + "/get_candidate_list" api will provide all the unzynched QP data as response
 api.add_resource(get_candidate_details, '/get_candidate_details')
 
 
@@ -6843,12 +6918,290 @@ class SetNewUserRole(Resource):
         if request.method=='GET':
             try:
                 user_role_id=request.args.get('user_role_id','',type=str)
+                user_role_name=request.args.get('user_role_name','',type=str)
                 session['user_role_id'] = int(user_role_id)
+                session['user_role_name'] = str(user_role_name)
                 return {'Status':True,'Description':'Success'}
             except Exception as e:
                 return {'Status':False,'Description':'Error: '+str(e)}
-                
 api.add_resource(SetNewUserRole,'/SetNewUserRole')
+
+########################################## TMA APIS #########################################
+class GetBatchCandidateList(Resource):
+    @staticmethod
+    def get():
+        try:
+            if request.method=='GET':
+                batch_id = int(request.args['batch_id'])
+                session_id = int(request.args['session_id'])
+                if batch_id<1:
+                    res = {'status':0,'message':'Missing or invalid batch_id'}
+                    return jsonify(res)
+                
+                candidate_list = TMA.GetBatchCandidateList_db(batch_id,session_id)
+                res = {'status':1,'message':'Success','candidate_list':candidate_list}
+                """
+                if candidate_list[0]==False:
+                    res = {'status':0, 'message':'No stage found' }
+                else:
+                    res = {'status':1,'message':'Success','candidate_list':candidate_list}
+                """
+                return jsonify(res)
+        except Exception as e:
+            res={'status':-1,'message':'Error : '+ str(e)}
+            response=jsonify(res)
+            return response
+api.add_resource(GetBatchCandidateList, '/GetBatchCandidateList')
+
+class UploadCandidateAttendanceImages(Resource):
+    # secret_id = 'L4b0urN3t'
+    # secret_key='N304pp5'
+    # if (client_id==UploadCandidateAttendanceImages.secret_id) and (client_key==UploadCandidateAttendanceImages.secret_key):
+    upload_path = config.tmapath + 'attendance_images/'
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            client_id = str(request.form['client_id'])
+            client_key = str(request.form['client_key'])
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                try:
+                    files = request.files.getlist('files[]')
+                except Exception as e:
+                    res = {'status':0,'message':"unable to read image " + str(e)}
+                    return jsonify(res)
+                if len(files)==0:
+                    res = {'status':0,'message':"Please select atleast one image"}
+                    return jsonify(res)
+                for file in files:
+                    try:
+                        name = file.filename
+                        file.save(UploadCandidateAttendanceImages.upload_path + name)
+                    except Exception as e:
+                        res = {'status':0,'message':"uploaded failed " + str(e)}
+                        return jsonify(res)
+                res = {'status':1,'message':"uploaded succesfully"}
+                return jsonify(res)
+            else:
+                res = {'status':0,'message':"client name and password not matching"}
+                return jsonify(res)
+        else:
+            res = {'status':-1,'message':"Method is wrong"}
+            return jsonify(res)
+api.add_resource(UploadCandidateAttendanceImages, '/UploadCandidateAttendanceImages')
+
+class UploadTrainerStageImage(Resource):
+    upload_path = config.tmapath + 'trainer_stage_images/'
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            client_id = request.form['client_id']
+            client_key = request.form['client_key']
+
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                try:
+                    file = request.files['file']
+                    name = file.filename
+                except Exception as e:
+                    res = {'status':0,'message':"unable to read image " + str(e)}
+                    return jsonify(res)
+                if file:
+                    try:
+                        f=open(UploadTrainerStageImage.upload_path + name,'wb')
+                        f.write(file.read())
+                        f.close()
+                        res = {'status':1,'message':"uploaded succesfully"}
+                        #res = {'success': True, 'description': "uploaded succesfully"}
+                        return jsonify(res)
+                    except Exception as e:
+                        res = {'status':0,'message':"uploaded failed " + str(e)}
+                        #res = {'success': False, 'description': "uploaded failed " + str(e)}
+                        return jsonify(res)        
+            else:
+                res = {'status':0,'message':"client name and password not matching {}, {}".format(client_id, client_key)}
+                #res = {'success': False, 'description': "client name and password not matching"}
+                return jsonify(res)
+        else:
+            res = {'status':-1,'message':"wrong method"}
+            return jsonify(res)
+api.add_resource(UploadTrainerStageImage, '/UploadTrainerStageImage')
+
+class GetSessionPlanModuleDetailsForCourse(Resource):
+    @staticmethod
+    def get():
+        try:
+            if request.method=='GET':
+                client_id=str(request.args.get("client_id"))
+                client_key=str(request.args.get("client_key"))
+                if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                    course_id=request.args.get("course_id",0,type=int)
+                    qp_id=request.args.get("qp_id",0,type=int)
+                    session_plan_module_list = TMA.GetSessionPlanModuleDetailsForCourse(course_id,qp_id)
+                    if session_plan_module_list!=None:
+                        res={'success':True,'description':'Session Plan(s) are available','session_plan_module_list':session_plan_module_list}
+                    else:
+                        res={'success':False,'description':'NO response from DB'}
+                else:
+                    res={'success':False,'description':'Invalid Request'}
+                response=jsonify(res)
+                return response
+        except Exception as e:
+            res={'success':False,'description':'Error : '+ str(e)}
+            response=jsonify(res)
+            return response
+api.add_resource(GetSessionPlanModuleDetailsForCourse,'/GetSessionPlanModuleDetailsForCourse')
+
+class GetBatchSessionCurrentStageDetails(Resource):
+    @staticmethod
+    def post():
+        try:
+            if request.method=='POST':
+                batch_id = int(request.form['batch_id'])
+                session_id = int(request.form['session_id'])
+                user_id = int(request.form['user_id'])
+                if batch_id<1:
+                    res = {'status':0,'message':'Missing or invalid batch_id'}
+                    return jsonify(res)
+                if session_id<1:
+                    res = {'status':0,'message':'Missing or invalid session_id'}
+                    return jsonify(res)
+                current_stage = TMA.GetBatchSessionCurrentStageDetails(batch_id,session_id,user_id)
+                #print(current_stage)
+                if current_stage ==None:
+                    res = {'status':0, 'message':'No stage found' }
+                else:
+                    res = {'status':1,'message':'Success','user_id':user_id,'batch_id':batch_id,'session_id':session_id,'stage_id':current_stage}
+                return jsonify(res)
+        except Exception as e:
+            res={'status':-1,'message':'Error : '+ str(e)}
+            response=jsonify(res)
+            return response
+api.add_resource(GetBatchSessionCurrentStageDetails, '/GetBatchSessionCurrentStageDetails')
+
+class GetBatchList(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=None
+            try:
+                #app_version_details=Database.GetAppVersionDetails()
+                BatchStatusId=request.args.get('batch_stage_id',2,type=int)
+                UserId=request.args.get('user_id',0,type=int)
+                CenterId=request.args.get('center_id',0,type=int)
+                role_id = request.args.get('role_id',0,type=int)
+                app_version = request.args.get('app_version',0,type=str)
+                if UserId == 0:
+                    res={'status':0,'message':'Invalid User Id','app_status':True}
+                    response=jsonify(res)
+                    return response
+                res = TMA.GetBatchListForTMA(BatchStatusId,UserId,CenterId,role_id,app_version)
+                response=jsonify(res)
+                return response
+            except Exception as e:
+                res={'status':-1,'message':'Error : '+ str(e),'app_status':True}
+                response=jsonify(res)
+                return response
+api.add_resource(GetBatchList,'/GetBatchList')
+
+
+class GetBatchSessionList(Resource):
+    @staticmethod
+    def get():
+        try:
+            if request.method=='GET':
+                BatchId=request.args.get('batch_id',0,type=int)
+                UserId=request.args.get('user_id',0,type=int)
+                SessionPlanId=request.args.get('session_plan_id',0,type=int)
+                ModuleId=request.args.get('module_id',0,type=int)
+                StatusId=request.args.get('status_id',0,type=int)
+                SessionName=request.args.get('session_name','')
+                app_version = request.args.get('app_version',0,type=str)
+                if UserId == 0:
+                    res={'status':0,'message':'Invalid User Id','app_status':True}
+                    response=jsonify(res)
+                    return response
+                res = TMA.GetBatchSessionListForTMA(BatchId,UserId,SessionPlanId,ModuleId,StatusId,SessionName,app_version)
+                response=jsonify(res)
+                return response
+        except Exception as e:
+            res={'status':-1,'message':'Error : '+ str(e),'app_status':True}
+            response=jsonify(res)
+            return response
+api.add_resource(GetBatchSessionList,'/GetBatchSessionList')
+
+class LogTrainerStageDetails(Resource):
+    @staticmethod
+    def post():
+        try:
+            if request.method=='POST':
+                session_id = str(request.form['session_id'])
+                user_id = int(request.form['user_id'])
+                batch_id = int(request.form['batch_id'])
+                stage_id = int(request.form['stage_id'])
+                latitude = request.form['latitude']
+                longitude = request.form['longitude']
+                image_file_name = request.form['image_file_name']
+                mark_candidate_attendance = int(request.form['mark_candidate_attendance'])
+                attendance_data = request.form['attendance_data']
+                group_attendance_image_data = request.form['group_attendance_image_data']
+                app_version = request.form['app_version']
+
+                if batch_id<1:
+                    res = {'status':0,'message':'Missing or invalid batch_id','app_status':True}
+                    return jsonify(res)
+                if session_id=='':
+                    res = {'status':0,'message':'Missing or invalid session_id','app_status':True}
+                    return jsonify(res)
+                if (stage_id<1 or stage_id>4):
+                    res = {'status':0,'message':'Missing or invalid stage_id','app_status':True}
+                    return jsonify(res)
+                res = TMA.LogTrainerStageDetails(session_id,user_id,batch_id,stage_id,latitude,longitude,image_file_name,mark_candidate_attendance,attendance_data,group_attendance_image_data,app_version)
+                response=jsonify(res)
+                return response
+
+        except Exception as e:
+            res={'status':-1,'message':'Error : '+ str(e),'app_status':True}
+            response=jsonify(res)
+            return response
+api.add_resource(LogTrainerStageDetails,'/LogTrainerStageDetails')
+
+class GetSubProjectsForRegionUser(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            user_id=request.args.get('user_id',0,type=int)
+            user_role_id=request.args.get('user_role_id',0,type=int)
+            region_id=request.args.get('region_id','',type=str)
+            response={"SubProjects":Master.GetSubProjectsForRegionUser(user_id,user_role_id,region_id)}
+            return response
+api.add_resource(GetSubProjectsForRegionUser,'/GetSubProjectsForRegionUser')
+
+class GetCoursesBasedOnSubProjects(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sub_project_ids=request.args.get('sub_project_ids','',type=str)
+            #print('hi')
+            #print(sub_project_ids)
+            response={"Courses":Master.GetCoursesBasedOnSubProjects(sub_project_ids)}
+            return response
+api.add_resource(GetCoursesBasedOnSubProjects,'/GetCoursesBasedOnSubProjects')
+
+class trainers_based_on_sub_projects(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            sub_project_ids=request.form['sub_project_ids']
+            return Batch.AllTrainersOnSubProjects(sub_project_ids)
+api.add_resource(trainers_based_on_sub_projects,'/trainers_based_on_sub_projects')
+
+class GetSubProjectsForCustomer(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            customer_ids=request.args.get('customer_ids','',type=str)
+            response={"SubProjects":TMA.GetSubProjectsForCustomer(customer_ids)}
+            return response
+api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
 
 if __name__ == '__main__':
     app.run(debug=True)

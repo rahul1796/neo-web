@@ -5,7 +5,9 @@ from .Batch import Batch
 from .Candidate import Candidate
 from .Report import Report
 from .DownloadDump import DownloadDump
+from .TMA import TMA
 from .Assessments import *
+
 #from .Assessments import DownloadAssessmentResult
 # Content,Assessments,DownloadAssessmentResult
 # from Models import Master

@@ -7,15 +7,19 @@ from datetime import datetime
 from flask import request,make_response
 import requests
 import xml.etree.ElementTree as ET
-import requests
 import io
 import csv
 
 
 def to_xml(df, filename=None, mode='w'):
     if len(df)>0:
-        df1=df[['Candidate_Id','Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On']]
-        df2=df.drop(['Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On'],axis=1)
+        if 'Candidate_Family_Details_Id' in df:
+            df1=df[['Candidate_Id','Family_Salutation','Family_Name','Family_Date_Of_Birth','Family_Age','Family_Primary_Contact','Family_Email_Address','Family_Gender','Family_Education','Family_Relationship','Family_Current_Occupation','Candidate_Family_Details_Id']]
+            df2=df.drop(['Family_Salutation','Family_Name','Family_Date_Of_Birth','Family_Age','Family_Primary_Contact','Family_Email_Address','Family_Gender','Family_Education','Family_Relationship','Family_Current_Occupation','Candidate_Family_Details_Id'],axis=1)
+            
+        else:
+            df1=df[['Candidate_Id','Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On']]
+            df2=df.drop(['Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On'],axis=1)
         df2.drop_duplicates(subset ="Candidate_Id",inplace=True)
     else:
         df1=None
@@ -28,15 +32,29 @@ def to_xml(df, filename=None, mode='w'):
         xml.append('      </status>')
         return '\n'.join(xml)
 
+    def nested_family_details_row_to_xml(row):
+        xml = ['      <family>']
+        for i, col_name in enumerate(row.index):
+            xml.append('        <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
+        xml.append('      </family>')
+        return '\n'.join(xml)
+
     def row_to_xml(row):
         xml = ['  <candidate>']
         for i, col_name in enumerate(row.index):
             xml.append('    <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
-        df3=df1.loc[(df1['Candidate_Id'] == row['Candidate_Id']) & (df1['Activity_Status_Id']>0)]
+        if 'Candidate_Family_Details_Id' in df1:
+            df3=df1.loc[(df1['Candidate_Id'] == row['Candidate_Id']) & (df1['Candidate_Family_Details_Id']>0)]
+            xml.append('    <family_details>')
+            xml.append('\n'.join(df3.apply(nested_family_details_row_to_xml, axis=1)))
+            xml.append('    </family_details>')
+        else:
+            df3=df1.loc[(df1['Candidate_Id'] == row['Candidate_Id']) & (df1['Activity_Status_Id']>0)]
+            xml.append('    <statushistory>')
+            xml.append('\n'.join(df3.apply(nested_row_to_xml, axis=1)))
+            xml.append('    </statushistory>')
         #print(df3.dtypes)
-        xml.append('    <statushistory>')
-        xml.append('\n'.join(df3.apply(nested_row_to_xml, axis=1)))
-        xml.append('    </statushistory>')
+        
         xml.append('  </candidate>')
         return '\n'.join(xml)
     res=''
@@ -789,14 +807,15 @@ class Database:
         cur = con.cursor()
         sql = 'exec [users].[sp_get_users_list] ?, ?, ?, ?, ?, ?,? ,? ,? ,? ,? ,?, ?, ?, ?, ?, ?'
         values = (user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids)
+        print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
         for row in cur:
-            record=row[19]
-            fil=row[18]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16],""+columns[17]+"":row[17]}
+            record=row[22]
+            fil=row[21]
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16],""+columns[17]+"":row[17],""+columns[18]+"":row[18],""+columns[19]+"":row[19],""+columns[20]+"":row[20]}
             d.append(h)
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
@@ -870,6 +889,21 @@ class Database:
             h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],columns[8]+"":row[8],columns[9]+"":row[9]}
         cur.close()
         con.close()
+        return h
+    def get_user_role_details_for_role_update(user_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        h={}
+        sql = 'EXEC	[users].[sp_get_user_role_details] @user_id = ?'
+        values = (user_id,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        #print(columns)
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],columns[8]+"":row[8]}
+        cur.close()
+        con.close()
+        print(h)
         return h
     def batch_list(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id):
         content = {}
@@ -1185,6 +1219,23 @@ class Database:
         else:
             msg={"message":"Error in tagging"}
         return msg
+    def tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[users].[sp_tag_user_roles] ?, ?, ?,?,?'
+        values = (login_user_id,user_id,neo_role,jobs_role,crm_role)
+        print(values)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[0]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Success"}
+        else:
+            msg={"message":"Updation Error"}
+        return msg
     def qp_list(user_id,user_role_id,qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors):
         content = {}
         d = []
@@ -1285,7 +1336,6 @@ class Database:
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
-        print(d)
         return content
            
     def mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,created_by):
@@ -1911,7 +1961,7 @@ class Database:
         sessionplans = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'SELECT * FROM [content].[tbl_session_plans] AS sp LEFT JOIN [content].[tbl_map_session_plan_course] AS map ON map.session_plan_id=sp.session_plan_id where map.course_id=?'
+        sql = 'SELECT sp.session_plan_id, sp.session_plan_name FROM [content].[tbl_session_plans] AS sp LEFT JOIN [content].[tbl_map_session_plan_course] AS map ON map.session_plan_id=sp.session_plan_id where map.course_id=?'
         values= (course_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
@@ -1925,7 +1975,7 @@ class Database:
         modules = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'SELECT * FROM [content].[tbl_modules] where session_plan_id=?'
+        sql = 'SELECT module_id, module_name FROM [content].[tbl_modules] where session_plan_id=?'
         values= (session_plan_id,)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
@@ -2663,13 +2713,13 @@ SELECT					cb.name as candidate_name,
         con.close()       
         return response
 
-    def TrainerDeploymentBatches(region_id,center_id,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def TrainerDeploymentBatches(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         batch = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec [batches].[sp_tma_web_batch_detail_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (region_id,center_id,course_ids,trainer_ids,batch_stage_id,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        values = (region_id,sub_project_ids,course_ids,trainer_ids,batch_stage_id,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -2683,13 +2733,13 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return batch
-    def ReportAttendanceBatches(region_id,center_id,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def ReportAttendanceBatches(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         batch = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec [batches].[sp_tma_batch_list_for_attendance_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (region_id,center_id,course_ids,trainer_ids,batch_stage_id,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        values = (region_id,sub_project_ids,course_ids,trainer_ids,batch_stage_id,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -3358,6 +3408,22 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return response
+    
+    def All_role_neo_db():
+        response=[]
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        
+        cur.execute("SELECT user_role_id, user_role_name  FROM [users].[tbl_user_role] where is_active=1 and is_deleted=0 order by user_role_name")
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h)
+        cur.commit()
+        cur.close()
+        con.close()
+        #print(response)       
+        return response
 
     def All_dept_db():
         response=[]
@@ -3959,7 +4025,8 @@ SELECT					cb.name as candidate_name,
             cur = con.cursor()
             sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
             values = (batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag)
-            print(values)
+            #print(values)
+            #print("kjjkj")
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]
             for row in cur:
@@ -4213,6 +4280,23 @@ SELECT					cb.name as candidate_name,
         cur2 = con.cursor()
         sql = 'exec [users].[sp_get_sub_projects_for_user]  ?'
         values = (user_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    
+    def GetSubProjectsForRegionUser(user_id,user_role_id,region_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_sub_projects_for_regionuser]  ?,?,?'
+        values = (user_id,user_role_id,region_id)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -4611,7 +4695,6 @@ SELECT					cb.name as candidate_name,
             conn.close()
             out = {'success': False, 'description': "Lower App Version", 'app_status':False}
             return out
-        
         try:
             '''
             insert into candidate_details.tbl_candidate_interventions
@@ -4640,11 +4723,12 @@ SELECT					cb.name as candidate_name,
             data = r.text
             root = ET.fromstring(data)
             out = []
+            
             for child in root:
                 data = child.attrib
                 out.append(data)
                 #quer1_a + = 
-                quer = "({},'{}','{}','{}','{}','{}',{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},1,'m','{}','{}','{}','{}'),".format(1 if data['isFresher']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],
+                quer = "({},'{}','{}','{}','{}','{}',{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},{},1,'m','{}','{}','{}','{}'),".format(1 if data['isFresher']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],
                             data['candDob'],1 if data['dobEntered']=='true' else 0,data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'], data['disableStatus'], data['candReligion'],
                             data['candSource'], data['presPincode'],data['presDistrict'],data['permDistrict'],data['permPincode'],user_id,role_id,data['permState'],data['permCountry'] ,data['presState'],data['presCountry'])
                 quer1 += '\n'+quer
@@ -4817,16 +4901,12 @@ SELECT					cb.name as candidate_name,
             conn.close()
             return out
           
-    def get_batch_list_updated(user_id):
+    def get_batch_list_updated(user_id,candidate_id,role_id):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
-        quer = """
-        SELECT	distinct b.batch_id, b.batch_name, batch_code FROM [masters].[tbl_map_sub_project_user] as mspb inner join	batches.tbl_batches as b on b.sub_project_id=mspb.sub_project_id where mspb.user_id={} and CONVERT(DATE, GETDATE(), 102) <= b.actual_end_date
-        UNION
-        SELECT	distinct b.batch_id, b.batch_name, batch_code FROM [masters].[tbl_map_sub_project_user] as mspb inner join	batches.tbl_batches as b on b.co_funding_project_id=mspb.sub_project_id where mspb.user_id={} and CONVERT(DATE, GETDATE(), 102) <= b.actual_end_date
-        """.format(user_id,user_id)
-        
-        curs.execute(quer)
+        quer = 'exec  [batches].[sp_get_batch_list_for_app]  ?,?,?'
+        values=(user_id,candidate_id,role_id)
+        curs.execute(quer,(values))
         columns = [column[0].title() for column in curs.description]
         response = []
         h={}
@@ -5078,7 +5158,7 @@ SELECT					cb.name as candidate_name,
             conn.close()
             return out
 
-    def SaveCandidateActivityStatus(json_string,user_id,role_idlatitude,longitude,timestamp,app_version,device_model,imei_num,android_version):
+    def SaveCandidateActivityStatus(json_string,user_id,role_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec	[candidate_details].[sp_store_sub_candidate_activity_status]  ?, ?,?,?,?,?,?,?,?,?'
@@ -5583,6 +5663,42 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
+            
+    def upload_user(df,user_id,user_role_id):
+        try:   
+            print("jiofhlovhswvik")         
+            print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            h=[]           
+            d={} 
+            json_str=df.to_json(orient='records')
+            print(json_str)
+            sql = 'exec	[users].[sp_validate_upload_user]  ?,?,?'
+            values = (json_str,user_id,user_role_id)
+            cur.execute(sql,(values))
+            columns = [column[0].title() for column in cur.description]
+            col_len=len(columns)
+            pop=0
+            for row in cur:
+                pop=row[0]
+                for i in range(col_len):
+                    d[columns[i]]=row[i]
+                h.append(d.copy())
+            cur.commit()
+            if pop==0 :
+                Status=False
+                msg="Error"
+                return {"Status":Status,'message':msg,'data':h}
+            else:
+                msg="Uploaded Successfully"
+                Status=True
+                return {"Status":Status,'message':msg}
+            cur.close()
+            con.close()
+        except Exception as e:
+            print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
     def GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id):
         response = []
         h={}
@@ -5853,3 +5969,36 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return {"User":response} if response!=[] else None
+
+    def GetCoursesBasedOnSubProjects(sub_project_ids):
+        #print(sub_project_ids)
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = "exec [masters].[sp_get_courses_based_on_sub_projects]  ? "
+        values = (sub_project_ids,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    def AllTrainersOnSubProjects(sub_project_id):
+        trainers = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = "exec [masters].[sp_get_trainer_based_on_sub_projects] ?"
+        values = (str(sub_project_id.replace('\'','')),)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for r in cur2:
+            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            trainers.append(h)
+        cur2.close()
+        con.close()
+        return trainers

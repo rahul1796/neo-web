@@ -1,14 +1,14 @@
-def create_report(start_date, end_date, customername, centername, coursename, name):
-    '''from datetime import datetime
+def create_report(start_date, end_date, customername, sub_project, coursename, name):
+    '''
+    from datetime import datetime
     start_time = datetime.now()
-    
         start_date = '2019-11-01'
         end_date = '2019-12-30'
         coursename=''
         centername=''
         customername=''
-    ##########################################
     '''
+    print(start_date, end_date, customername, sub_project, coursename, name)
     try:
         import pandas as pd
         import pypyodbc as pyodbc
@@ -19,14 +19,15 @@ def create_report(start_date, end_date, customername, centername, coursename, na
         return({'Description':'Module Error', 'Status':False})
 
     try:
-        base_url = 'http://neolive.southindia.cloudapp.azure.com:27072/'
-        log_image = 'data/log_images/'
-        attendance_image = 'data/attendance_images/'
+        base_url = config.Base_URL
+        
+        log_image = '/data/TMA/trainer_stage_images/'
+        attendance_image = '/data/TMA/attendance_images/'
         attendance_url = base_url + attendance_image
         log_url = base_url + log_image
         conn_str = config.conn_str
 
-        name_withpath = config.neo_report_file_path + name
+        name_withpath = config.neo_report_file_path + 'report file/'+ name
         
         writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
         workbook  = writer.book
@@ -49,8 +50,8 @@ def create_report(start_date, end_date, customername, centername, coursename, na
 
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [masters].[sp_stagelog_tmareport] ?, ?, ?, ?, ?'
-            values = (start_date, end_date, customername, centername, coursename)
+            sql = 'exec [masters].[sp_stagelog_tmareport_new] ?, ?, ?, ?, ?'
+            values = (start_date, end_date, customername, sub_project, coursename)
             curs.execute(sql,(values))
             
             data = curs.fetchall()
@@ -64,8 +65,6 @@ def create_report(start_date, end_date, customername, centername, coursename, na
             df.iloc[:,24] = df.iloc[:,24].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
             df.iloc[:,26] = df.iloc[:,26].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + log_url + x + '","View Image")')
             df.iloc[:,27] = df.iloc[:,27].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
-            #17,18,20,21
-
             
             df.to_excel(writer, index=None, header=None, startrow=2 ,sheet_name='Stage-Log')
 
@@ -88,8 +87,8 @@ def create_report(start_date, end_date, customername, centername, coursename, na
 
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [masters].[sp_groupimage_tmareport] ?, ?, ?, ?, ?'
-            values = (start_date, end_date, customername, centername, coursename)
+            sql = 'exec [masters].[sp_groupimage_tmareport_new] ?, ?, ?, ?, ?'
+            values = (start_date, end_date, customername, sub_project, coursename)
             curs.execute(sql,(values))
             
             data = curs.fetchall()
@@ -104,18 +103,16 @@ def create_report(start_date, end_date, customername, centername, coursename, na
             for col_num, value in enumerate(groupimage_default_column):
                 worksheet.write(0, col_num, value, header_format)
             
-
-            
         def candidate_attendance_fxn():
             attendance_default_column = ['ATTENDANCE DATE', 'TRAINER NAME', 'TRAINER EMAIL', 'BATCH CODE', 'BATCH START DATE',
-                          'BATCH END DATE', 'CUSTOMER NAME', 'CENTER NAME', 'CENTER TYPE', 'DISTRICT', 'STATE' , 'REGION', 'BUSSINESS UNIT',
-                          'COURSE CODE', 'COURSE NAME', 'SESSION NAME', 'CANDIDATE NAME', 'ENROLLMENT ID', 'ATTENDANCE',
-                          'ATTENDANCE IMAGE']
+                            'BATCH END DATE', 'CUSTOMER NAME', 'CENTER NAME', 'CENTER TYPE', 'DISTRICT', 'STATE' , 'REGION', 'BUSSINESS UNIT',
+                            'COURSE CODE', 'COURSE NAME', 'SESSION NAME', 'CANDIDATE NAME', 'ENROLLMENT ID', 'ATTENDANCE',
+                            'ATTENDANCE IMAGE']
             
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [masters].[sp_candidate_tmareport] ?, ?, ?, ?, ?'
-            values = (start_date, end_date, customername, centername, coursename)
+            sql = 'exec [masters].[sp_candidate_tmareport_new] ?, ?, ?, ?, ?'
+            values = (start_date, end_date, customername, sub_project, coursename)
             curs.execute(sql,(values))
             
             data = curs.fetchall()
@@ -124,16 +121,12 @@ def create_report(start_date, end_date, customername, centername, coursename, na
             df.columns = attendance_default_column
             df['ATTENDANCE IMAGE'] = df.loc[:,'ATTENDANCE IMAGE'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + attendance_url + x + '","View Image")')
 
-            
             df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Candidate-Attendance')
 
             worksheet = writer.sheets['Candidate-Attendance']
             for col_num, value in enumerate(attendance_default_column):
                 worksheet.write(0, col_num, value, header_format)
-            
-
-            
-
+        
         t1 = threading.Thread(target=stage_log_fxn) 
         t2 = threading.Thread(target=group_images_fxn)
         t3 = threading.Thread(target=candidate_attendance_fxn)
@@ -152,5 +145,3 @@ def create_report(start_date, end_date, customername, centername, coursename, na
         
     except Exception as e:
         return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
-    ##########################################
-    
