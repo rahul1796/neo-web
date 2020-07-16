@@ -7119,5 +7119,6 @@ class GetSubProjectsForCustomer(Resource):
             response={"SubProjects":TMA.GetSubProjectsForCustomer(customer_ids)}
             return response
 api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
+
 if __name__ == '__main__':
     app.run(debug=True)
