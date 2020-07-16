@@ -7170,7 +7170,7 @@ class GetSubProjectsForRegionUser(Resource):
         if request.method=='GET':
             user_id=request.args.get('user_id',0,type=int)
             user_role_id=request.args.get('user_role_id',0,type=int)
-            region_id=request.args.get('region_id',0,type=int)
+            region_id=request.args.get('region_id','',type=str)
             response={"SubProjects":Master.GetSubProjectsForRegionUser(user_id,user_role_id,region_id)}
             return response
 api.add_resource(GetSubProjectsForRegionUser,'/GetSubProjectsForRegionUser')
