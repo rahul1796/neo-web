@@ -4853,11 +4853,11 @@ SELECT					cb.name as candidate_name,
             conn.close()
             return out
           
-    def get_batch_list_updated(user_id,candidate_id):
+    def get_batch_list_updated(user_id,candidate_id,role_id):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
-        quer = 'exec  [batches].[sp_get_batch_list_for_app]  ?,?'
-        values=(user_id,candidate_id)
+        quer = 'exec  [batches].[sp_get_batch_list_for_app]  ?,?,?'
+        values=(user_id,candidate_id,role_id)
         curs.execute(quer,(values))
         columns = [column[0].title() for column in curs.description]
         response = []
