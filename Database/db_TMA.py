@@ -156,7 +156,7 @@ class TMADatabase:
         curs.close()
         con.close()
         return res
-        
+    
     def GetSubProjectsForCustomer(customer_ids):
         response = []
         h={}
