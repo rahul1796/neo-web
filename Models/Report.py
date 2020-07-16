@@ -699,7 +699,7 @@ class Report:
             df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Region Wise Batch Count') 
 
             df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Region-Customer Wise Candidate Count') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Customer Wise Candidate Count') 
 
             worksheet = writer.sheets['Region Wise Candidate Count']
             default_column = ['Region','BU']
@@ -758,7 +758,7 @@ class Report:
             for col_num, value in enumerate(third_row):
                 worksheet.write(2, 2+col_num, value, header_format)
 
-            worksheet = writer.sheets['Region-Customer Wise Candidate Count']            
+            worksheet = writer.sheets['Customer Wise Candidate Count']            
             default_column = ['Region','BU','Customer']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)

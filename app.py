@@ -6677,7 +6677,7 @@ class upload_user(Resource):
                         Column('Employee Email*',str_validation+null_validation),
                         Column('Reporting Manager Employee Code*',str_validation+null_validation),
                         Column('Mobile Number*',str_validation+null_validation),
-                        Column('Employee Role*',str_validation+null_validation),
+                        Column('Employee HR Role*',str_validation+null_validation),
                         Column('Region*',str_validation+null_validation),
                         Column('Grade*',str_validation+null_validation),
                         Column('Designation*',str_validation+null_validation),
