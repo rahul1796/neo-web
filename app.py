@@ -5503,7 +5503,7 @@ class get_batch_list_updated(Resource):
             role_id = int(request.args['role_id'])
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
 
-                out = Database.get_batch_list_updated(user_id,candidate_id)
+                out = Database.get_batch_list_updated(user_id,candidate_id,role_id)
                 return jsonify(out)
                 
             else:
