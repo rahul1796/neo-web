@@ -229,7 +229,19 @@ function LoadState(){
     });
     return false;
 }
-
+function BatchModal(QpCode,QpName,CourseCode,CourseName,BatchCode,StartDate,EndDate,ActualStartDate,ActualEndDate,BatchActiveStatus){
+    $('#txtQPCode').val(QpCode);
+    $('#txtQPName').val(QpName);
+    $('#txtCourseCode').val(CourseCode);
+    $('#txtCourseName').val(CourseName);
+    $('#txtBatchCode').val(BatchCode);
+    $('#txtPlannedStartDate').val(StartDate);
+    $('#txtPlannedEndDate').val(EndDate);
+    $('#txtActualStartDate').val(ActualStartDate);
+    $('#txtActualEndDate').val(ActualEndDate);
+    $('#txtBatchActiveStatus').val(BatchActiveStatus);
+    $('#con_close_modal').modal('show');
+    }
 function LoadTable()
 {   //console.log($("#ddlRegion").val().toString(),$("#ddlState").val().toString(),$("#MinAge").val().toString(),$("#MaxAge").val().toString())
     $('#divCandidateList').show();
@@ -273,6 +285,16 @@ function LoadTable()
                     return varButtons;
                 }
             },
+            {
+                "data": function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Batch_Id!="")
+                        varButtons += '<a  onclick="BatchModal(\'' + row.Qp_Code + '\',\'' + row.Qp_Name + '\',\'' + row.Course_Code + '\',\'' + row.Course_Name + '\',\'' + row.Batch_Code + '\',\'' + row.Start_Date + '\',\'' + row.End_Date + '\',\'' + row.Actual_Start_Date + '\',\'' + row.Actual_End_Date + '\',\'' + row.Batch_Active_Status + '\')"  style="color:blue;cursor:pointer" >' + row.Batch_Code + '</a>';
+                    return varButtons;
+                    }
+            },
+
+
             { "data": "Candidate_Id"},
             { "data": function (row, type, val, meta) {
                 varButtons = '<a onclick="CandidateBasicDetails(\'' + row.First_Name + '\',\'' + row.Middle_Name + '\',\'' + row.Last_Name + '\',\'' + row.Salutation + '\',\'' + row.Date_Of_Birth+ '\',\'' + row.Age+ '\',\'' + row.Gender+ '\',\'' + row.Marital_Status+ '\',\'' + row.Caste+ '\',\'' + row.Disability_Status+ '\',\'' + row.Religion + '\')"  style="color:blue;cursor:pointer" >'+row.First_Name+'</a>';

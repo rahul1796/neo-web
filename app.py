@@ -232,6 +232,14 @@ def dashboard():
 def EraseDisplayMsg():
     config.displaymsg=""
     return redirect(url_for('index'))
+
+class clear_config_msg(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            config.displaymsg=""
+            return {"sucess":True}
+api.add_resource(clear_config_msg,'/clear_config_msg')
     
 @app.route("/home")
 def home():
@@ -3160,6 +3168,8 @@ class ReportAttendanceBatches(Resource):
     def post():
         if request.method=='POST':
             try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
                 region_id = request.form['region_id']
                 sub_project_ids = request.form['sub_project_ids']
                 course_ids = request.form['course_ids']
@@ -3180,7 +3190,7 @@ class ReportAttendanceBatches(Resource):
                 if 'draw' in request.form:
                     draw = request.form['draw']
                 #print(region_id,center_id,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-                response=Report.ReportAttendanceBatches(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+                response=Report.ReportAttendanceBatches(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, user_id, user_role_id)
                 
                 return response
             except Exception as e:
@@ -4059,6 +4069,8 @@ class updated_new_tma_report(Resource):
     def post():
         if request.method=='POST':
             try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
                 from_date = request.form["from_date"]
                 to_date = request.form["to_date"]
                 Customers = request.form["Customers"]
@@ -4066,8 +4078,7 @@ class updated_new_tma_report(Resource):
                 Courses = request.form["Courses"]
                 
                 file_name='tma_report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
-
-                resp = filter_tma_report_new.create_report(from_date, to_date, Customers, SubProject, Courses, file_name)
+                resp = filter_tma_report_new.create_report(from_date, to_date, Customers, SubProject, Courses, file_name,user_id,user_role_id)
                 return resp
                 
             except Exception as e:

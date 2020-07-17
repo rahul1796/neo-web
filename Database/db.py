@@ -2682,13 +2682,13 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return batch
-    def ReportAttendanceBatches(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def ReportAttendanceBatches(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, user_id, user_role_id):
         batch = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [batches].[sp_tma_batch_list_for_attendance_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (region_id,sub_project_ids,course_ids,trainer_ids,batch_stage_id,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [batches].[sp_tma_batch_list_for_attendance_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (region_id,sub_project_ids,course_ids,trainer_ids,batch_stage_id,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id, user_role_id)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
