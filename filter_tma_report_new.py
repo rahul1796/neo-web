@@ -1,4 +1,4 @@
-def create_report(start_date, end_date, customername, centername, coursename, name):
+def create_report(start_date, end_date, customername, sub_project, coursename, name):
     '''
     from datetime import datetime
     start_time = datetime.now()
@@ -8,6 +8,7 @@ def create_report(start_date, end_date, customername, centername, coursename, na
         centername=''
         customername=''
     '''
+    print(start_date, end_date, customername, sub_project, coursename, name)
     try:
         import pandas as pd
         import pypyodbc as pyodbc
@@ -20,8 +21,8 @@ def create_report(start_date, end_date, customername, centername, coursename, na
     try:
         base_url = config.Base_URL
         
-        log_image = 'data/TMA/trainer_stage_images/'
-        attendance_image = 'data/TMA/attendance_images/'
+        log_image = '/data/TMA/trainer_stage_images/'
+        attendance_image = '/data/TMA/attendance_images/'
         attendance_url = base_url + attendance_image
         log_url = base_url + log_image
         conn_str = config.conn_str
@@ -49,8 +50,8 @@ def create_report(start_date, end_date, customername, centername, coursename, na
 
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [masters].[sp_stagelog_tmareport] ?, ?, ?, ?, ?'
-            values = (start_date, end_date, customername, centername, coursename)
+            sql = 'exec [masters].[sp_stagelog_tmareport_new] ?, ?, ?, ?, ?'
+            values = (start_date, end_date, customername, sub_project, coursename)
             curs.execute(sql,(values))
             
             data = curs.fetchall()
@@ -86,8 +87,8 @@ def create_report(start_date, end_date, customername, centername, coursename, na
 
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [masters].[sp_groupimage_tmareport] ?, ?, ?, ?, ?'
-            values = (start_date, end_date, customername, centername, coursename)
+            sql = 'exec [masters].[sp_groupimage_tmareport_new] ?, ?, ?, ?, ?'
+            values = (start_date, end_date, customername, sub_project, coursename)
             curs.execute(sql,(values))
             
             data = curs.fetchall()
@@ -104,14 +105,14 @@ def create_report(start_date, end_date, customername, centername, coursename, na
             
         def candidate_attendance_fxn():
             attendance_default_column = ['ATTENDANCE DATE', 'TRAINER NAME', 'TRAINER EMAIL', 'BATCH CODE', 'BATCH START DATE',
-                          'BATCH END DATE', 'CUSTOMER NAME', 'CENTER NAME', 'CENTER TYPE', 'DISTRICT', 'STATE' , 'REGION', 'BUSSINESS UNIT',
-                          'COURSE CODE', 'COURSE NAME', 'SESSION NAME', 'CANDIDATE NAME', 'ENROLLMENT ID', 'ATTENDANCE',
-                          'ATTENDANCE IMAGE']
+                            'BATCH END DATE', 'CUSTOMER NAME', 'CENTER NAME', 'CENTER TYPE', 'DISTRICT', 'STATE' , 'REGION', 'BUSSINESS UNIT',
+                            'COURSE CODE', 'COURSE NAME', 'SESSION NAME', 'CANDIDATE NAME', 'ENROLLMENT ID', 'ATTENDANCE',
+                            'ATTENDANCE IMAGE']
             
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [masters].[sp_candidate_tmareport] ?, ?, ?, ?, ?'
-            values = (start_date, end_date, customername, centername, coursename)
+            sql = 'exec [masters].[sp_candidate_tmareport_new] ?, ?, ?, ?, ?'
+            values = (start_date, end_date, customername, sub_project, coursename)
             curs.execute(sql,(values))
             
             data = curs.fetchall()
@@ -120,7 +121,6 @@ def create_report(start_date, end_date, customername, centername, coursename, na
             df.columns = attendance_default_column
             df['ATTENDANCE IMAGE'] = df.loc[:,'ATTENDANCE IMAGE'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + attendance_url + x + '","View Image")')
 
-            
             df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Candidate-Attendance')
 
             worksheet = writer.sheets['Candidate-Attendance']

@@ -3977,7 +3977,6 @@ class download_trainer_filter(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(download_trainer_filter,'/download_trainer_filter')
 
-
 @app.route("/tma_report_filter_page")
 def tma_report_filter_page():
     if g.user:
@@ -5504,7 +5503,7 @@ class get_batch_list_updated(Resource):
             role_id = int(request.args['role_id'])
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
 
-                out = Database.get_batch_list_updated(user_id,candidate_id)
+                out = Database.get_batch_list_updated(user_id,candidate_id,role_id)
                 return jsonify(out)
                 
             else:
@@ -6767,7 +6766,6 @@ class get_candidate_details(Resource):
                 res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
                 return jsonify(res)
 
-#Base URL + "/get_candidate_list" api will provide all the unzynched QP data as response
 api.add_resource(get_candidate_details, '/get_candidate_details')
 
 
@@ -7172,7 +7170,7 @@ class GetSubProjectsForRegionUser(Resource):
         if request.method=='GET':
             user_id=request.args.get('user_id',0,type=int)
             user_role_id=request.args.get('user_role_id',0,type=int)
-            region_id=request.args.get('region_id',0,type=int)
+            region_id=request.args.get('region_id','',type=str)
             response={"SubProjects":Master.GetSubProjectsForRegionUser(user_id,user_role_id,region_id)}
             return response
 api.add_resource(GetSubProjectsForRegionUser,'/GetSubProjectsForRegionUser')
@@ -7204,5 +7202,6 @@ class GetSubProjectsForCustomer(Resource):
             response={"SubProjects":TMA.GetSubProjectsForCustomer(customer_ids)}
             return response
 api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
+
 if __name__ == '__main__':
     app.run(debug=True)

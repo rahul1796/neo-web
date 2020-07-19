@@ -13,8 +13,13 @@ import csv
 
 def to_xml(df, filename=None, mode='w'):
     if len(df)>0:
-        df1=df[['Candidate_Id','Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On']]
-        df2=df.drop(['Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On'],axis=1)
+        if 'Candidate_Family_Details_Id' in df:
+            df1=df[['Candidate_Id','Family_Salutation','Family_Name','Family_Date_Of_Birth','Family_Age','Family_Primary_Contact','Family_Email_Address','Family_Gender','Family_Education','Family_Relationship','Family_Current_Occupation','Candidate_Family_Details_Id']]
+            df2=df.drop(['Family_Salutation','Family_Name','Family_Date_Of_Birth','Family_Age','Family_Primary_Contact','Family_Email_Address','Family_Gender','Family_Education','Family_Relationship','Family_Current_Occupation','Candidate_Family_Details_Id'],axis=1)
+            
+        else:
+            df1=df[['Candidate_Id','Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On']]
+            df2=df.drop(['Activity_Status_Id','Activity_Status_Name','Reason','Remarks','Activity_Date','Device_Date','Created_On'],axis=1)
         df2.drop_duplicates(subset ="Candidate_Id",inplace=True)
     else:
         df1=None
@@ -27,15 +32,29 @@ def to_xml(df, filename=None, mode='w'):
         xml.append('      </status>')
         return '\n'.join(xml)
 
+    def nested_family_details_row_to_xml(row):
+        xml = ['      <family>']
+        for i, col_name in enumerate(row.index):
+            xml.append('        <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
+        xml.append('      </family>')
+        return '\n'.join(xml)
+
     def row_to_xml(row):
         xml = ['  <candidate>']
         for i, col_name in enumerate(row.index):
             xml.append('    <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
-        df3=df1.loc[(df1['Candidate_Id'] == row['Candidate_Id']) & (df1['Activity_Status_Id']>0)]
+        if 'Candidate_Family_Details_Id' in df1:
+            df3=df1.loc[(df1['Candidate_Id'] == row['Candidate_Id']) & (df1['Candidate_Family_Details_Id']>0)]
+            xml.append('    <family_details>')
+            xml.append('\n'.join(df3.apply(nested_family_details_row_to_xml, axis=1)))
+            xml.append('    </family_details>')
+        else:
+            df3=df1.loc[(df1['Candidate_Id'] == row['Candidate_Id']) & (df1['Activity_Status_Id']>0)]
+            xml.append('    <statushistory>')
+            xml.append('\n'.join(df3.apply(nested_row_to_xml, axis=1)))
+            xml.append('    </statushistory>')
         #print(df3.dtypes)
-        xml.append('    <statushistory>')
-        xml.append('\n'.join(df3.apply(nested_row_to_xml, axis=1)))
-        xml.append('    </statushistory>')
+        
         xml.append('  </candidate>')
         return '\n'.join(xml)
     res=''
@@ -4882,11 +4901,11 @@ SELECT					cb.name as candidate_name,
             conn.close()
             return out
           
-    def get_batch_list_updated(user_id,candidate_id):
+    def get_batch_list_updated(user_id,candidate_id,role_id):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
-        quer = 'exec  [batches].[sp_get_batch_list_for_app]  ?,?'
-        values=(user_id,candidate_id)
+        quer = 'exec  [batches].[sp_get_batch_list_for_app]  ?,?,?'
+        values=(user_id,candidate_id,role_id)
         curs.execute(quer,(values))
         columns = [column[0].title() for column in curs.description]
         response = []

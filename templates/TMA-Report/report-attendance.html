@@ -26,7 +26,7 @@
         data:{
                 "user_id": $('#hdn_home_user_id').val(),
                 "user_role_id" : $('#hdn_home_user_role_id').val(),
-                    "user_region_id" : $('#hdn_user_region_id').val()
+                "user_region_id" : $('#hdn_user_region_id').val()
         },
         success: function (data){
             if(data.Regions != null)
@@ -55,7 +55,7 @@
     return false;
 }   
 
-    function LoadSubProject(region_id){
+    function LoadSubProject(){
         var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForRegionUser"
             $.ajax({
             type:"GET",
@@ -66,7 +66,7 @@
             data:{
                     "user_id": $('#hdn_home_user_id').val(),
                     "user_role_id" : $('#hdn_home_user_role_id').val(),
-                    "region_id":region_id
+                    "region_id": $('#ddlRegion').val().toString()
             },
             success: function (data){
                 if(data.SubProjects != null)
@@ -201,7 +201,7 @@
             "type": "POST",
             "dataType": "json",
             "data": function (d) {
-                d.region_id = $('#ddlRegion').val();
+                d.region_id = $('#ddlRegion').val().toString();
                 d.sub_project_ids = $('#ddlSubProject').val().toString();  
                 d.course_ids = $('#ddlCourse').val().toString();  
                 d.trainer_ids = $('#ddlTrainer').val().toString();             
@@ -217,7 +217,7 @@
         },
         "columns": [
             { "data": "S_No"},
-            { "data": "Center_Name"},
+            { "data": "Sub_Project"},
             { "data": "Course_Name"},
             { "data": "Trainer_Name"},
             //{ "data": "Batch_Code"},
@@ -272,7 +272,7 @@
                 <div class="row">
                     <div class="col-lg-3">
                         <label for="ddlRegion " class="mr-2">Region</label>
-                        <select class="form-control dropdown-search-filter" onchange="LoadSubProject(this.value);" id="ddlRegion" >
+                        <select class="form-control dropdown-search-filter" onchange="LoadSubProject();" id="ddlRegion" multiple>
                             <option selected="" value="0">All</option>
                         </select>
                     </div>

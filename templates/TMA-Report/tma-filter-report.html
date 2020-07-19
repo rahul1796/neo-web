@@ -4,7 +4,6 @@
 <link href="static/assets/libs/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
 
-
 <script type="text/javascript">
     var Candidates = {};
         $(document).ready(function(){  
@@ -14,7 +13,6 @@
                 dateFormat:'d-M-Y'
             });
             LoadCustomerdl();
-    
         });
     
         function LoadCustomerdl(){
@@ -83,7 +81,7 @@
                     }
                     else
                     {
-                        $('#ddlSubProject').append(new Option('ALL','0'));
+                        $('#ddlSubProject').append(new Option('ALL',''));
                     }
                 }
             },
@@ -127,7 +125,7 @@
                     }
                     else
                     {
-                        $('#ddlCourse').append(new Option('ALL','0'));
+                        $('#ddlCourse').append(new Option('ALL',''));
                     }
                 }
             },
@@ -153,8 +151,8 @@
 		
         }
 		*/
-		if (0==9){
-		console.log(false)
+        if($('#FromDate').val()=='' || $('#ToDate').val()==''){
+		alert('Please Select both Dates');
 		}
 		else{
             
@@ -166,7 +164,6 @@
                         dataType: "json",
                         url: URL, 
                         data: { 
-                            
 						'from_date':$('#FromDate').val(),	//.toString()
 						'to_date':$('#ToDate').val(),     	//.toString()
 						'Customers':$('#ddlCustomer').val().toString(),
@@ -246,31 +243,31 @@
                     <div class="col-lg-4">
                         <label for="ddlCustomer" class="mr-2">Customer</label>
                         <select class="form-control dropdown-search-filter" onchange="LoadSubProject();" id="ddlCustomer" multiple >
-                            <option value="0">All</option>
+                            <option value="">All</option>
                         </select>
                     </div>
                     <div class="col-lg-4">
                         <label for="ddlSubProject" class="mr-2">Sub Project</label>
                         <select class="form-control dropdown-search-filter" id="ddlSubProject" onchange="LoadCourse_users();" multiple>
-                            <option selected="" value="0">All</option>
+                            <option selected="" value="">All</option>
                         </select>
                     </div>
                     <div class="col-lg-4">
                         <label for="ddlCourse" class="mr-2">Course</label>
                         <select class="form-control dropdown-search-filter" id="ddlCourse" multiple >
-                            <option value="-1">All</option>
+                            <option value="">All</option>
                         </select>
                     </div>
                 </div>
 				
                 <div class="row">  
                     <div class="col-lg-4">
-                        <label for="FromDate" class="mr-2">From Date</label>
+                        <label for="FromDate" class="mr-2">From Date*</label>
                         <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
                         ClientIdMode="static" placeholder="From Date">
                     </div>
                     <div class="col-lg-4">
-                        <label for="ToDate" class="mr-2">To Date</label>
+                        <label for="ToDate" class="mr-2">To Date*</label>
                         <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
                         ClientIdMode="static" placeholder="To Date">
                     </div>
