@@ -60,7 +60,7 @@
                     //$('#ddlRM_role').val().toString()//$('#ddlProject option:selected').val()
                 },
                 success: function (data){
-                    if(data != 'null' && data != null)
+                    if(data.User.Role_Ids != 'null' && data.User.Role_Ids != null)
                     {   //alert('null :'+data+':')
                         ids=data.User[0].Role_Ids;
                         var names=data.User[0].Role_Names;
