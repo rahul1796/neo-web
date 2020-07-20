@@ -693,20 +693,20 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Region-Wise candidate') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Region Wise Candidate Count') 
 
             df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Region-wise batch') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Region Wise Batch Count') 
 
             df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Region-Client') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Customer Wise Candidate Count') 
 
-            worksheet = writer.sheets['Region-Wise candidate']
+            worksheet = writer.sheets['Region Wise Candidate Count']
             default_column = ['Region','BU']
             first_row = ['Enrolment', 'Certification','Placement']
             second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual']
-            third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
-                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',]
+            third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',]
             
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
@@ -732,7 +732,7 @@ class Report:
             for col_num, value in enumerate(third_row):
                 worksheet.write(2, 2+col_num, value, header_format)
 
-            worksheet = writer.sheets['Region-wise batch']
+            worksheet = writer.sheets['Region Wise Batch Count']
             #default_column = ['COO','Sub Project']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
@@ -758,7 +758,7 @@ class Report:
             for col_num, value in enumerate(third_row):
                 worksheet.write(2, 2+col_num, value, header_format)
 
-            worksheet = writer.sheets['Region-Client']            
+            worksheet = writer.sheets['Customer Wise Candidate Count']            
             default_column = ['Region','BU','Customer']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)

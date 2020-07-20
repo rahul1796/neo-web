@@ -1149,6 +1149,15 @@ class tag_users_from_sub_project(Resource):
         sub_project_id=request.form['sub_project_id']
         tagged_by= session['user_id']
         return Master.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)
+class tag_user_roles(Resource):
+    @staticmethod
+    def post():
+        login_user_id=request.form['login_user_id']
+        user_id=request.form['user_id']
+        neo_role=request.form['neo_role']
+        jobs_role=request.form['jobs_role']
+        crm_role=request.form['crm_role']        
+        return UsersM.tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role)
 
 api.add_resource(batch_list, '/batch_list')
 api.add_resource(batch_list_updated, '/batch_list_updated')
@@ -1168,6 +1177,7 @@ api.add_resource(drop_edit_map_candidate_batch,'/drop_edit_candidate_batch')
 api.add_resource(untag_users_from_sub_project,'/untag_users_from_sub_project')
 api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
+api.add_resource(tag_user_roles,'/tag_user_roles')
 ####################################################################################################
 
 #QP_API's
@@ -4182,6 +4192,17 @@ class All_role(Resource):
                 return {'exception':str(e)}
 api.add_resource(All_role,'/All_role')
 
+class All_role_neo(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.All_role_neo_db()
+                return {'Role':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(All_role_neo,'/All_role_neo')
+
 class All_dept(Resource):
     @staticmethod
     def get():
@@ -4475,6 +4496,14 @@ class get_user_details_new(Resource):
             user_id=int(request.args['user_id'])
             return UsersM.get_user(user_id)
 api.add_resource(get_user_details_new,'/get_user_details_new')
+
+class get_user_role_details_new(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            user_id=int(request.args['user_id'])
+            return UsersM.get_user_role_details_for_role_update(user_id)
+api.add_resource(get_user_role_details_new,'/get_user_role_details_new')
 
 class GetProjectsForCourse(Resource):
     @staticmethod
@@ -5481,11 +5510,11 @@ class get_batch_list_updated(Resource):
             client_key = str(request.args['client_key'])
             
             user_id = int(request.args['user_id'])
+            candidate_id = int(request.args['candidate_id'])
             role_id = int(request.args['role_id'])
-            
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
 
-                out = Database.get_batch_list_updated(user_id)
+                out = Database.get_batch_list_updated(user_id,candidate_id,role_id)
                 return jsonify(out)
                 
             else:
@@ -6640,6 +6669,61 @@ class upload_batch_target_plan(Resource):
              
 api.add_resource(upload_batch_target_plan,'/upload_batch_target_plan')
 
+class upload_user(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                f = request.files['filename']
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
+                f.save(file_name)
+                df= pd.read_excel(file_name,sheet_name='Template')
+                df = df.fillna('')
+                schema = Schema([
+                        #null check
+                        Column('Employee Code*',str_validation+null_validation),
+                        Column('Employee Name*',str_validation+null_validation),
+                        Column('Employee Email*',str_validation+null_validation),
+                        Column('Reporting Manager Employee Code*',str_validation+null_validation),
+                        Column('Mobile Number*',str_validation+null_validation),
+                        Column('Employee HR Role*',str_validation+null_validation),
+                        Column('Region*',str_validation+null_validation),
+                        Column('Grade*',str_validation+null_validation),
+                        Column('Designation*',str_validation+null_validation),
+                        Column('Employment Status*',str_validation+null_validation),
+                        Column('Entity*',str_validation+null_validation),
+                        Column('Employee Department*',str_validation+null_validation),
+                        Column('Active Status*',str_validation+null_validation)
+                        ])
+                errors = schema.validate(df)
+                errors_index_rows = [e.row for e in errors]
+                len_error = len(errors_index_rows)
+                if len_error>0:
+                    print("1")
+                    file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                    pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                    return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                else:
+                    print("2")
+                    df.columns = df.columns.str.replace(" ", "_")
+                    df.columns = df.columns.str.replace("*", "")
+                    df.insert(0, 'row_index', range(len(df)))
+                    out = Database.upload_user(df,user_id,user_role_id)
+                    if out['Status']==False:
+                        file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                        pd.DataFrame(out['data']).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                        return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                    else:
+                        return out
+                
+            except Exception as e:
+                 print(e)
+                 return {"Status":False, "message":"Unable to upload " + str(e)}  
+             
+api.add_resource(upload_user,'/upload_user')
+
 class GetSubProjectPlannedBatches(Resource):
     @staticmethod
     def get():
@@ -6693,7 +6777,6 @@ class get_candidate_details(Resource):
                 res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
                 return jsonify(res)
 
-#Base URL + "/get_candidate_list" api will provide all the unzynched QP data as response
 api.add_resource(get_candidate_details, '/get_candidate_details')
 
 
