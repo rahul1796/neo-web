@@ -68,7 +68,7 @@
                                             </select>
                                         </div>
                                         <div class="col-lg-4">
-                                            <button class="btn" style="cursor:pointer" onclick="javascript:$('#AddSessionPlan').show();$('#getsessionplan').hide();$('#getmodule').hide();$('#getsessions').hide();$('#AddModule').hide();$('#add_edit_session').hide();"><i style="color: #00AA00;" title="Add Session" class="fas fa-plus"></i></button> 
+                                            <button class="btn" style="cursor:pointer" onclick="javascript:AddSessionPlanPopUp();"><i style="color: #00AA00;" title="Add Session" class="fas fa-plus"></i></button> 
                                         </div>
                                     </div>
                                 </div>
@@ -158,7 +158,7 @@
                                             </select>
                                         </div>
                                         <div class="col-lg-4">
-                                            <button class="btn" onclick="javascript:$('#AddModule').show();$('#getmodule').hide();$('#getsessionplan').hide();$('#getsessions').hide();$('#AddSessionPlan').hide();$('#add_edit_session').hide();" style="cursor:pointer"><i style="color: #00AA00;" title="Add Module" class="fas fa-plus"></i></button>
+                                            <button class="btn" onclick="javascript:AddModulePopUp();" style="cursor:pointer"><i style="color: #00AA00;" title="Add Module" class="fas fa-plus"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -247,7 +247,7 @@
                             <p class="mb-0">Everything seems to be ok :)</p>
                         </div>
                                 <div class="col-lg-12">
-                                        <button id="addsession" class="btn" style="float: right;"onclick="javascript:$('#add_edit_session').show();$('#getsessions').hide();$('#getsessionplan').hide();$('#getmodule').hide();$('#AddSessionPlan').hide();$('#AddModule').hide();"><i style="color: #00AA00;" title="Add Session" class="fas fa-plus" ></i></button> 
+                                        <button id="addsession" class="btn" style="float: right;"onclick="javascript:AddSessionPopUp();"><i style="color: #00AA00;" title="Add Session" class="fas fa-plus" ></i></button> 
                                         <table id="tbl_sessions"  class="table dt-responsive nowrap">
                                             <thead>
                                                 <tr>
@@ -256,8 +256,8 @@
                                                     <th>Name</th>
                                                     <th>Code</th>
                                                     <th>Order</th>
-                                                    <th>Duration(In Munites)</th>
-                                                    <th>Session Type</th>
+                                                    <th>Duration(In Minutes)</th>
+                                                    <!-- <th>Session Type</th> -->
                                                 </tr>
                                             </thead>
                                         

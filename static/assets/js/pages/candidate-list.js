@@ -421,7 +421,7 @@ function LoadTable()
             },
             {      
                 "data": function (row, type, val, meta) {
-                    var varButtons='<a onclick="CandidateIDDetails(\'' + row.Aadhar_No+ '\',\'' + row.Identifier_Type+ '\',\'' + row.Identity_Numbe+ '\')"  style="color:blue;cursor:pointer" >Click Here</a>';
+                    var varButtons='<a onclick="CandidateIDDetails(\'' + row.Aadhar_No+ '\',\'' + row.Identifier_Type+ '\',\'' + row.Identity_Number+ '\')"  style="color:blue;cursor:pointer" >Click Here</a>';
                     return varButtons;
                 }
             }
@@ -507,11 +507,11 @@ function CandidateExperienceDetails(Highest_Qualification,Stream_Specialization,
     $('#mdl_cand_experience').modal('show');
 }
 
-function CandidateIDDetails(Aadhar_No,    Identifier_Type,    Identity_Numbe)
+function CandidateIDDetails(Aadhar_No,    Identifier_Type,    Identity_Number)
 {    
     $('#txtAadhar').val(Aadhar_No);
     $('#txtIdentificationType').val(Identifier_Type);
-    $('#txtIdenNumber').val(Identity_Numbe);
+    $('#txtIdenNumber').val(Identity_Number);
     $('#mdl_cand_identity').modal('show');
 }
 
