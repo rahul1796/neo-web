@@ -164,6 +164,8 @@
                         dataType: "json",
                         url: URL, 
                         data: { 
+                        'user_id':$('#hdn_home_user_id').val(),
+                        'user_role_id':$('#hdn_home_user_role_id').val(),
 						'from_date':$('#FromDate').val(),	//.toString()
 						'to_date':$('#ToDate').val(),     	//.toString()
 						'Customers':$('#ddlCustomer').val().toString(),

@@ -201,6 +201,8 @@
             "type": "POST",
             "dataType": "json",
             "data": function (d) {
+                d.user_id = $('#hdn_home_user_id').val();
+                d.user_role_id  = $('#hdn_home_user_role_id').val();
                 d.region_id = $('#ddlRegion').val().toString();
                 d.sub_project_ids = $('#ddlSubProject').val().toString();  
                 d.course_ids = $('#ddlCourse').val().toString();  
@@ -499,7 +501,6 @@
         </div>
     </div>
 </div><!--/.modal-->
-
 
 <!-- third party js -->
 <script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
