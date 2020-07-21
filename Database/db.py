@@ -5954,3 +5954,17 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return trainers
+
+    def app_get_release_date_msg():
+        res = []
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "EXEC [masters].[sp_get_app_release_date_message]"
+        curs.execute(quer)
+        columns = [column[0].title() for column in curs.description]
+        for r in curs:
+            h = {"success":r[0],"description":r[1]}
+            res.append(h)
+        curs.close()
+        conn.close()
+        return res
