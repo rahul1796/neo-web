@@ -44,9 +44,10 @@
                     $('#hdn_web_url').val('{{values[4]}}');
                     $('#hdn_user_region_id').val('{{values[5]}}');
                 }
+                select_roles(0);
 
             if(parseInt($('#hdn_home_user_role_id').val())>0)
-            {
+            {   1, 15, 11, 13, 5,7
                 var role_id=parseInt($('#hdn_home_user_role_id').val());
                 //alert(role_id);
                 switch(role_id)
@@ -83,9 +84,14 @@
                             $('#Qp_wise_report').show();
                             $('#Batch_Status_report').show();
                             $('#ops_productivity_report').show();
-                        $('#training_Report_Menu').show();
-                            $('#TMA_attendance_Menu').show();
-                            $('#TMA_deployment_Menu').show();
+                        $('#Productivity_Report').show();
+                            $('#region_productivity_report').show();
+                            $('#mobilizer_productivity_report').show();
+                            $('#Ops_Productivity_Report').show();
+                        $('#training_Report_Menu').hide();
+                            $('#TMA_attendance_Menu').hide();
+                            $('#TMA_deployment_Menu').hide();
+                        $('#TMA_attendance_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
                         if(goto !="")
@@ -189,6 +195,9 @@
                             $('#Qp_wise_report').show();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
+                        $('#TMA_attendance_Menu').show();
+                        $('#TMA_content').show();
+                            $('#tma_report_filter').show();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -220,8 +229,13 @@
                         $('#Report_Menu').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
-							$('#Batch_Status_report').show();
-							$('#ops_productivity_report').hide();
+
+                            $('#Batch_Status_report').show();
+                            $('#ops_productivity_report').hide();
+                        $('#TMA_attendance_Menu').show();
+                        $('#TMA_content').show();
+                            $('#tma_report_filter').show();
+							          
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -254,7 +268,7 @@
                         $('#Report_Menu').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').hide();
-							$('#Batch_Status_report').show();
+							          $('#Batch_Status_report').show();
                             $('#ops_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
@@ -289,6 +303,9 @@
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
+                        $('#TMA_attendance_Menu').show();
+                        $('#TMA_content').show();
+                            $('#tma_report_filter').show();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -322,6 +339,9 @@
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
+                        $('#TMA_attendance_Menu').show();
+                        $('#TMA_content').show();
+                            $('#tma_report_filter').show();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -388,6 +408,9 @@
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
+                        $('#TMA_attendance_Menu').show();
+                        $('#TMA_content').show();
+                            $('#tma_report_filter').show();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -534,7 +557,7 @@
             }
         });      
 
-        function select_roles(){
+        function select_roles(a){
             var ids=''
             //document.getElementById('container').innerHTML = "";
             var URL="/All_role_user"
@@ -556,7 +579,6 @@
                         ids=data.User[0].Role_Ids;
                         var names=data.User[0].Role_Names;
                         $('#ddlRole').empty();
-                        
                         for (i = 0; i < ids.split(',').length; i++) {
                             $('#ddlRole').append(new Option(names.split(',')[i],ids.split(',')[i]));
                             }
@@ -571,7 +593,19 @@
                     return false;
                 }
             });
-            $('#mdl_user_role').modal('show');
+
+            if(ids.split(',').length==1){
+                //alert(ids)
+                $('#changerole_Menu').hide();
+            }
+            else{
+                //alert('lol')
+                $('#changerole_Menu').show();
+            }
+
+            if(a==1){
+                $('#mdl_user_role').modal('show');
+            }
         }
 
         function LoadRoleWisePage(){
@@ -623,8 +657,8 @@
             <input type="hidden" id="hdn_home_user_name" name="hdn_home_user_name" value="0">
             <input type="hidden" id="hdn_web_url" name="hdn_web_url" value="">
             <input type="hidden" id="hdn_user_region_id" name="hdn_user_region_id" value="">
-            <input type="hidden" id="hdn_home_alluserrole_id" name="hdn_home_user_id" value="">
-            <input type="hidden" id="hdn_home_alluserrole_name" name="hdn_home_user_id" value="">
+            <input type="hidden" id="hdn_home_alluserrole_id" name="hdn_home_alluserrole_id" value="">
+            <input type="hidden" id="hdn_home_alluserrole_name" name="hdn_home_alluserrole_name" value="">
             
 			
         <header id="topnav" style="background-color:#1C2A43;min-height: 10%; font-size: 15px; z-index: 1000;" >
@@ -654,7 +688,7 @@
                                     <a href="/my_projects" >My Projects</a>
                                 </li>
                                 <li id="changerole_Menu">
-                                    <a href="javascript:select_roles()" >Change Role</a>
+                                    <a href="javascript:select_roles(1)" >Change Role</a>
                                 </li>
                                 <li id="changepass_Menu">
                                     <a href="/change_password" >Change Password</a>
@@ -701,9 +735,15 @@
                             <li class="has-submenu active" id="Registration_Menu">
                                 <a id="AnchorRegistration" href="/registration"  class="active"> <i class="fe-edit-2"></i>Registration<div class="button"></div></a>
                             </li>
+                            <li class="has-submenu active" id="Enrollment_Menu">
+                                <a id="AnchorRegistration" href="/enrollment"  class="active"> <i class="fe-edit-2"></i>Enrollment<div class="button"></div></a>
+                            </li>
+                            <li class="has-submenu active" id="TMA_attendance_Menu" style="display:none">
+                                <a id="Anchorattendance" href="/AttendanceReport"  class="active"> <i class="fe-airplay"></i>Training<div class="button"></div></a>
+                            </li>
                             <li class="has-submenu active"  id="training_Report_Menu" style="display:none">
                                 <a href="#" class="active">
-                                    <i class="fe-airplay"></i>Trainer <div class="arrow-down"></div></a>
+                                    <i class="fe-airplay"></i>Training<div class="arrow-down"></div></a>
                                 <ul class="submenu"> 
                                     <li  id="TMA_deployment_Menu">
                                         <a href="/TrainerDeployment" class="active"> Trainer Deployment <div class="button"></div></a>
@@ -712,9 +752,6 @@
                                         <a href="/AttendanceReport" class="active"> Attendance<div class="button"></div></a>
                                     </li>
                                 </ul>
-                            </li>
-                            <li class="has-submenu active" id="Enrollment_Menu">
-                                <a id="AnchorRegistration" href="/enrollment"  class="active"> <i class="fe-edit-2"></i>Enrollment<div class="button"></div></a>
                             </li>
 							<!-- <li class="has-submenu active" id="Batch_Menu">
                                 <a id="AnchorBatch" href="/batch"  class="active"> <i class="fe-tag"></i>Batch<div class="button"></div></a>
@@ -748,12 +785,6 @@
 									<li  id="Mobilization_report_Menu" style="display:none">
                                         <a href="/MobilizationReport" id="Mobilization_report" class="active"> Mobilization Report<div class="button"></div></a>
                                     </li>
-                                    <li>
-										<a href="/ops_productivity_report" id="Ops_Productivity_Report" class="active">Ops Productivity Report<div class="button"></div></a>
-                                    </li>
-                                    <li>
-										<a href="/region_productivity_report" id="region_productivity_report" class="active">Region-wise Productivity Report<div class="button"></div></a>
-                                    </li>
                                     <li class="has-submenu"  id="TMA_content" style="display:none">
                                         <a href="#">Training Report <div class="arrow-down"></div></a>
                                         <ul class="submenu">      
@@ -764,6 +795,23 @@
 												<a href="/tma_report_filter" class="active"> TMA Report<div class="button"></div></a>
 											</li>
                                         </ul>
+                                    </li>
+                                    <li class="has-submenu"  id="Productivity_Report" style="display:none">
+                                        <a href="#">Productivity Report<div class="arrow-down"></div></a>
+                                        <ul class="submenu">      
+                                            <!--<li  id="TMA_batch_Menu">
+												<a href="/tma_batch" class="active"> Trainer Deployment <div class="button"></div></a>
+                                            </li-->
+                                            <li id="region_productivity_report">
+                                                <a href="/region_productivity_report" class="active">Region-wise Productivity Report<div class="button"></div></a>
+                                            </li>
+                                            <li id="mobilizer_productivity_report">
+                                                <a href="/mobilizer_productivity_report" class="active">Mobilizer Productivity Report<div class="button"></div></a>
+                                            </li>
+                                            <li id="Ops_Productivity_Report">
+                                                <a href="/ops_productivity_report" class="active">Ops Productivity Report<div class="button"></div></a>
+                                            </li>
+										</ul>
                                     </li>
 									<li class="has-submenu"  id="CoomplianceReport" style="display:none">
                                         <a href="#">Compliance Reports <div class="arrow-down"></div></a>
@@ -778,10 +826,6 @@
                                     </li>
                                     <li  id="master_data_Menu" style="display:none"> 
 										<a href="/download_master_data" class="active">Download Master Data<div class="button"></div></a>
-                                    </li>
-                                    
-                                    <li>
-										<a href="/mobilizer_productivity_report" id="mobilizer_productivity_report" class="active">Mobilizer Productivity Report<div class="button"></div></a>
                                     </li>
                                 </ul>
                             </li>
@@ -817,9 +861,9 @@
                                     <li id="Contract_Menu">
                                         <a id="AnchorContracts"  href="/contract" >Contracts</a>
                                     </li>                                    
-                                    <li class="has-submenu" id="Project_Menu" >
+                                    <li class="has-submenu dropdown-menu-left " id="Project_Menu" >
                                         <a href="#">Projects <div class="arrow-down"></div></a>
-                                        <ul class="submenu"> 
+                                        <ul class="submenu" style="right: 185px; left: auto; margin-right: 20px;">
                                             <li >
                                                 <a href="/project" id="AnchorProjects" class="active">Main Projects<div class="button"></div></a>
                                             </li>
@@ -836,7 +880,7 @@
                                     </li>
                                     <li class="has-submenu" id="Content_Menu">
                                         <a href="#"> Content <div class="arrow-down"></div></a>
-                                        <ul class="submenu">
+                                        <ul class="submenu" style="right: 185px; left: auto; margin-right: 20px;">
                                             <li id="Sector_Menu">
                                                 <a id="AnchorSectors"  href="/sector" >Sectors</a>
                                             </li>

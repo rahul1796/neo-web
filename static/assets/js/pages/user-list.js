@@ -256,6 +256,56 @@ function LoadRoleddl(){
     });
     return false;
 }
+function LoadNEORoleddl(needed){
+    var URL=$('#hdn_web_url').val()+ "/All_role_neo"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            if(data.Role != null)
+            {
+                $('#ddlNeoRole').empty();
+                $('#ddlJobsRole').empty();
+                $('#ddlCRMRole').empty();
+                var count=data.Role.length;
+                if( count> 0) 
+                {
+                    //$('#ddlRole').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                    {
+                        $('#ddlNeoRole').append(new Option(data.Role[i].User_Role_Name,data.Role[i].User_Role_Id));
+                        $('#ddlJobsRole').append(new Option(data.Role[i].User_Role_Name,data.Role[i].User_Role_Id));
+                        $('#ddlCRMRole').append(new Option(data.Role[i].User_Role_Name,data.Role[i].User_Role_Id));
+                        
+                    }
+                    if(needed!='' && needed!='0' && needed!=null)
+                            {
+                                //console.log(needed);
+                                $('#ddlNeoRole').val(needed.split(',')); 
+                            }
+                        
+                        //$('#ddlCourse').val('-1');
+                }
+                else
+                {
+                    $('#ddlNeoRole').append(new Option('ALL','-1'));
+                    $('#ddlJobsRole').append(new Option('ALL','-1'));
+                    $('#ddlCRMRole').append(new Option('ALL','-1'));
+
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading Neo User Roles! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
 function LoadDEPTddl(){
     var URL=$('#hdn_web_url').val()+ "/All_dept"
         $.ajax({
@@ -331,12 +381,14 @@ function LoadTable(FilterRoleId)
 
         "columns": [
             { "data": "S_No"},
-            {"visible": false,
+            {"visible": true,
             "data": function (row, type, val, meta) {
                 var varButtons = ""; 
-                if(role_id != 5)
-                    varButtons += '<a onclick="EditUserDetail(\'' + row.User_Id + '\',\'' + row.User_Role_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit User" class="fas fa-edit" ></i></a>';
-                return varButtons;
+                if(role_id == 1 )
+                {
+                    varButtons += '<a onclick="EditUserDetail(\'' + row.User_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit User Roles" class="fas fa-edit" ></i></a>';
+                }
+                     return varButtons;
                 }
             },
 
@@ -355,10 +407,13 @@ function LoadTable(FilterRoleId)
             },
             //{ "data": "User_Name" },
             { "data": "Email" },
+            { "data": "Employee_Code" },            
             { "data": "Entity_Name" },
             { "data": "Department_Name" },
             { "data": "Employee_Role_Name" },
             { "data": "User_Role_Name" },
+            { "data": "Jobs_Role_Name" },
+            { "data": "Crm_Role_Name" },
             { "data": "Region" },
             { 
                 "data": 
@@ -393,11 +448,83 @@ function LoadTable(FilterRoleId)
     });
 }
 
-function EditUserDetail(UserId,UserRoleId)
+function EditUserDetail(UserId)
 {
-    $('#hdn_user_id').val(UserId);
-    //alert('Hi');
-    $('#form1').submit();
+    $('#hdn_neo_user_id').val(UserId);
+    //LoadNEORoleddl(needed);
+    $('.dropdown-search-filter').select2({
+        width: '100%' 
+    });
+    var URL=$('#hdn_web_url').val()+ "/get_user_role_details_new?user_id="+UserId;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            overflow:true,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+
+                $('#TxtEmpCode').val(data.UserDetail.Employee_Code);
+                $('#TxtEmpName').val(data.UserDetail.Employee_Name);              
+                LoadNEORoleddl(data.UserDetail.Neo_Role_Id);
+                $('#ddlJobsRole').val(data.UserDetail.Jobs_Role_Id);
+                $('#ddlCRMRole').val(data.UserDetail.Crm_Role_Id);
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+     
+    $('#mdl_add_edit_role').modal('show');
+    
+}
+function UpdateRole()
+{
+    var URL=$('#hdn_web_url').val()+ "/tag_user_roles";
+        $.ajax({
+            type:"POST",
+            url:URL,
+            data:{
+                "login_user_id": $('#hdn_home_user_id').val() ,
+                "user_id": $('#hdn_neo_user_id').val(),
+                "neo_role":$('#ddlNeoRole').val().toString(),
+                "jobs_role":$('#ddlJobsRole').val().toString(),
+                "crm_role":$('#ddlCRMRole').val().toString(),
+            },
+            success:function(data){
+                if(data.PopupMessage.message =="Success")
+                {
+                    swal({   
+                        title:data.PopupMessage.message,
+                        text:data.PopupMessage.message+"!!",
+                        icon:"success",
+                        confirmButtonClass:"btn btn-confirm mt-2"
+                        }).then(function(){
+                            window.location.href = '/user';                          
+                        });
+
+                }
+                else{
+                    swal({   
+                        title:data.PopupMessage.message,
+                        text:"Error in updating Roles!",
+                        icon:"error",
+                        confirmButtonClass:"btn btn-confirm mt-2"
+                        }).then(function(){
+                            window.location.href = '/user';                          
+                        });
+                }
+                    
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
     
 }
 function GetProjectDetails(User_Id,User_Name)

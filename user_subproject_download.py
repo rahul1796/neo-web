@@ -27,11 +27,11 @@ def create_report(sub_project,project,region,customer,user_id,user_role_id,emplo
         data = curs.fetchall()
         data = list(map(lambda x:list(x), data))
         df = pd.DataFrame(data, columns=columns)
-        df= df[['Employee_Code', 'Employee_Name','Employee_Email','Sub_Project_Code', 'Sub_Project_Name', 'Employee_Role', 'Employement_Type']]
+        df= df[['Employee_Code', 'Employee_Name','Employee_Email','Sub_Project_Code', 'Sub_Project_Name', 'Employee_Neo_Role', 'Employement_Type']]
         
         df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='user-subproject Report') 
         worksheet = writer.sheets['user-subproject Report']
-        Column = ['Employee_Code', 'Employee_Name','Employee_Email','Sub_Project_Code', 'Sub_Project_Name', 'Employee_Role', 'Employement_Type']
+        Column = ['Employee_Code', 'Employee_Name','Employee_Email','Sub_Project_Code', 'Sub_Project_Name', 'Employee_Neo_Role', 'Employement_Type']
         for col_num, value in enumerate(Column):
             worksheet.write(0, col_num, value, header_format)                 
         writer.save()

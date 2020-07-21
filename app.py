@@ -232,6 +232,14 @@ def dashboard():
 def EraseDisplayMsg():
     config.displaymsg=""
     return redirect(url_for('index'))
+
+class clear_config_msg(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            config.displaymsg=""
+            return {"sucess":True}
+api.add_resource(clear_config_msg,'/clear_config_msg')
     
 @app.route("/home")
 def home():
@@ -1141,6 +1149,15 @@ class tag_users_from_sub_project(Resource):
         sub_project_id=request.form['sub_project_id']
         tagged_by= session['user_id']
         return Master.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)
+class tag_user_roles(Resource):
+    @staticmethod
+    def post():
+        login_user_id=request.form['login_user_id']
+        user_id=request.form['user_id']
+        neo_role=request.form['neo_role']
+        jobs_role=request.form['jobs_role']
+        crm_role=request.form['crm_role']        
+        return UsersM.tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role)
 
 api.add_resource(batch_list, '/batch_list')
 api.add_resource(batch_list_updated, '/batch_list_updated')
@@ -1160,6 +1177,7 @@ api.add_resource(drop_edit_map_candidate_batch,'/drop_edit_candidate_batch')
 api.add_resource(untag_users_from_sub_project,'/untag_users_from_sub_project')
 api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
+api.add_resource(tag_user_roles,'/tag_user_roles')
 ####################################################################################################
 
 #QP_API's
@@ -3160,6 +3178,8 @@ class ReportAttendanceBatches(Resource):
     def post():
         if request.method=='POST':
             try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
                 region_id = request.form['region_id']
                 sub_project_ids = request.form['sub_project_ids']
                 course_ids = request.form['course_ids']
@@ -3180,7 +3200,7 @@ class ReportAttendanceBatches(Resource):
                 if 'draw' in request.form:
                     draw = request.form['draw']
                 #print(region_id,center_id,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-                response=Report.ReportAttendanceBatches(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+                response=Report.ReportAttendanceBatches(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, user_id, user_role_id)
                 
                 return response
             except Exception as e:
@@ -3967,7 +3987,6 @@ class download_trainer_filter(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(download_trainer_filter,'/download_trainer_filter')
 
-
 @app.route("/tma_report_filter_page")
 def tma_report_filter_page():
     if g.user:
@@ -4037,7 +4056,6 @@ class updated_tma_report(Resource):
     def post():
         if request.method=='POST':
             try:
-                
                 from_date = request.form["from_date"]
                 to_date = request.form["to_date"]
                 Customers = request.form["Customers"]
@@ -4061,19 +4079,18 @@ class updated_new_tma_report(Resource):
     def post():
         if request.method=='POST':
             try:
-                
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
                 from_date = request.form["from_date"]
                 to_date = request.form["to_date"]
                 Customers = request.form["Customers"]
-                Centers =request.form["Centers"]
+                SubProject =request.form["SubProject"]
                 Courses = request.form["Courses"]
-
-                file_name='tma_report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
-
-                resp = filter_tma_report_new.create_report(from_date, to_date, Customers, Centers, Courses, file_name)
                 
+                file_name='tma_report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                resp = filter_tma_report_new.create_report(from_date, to_date, Customers, SubProject, Courses, file_name,user_id,user_role_id)
                 return resp
-                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+                
             except Exception as e:
                 #print(str(e))
                 return {"exceptione":str(e)}
@@ -4174,6 +4191,17 @@ class All_role(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(All_role,'/All_role')
+
+class All_role_neo(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                response = Database.All_role_neo_db()
+                return {'Role':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(All_role_neo,'/All_role_neo')
 
 class All_dept(Resource):
     @staticmethod
@@ -4468,6 +4496,14 @@ class get_user_details_new(Resource):
             user_id=int(request.args['user_id'])
             return UsersM.get_user(user_id)
 api.add_resource(get_user_details_new,'/get_user_details_new')
+
+class get_user_role_details_new(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            user_id=int(request.args['user_id'])
+            return UsersM.get_user_role_details_for_role_update(user_id)
+api.add_resource(get_user_role_details_new,'/get_user_role_details_new')
 
 class GetProjectsForCourse(Resource):
     @staticmethod
@@ -6652,7 +6688,7 @@ class upload_user(Resource):
                         Column('Employee Email*',str_validation+null_validation),
                         Column('Reporting Manager Employee Code*',str_validation+null_validation),
                         Column('Mobile Number*',str_validation+null_validation),
-                        Column('Employee Role*',str_validation+null_validation),
+                        Column('Employee HR Role*',str_validation+null_validation),
                         Column('Region*',str_validation+null_validation),
                         Column('Grade*',str_validation+null_validation),
                         Column('Designation*',str_validation+null_validation),
@@ -7090,7 +7126,6 @@ class GetBatchSessionList(Resource):
                 StatusId=request.args.get('status_id',0,type=int)
                 SessionName=request.args.get('session_name','')
                 app_version = request.args.get('app_version',0,type=str)
-
                 if UserId == 0:
                     res={'status':0,'message':'Invalid User Id','app_status':True}
                     response=jsonify(res)
@@ -7146,7 +7181,7 @@ class GetSubProjectsForRegionUser(Resource):
         if request.method=='GET':
             user_id=request.args.get('user_id',0,type=int)
             user_role_id=request.args.get('user_role_id',0,type=int)
-            region_id=request.args.get('region_id',0,type=int)
+            region_id=request.args.get('region_id','',type=str)
             response={"SubProjects":Master.GetSubProjectsForRegionUser(user_id,user_role_id,region_id)}
             return response
 api.add_resource(GetSubProjectsForRegionUser,'/GetSubProjectsForRegionUser')
@@ -7170,6 +7205,7 @@ class trainers_based_on_sub_projects(Resource):
             return Batch.AllTrainersOnSubProjects(sub_project_ids)
 api.add_resource(trainers_based_on_sub_projects,'/trainers_based_on_sub_projects')
 
+
 class app_get_release_date_msg(Resource):
     @staticmethod
     def get():
@@ -7186,6 +7222,16 @@ class app_get_release_date_msg(Resource):
                 return {'success': False, 'description': "Error! "+str(e)} 
 
 api.add_resource(app_get_release_date_msg, '/app_get_release_date_msg')
+
+class GetSubProjectsForCustomer(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            customer_ids=request.args.get('customer_ids','',type=str)
+            response={"SubProjects":TMA.GetSubProjectsForCustomer(customer_ids)}
+            return response
+api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

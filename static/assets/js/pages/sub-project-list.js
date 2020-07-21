@@ -334,6 +334,7 @@ function LoadTrainerType(){
     $('#ddlTrainerType').append(new Option("All Trainers",0));
     $('#ddlTrainerType').append(new Option("Internal Trainers",1));
     $('#ddlTrainerType').append(new Option("External Trainers",2));
+    LoadTrainers()
 }
 function LoadTrainers(){
     

@@ -18,3 +18,6 @@ class TMA:
     
     def LogTrainerStageDetails(session_id,user_id,batch_id,stage_id,latitude,longitude,image_file_name,mark_candidate_attendance,attendance_data,group_attendance_image_data,app_version):
         return TMADatabase.LogTrainerStageDetails(session_id,user_id,batch_id,stage_id,latitude,longitude,image_file_name,mark_candidate_attendance,attendance_data,group_attendance_image_data,app_version)
+    
+    def GetSubProjectsForCustomer(customer_ids):
+        return TMADatabase.GetSubProjectsForCustomer(customer_ids)
