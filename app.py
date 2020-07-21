@@ -7205,6 +7205,24 @@ class trainers_based_on_sub_projects(Resource):
             return Batch.AllTrainersOnSubProjects(sub_project_ids)
 api.add_resource(trainers_based_on_sub_projects,'/trainers_based_on_sub_projects')
 
+
+class app_get_release_date_msg(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            try:
+                client_id = request.args['client_id']
+                client_key = request.args['client_key']
+                if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                    out=Database.app_get_release_date_msg()                        
+                else:
+                    out = {'success': False, 'description': "client name and password not matching"}
+                return jsonify(out)
+            except Exception as e:
+                return {'success': False, 'description': "Error! "+str(e)} 
+
+api.add_resource(app_get_release_date_msg, '/app_get_release_date_msg')
+
 class GetSubProjectsForCustomer(Resource):
     @staticmethod
     def get():
@@ -7213,6 +7231,7 @@ class GetSubProjectsForCustomer(Resource):
             response={"SubProjects":TMA.GetSubProjectsForCustomer(customer_ids)}
             return response
 api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
