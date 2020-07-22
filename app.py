@@ -20,6 +20,7 @@ import pandas as pd
 import re
 import filter_tma_report
 import filter_tma_report_new
+import SL4Report_filter_new
 import candidate_report
 import user_subproject_download
 import batch_report
@@ -4096,7 +4097,6 @@ class updated_new_tma_report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(updated_new_tma_report,'/updated_new_tma_report')
 
-
 class GetAllContractStages(Resource):
     @staticmethod
     def get():
@@ -7213,6 +7213,40 @@ class GetSubProjectsForCustomer(Resource):
             response={"SubProjects":TMA.GetSubProjectsForCustomer(customer_ids)}
             return response
 api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
+
+
+@app.route("/SL4Report_page")
+def SL4Report_page():
+    if g.user:
+        return render_template("Reports/SL4Report.html")
+    else:
+        return redirect("/")
+
+@app.route("/SL4Report")
+def SL4Report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="SL4Report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class updated_new_SL4Report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
+                from_date = request.form["from_date"]
+                to_date = request.form["to_date"]
+                Customers = request.form["Customers"]
+                
+                report_name = "SL4_Customer_wise_report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                resp = SL4Report_filter_new.create_report(from_date, to_date, Customers, user_id, user_role_id, report_name)
+                return resp
+                
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(updated_new_SL4Report,'/updated_new_SL4Report')
 
 if __name__ == '__main__':
     app.run(debug=True)
