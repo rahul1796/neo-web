@@ -6881,6 +6881,20 @@ def region_productivity_report():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+@app.route("/customer_target_report_page")
+def customer_target_report_page():
+    if g.user:
+        return render_template("Reports/customer_wise_target_report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/customer_productivity_report")
+def customer_productivity_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="customer_target_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
 class DownloadOpsProductivityReport(Resource):
     @staticmethod
     def post():
@@ -6907,6 +6921,19 @@ class DownloadRegionProductivityReport(Resource):
             return resp
 
 api.add_resource(DownloadRegionProductivityReport,'/DownloadRegionProductivityReport')
+
+class DownloadCustomerTargetReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            month = request.form["month"]
+            region_ids = request.form["region_ids"]
+            customer_ids = request.form["customer_ids"]
+            contract_ids = request.form["contract_ids"]
+            resp = Report.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids)
+            return resp
+
+api.add_resource(DownloadCustomerTargetReport,'/DownloadCustomerTargetReport')
 ###############################################################################
 class All_role_user(Resource):
     @staticmethod
@@ -7205,6 +7232,24 @@ class trainers_based_on_sub_projects(Resource):
             return Batch.AllTrainersOnSubProjects(sub_project_ids)
 api.add_resource(trainers_based_on_sub_projects,'/trainers_based_on_sub_projects')
 
+
+class app_get_release_date_msg(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            try:
+                client_id = request.args['client_id']
+                client_key = request.args['client_key']
+                if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                    out=Database.app_get_release_date_msg()                        
+                else:
+                    out = {'success': False, 'description': "client name and password not matching"}
+                return jsonify(out)
+            except Exception as e:
+                return {'success': False, 'description': "Error! "+str(e)} 
+
+api.add_resource(app_get_release_date_msg, '/app_get_release_date_msg')
+
 class GetSubProjectsForCustomer(Resource):
     @staticmethod
     def get():
@@ -7213,7 +7258,6 @@ class GetSubProjectsForCustomer(Resource):
             response={"SubProjects":TMA.GetSubProjectsForCustomer(customer_ids)}
             return response
 api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
-
 
 @app.route("/SL4Report_page")
 def SL4Report_page():
