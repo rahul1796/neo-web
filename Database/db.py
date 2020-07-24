@@ -6005,6 +6005,7 @@ SELECT					cb.name as candidate_name,
 
     def app_get_release_date_msg():
         res = []
+        h={}
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
         quer = "EXEC [masters].[sp_get_app_release_date_message]"
@@ -6015,4 +6016,4 @@ SELECT					cb.name as candidate_name,
             res.append(h)
         curs.close()
         conn.close()
-        return res
+        return h
