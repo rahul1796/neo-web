@@ -820,15 +820,15 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=2 ,sheet_name='Summary') 
+            df.to_excel(writer, index=None, header=None ,startrow=2 ,sheet_name='Region-BU Wise Summary') 
 
             df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=2 ,sheet_name='LE NEO vs Actual') 
+            df.to_excel(writer, index=None, header=None ,startrow=2 ,sheet_name='Customer-BU Wise Nos') 
 
             df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=2 ,sheet_name='Enrolment and Assessment Batch') 
+            df.to_excel(writer, index=None, header=None ,startrow=2 ,sheet_name='Batch Plan Summary') 
 
-            worksheet = writer.sheets['Summary']
+            worksheet = writer.sheets['Region-BU Wise Summary']
             default_column = ['Region','BU']
             first_row = ['Enrolment', 'Certification','Placement','New Batch Start(Planned Vs Actual)', 'Batch Certification(Planned Vs Actual)']
             second_row = ['Target', 'Actual','% Achieved',
@@ -847,7 +847,7 @@ class Report:
             for col_num, value in enumerate(second_row):
                 worksheet.write(1, 2+col_num, value, header_format)
 
-            worksheet = writer.sheets['LE NEO vs Actual']            
+            worksheet = writer.sheets['Customer-BU Wise Nos']            
             default_column = ['Region','BU','Customer','PMT']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
@@ -859,7 +859,7 @@ class Report:
             for col_num, value in enumerate(second_row):
                 worksheet.write(1, 4+col_num, value, header_format)
 
-            worksheet = writer.sheets['Enrolment and Assessment Batch']            
+            worksheet = writer.sheets['Batch Plan Summary']            
             default_column = ['Region','BU','Customer']
             first_row = ['New Batch Start(Planned Vs Actual)', 'Batch Certification(Planned Vs Actual)']
             second_row = ['MTD Batch Plan', 'Yes','No','Not Started',
