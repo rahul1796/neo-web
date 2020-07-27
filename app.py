@@ -7232,7 +7232,6 @@ class trainers_based_on_sub_projects(Resource):
             return Batch.AllTrainersOnSubProjects(sub_project_ids)
 api.add_resource(trainers_based_on_sub_projects,'/trainers_based_on_sub_projects')
 
-
 class app_get_release_date_msg(Resource):
     @staticmethod
     def get():
