@@ -4680,8 +4680,26 @@ SELECT					cb.name as candidate_name,
         curs.close()
         conn.close()
         df.to_xml(candidate_xmlPath + filenmae)
-        out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
+        mobilization_types=Database.get_user_mobilization_type(user_id)
+        out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae,'mobilization_types':mobilization_types}
         return out
+
+    def get_user_mobilization_type(user_id):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "EXECUTE [masters].[sp_get_user_mobilization_types] ?"
+        values=(user_id,)
+        curs.execute(quer,(values))
+        columns = [column[0].title() for column in curs.description]
+        response = []
+        h={}
+        for row in curs:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        curs.close()
+        conn.close()
+        return response
 
     def get_submit_candidate_mobi(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
         conn = pyodbc.connect(conn_str)
