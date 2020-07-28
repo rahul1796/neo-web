@@ -7258,6 +7258,15 @@ class GetSubProjectsForCustomer(Resource):
             return response
 api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
 
+
+class SyncShikshaAttendanceData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=Master.SyncShikshaAttendanceData()
+            return response
+api.add_resource(SyncShikshaAttendanceData,'/SyncShikshaAttendanceData')
+
 @app.route("/SL4Report_page")
 def SL4Report_page():
     if g.user:
@@ -7290,6 +7299,7 @@ class updated_new_SL4Report(Resource):
             except Exception as e:
                 return {"exceptione":str(e)}
 api.add_resource(updated_new_SL4Report,'/updated_new_SL4Report')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
