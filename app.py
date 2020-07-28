@@ -7230,5 +7230,13 @@ class GetSubProjectsForCustomer(Resource):
             return response
 api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
 
+class SyncShikshaAttendanceData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=Master.SyncShikshaAttendanceData()
+            return response
+api.add_resource(SyncShikshaAttendanceData,'/SyncShikshaAttendanceData')
+
 if __name__ == '__main__':
     app.run(debug=True)
