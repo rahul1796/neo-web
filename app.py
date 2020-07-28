@@ -21,6 +21,7 @@ import re
 import filter_tma_report
 import filter_tma_report_new
 import SL4Report_filter_new
+import Naton_Wise_Report
 import candidate_report
 import user_subproject_download
 import batch_report
@@ -7258,6 +7259,7 @@ class GetSubProjectsForCustomer(Resource):
             return response
 api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
 
+################################### SL4 report
 @app.route("/SL4Report_page")
 def SL4Report_page():
     if g.user:
@@ -7290,6 +7292,39 @@ class updated_new_SL4Report(Resource):
             except Exception as e:
                 return {"exceptione":str(e)}
 api.add_resource(updated_new_SL4Report,'/updated_new_SL4Report')
+
+############################## nation wise report 
+@app.route("/NationalReport_page")
+def NationalReport_page():
+    if g.user:
+        return render_template("Reports/Nation wise report.html")
+    else:
+        return redirect("/")
+
+@app.route("/NationalReport")
+def NationalReport():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="NationalReport_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class updated_new_NationalReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
+                month = request.form["month"]
+                Customers = request.form["Customers"]
+                
+                report_name = "Naton_Wise_Report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                resp = Naton_Wise_Report.create_report(month, Customers, user_id, user_role_id, report_name)
+                return resp
+                
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(updated_new_NationalReport,'/updated_new_NationalReport')
 
 if __name__ == '__main__':
     app.run(debug=True)
