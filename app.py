@@ -7259,6 +7259,14 @@ class GetSubProjectsForCustomer(Resource):
             return response
 api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
 
+class SyncShikshaAttendanceData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=Master.SyncShikshaAttendanceData()
+            return response
+api.add_resource(SyncShikshaAttendanceData,'/SyncShikshaAttendanceData')
+
 ################################### SL4 report
 @app.route("/SL4Report_page")
 def SL4Report_page():

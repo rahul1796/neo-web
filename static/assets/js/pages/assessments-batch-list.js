@@ -284,9 +284,13 @@ function LoadTable()
             { "orderable":false,
                 "data": function(row, type, val, meta) {
                     var varButtons='';
-                    if($('#hdn_home_user_role_id').val()!='25' & row.Summative_Count==0)
-                        varButtons+='<a onclick="ScheduleAssessmentModal(\'' + row.Batch_Id + '\',\'' + row.Batch_Code + '\')" class="btn" style="cursor:pointer" ><i title="Schedule Assessment" class="fe-edit" ></i></a>';
-                    //varButtons+='<a onclick="GetAssessments(\'' + row.Batch_Id + '\',\'' + row.Batch_Code + '\')" class="btn" style="cursor:pointer" ><i title="Assessment List" class="fas fa-list" ></i></a>';
+                    if($('#hdn_home_user_role_id').val()!='25'  & row.Summative_Count==0)
+                    {
+                        if($('#hdn_home_user_role_id').val()!='37')
+                            varButtons+='<a onclick="ScheduleAssessmentModal(\'' + row.Batch_Id + '\',\'' + row.Batch_Code + '\')" class="btn" style="cursor:pointer" ><i title="Schedule Assessment" class="fe-edit" ></i></a>';
+                    
+                    }
+                        //varButtons+='<a onclick="GetAssessments(\'' + row.Batch_Id + '\',\'' + row.Batch_Code + '\')" class="btn" style="cursor:pointer" ><i title="Assessment List" class="fas fa-list" ></i></a>';
                     return varButtons;
                 }
             },            
@@ -916,7 +920,10 @@ function add_map_message(){
                                     }                                     
                                     if (data.Assessments[i].Assessment_Stage_Id>=3 & $('#hdn_home_user_role_id').val()!='25' )
                                         txt+='<a onclick="Reassessment(\'' + data.Assessments[i].Assessment_Id + '\',\''+ data.Assessments[i].Batch_Id +'\',\''+ data.Assessments[i].Partner_Category_Id +'\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Schedule Reassessment" class="fe-edit" ></i></a>';
-                                    varHtml+='  <td style="text-align:center;">'+ txt +'</td>';
+                                    if($('#hdn_home_user_role_id').val()!='37')
+                                        varHtml+='  <td style="text-align:center;">'+ txt +'</td>';
+                                    else
+                                        varHtml+='  <td style="text-align:center;">'+ ''+'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Batch_Code +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Requested_Date +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Requested_On +'</td>';

@@ -31,7 +31,16 @@
         LoadTable(); 
         role_id=parseInt($('#hdn_home_user_role_id').val());
         if(role_id == 1 || role_id==15)
+        {
             $('#btn_create').show();
+            $('#btn_add').show();
+        }
+        else
+        {
+            $('#btn_create').hide();
+            $('#btn_add').hide();
+        }
+
     });
     function LoadPartnerTypes()
     {
@@ -166,7 +175,10 @@
                                 td_close=   '</td>';       
                                 varHtml+='<tr>';
                                 varHtml+='  <td style="text-align:center;">'+ data.PartnerUsers[i].S_No +'</td>';
-                                varHtml+='  <td style="text-align:center;">'+'<a onclick="EditModal(\'' + data.PartnerUsers[i].User_Name + '\',\'' + data.PartnerUsers[i].Email + '\',\'' + data.PartnerUsers[i].Mobile + '\',\'' + data.PartnerUsers[i].Is_Active + '\',\'' + data.PartnerUsers[i].Partner_User_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Partner User" class="fas fa-edit" ></i></a>'+'</td>';
+                                if($('#hdn_home_user_role_id').val()!='37')
+                                    varHtml+='  <td style="text-align:center;">'+'<a onclick="EditModal(\'' + data.PartnerUsers[i].User_Name + '\',\'' + data.PartnerUsers[i].Email + '\',\'' + data.PartnerUsers[i].Mobile + '\',\'' + data.PartnerUsers[i].Is_Active + '\',\'' + data.PartnerUsers[i].Partner_User_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Partner User" class="fas fa-edit" ></i></a>'+'</td>';
+                                else
+                                    varHtml+='  <td style="text-align:center;">'+ ''+'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.PartnerUsers[i].User_Name +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.PartnerUsers[i].Email +'</td>';                    
                                 varHtml+='  <td style="text-align:center;">'+ data.PartnerUsers[i].Mobile +'</td>';  

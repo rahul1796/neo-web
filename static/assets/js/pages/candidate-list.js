@@ -28,7 +28,8 @@ function Loadcandidatestatusddl(){
         $('#ddlcandidateStage').empty();
         $('#ddlcandidateStage').append(new Option('Enrolled','1'));
         $('#ddlcandidateStage').append(new Option('Certified','2'));
-        $('#ddlcandidateStage').append(new Option('Placed','3'));
+        $('#ddlcandidateStage').append(new Option('Placed (Date Of Join)','3'));
+        $('#ddlcandidateStage').append(new Option('Placed (Offer Uploaded Date)','4'));
     }    
 }
 function LoadRegionddl(){

@@ -4680,8 +4680,26 @@ SELECT					cb.name as candidate_name,
         curs.close()
         conn.close()
         df.to_xml(candidate_xmlPath + filenmae)
-        out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
+        mobilization_types=Database.get_user_mobilization_type(user_id)
+        out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae,'mobilization_types':mobilization_types}
         return out
+
+    def get_user_mobilization_type(user_id):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "EXECUTE [masters].[sp_get_user_mobilization_types] ?"
+        values=(user_id,)
+        curs.execute(quer,(values))
+        columns = [column[0].title() for column in curs.description]
+        response = []
+        h={}
+        for row in curs:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        curs.close()
+        conn.close()
+        return response
 
     def get_submit_candidate_mobi(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
         conn = pyodbc.connect(conn_str)
@@ -6043,9 +6061,49 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return trainers
+    
+    def SyncShikshaAttendanceData():
+        max_attendance_id = 0
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()        
+        quer = "Select COALESCE(MAX(attendance_id),0) as max_id from [masters].[tbl_shiksha_attendance];"
+        cur2.execute(quer)
+        data=cur2.fetchall()
+        data = '' if data==[] else data[0][0]
+        max_attendance_id=int(data)        
+        cur2.close()
+        con.close()
+        return max_attendance_id
+    
+    def UploadShikshaAttendanceData(attandance_data):
+        try: 
+            # print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            sql = 'exec	[masters].[sp_sync_shiksha_attandance]  ?'
+            values = (attandance_data,)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop >0 :
+                Status=True
+                msg="Synced Successfully"
+            else:
+                msg="Error in Syncing"
+                Status=False
+            return {"Status":Status,'Message':msg}
+        except Exception as e:
+            # print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+
+
 
     def app_get_release_date_msg():
         res = []
+        h={}
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
         quer = "EXEC [masters].[sp_get_app_release_date_message]"
@@ -6056,4 +6114,5 @@ SELECT					cb.name as candidate_name,
             res.append(h)
         curs.close()
         conn.close()
-        return res
+        return h
+
