@@ -20,6 +20,7 @@ import pandas as pd
 import re
 import filter_tma_report
 import filter_tma_report_new
+import SL4Report_filter_new
 import candidate_report
 import user_subproject_download
 import batch_report
@@ -232,6 +233,14 @@ def dashboard():
 def EraseDisplayMsg():
     config.displaymsg=""
     return redirect(url_for('index'))
+
+class clear_config_msg(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            config.displaymsg=""
+            return {"sucess":True}
+api.add_resource(clear_config_msg,'/clear_config_msg')
     
 @app.route("/home")
 def home():
@@ -3170,6 +3179,8 @@ class ReportAttendanceBatches(Resource):
     def post():
         if request.method=='POST':
             try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
                 region_id = request.form['region_id']
                 sub_project_ids = request.form['sub_project_ids']
                 course_ids = request.form['course_ids']
@@ -3190,7 +3201,7 @@ class ReportAttendanceBatches(Resource):
                 if 'draw' in request.form:
                     draw = request.form['draw']
                 #print(region_id,center_id,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-                response=Report.ReportAttendanceBatches(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+                response=Report.ReportAttendanceBatches(region_id,sub_project_ids,course_ids,trainer_ids,from_date,to_date,batch_stage_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, user_id, user_role_id)
                 
                 return response
             except Exception as e:
@@ -4069,6 +4080,8 @@ class updated_new_tma_report(Resource):
     def post():
         if request.method=='POST':
             try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
                 from_date = request.form["from_date"]
                 to_date = request.form["to_date"]
                 Customers = request.form["Customers"]
@@ -4076,15 +4089,13 @@ class updated_new_tma_report(Resource):
                 Courses = request.form["Courses"]
                 
                 file_name='tma_report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
-
-                resp = filter_tma_report_new.create_report(from_date, to_date, Customers, SubProject, Courses, file_name)
+                resp = filter_tma_report_new.create_report(from_date, to_date, Customers, SubProject, Courses, file_name,user_id,user_role_id)
                 return resp
                 
             except Exception as e:
                 #print(str(e))
                 return {"exceptione":str(e)}
 api.add_resource(updated_new_tma_report,'/updated_new_tma_report')
-
 
 class GetAllContractStages(Resource):
     @staticmethod
@@ -7221,6 +7232,23 @@ class trainers_based_on_sub_projects(Resource):
             return Batch.AllTrainersOnSubProjects(sub_project_ids)
 api.add_resource(trainers_based_on_sub_projects,'/trainers_based_on_sub_projects')
 
+class app_get_release_date_msg(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            try:
+                client_id = request.args['client_id']
+                client_key = request.args['client_key']
+                if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                    out=Database.app_get_release_date_msg()                        
+                else:
+                    out = {'success': False, 'description': "client name and password not matching"}
+                return jsonify(out)
+            except Exception as e:
+                return {'success': False, 'description': "Error! "+str(e)} 
+
+api.add_resource(app_get_release_date_msg, '/app_get_release_date_msg')
+
 class GetSubProjectsForCustomer(Resource):
     @staticmethod
     def get():
@@ -7230,6 +7258,7 @@ class GetSubProjectsForCustomer(Resource):
             return response
 api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
 
+
 class SyncShikshaAttendanceData(Resource):
     @staticmethod
     def get():
@@ -7237,6 +7266,40 @@ class SyncShikshaAttendanceData(Resource):
             response=Master.SyncShikshaAttendanceData()
             return response
 api.add_resource(SyncShikshaAttendanceData,'/SyncShikshaAttendanceData')
+
+@app.route("/SL4Report_page")
+def SL4Report_page():
+    if g.user:
+        return render_template("Reports/SL4Report.html")
+    else:
+        return redirect("/")
+
+@app.route("/SL4Report")
+def SL4Report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="SL4Report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class updated_new_SL4Report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
+                from_date = request.form["from_date"]
+                to_date = request.form["to_date"]
+                Customers = request.form["Customers"]
+                
+                report_name = "SL4_Customer_wise_report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                resp = SL4Report_filter_new.create_report(from_date, to_date, Customers, user_id, user_role_id, report_name)
+                return resp
+                
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(updated_new_SL4Report,'/updated_new_SL4Report')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

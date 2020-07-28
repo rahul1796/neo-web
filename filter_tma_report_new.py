@@ -1,4 +1,4 @@
-def create_report(start_date, end_date, customername, sub_project, coursename, name):
+def create_report(start_date, end_date, customername, sub_project, coursename, name, user_id,user_role_id):
     '''
     from datetime import datetime
     start_time = datetime.now()
@@ -50,8 +50,8 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
 
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [masters].[sp_stagelog_tmareport_new] ?, ?, ?, ?, ?'
-            values = (start_date, end_date, customername, sub_project, coursename)
+            sql = 'exec [masters].[sp_stagelog_tmareport_new] ?, ?, ?, ?, ?, ?, ?'
+            values = (start_date, end_date, customername, sub_project, coursename,user_id,user_role_id)
             curs.execute(sql,(values))
             
             data = curs.fetchall()
@@ -87,8 +87,8 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
 
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [masters].[sp_groupimage_tmareport_new] ?, ?, ?, ?, ?'
-            values = (start_date, end_date, customername, sub_project, coursename)
+            sql = 'exec [masters].[sp_groupimage_tmareport_new] ?, ?, ?, ?, ?,?,?'
+            values = (start_date, end_date, customername, sub_project, coursename,user_id,user_role_id)
             curs.execute(sql,(values))
             
             data = curs.fetchall()
@@ -111,8 +111,8 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
             
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [masters].[sp_candidate_tmareport_new] ?, ?, ?, ?, ?'
-            values = (start_date, end_date, customername, sub_project, coursename)
+            sql = 'exec [masters].[sp_candidate_tmareport_new] ?, ?, ?, ?, ?,?,?'
+            values = (start_date, end_date, customername, sub_project, coursename,user_id,user_role_id)
             curs.execute(sql,(values))
             
             data = curs.fetchall()
