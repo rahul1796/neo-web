@@ -5513,9 +5513,10 @@ class get_batch_list_updated(Resource):
             user_id = int(request.args['user_id'])
             candidate_id = int(request.args['candidate_id'])
             role_id = int(request.args['role_id'])
+            mobilization_type=request.args.get('mobilization_type',1,type=int)
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
 
-                out = Database.get_batch_list_updated(user_id,candidate_id,role_id)
+                out = Database.get_batch_list_updated(user_id,candidate_id,role_id,mobilization_type)
                 return jsonify(out)
                 
             else:
