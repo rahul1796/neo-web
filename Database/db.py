@@ -4869,6 +4869,63 @@ SELECT					cb.name as candidate_name,
                 ,[is_active])
             VALUES
             '''
+
+            insert_query_she='''
+            INSERT INTO [candidate_details].[tbl_candidate_she_details]
+                ([candidate_id]
+                ,[mobilization_type]
+                ,[score]
+                ,[result]
+                ,[Are you able to read and write local language?]
+                ,[Do you have a smart phone?]
+                ,[Are you willing to buy a smartphone?]
+                ,[Do you own two wheeler?]
+                ,[Do you know how to operate a smartphone?]
+                ,[Are you/ Have you been an entrepreneur before?]
+                ,[Do you have permission from your family to work outside?]
+                ,[Are you a member of SHG?]
+                ,[Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?]
+                ,[Are you willing to undergo online trainings and mentorship program for 6 month?]
+                ,[Are you willing to share details of customer, revenue, expenses frequently with LN?]
+                ,[Are you willing to work and sign the work contract with LN?]
+                ,[Are you willing to buy tools and consumables required to run your business?]
+                ,[Are you willing to adopt digital transactions in your business?]
+                ,[Are you willing to register your business in Social platforms like WhatsApp, Face book, Geo listing, Just dial etc.?]
+                ,[Have you availed any loan in the past?]
+                ,[Do you have any active loan?]
+                ,[Are you willing to take up a loan to purchase tools and consumables?]
+                ,[Are you covered under any health insurance?]
+                ,[Are you allergic to any chemicals and dust?]
+                ,[Will you able to wear mandatory PPEs during the work?]
+                ,[Are you willing to follow  Environment, Health and Safety Norms in your business?]
+                ,[Have you ever been subjected to any legal enquiry for Non ethical work/business?]
+                ,[Address as per Aadhar Card (incl pin code)]
+                ,[Number of members earning in the family]
+                ,[Rented or own house?]
+                ,[Size of the house]
+                ,[Ration card (APL or BPL)]
+                ,[TV]
+                ,[Refrigerator]
+                ,[Washing Machine]
+                ,[AC /Cooler]
+                ,[Car]
+                ,[Kids education]
+                ,[Medical Insurance]
+                ,[Life Insurance]
+                ,[Others]
+                ,[Educational qualification]
+                ,[Age proof]
+                ,[Signed MoU]
+                ,[MoU signed date]
+                ,[Kit given date]
+                ,[Head of the household]
+                ,[Farm land ]
+                ,[If yes, acres of land ]
+                ,[created_on]
+                ,[created_by]
+                ,[is_active])
+            VALUES
+            '''
             url = candidate_xml_weburl + xml
             r = requests.get(url)
             data = r.text
@@ -4876,6 +4933,7 @@ SELECT					cb.name as candidate_name,
             query = ""
             fam_query=""
             out=[]
+            she_query=""
             for child in root:
                 data = child.attrib
                 out.append(data['assign_batch'])
@@ -4893,13 +4951,26 @@ SELECT					cb.name as candidate_name,
                 for fam in child.findall('family_details'):
                     dt=fam.attrib
                     fam_query+="({},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',{},GETDATE(),1),".format(data['cand_id'],dt['memberSal'],dt['memberName'],dt['memberDob'],dt['memberAge'],dt['memberContact'],dt['memberEmail'],dt['memberGender'],dt['memberRelation'],dt['memberQuali'],dt['memberOccuptn'],user_id)
+
+                if data['mobilization_type']==1:
+                    she_query="({},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(data['cand_id'],data['mobilization_type'],data['score'],data['result'],data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['operate_smart_phone'],data['entreprenuer_before'],data['permission_to_work_outside'],data['shg_member'],data['serve_as_she'],data['online_training_mentorship'],data['share_details_with_LN'],data['sign_contract_with_LN'],data['buy_tools_consumables'],data['adopt_digital_transaction'],data['register_business_in_social_platform'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['wear_mandatory_ppe'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['aadhar_address'],data['family_members'],data['rented_or_own'],data['size_of_house'],data['ration_card'],data['tv'],data['refrigerator'],data['washing_machine'],data['ac_cooler'],data['car'],data['kids_education'],data['medical_insurance'],data['life_insurance'],data['others'],data['educational_qualification'],data['age_proof'],data['signed_mou'],data['mou_signed_date'],data['kit_given_date'],data['head_of_household'],data['farm_land'],data['acres_of_land'],user_id)
+                    insert_query_she += '\n'+she_query
+
+            
+            
             curs.execute(query)
             curs.commit()
 
             quer4 = quer4[:-1]+';'
             curs.execute(quer4)
-            d = list(map(lambda x:x[0],curs.fetchall()))
             curs.commit()
+
+            if she_query!="":
+                insert_query_she=insert_query_she[:-1]+';'
+                curs.execute(insert_query_she)
+                curs.commit()
+            d = list(map(lambda x:x[0],curs.fetchall()))
+            
             for i in range(len(d)):
                 quer5 += '\n' + "({},(select course_id from batches.tbl_batches where batch_id={}),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],out[i],out[i],user_id)
             quer5 = quer5[:-1]+';'
@@ -4919,11 +4990,11 @@ SELECT					cb.name as candidate_name,
             conn.close()
             return out
           
-    def get_batch_list_updated(user_id,candidate_id,role_id):
+    def get_batch_list_updated(user_id,candidate_id,role_id,mobilization_type):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
-        quer = 'exec  [batches].[sp_get_batch_list_for_app]  ?,?,?'
-        values=(user_id,candidate_id,role_id)
+        quer = 'exec  [batches].[sp_get_batch_list_for_app]  ?,?,?,?'
+        values=(user_id,candidate_id,role_id,mobilization_type)
         curs.execute(quer,(values))
         columns = [column[0].title() for column in curs.description]
         response = []
