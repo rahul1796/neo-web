@@ -278,3 +278,6 @@ class Master:
         data=shiksha_response.json()
         data=json.dumps(data)
         return Database.UploadShikshaAttendanceData(data)
+    def cancel_planned_batch(user_id,planned_batch_code,cancel_reason):
+        popupMessage = {"PopupMessage": Database.cancel_planned_batch(user_id,planned_batch_code,cancel_reason)}
+        return popupMessage

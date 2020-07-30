@@ -1219,6 +1219,17 @@ class Database:
         else:
             msg={"message":"Error in tagging"}
         return msg
+    def cancel_planned_batch(user_id,planned_batch_code,cancel_reason):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'UPDATE [masters].[tbl_planned_batches] SET is_cancelled=1 ,cancel_reason= ? where planned_batch_code=?'
+        values = (cancel_reason,planned_batch_code)
+        cur.execute(sql,(values))
+        cur.commit()
+        cur.close()
+        con.close()
+        msg={"message":"Batch Cancelled"}
+        return msg
     def tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -5755,8 +5766,6 @@ SELECT					cb.name as candidate_name,
             
     def upload_user(df,user_id,user_role_id):
         try:   
-            print("jiofhlovhswvik")         
-            print(str(df.to_json(orient='records')))
             con = pyodbc.connect(conn_str)
             cur = con.cursor()
             h=[]           
