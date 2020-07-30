@@ -830,7 +830,7 @@ class Report:
 
             worksheet = writer.sheets['Region-BU Wise Summary']
             default_column = ['Region','BU']
-            first_row = ['Enrolment', 'Certification','Placement','New Batch Start(Planned Vs Actual)', 'Batch Certification(Planned Vs Actual)']
+            first_row = ['Enrolment', 'Certification','Placement','  New Batch Start(Planned Vs Actual)', '  Batch Certification(Planned Vs Actual)']
             second_row = ['Target', 'Actual','% Achieved',
                           'Target', 'Actual','% Achieved',
                           'Target', 'Actual','% Achieved',
@@ -848,7 +848,7 @@ class Report:
                 worksheet.write(1, 2+col_num, value, header_format)
 
             worksheet = writer.sheets['Customer-BU Wise Nos']            
-            default_column = ['Region','BU','Customer','PMT']
+            default_column = ['Region','BU','Customer ','PMT']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
             col=4
@@ -860,10 +860,10 @@ class Report:
                 worksheet.write(1, 4+col_num, value, header_format)
 
             worksheet = writer.sheets['Batch Plan Summary']            
-            default_column = ['Region','BU','Customer']
-            first_row = ['New Batch Start(Planned Vs Actual)', 'Batch Certification(Planned Vs Actual)']
-            second_row = ['MTD Batch Plan', 'Yes','No','Not Started',
-                          'MTD Batch Plan', 'Yes','No','Not Started'
+            default_column = ['Region','BU','Customer ']
+            first_row = ['  New Batch Start(Planned Vs Actual)  ', '  Batch Certification(Planned Vs Actual)  ']
+            second_row = ['MTD Batch Plan', 'Actual Batch','Cancelled Planned Batch','Yet To Start',
+                          'MTD Batch Plan', 'Actual Batch','Cancelled Planned Batch','Yet To Start'
                           ]
             header_format = workbook.add_format({
                 'bold': True,
