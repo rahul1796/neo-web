@@ -33,10 +33,10 @@
                     var count=data.Clients.length;
                     if( count> 0)
                     {
-                        //$('#ddlRegion').append(new Option('ALL','-1'));
+                        $('#ddlCustomer').append(new Option('ALL','0'));
                         for(var i=0;i<count;i++)
                             $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
-                        //$('#ddlCourse').val('-1');
+                        //$('#ddlCourse').val('0');
                     }
                     else
                     {
@@ -55,6 +55,9 @@
     function DownloadTableBasedOnSearch(){
         if($('#FromDate').val()=='' || $('#ToDate').val()==''){
 		alert('Please Select both Dates');
+		}
+        else if($('#ddlCustomer').val().toString()==''){
+		alert('Please Select Customer');
 		}
 		else{            
             $("#imgSpinner").show();
@@ -142,7 +145,7 @@
             <div class="card-box">
                 <div class="row">
                     <div class="col-lg-4">
-                        <label for="ddlCustomer" class="mr-2">Customer</label>
+                        <label for="ddlCustomer" class="mr-2">Customer*</label>
                         <select class="form-control dropdown-search-filter" id="ddlCustomer" multiple >
                             <option value="">All</option>
                         </select>
