@@ -704,22 +704,32 @@ class Report:
             worksheet = writer.sheets['Region Wise Candidate Count']
             default_column = ['Region','BU']
             first_row = ['Enrolment', 'Certification','Placement']
-            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual']
+            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
             third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
-                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',]
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %']
             
-            for col_num, value in enumerate(default_column):
+            default_column1 = ['Region','BU','Contract']
+            first_row1 = ['Enrolment', 'Certification','Placement','Revenue']
+            second_row1 = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
+            third_row1 = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %']
+            
+
+            for col_num, value in enumerate(default_column1):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=2
-            for col_num, value in enumerate(first_row):
+            col=3
+            for col_num, value in enumerate(first_row1):
                 if col_num==-1:
                     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
                     col=col+5                    
                 else:
                     worksheet.merge_range(0, col, 0, 10+col, value, header_format)
                     col=col+11
-            col=2
-            for col_num, value in enumerate(second_row):
+            col=3
+            for col_num, value in enumerate(second_row1):
                 if col_num==-1:
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
                     col=col+5
@@ -729,8 +739,9 @@ class Report:
                 elif value=='Actual':
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6                
-            for col_num, value in enumerate(third_row):
-                worksheet.write(2, 2+col_num, value, header_format)
+            
+            for col_num, value in enumerate(third_row1):
+                worksheet.write(2, 3+col_num, value, header_format)
 
             worksheet = writer.sheets['Region Wise Batch Count']
             #default_column = ['COO','Sub Project']
