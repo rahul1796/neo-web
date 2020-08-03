@@ -7310,6 +7310,22 @@ class updated_new_SL4Report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(updated_new_SL4Report,'/updated_new_SL4Report')
 
+
+@app.route("/candidate_data_page")
+def candidate_data_page():
+    if g.user:
+        return render_template("Reports/candidate-data.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/candidate_data")
+def candidate_data():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="candidate_data_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
 ############################## nation wise report 
 @app.route("/NationalReport_page")
 def NationalReport_page():

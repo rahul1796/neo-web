@@ -4972,14 +4972,16 @@ SELECT					cb.name as candidate_name,
             curs.execute(query)
             curs.commit()
 
-            quer4 = quer4[:-1]+';'
-            curs.execute(quer4)
-            curs.commit()
-
             if she_query!="":
                 insert_query_she=insert_query_she[:-1]+';'
                 curs.execute(insert_query_she)
                 curs.commit()
+                
+            quer4 = quer4[:-1]+';'
+            curs.execute(quer4)
+            curs.commit()
+
+            
             d = list(map(lambda x:x[0],curs.fetchall()))
             
             for i in range(len(d)):
