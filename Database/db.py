@@ -4961,18 +4961,17 @@ SELECT					cb.name as candidate_name,
             curs.execute(query)
             curs.commit()
 
+            print(she_query)
             if she_query!="":
                 insert_query_she=insert_query_she[:-1]+';'
                 curs.execute(insert_query_she)
                 curs.commit()
-                
+
             quer4 = quer4[:-1]+';'
             curs.execute(quer4)
-            curs.commit()
-
             
             d = list(map(lambda x:x[0],curs.fetchall()))
-            
+            curs.commit()
             for i in range(len(d)):
                 quer5 += '\n' + "({},(select course_id from batches.tbl_batches where batch_id={}),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],out[i],out[i],user_id)
             quer5 = quer5[:-1]+';'
