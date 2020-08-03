@@ -21,6 +21,7 @@ import re
 import filter_tma_report
 import filter_tma_report_new
 import SL4Report_filter_new
+import Naton_Wise_Report
 import candidate_report
 import user_subproject_download
 import batch_report
@@ -1159,6 +1160,13 @@ class tag_user_roles(Resource):
         jobs_role=request.form['jobs_role']
         crm_role=request.form['crm_role']        
         return UsersM.tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role)
+class cancel_planned_batch(Resource):
+    @staticmethod
+    def post():
+        user_id=request.form['user_id']
+        planned_batch_code=request.form['planned_batch_code']
+        cancel_reason=request.form['cancel_reason']               
+        return Master.cancel_planned_batch(user_id,planned_batch_code,cancel_reason)
 
 api.add_resource(batch_list, '/batch_list')
 api.add_resource(batch_list_updated, '/batch_list_updated')
@@ -1179,6 +1187,7 @@ api.add_resource(untag_users_from_sub_project,'/untag_users_from_sub_project')
 api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
 api.add_resource(tag_user_roles,'/tag_user_roles')
+api.add_resource(cancel_planned_batch,'/cancel_planned_batch')
 ####################################################################################################
 
 #QP_API's
@@ -7233,7 +7242,6 @@ class trainers_based_on_sub_projects(Resource):
             return Batch.AllTrainersOnSubProjects(sub_project_ids)
 api.add_resource(trainers_based_on_sub_projects,'/trainers_based_on_sub_projects')
 
-
 class app_get_release_date_msg(Resource):
     @staticmethod
     def get():
@@ -7260,6 +7268,15 @@ class GetSubProjectsForCustomer(Resource):
             return response
 api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
 
+class SyncShikshaAttendanceData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=Master.SyncShikshaAttendanceData()
+            return response
+api.add_resource(SyncShikshaAttendanceData,'/SyncShikshaAttendanceData')
+
+################################### SL4 report
 @app.route("/SL4Report_page")
 def SL4Report_page():
     if g.user:
@@ -7307,6 +7324,40 @@ def candidate_data():
         return render_template("home.html",values=g.User_detail_with_ids,html="candidate_data_page")
     else:
         return render_template("login.html",error="Session Time Out!!")
+
+
+############################## nation wise report 
+@app.route("/NationalReport_page")
+def NationalReport_page():
+    if g.user:
+        return render_template("Reports/Nation wise report.html")
+    else:
+        return redirect("/")
+
+@app.route("/NationalReport")
+def NationalReport():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="NationalReport_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class updated_new_NationalReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
+                month = request.form["month"]
+                Customers = request.form["Customers"]
+                
+                report_name = "Naton_Wise_Report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                resp = Naton_Wise_Report.create_report(month, Customers, user_id, user_role_id, report_name)
+                return resp
+                
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(updated_new_NationalReport,'/updated_new_NationalReport')
 
 if __name__ == '__main__':
     app.run(debug=True)

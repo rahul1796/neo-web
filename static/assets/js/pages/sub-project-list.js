@@ -1162,9 +1162,15 @@ function GetPlannedBatches(SubProjectId,SubProjectName)
                         for(var i=0;i<count;i++)
                         {
                             td_open= '  <td style="text-align:center;">' ;
+                            varRemButton='';
                             td_close=   '</td>';       
                             varHtml+='<tr>';
                             varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].S_No +'</td>';
+                            if($('#hdn_home_user_role_id').val()=='1' && data.PlannedBatches[i].Batch_Code =='')
+                            {
+                                varRemButton='<a onclick="CancelPlannedBatch(\'' + data.PlannedBatches[i].Planned_Batch_Code + '\')" class="btn" style="cursor:pointer" ><i title="Cancel Batch" class="fas fa-cut" ></i></a>';
+                            }
+                            varHtml+='  <td style="text-align:center;">'+varRemButton+'</td>';                               
                             varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].Planned_Batch_Code +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].Batch_Code +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.PlannedBatches[i].Course_Code +'</td>';
@@ -1207,4 +1213,64 @@ function GetPlannedBatches(SubProjectId,SubProjectName)
         }
     });
     return false;
+}
+
+function CancelBatchSubmit(planned_batch_code)
+{
+    if ($('#TxtReason').val()=='')
+    {
+        alert('Please Enter Reason To Cancel The Batch.');
+    }
+    else
+    {
+       var URL=$('#hdn_web_url').val()+ "/cancel_planned_batch";
+            $.ajax({
+                type:"POST",
+                url:URL,
+                data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "planned_batch_code": planned_batch_code,
+                    "cancel_reason": $('#TxtReason').val()
+                },
+                success:function(data){
+                    if(data.PopupMessage.message =="Batch Cancelled")
+                    {
+                        swal({   
+                            title:data.PopupMessage.message,
+                            text:data.PopupMessage.message+" Sucessfully!!",
+                            icon:"success",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                window.location.href = '/sub_project';                          
+                            });
+
+                    }
+                    else{
+                        swal({   
+                            title:data.PopupMessage.message,
+                            text:"Error!",
+                            icon:"error",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                               window.location.href = '/sub_project';                          
+                            });
+                    }
+                        
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+    }
+}
+
+function CancelPlannedBatch(planned_batch_code)
+{
+    
+    $('#hdn_planned_batch').val(planned_batch_code);
+    $('#mdl_planned_batches').modal('hide');
+    $('#mdl_cancel_batch').modal('show');
+    
 }

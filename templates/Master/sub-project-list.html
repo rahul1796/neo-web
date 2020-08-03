@@ -466,16 +466,19 @@ GetSub_project('{{project_id}}')
  </div>
  <div id="mdl_planned_batches" class="modal fade" role="dialog">
     <div class="modal-dialog modal-xl">
-        <div class="modal-content ">
+        <div class="modal-content " style="width: 1230px;">
+            <input type="hidden" id="hdn_planned_batch" name="hdn_planned_batch" value="0">
+               
             <div class="modal-header">
                 <h4 class="modal-title" id="HdPlannedBatches"></h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>                    
             <div class="modal-body">
-                <table id="tbl_planned_batches" class="table table-bordered wrap w-100" style="border-color: lightgray;width:100% ;font-size: 9px;">
+                <table id="tbl_planned_batches" class="table table-bordered wrap w-90" style="border-color: lightgray;width:90% ;font-size: 9px;">
                     <thead>
                         <tr style="background-color: #f5f6f8;">
                             <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                            <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Actions</th>
                             <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Planned Batch Code</th>
                             <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Actual Batch Code</th>
                             <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Code</th>
@@ -534,7 +537,36 @@ GetSub_project('{{project_id}}')
    </div>
 
 </div><!--/.modal-->
-
+<div id="mdl_cancel_batch" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content ">
+           
+               
+            <div class="modal-header">
+                <h4 class="modal-title" id="HdPlannedBatches">Reason For Cancel Planned Batch* </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            
+                            <input type="text" id="TxtReason" name="TxtReason" class="form-control"  ClientIdMode="static">
+                       </div>
+                       
+                    </div>
+                </div>
+               
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary waves-effect" type="submit" onclick="CancelBatchSubmit($('#hdn_planned_batch').val())">Cancel Batch</button>
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Back</button>
+            </div>
+           
+         
+        </div>
+    </div>
+</div><!--/.modal-->
 <div id="mdl_upload_batch_target_plan" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content ">

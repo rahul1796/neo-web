@@ -1,6 +1,11 @@
 from Database import Database
 from flask_restful import Resource
 import pandas as pd
+from flask import request,make_response
+import requests
+import json
+
+
 class Master:
     ##Center_type##
     def center_type_list(center_type_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
@@ -267,3 +272,12 @@ class Master:
         return Database.GetSubProjectsForRegionUser(user_id,user_role_id,region_id)
     def GetCoursesBasedOnSubProjects(sub_project_ids):
         return Database.GetCoursesBasedOnSubProjects(sub_project_ids)
+    def SyncShikshaAttendanceData():
+        max_attendace_id=Database.SyncShikshaAttendanceData()
+        shiksha_response=requests.get('https://shiksha.ai/webservice/rest/server.php?wstoken=9690041e9c6d116e3d6414d6188f3a8b&moodlewsrestformat=json&wsfunction=local_student_get_attendance&liveclass[attendance_id]='+str(max_attendace_id))
+        data=shiksha_response.json()
+        data=json.dumps(data)
+        return Database.UploadShikshaAttendanceData(data)
+    def cancel_planned_batch(user_id,planned_batch_code,cancel_reason):
+        popupMessage = {"PopupMessage": Database.cancel_planned_batch(user_id,planned_batch_code,cancel_reason)}
+        return popupMessage

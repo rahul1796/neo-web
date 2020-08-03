@@ -1219,6 +1219,17 @@ class Database:
         else:
             msg={"message":"Error in tagging"}
         return msg
+    def cancel_planned_batch(user_id,planned_batch_code,cancel_reason):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'UPDATE [masters].[tbl_planned_batches] SET is_cancelled=1 ,cancel_reason= ? where planned_batch_code=?'
+        values = (cancel_reason,planned_batch_code)
+        cur.execute(sql,(values))
+        cur.commit()
+        cur.close()
+        con.close()
+        msg={"message":"Batch Cancelled"}
+        return msg
     def tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -5756,8 +5767,6 @@ SELECT					cb.name as candidate_name,
             
     def upload_user(df,user_id,user_role_id):
         try:   
-            print("jiofhlovhswvik")         
-            print(str(df.to_json(orient='records')))
             con = pyodbc.connect(conn_str)
             cur = con.cursor()
             h=[]           
@@ -6133,6 +6142,45 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return trainers
+    
+    def SyncShikshaAttendanceData():
+        max_attendance_id = 0
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()        
+        quer = "Select COALESCE(MAX(attendance_id),0) as max_id from [masters].[tbl_shiksha_attendance];"
+        cur2.execute(quer)
+        data=cur2.fetchall()
+        data = '' if data==[] else data[0][0]
+        max_attendance_id=int(data)        
+        cur2.close()
+        con.close()
+        return max_attendance_id
+    
+    def UploadShikshaAttendanceData(attandance_data):
+        try: 
+            # print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            sql = 'exec	[masters].[sp_sync_shiksha_attandance]  ?'
+            values = (attandance_data,)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop >0 :
+                Status=True
+                msg="Synced Successfully"
+            else:
+                msg="Error in Syncing"
+                Status=False
+            return {"Status":Status,'Message':msg}
+        except Exception as e:
+            # print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+
+
 
     def app_get_release_date_msg():
         res = []
@@ -6148,3 +6196,4 @@ SELECT					cb.name as candidate_name,
         curs.close()
         conn.close()
         return h
+
