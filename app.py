@@ -1160,6 +1160,13 @@ class tag_user_roles(Resource):
         jobs_role=request.form['jobs_role']
         crm_role=request.form['crm_role']        
         return UsersM.tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role)
+class cancel_planned_batch(Resource):
+    @staticmethod
+    def post():
+        user_id=request.form['user_id']
+        planned_batch_code=request.form['planned_batch_code']
+        cancel_reason=request.form['cancel_reason']               
+        return Master.cancel_planned_batch(user_id,planned_batch_code,cancel_reason)
 
 api.add_resource(batch_list, '/batch_list')
 api.add_resource(batch_list_updated, '/batch_list_updated')
@@ -1180,6 +1187,7 @@ api.add_resource(untag_users_from_sub_project,'/untag_users_from_sub_project')
 api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
 api.add_resource(tag_user_roles,'/tag_user_roles')
+api.add_resource(cancel_planned_batch,'/cancel_planned_batch')
 ####################################################################################################
 
 #QP_API's
@@ -7301,6 +7309,22 @@ class updated_new_SL4Report(Resource):
             except Exception as e:
                 return {"exceptione":str(e)}
 api.add_resource(updated_new_SL4Report,'/updated_new_SL4Report')
+
+
+@app.route("/candidate_data_page")
+def candidate_data_page():
+    if g.user:
+        return render_template("Reports/candidate-data.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/candidate_data")
+def candidate_data():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="candidate_data_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
 
 ############################## nation wise report 
 @app.route("/NationalReport_page")
