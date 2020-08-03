@@ -96,6 +96,7 @@
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
                         $('#SL4Report_Menu').show();
+                        //$('#NationalReport_Menu').show();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -823,6 +824,27 @@
                                     <li>
                                         <a href="/candidate" id="Candidate_Menu" class="active">Candidate Report<div class="button"></div></a>
                                     </li>
+                                    <li class="has-submenu"  id="Productivity_Report" style="display:none">
+                                        <!--<li class="has-submenu dropdown-menu-left "  id="Productivity_Report" style="display:none"> -->
+                                             <a href="#">Productivity Report<div class="arrow-down"></div></a>
+                                             <ul class="submenu">      
+                                                 <!--<li  id="TMA_batch_Menu">
+                                                     <a href="/tma_batch" class="active"> Trainer Deployment <div class="button"></div></a>
+                                                 </li-->
+                                                 <li id="region_productivity_report">
+                                                     <a href="/region_productivity_report" class="active">Region-Wise Productivity Report<div class="button"></div></a>
+                                                 </li>
+                                                 <li id="mobilizer_productivity_report">
+                                                     <a href="/mobilizer_productivity_report" class="active">Mobilizer Productivity Report<div class="button"></div></a>
+                                                 </li>
+                                                 <li id="Ops_Productivity_Report">
+                                                     <a href="/ops_productivity_report" class="active">Ops Productivity Report<div class="button"></div></a>
+                                                 </li>
+                                                 <li id="customer_productivity_report">
+                                                     <a href="/customer_productivity_report" class="active">Customer-wise Productivity Report<div class="button"></div></a>
+                                                 </li>
+                                             </ul>
+                                    </li>
                                     <li>
                                         <a href="/user_sub_project" id="User_Sub+Project_Menu" class="active">User-Sub Project Report<div class="button"></div></a>
                                     </li>
@@ -850,28 +872,10 @@
                                     <li  id="SL4Report_Menu" style="display:none">
                                         <a href="/SL4Report" id="SL4Report" class="active">SL4 Customer wise report<div class="button"></div></a>
                                     </li>
-                                    <li class="has-submenu"  id="Productivity_Report" style="display:none">
-                                   <!--<li class="has-submenu dropdown-menu-left "  id="Productivity_Report" style="display:none"> -->
-                                        <a href="#">Productivity Report<div class="arrow-down"></div></a>
-                                        <ul class="submenu">      
-                                            <!--<li  id="TMA_batch_Menu">
-												<a href="/tma_batch" class="active"> Trainer Deployment <div class="button"></div></a>
-                                            </li-->
-                                            <li id="region_productivity_report">
-                                                <a href="/region_productivity_report" class="active">Region-Wise Productivity Report<div class="button"></div></a>
-                                            </li>
-                                            <li id="mobilizer_productivity_report">
-                                                <a href="/mobilizer_productivity_report" class="active">Mobilizer Productivity Report<div class="button"></div></a>
-                                            </li>
-                                            <li id="Ops_Productivity_Report">
-                                                <a href="/ops_productivity_report" class="active">Ops Productivity Report<div class="button"></div></a>
-                                            </li>
-                                            <li id="customer_productivity_report">
-                                                <a href="/customer_productivity_report" class="active">Customer-wise Productivity Report<div class="button"></div></a>
-                                            </li>
-										</ul>
+                                    <li  id="NationalReport_Menu" style="display:none">
+                                        <a href="/NationalReport" id="NationalReport" class="active">Nation Wise Report<div class="button"></div></a>
                                     </li>
-									<li class="has-submenu"  id="CoomplianceReport" style="display:none">
+                                    <li class="has-submenu"  id="CoomplianceReport" style="display:none">
                                         <a href="#">Compliance Reports <div class="arrow-down"></div></a>
                                         <ul class="submenu">
                                             <li  id="TMA_registraion_Menu"><!--/tma_batch,/tma_report-->
