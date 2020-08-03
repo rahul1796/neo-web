@@ -7359,5 +7359,36 @@ class updated_new_NationalReport(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(updated_new_NationalReport,'/updated_new_NationalReport')
 
+
+class download_candidate_data(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
+                
+                candidate_id = request.form["candidate_id"]
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                status = request.form["status"]
+                customer = request.form["customer"]
+                project = request.form["project"]
+                sub_project = request.form["sub_project"]
+                batch = request.form["batch"]
+                region = request.form["region"]
+                center = request.form["center"]
+                center_type = request.form["center_type"]
+                Contracts = request.form["Contracts"]
+                candidate_stage = request.form["candidate_stage"]
+                from_date = request.form["from_date"]
+                to_date = request.form["to_date"]
+                
+                resp = Report.DownloadCandidateData(candidate_id, user_id, user_role_id, status, customer, project, sub_project, batch, region, center, center_type, Contracts, candidate_stage, from_date, to_date)
+                
+                return resp
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(download_candidate_data,'/download_candidate_data')
+
 if __name__ == '__main__':
     app.run(debug=True)

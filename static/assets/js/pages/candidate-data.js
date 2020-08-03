@@ -582,101 +582,79 @@ function CandidateFamilyDetails(Candidate_Id)
 
 function DownloadTableBasedOnSearch(){
     $("#imgSpinner").show();
-    /*if($('#ddlCustomer').val()==''|| $('#ddlCustomer').val()==null){
-        alert("Please select a Customer.");
-    
-    }
-    else if($('#ddlCenter').val()==''|| $('#ddlCenter').val()==null){
-        alert("Please select a Center.");
-    
-    }
-    else if($('#ddlCourse').val()==''|| $('#ddlCourse').val()==null){
-        alert("Please select a Center.");
-    
-    }
-    */
-    if (0==9){
-    console.log(false)
-    }
-    else{
-        var URL=$('#hdn_web_url').val()+ "/candidate_download_report"
-        //window.location = URL + "?ActivityDate=2019-09-09"
-        $.ajax({
-                    type: "POST",
-                    dataType: "json",
-                    url: URL, 
-                    data: {
-                            //candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
-                            'candidate_id':0,
-                            'user_id':$('#hdn_home_user_id').val(),
-                            'user_role_id':$('#hdn_home_user_role_id').val(),
-                            'status':$('#ddlStatus').val().toString(),
-                            'customer':$('#ddlClient').val().toString(),
-                            'project': $('#ddlProject').val().toString(),
-                            'sub_project':$('#ddlSubProject').val().toString(),
-                            'batch':$('#ddlBatches').val().toString(),
-                            'region':$('#ddlRegion').val().toString(),
-                            'center':$('#ddlCenter').val().toString(),
-                            'center_type':$('#ddlCenterType').val().toString(),
-                            'Contracts' :$('#ddlContract').val().toString(),
-                            'candidate_stage':$('#ddlcandidateStage').val().toString(),
-                            'from_date' : $('#FromDate').val(),
-                            'to_date' : $('#ToDate').val()
+    var URL=$('#hdn_web_url').val()+ "/download_candidate_data"
+    $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: URL, 
+            data: {
+                    'candidate_id':0,
+                    'user_id':$('#hdn_home_user_id').val(),
+                    'user_role_id':$('#hdn_home_user_role_id').val(),
+                    'status':$('#ddlStatus').val().toString(),
+                    'customer':$('#ddlClient').val().toString(),
+                    'project': $('#ddlProject').val().toString(),
+                    'sub_project':$('#ddlSubProject').val().toString(),
+                    'batch':$('#ddlBatches').val().toString(),
+                    'region':$('#ddlRegion').val().toString(),
+                    'center':$('#ddlCenter').val().toString(),
+                    'center_type':$('#ddlCenterType').val().toString(),
+                    'Contracts' :$('#ddlContract').val().toString(),
+                    'candidate_stage':$('#ddlcandidateStage').val().toString(),
+                    'from_date' : $('#FromDate').val(),
+                    'to_date' : $('#ToDate').val()
 
-                    },
-                    success: function(resp) 
-                    {
+            },
+            success: function(resp) 
+            {
 
-                        if (resp.Status){
-                            var varAnchor = document.getElementById('lnkDownload');
-                            varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
-                            $("#imgSpinner").hide();
-                            try 
-                                { 
-                                    //in firefox
-                                    varAnchor.click();
+                if (resp.success){
+                    var varAnchor = document.getElementById('lnkDownload');
+                    varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.FileName;
+                    $("#imgSpinner").hide();
+                    try 
+                        { 
+                            //in firefox
+                            varAnchor.click();
+                            return;
+                        } catch(ex) {}
+                        
+                        try 
+                        { 
+                            // in chrome
+                            if(document.createEvent) 
+                            {
+                                var e = document.createEvent('MouseEvents');
+                                e.initEvent( 'click', true, true );
+                                varAnchor.dispatchEvent(e);
+                                return;
+                            }
+                        } catch(ex) {}
+                        
+                        try 
+                        { 
+                            // in IE
+                            if(document.createEventObject) 
+                            {
+                                    var evObj = document.createEventObject();
+                                    varAnchor.fireEvent("onclick", evObj);
                                     return;
-                                } catch(ex) {}
-                                
-                                try 
-                                { 
-                                    // in chrome
-                                    if(document.createEvent) 
-                                    {
-                                        var e = document.createEvent('MouseEvents');
-                                        e.initEvent( 'click', true, true );
-                                        varAnchor.dispatchEvent(e);
-                                        return;
-                                    }
-                                } catch(ex) {}
-                                
-                                try 
-                                { 
-                                    // in IE
-                                    if(document.createEventObject) 
-                                    {
-                                         var evObj = document.createEventObject();
-                                         varAnchor.fireEvent("onclick", evObj);
-                                         return;
-                                    }
-                                } catch(ex) {}
-                            
-                        }
-                        else{
-                            //alert(resp.Description)
-                            //alert('Not success')
-                            $("#imgSpinner").hide();
-                            
-                        }
-                    },
-                    error:function()
-                    {
-                        //$("#imgSpinner").hide();
-                    }
-                });
-        
-    }
-    //$("#imgSpinner").hide();
+                            }
+                        } catch(ex) {}
+                    
+                }
+                else{
+                    //alert(resp.Description)
+                    alert(resp.msg);
+                    $("#imgSpinner").hide();
+                    
+                }
+            },
+            error:function()
+            {
+                //$("#imgSpinner").hide();
+            }
+        });
 }
 
 function ForceDownload(varUrl, varFileName)
