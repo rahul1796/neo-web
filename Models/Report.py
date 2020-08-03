@@ -693,7 +693,7 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Region Wise Candidate Count') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Region-Contract Nos & Revenue')
 
             df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Region Wise Batch Count') 
@@ -701,23 +701,22 @@ class Report:
             df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Customer Wise Candidate Count') 
 
-            worksheet = writer.sheets['Region Wise Candidate Count']
             default_column = ['Region','BU']
             first_row = ['Enrolment', 'Certification','Placement']
-            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
+            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual']
             third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
                          'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
                          'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %']
             
             default_column1 = ['Region','BU','Contract']
-            first_row1 = ['Enrolment', 'Certification','Placement','Revenue']
+            first_row1 = ['Enrolment', 'Certification','Placement','Revenue (In Rs)']
             second_row1 = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
             third_row1 = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
                          'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
                          'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
                          'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %']
             
-
+            worksheet = writer.sheets['Region-Contract Nos & Revenue']
             for col_num, value in enumerate(default_column1):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
             col=3

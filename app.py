@@ -6782,13 +6782,11 @@ class get_candidate_details(Resource):
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
                 out = Database.get_candidate_details(user_id,candidate_id)
                 return jsonify(out)
-                
             else:
                 res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
                 return jsonify(res)
 
 api.add_resource(get_candidate_details, '/get_candidate_details')
-
 
 class All_Course_basedon_rooms(Resource):
     @staticmethod
