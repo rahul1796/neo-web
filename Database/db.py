@@ -1219,6 +1219,30 @@ class Database:
         else:
             msg={"message":"Error in tagging"}
         return msg
+    def cancel_planned_batch(user_id,planned_batch_code,cancel_reason):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'UPDATE [masters].[tbl_planned_batches] SET is_cancelled=1 ,cancel_reason= ? where planned_batch_code=?'
+        values = (cancel_reason,planned_batch_code)
+        cur.execute(sql,(values))
+        cur.commit()
+        cur.close()
+        con.close()
+        msg={"message":"Batch Cancelled"}
+        return msg
+    def cancel_actual_batch(user_id,actual_batch_id,cancel_reason):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'UPDATE [batches].[tbl_batches] SET is_cancelled=1 ,cancel_reason= ? where batch_id=?'
+        sql2 = 'update candidate_details.tbl_map_candidate_intervention_skilling set is_dropped=1,dropped_reason=?,dropped_date=getdate() where batch_id=?'
+        values = (cancel_reason,actual_batch_id)
+        cur.execute(sql,(values))
+        cur.execute(sql2,(values))
+        cur.commit()
+        cur.close()
+        con.close()
+        msg={"message":"Batch Cancelled"}
+        return msg
     def tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -4680,8 +4704,26 @@ SELECT					cb.name as candidate_name,
         curs.close()
         conn.close()
         df.to_xml(candidate_xmlPath + filenmae)
-        out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
+        mobilization_types=Database.get_user_mobilization_type(user_id)
+        out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae,'mobilization_types':mobilization_types}
         return out
+
+    def get_user_mobilization_type(user_id):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "EXECUTE [masters].[sp_get_user_mobilization_types] ?"
+        values=(user_id,)
+        curs.execute(quer,(values))
+        columns = [column[0].title() for column in curs.description]
+        response = []
+        h={}
+        for row in curs:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        curs.close()
+        conn.close()
+        return response
 
     def get_submit_candidate_mobi(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
         conn = pyodbc.connect(conn_str)
@@ -4851,6 +4893,63 @@ SELECT					cb.name as candidate_name,
                 ,[is_active])
             VALUES
             '''
+
+            insert_query_she='''
+            INSERT INTO [candidate_details].[tbl_candidate_she_details]
+                ([candidate_id]
+                ,[mobilization_type]
+                ,[score]
+                ,[result]
+                ,[Are you able to read and write local language?]
+                ,[Do you have a smart phone?]
+                ,[Are you willing to buy a smartphone?]
+                ,[Do you own two wheeler?]
+                ,[Do you know how to operate a smartphone?]
+                ,[Are you/ Have you been an entrepreneur before?]
+                ,[Do you have permission from your family to work outside?]
+                ,[Are you a member of SHG?]
+                ,[Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?]
+                ,[Are you willing to undergo online trainings and mentorship program for 6 month?]
+                ,[Are you willing to share details of customer, revenue, expenses frequently with LN?]
+                ,[Are you willing to work and sign the work contract with LN?]
+                ,[Are you willing to buy tools and consumables required to run your business?]
+                ,[Are you willing to adopt digital transactions in your business?]
+                ,[Are you willing to register your business in Social platforms like WhatsApp, Face book, Geo listing, Just dial etc.?]
+                ,[Have you availed any loan in the past?]
+                ,[Do you have any active loan?]
+                ,[Are you willing to take up a loan to purchase tools and consumables?]
+                ,[Are you covered under any health insurance?]
+                ,[Are you allergic to any chemicals and dust?]
+                ,[Will you able to wear mandatory PPEs during the work?]
+                ,[Are you willing to follow  Environment, Health and Safety Norms in your business?]
+                ,[Have you ever been subjected to any legal enquiry for Non ethical work/business?]
+                ,[Address as per Aadhar Card (incl pin code)]
+                ,[Number of members earning in the family]
+                ,[Rented or own house?]
+                ,[Size of the house]
+                ,[Ration card (APL or BPL)]
+                ,[TV]
+                ,[Refrigerator]
+                ,[Washing Machine]
+                ,[AC /Cooler]
+                ,[Car]
+                ,[Kids education]
+                ,[Medical Insurance]
+                ,[Life Insurance]
+                ,[Others]
+                ,[Educational qualification]
+                ,[Age proof]
+                ,[Signed MoU]
+                ,[MoU signed date]
+                ,[Kit given date]
+                ,[Head of the household]
+                ,[Farm land]
+                ,[If yes, acres of land]
+                ,[created_on]
+                ,[created_by]
+                ,[is_active])
+            VALUES
+            '''
             url = candidate_xml_weburl + xml
             r = requests.get(url)
             data = r.text
@@ -4858,6 +4957,7 @@ SELECT					cb.name as candidate_name,
             query = ""
             fam_query=""
             out=[]
+            she_query=""
             for child in root:
                 data = child.attrib
                 out.append(data['assign_batch'])
@@ -4875,11 +4975,24 @@ SELECT					cb.name as candidate_name,
                 for fam in child.findall('family_details'):
                     dt=fam.attrib
                     fam_query+="({},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',{},GETDATE(),1),".format(data['cand_id'],dt['memberSal'],dt['memberName'],dt['memberDob'],dt['memberAge'],dt['memberContact'],dt['memberEmail'],dt['memberGender'],dt['memberRelation'],dt['memberQuali'],dt['memberOccuptn'],user_id)
+                print(data['mobilization_type'])
+                if int(data['mobilization_type'])==2:
+                    she_query="({},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(data['cand_id'],data['mobilization_type'],data['score'],data['result'],data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['operate_smart_phone'],data['entreprenuer_before'],data['permission_to_work_outside'],data['shg_member'],data['serve_as_she'],data['online_training_mentorship'],data['share_details_with_LN'],data['sign_contract_with_LN'],data['buy_tools_consumables'],data['adopt_digital_transaction'],data['register_business_in_social_platform'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['wear_mandatory_ppe'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['aadhar_address'],data['family_members'],data['rented_or_own'],data['size_of_house'],data['ration_card'],data['tv'],data['refrigerator'],data['washing_machine'],data['ac_cooler'],data['car'],data['kids_education'],data['medical_insurance'],data['life_insurance'],data['others'],data['educational_qualification'],data['age_proof'],data['signed_mou'],data['mou_signed_date'],data['kit_given_date'],data['head_of_household'],data['farm_land'],data['acres_of_land'],user_id)
+                    insert_query_she += '\n'+she_query
+
+            
+            
             curs.execute(query)
             curs.commit()
 
+            if she_query!="":
+                insert_query_she=insert_query_she[:-1]+';'
+                curs.execute(insert_query_she)
+                curs.commit()
+
             quer4 = quer4[:-1]+';'
             curs.execute(quer4)
+            
             d = list(map(lambda x:x[0],curs.fetchall()))
             curs.commit()
             for i in range(len(d)):
@@ -4901,11 +5014,11 @@ SELECT					cb.name as candidate_name,
             conn.close()
             return out
           
-    def get_batch_list_updated(user_id,candidate_id,role_id):
+    def get_batch_list_updated(user_id,candidate_id,role_id,mobilization_type):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
-        quer = 'exec  [batches].[sp_get_batch_list_for_app]  ?,?,?'
-        values=(user_id,candidate_id,role_id)
+        quer = 'exec  [batches].[sp_get_batch_list_for_app]  ?,?,?,?'
+        values=(user_id,candidate_id,role_id,mobilization_type)
         curs.execute(quer,(values))
         columns = [column[0].title() for column in curs.description]
         response = []
@@ -5666,8 +5779,6 @@ SELECT					cb.name as candidate_name,
             
     def upload_user(df,user_id,user_role_id):
         try:   
-            print("jiofhlovhswvik")         
-            print(str(df.to_json(orient='records')))
             con = pyodbc.connect(conn_str)
             cur = con.cursor()
             h=[]           
@@ -5953,6 +6064,47 @@ SELECT					cb.name as candidate_name,
         con.close()
         con.close()
 
+    def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        sheet2=[]
+        sheet2_columns=[]
+        sheet3=[]
+        sheet3_columns=[]
+        sql=''
+        sql1=''
+        sql2=''
+        
+        sql = 'exec [reports].[sp_get_monthly_target_report_data] ?, ?, ?,?'
+        sql1 = 'exec [reports].[sp_get_monthly_target_report_data_customerwise] ?, ?, ?,?'
+        sql2 = 'exec [reports].[sp_get_monthly_target_report_data_customerwise_batches] ?, ?, ?,?'
+        values = (customer_ids, contract_ids, region_ids,month)
+        #print(values)
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))
+        #print(data)
+
+        curs.execute(sql1,(values))
+        sheet2_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet2 = list(map(lambda x:list(x), data))
+
+        curs.execute(sql2,(values))
+        sheet3_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet3 = list(map(lambda x:list(x), data))
+
+      
+        return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
+        cur2.close()
+        con.close()
+        con.close()
+
+
     def All_role_user(email_id,password,user_id):
         response = []
         h={}
@@ -6002,3 +6154,76 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return trainers
+    
+    def SyncShikshaAttendanceData():
+        max_attendance_id = 0
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()        
+        quer = "Select COALESCE(MAX(attendance_id),0) as max_id from [masters].[tbl_shiksha_attendance];"
+        cur2.execute(quer)
+        data=cur2.fetchall()
+        data = '' if data==[] else data[0][0]
+        max_attendance_id=int(data)        
+        cur2.close()
+        con.close()
+        return max_attendance_id
+    
+    def UploadShikshaAttendanceData(attandance_data):
+        try: 
+            # print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            sql = 'exec	[masters].[sp_sync_shiksha_attandance]  ?'
+            values = (attandance_data,)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop >0 :
+                Status=True
+                msg="Synced Successfully"
+            else:
+                msg="Error in Syncing"
+                Status=False
+            return {"Status":Status,'Message':msg}
+        except Exception as e:
+            # print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+
+
+
+    def app_get_release_date_msg():
+        res = []
+        h={}
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "EXEC [masters].[sp_get_app_release_date_message]"
+        curs.execute(quer)
+        columns = [column[0].title() for column in curs.description]
+        for r in curs:
+            h = {"success":r[0],"description":r[1]}
+            res.append(h)
+        curs.close()
+        conn.close()
+        return h
+    def DownloadCandidateData(candidate_id, user_id, user_role_id, status, customer, project, sub_project, batch, region, center, center_type, Contracts, candidate_stage, from_date, to_date):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        sql = 'exec [candidate_details].[sp_get_candidate_data] ?,?,?,?,?'
+        values = (customer,Contracts,project, sub_project, batch)
+        print(values)
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]  
+        #print(sheet1_columns)      
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))
+
+        curs.close()
+        con.close()
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+        
+

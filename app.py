@@ -20,6 +20,8 @@ import pandas as pd
 import re
 import filter_tma_report
 import filter_tma_report_new
+import SL4Report_filter_new
+import Naton_Wise_Report
 import candidate_report
 import user_subproject_download
 import batch_report
@@ -1158,6 +1160,20 @@ class tag_user_roles(Resource):
         jobs_role=request.form['jobs_role']
         crm_role=request.form['crm_role']        
         return UsersM.tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role)
+class cancel_planned_batch(Resource):
+    @staticmethod
+    def post():
+        user_id=request.form['user_id']
+        planned_batch_code=request.form['planned_batch_code']
+        cancel_reason=request.form['cancel_reason']               
+        return Master.cancel_planned_batch(user_id,planned_batch_code,cancel_reason)
+class cancel_actual_batch(Resource):
+    @staticmethod
+    def post():
+        user_id=request.form['user_id']
+        actual_batch_id=request.form['actual_batch_id']
+        cancel_reason=request.form['cancel_reason']               
+        return Master.cancel_actual_batch(user_id,actual_batch_id,cancel_reason)
 
 api.add_resource(batch_list, '/batch_list')
 api.add_resource(batch_list_updated, '/batch_list_updated')
@@ -1178,6 +1194,8 @@ api.add_resource(untag_users_from_sub_project,'/untag_users_from_sub_project')
 api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
 api.add_resource(tag_user_roles,'/tag_user_roles')
+api.add_resource(cancel_planned_batch,'/cancel_planned_batch')
+api.add_resource(cancel_actual_batch,'/cancel_actual_batch')
 ####################################################################################################
 
 #QP_API's
@@ -4096,7 +4114,6 @@ class updated_new_tma_report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(updated_new_tma_report,'/updated_new_tma_report')
 
-
 class GetAllContractStages(Resource):
     @staticmethod
     def get():
@@ -5512,9 +5529,10 @@ class get_batch_list_updated(Resource):
             user_id = int(request.args['user_id'])
             candidate_id = int(request.args['candidate_id'])
             role_id = int(request.args['role_id'])
+            mobilization_type=request.args.get('mobilization_type',1,type=int)
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
 
-                out = Database.get_batch_list_updated(user_id,candidate_id,role_id)
+                out = Database.get_batch_list_updated(user_id,candidate_id,role_id,mobilization_type)
                 return jsonify(out)
                 
             else:
@@ -6772,13 +6790,11 @@ class get_candidate_details(Resource):
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
                 out = Database.get_candidate_details(user_id,candidate_id)
                 return jsonify(out)
-                
             else:
                 res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
                 return jsonify(res)
 
 api.add_resource(get_candidate_details, '/get_candidate_details')
-
 
 class All_Course_basedon_rooms(Resource):
     @staticmethod
@@ -6881,6 +6897,20 @@ def region_productivity_report():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+@app.route("/customer_target_report_page")
+def customer_target_report_page():
+    if g.user:
+        return render_template("Reports/customer_wise_target_report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/customer_productivity_report")
+def customer_productivity_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="customer_target_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
 class DownloadOpsProductivityReport(Resource):
     @staticmethod
     def post():
@@ -6907,6 +6937,19 @@ class DownloadRegionProductivityReport(Resource):
             return resp
 
 api.add_resource(DownloadRegionProductivityReport,'/DownloadRegionProductivityReport')
+
+class DownloadCustomerTargetReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            month = request.form["month"]
+            region_ids = request.form["region_ids"]
+            customer_ids = request.form["customer_ids"]
+            contract_ids = request.form["contract_ids"]
+            resp = Report.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids)
+            return resp
+
+api.add_resource(DownloadCustomerTargetReport,'/DownloadCustomerTargetReport')
 ###############################################################################
 class All_role_user(Resource):
     @staticmethod
@@ -7205,6 +7248,23 @@ class trainers_based_on_sub_projects(Resource):
             return Batch.AllTrainersOnSubProjects(sub_project_ids)
 api.add_resource(trainers_based_on_sub_projects,'/trainers_based_on_sub_projects')
 
+class app_get_release_date_msg(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            try:
+                client_id = request.args['client_id']
+                client_key = request.args['client_key']
+                if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                    out=Database.app_get_release_date_msg()                        
+                else:
+                    out = {'success': False, 'description': "client name and password not matching"}
+                return jsonify(out)
+            except Exception as e:
+                return {'success': False, 'description': "Error! "+str(e)} 
+
+api.add_resource(app_get_release_date_msg, '/app_get_release_date_msg')
+
 class GetSubProjectsForCustomer(Resource):
     @staticmethod
     def get():
@@ -7213,6 +7273,128 @@ class GetSubProjectsForCustomer(Resource):
             response={"SubProjects":TMA.GetSubProjectsForCustomer(customer_ids)}
             return response
 api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
+
+class SyncShikshaAttendanceData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=Master.SyncShikshaAttendanceData()
+            return response
+api.add_resource(SyncShikshaAttendanceData,'/SyncShikshaAttendanceData')
+
+################################### SL4 report
+@app.route("/SL4Report_page")
+def SL4Report_page():
+    if g.user:
+        return render_template("Reports/SL4Report.html")
+    else:
+        return redirect("/")
+
+@app.route("/SL4Report")
+def SL4Report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="SL4Report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class updated_new_SL4Report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
+                from_date = request.form["from_date"]
+                to_date = request.form["to_date"]
+                Customers = request.form["Customers"]
+                
+                report_name = "SL4_Customer_wise_report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                resp = SL4Report_filter_new.create_report(from_date, to_date, Customers, user_id, user_role_id, report_name)
+                return resp
+                
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(updated_new_SL4Report,'/updated_new_SL4Report')
+
+
+@app.route("/candidate_data_page")
+def candidate_data_page():
+    if g.user:
+        return render_template("Reports/candidate-data.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/candidate_data")
+def candidate_data():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="candidate_data_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
+############################## nation wise report 
+@app.route("/NationalReport_page")
+def NationalReport_page():
+    if g.user:
+        return render_template("Reports/Nation wise report.html")
+    else:
+        return redirect("/")
+
+@app.route("/NationalReport")
+def NationalReport():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="NationalReport_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class updated_new_NationalReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
+                month = request.form["month"]
+                Customers = request.form["Customers"]
+                
+                report_name = "Naton_Wise_Report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                resp = Naton_Wise_Report.create_report(month, Customers, user_id, user_role_id, report_name)
+                return resp
+                
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(updated_new_NationalReport,'/updated_new_NationalReport')
+
+
+class download_candidate_data(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
+                
+                candidate_id = request.form["candidate_id"]
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                status = request.form["status"]
+                customer = request.form["customer"]
+                project = request.form["project"]
+                sub_project = request.form["sub_project"]
+                batch = request.form["batch"]
+                region = request.form["region"]
+                center = request.form["center"]
+                center_type = request.form["center_type"]
+                Contracts = request.form["Contracts"]
+                candidate_stage = request.form["candidate_stage"]
+                from_date = request.form["from_date"]
+                to_date = request.form["to_date"]
+                
+                resp = Report.DownloadCandidateData(candidate_id, user_id, user_role_id, status, customer, project, sub_project, batch, region, center, center_type, Contracts, candidate_stage, from_date, to_date)
+                
+                return resp
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(download_candidate_data,'/download_candidate_data')
 
 if __name__ == '__main__':
     app.run(debug=True)
