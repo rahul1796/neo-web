@@ -281,3 +281,6 @@ class Master:
     def cancel_planned_batch(user_id,planned_batch_code,cancel_reason):
         popupMessage = {"PopupMessage": Database.cancel_planned_batch(user_id,planned_batch_code,cancel_reason)}
         return popupMessage
+    def cancel_actual_batch(user_id,actual_batch_id,cancel_reason):
+        popupMessage = {"PopupMessage": Database.cancel_actual_batch(user_id,actual_batch_id,cancel_reason)}
+        return popupMessage
