@@ -591,18 +591,18 @@ function DownloadTableBasedOnSearch(){
                     'candidate_id':0,
                     'user_id':$('#hdn_home_user_id').val(),
                     'user_role_id':$('#hdn_home_user_role_id').val(),
-                    'status':$('#ddlStatus').val().toString(),
+                    'status':'',//$('#ddlStatus').val().toString(),
                     'customer':$('#ddlClient').val().toString(),
                     'project': $('#ddlProject').val().toString(),
                     'sub_project':$('#ddlSubProject').val().toString(),
                     'batch':$('#ddlBatches').val().toString(),
-                    'region':$('#ddlRegion').val().toString(),
-                    'center':$('#ddlCenter').val().toString(),
-                    'center_type':$('#ddlCenterType').val().toString(),
+                    'region':'',//$('#ddlRegion').val().toString(),
+                    'center':'',//$('#ddlCenter').val().toString(),
+                    'center_type':'',//$('#ddlCenterType').val().toString(),
                     'Contracts' :$('#ddlContract').val().toString(),
-                    'candidate_stage':$('#ddlcandidateStage').val().toString(),
-                    'from_date' : $('#FromDate').val(),
-                    'to_date' : $('#ToDate').val()
+                    'candidate_stage':'',//$('#ddlcandidateStage').val().toString(),
+                    'from_date' : '',//$('#FromDate').val(),
+                    'to_date' : '',//$('#ToDate').val()
 
             },
             success: function(resp) 
