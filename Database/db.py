@@ -1230,6 +1230,19 @@ class Database:
         con.close()
         msg={"message":"Batch Cancelled"}
         return msg
+    def cancel_actual_batch(user_id,actual_batch_id,cancel_reason):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'UPDATE [batches].[tbl_batches] SET is_cancelled=1 ,cancel_reason= ? where batch_id=?'
+        sql2 = 'update candidate_details.tbl_map_candidate_intervention_skilling set is_dropped=1,dropped_reason=?,dropped_date=getdate() where batch_id=?'
+        values = (cancel_reason,actual_batch_id)
+        cur.execute(sql,(values))
+        cur.execute(sql2,(values))
+        cur.commit()
+        cur.close()
+        con.close()
+        msg={"message":"Batch Cancelled"}
+        return msg
     def tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()

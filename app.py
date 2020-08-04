@@ -1167,6 +1167,13 @@ class cancel_planned_batch(Resource):
         planned_batch_code=request.form['planned_batch_code']
         cancel_reason=request.form['cancel_reason']               
         return Master.cancel_planned_batch(user_id,planned_batch_code,cancel_reason)
+class cancel_actual_batch(Resource):
+    @staticmethod
+    def post():
+        user_id=request.form['user_id']
+        actual_batch_id=request.form['actual_batch_id']
+        cancel_reason=request.form['cancel_reason']               
+        return Master.cancel_actual_batch(user_id,actual_batch_id,cancel_reason)
 
 api.add_resource(batch_list, '/batch_list')
 api.add_resource(batch_list_updated, '/batch_list_updated')
@@ -1188,6 +1195,7 @@ api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
 api.add_resource(tag_user_roles,'/tag_user_roles')
 api.add_resource(cancel_planned_batch,'/cancel_planned_batch')
+api.add_resource(cancel_actual_batch,'/cancel_actual_batch')
 ####################################################################################################
 
 #QP_API's
