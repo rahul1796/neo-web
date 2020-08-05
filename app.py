@@ -7308,7 +7308,7 @@ class updated_new_SL4Report(Resource):
                 to_date = request.form["to_date"]
                 Customers = request.form["Customers"]
                 
-                report_name = "SL4_Customer_wise_report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                report_name = "Customer_wise_MIS_report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
                 resp = SL4Report_filter_new.create_report(from_date, to_date, Customers, user_id, user_role_id, report_name)
                 return resp
                 
