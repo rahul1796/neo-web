@@ -21,6 +21,7 @@ import re
 import filter_tma_report
 import filter_tma_report_new
 import SL4Report_filter_new
+import Naton_Wise_Report
 import candidate_report
 import user_subproject_download
 import batch_report
@@ -5528,9 +5529,10 @@ class get_batch_list_updated(Resource):
             user_id = int(request.args['user_id'])
             candidate_id = int(request.args['candidate_id'])
             role_id = int(request.args['role_id'])
+            mobilization_type=request.args.get('mobilization_type',1,type=int)
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
 
-                out = Database.get_batch_list_updated(user_id,candidate_id,role_id)
+                out = Database.get_batch_list_updated(user_id,candidate_id,role_id,mobilization_type)
                 return jsonify(out)
                 
             else:
@@ -6788,13 +6790,11 @@ class get_candidate_details(Resource):
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
                 out = Database.get_candidate_details(user_id,candidate_id)
                 return jsonify(out)
-                
             else:
                 res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
                 return jsonify(res)
 
 api.add_resource(get_candidate_details, '/get_candidate_details')
-
 
 class All_Course_basedon_rooms(Resource):
     @staticmethod
@@ -7274,7 +7274,6 @@ class GetSubProjectsForCustomer(Resource):
             return response
 api.add_resource(GetSubProjectsForCustomer,'/GetSubProjectsForCustomer')
 
-
 class SyncShikshaAttendanceData(Resource):
     @staticmethod
     def get():
@@ -7283,6 +7282,7 @@ class SyncShikshaAttendanceData(Resource):
             return response
 api.add_resource(SyncShikshaAttendanceData,'/SyncShikshaAttendanceData')
 
+################################### SL4 report
 @app.route("/SL4Report_page")
 def SL4Report_page():
     if g.user:
@@ -7308,7 +7308,7 @@ class updated_new_SL4Report(Resource):
                 to_date = request.form["to_date"]
                 Customers = request.form["Customers"]
                 
-                report_name = "SL4_Customer_wise_report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                report_name = "Customer_wise_MIS_report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
                 resp = SL4Report_filter_new.create_report(from_date, to_date, Customers, user_id, user_role_id, report_name)
                 return resp
                 
@@ -7316,6 +7316,85 @@ class updated_new_SL4Report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(updated_new_SL4Report,'/updated_new_SL4Report')
 
+
+@app.route("/candidate_data_page")
+def candidate_data_page():
+    if g.user:
+        return render_template("Reports/candidate-data.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/candidate_data")
+def candidate_data():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="candidate_data_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
+############################## nation wise report 
+@app.route("/NationalReport_page")
+def NationalReport_page():
+    if g.user:
+        return render_template("Reports/Nation wise report.html")
+    else:
+        return redirect("/")
+
+@app.route("/NationalReport")
+def NationalReport():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="NationalReport_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class updated_new_NationalReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
+                month = request.form["month"]
+                Customers = request.form["Customers"]
+                
+                report_name = "Naton_Wise_Report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                resp = Naton_Wise_Report.create_report(month, Customers, user_id, user_role_id, report_name)
+                return resp
+                
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(updated_new_NationalReport,'/updated_new_NationalReport')
+
+
+class download_candidate_data(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
+                
+                candidate_id = request.form["candidate_id"]
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                status = request.form["status"]
+                customer = request.form["customer"]
+                project = request.form["project"]
+                sub_project = request.form["sub_project"]
+                batch = request.form["batch"]
+                region = request.form["region"]
+                center = request.form["center"]
+                center_type = request.form["center_type"]
+                Contracts = request.form["Contracts"]
+                candidate_stage = request.form["candidate_stage"]
+                from_date = request.form["from_date"]
+                to_date = request.form["to_date"]
+                
+                resp = Report.DownloadCandidateData(candidate_id, user_id, user_role_id, status, customer, project, sub_project, batch, region, center, center_type, Contracts, candidate_stage, from_date, to_date)
+                
+                return resp
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(download_candidate_data,'/download_candidate_data')
 
 if __name__ == '__main__':
     app.run(debug=True)

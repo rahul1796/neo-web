@@ -5,6 +5,7 @@
 <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
 
 <script type="text/javascript">
+    const months = ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     var Candidates = {};
         $(document).ready(function(){  
 			$("#imgSpinner").hide();
@@ -33,10 +34,10 @@
                     var count=data.Clients.length;
                     if( count> 0)
                     {
-                        $('#ddlCustomer').append(new Option('ALL','0'));
+                        //$('#ddlRegion').append(new Option('ALL','-1'));
                         for(var i=0;i<count;i++)
                             $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
-                        //$('#ddlCourse').val('0');
+                        //$('#ddlCourse').val('-1');
                     }
                     else
                     {
@@ -53,15 +54,14 @@
         return false;
     }
     function DownloadTableBasedOnSearch(){
-        if($('#FromDate').val()=='' || $('#ToDate').val()==''){
-		alert('Please Select both Dates');
+        if($('#MonthYear').val()==''){
+		alert('Please Select Month Year');
 		}
-        else if($('#ddlCustomer').val().toString()==''){
-		alert('Please Select Customer');
-		}
-		else{            
+        
+		else{           
+            var to_date = new Date($('#MonthYear').val());
             $("#imgSpinner").show();
-			var URL=$('#hdn_web_url').val()+ "/updated_new_SL4Report"
+			var URL=$('#hdn_web_url').val()+ "/updated_new_NationalReport"
 			//window.location = URL + "?ActivityDate=2019-09-09"
 			$.ajax({
                         type: "POST",
@@ -70,18 +70,17 @@
                         data: { 
                         'user_id':$('#hdn_home_user_id').val(),
                         'user_role_id':$('#hdn_home_user_role_id').val(),
-						'from_date':$('#FromDate').val(),
-						'to_date':$('#ToDate').val(),
+						"month": months[to_date.getMonth()]+"-"+to_date.getFullYear(),
 						'Customers':$('#ddlCustomer').val().toString()
 						},
                         success: function(resp) 
                         {
-
+                            console.log(resp)
 							$("#imgSpinner").hide();
                             if (resp.Status){
                                 var varAnchor = document.getElementById('lnkDownload');
                                 varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
-                                
+                                console
                                 try 
 									{ 
                                         //in firefox
@@ -145,26 +144,20 @@
             <div class="card-box">
                 <div class="row">
                     <div class="col-lg-4">
-                        <label for="ddlCustomer" class="mr-2">Customer*</label>
+                        <label for="ddlCustomer" class="mr-2">Customer</label>
                         <select class="form-control dropdown-search-filter" id="ddlCustomer" multiple >
                             <option value="">All</option>
                         </select>
                     </div>
                     <div class="col-lg-4">
-                        <label for="FromDate" class="mr-2">From Date*</label>
-                        <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
-                        ClientIdMode="static" placeholder="From Date">
-                    </div>
-                    <div class="col-lg-4">
-                        <label for="ToDate" class="mr-2">To Date*</label>
-                        <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
-                        ClientIdMode="static" placeholder="To Date">
-                    </div>
-                </div>
-				
-                <div class="row">  
-                    <div class="form-group col-lg-4">                                         
-                        <a class="btn btn-primary" style="margin-right: 20px;color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
+                        <label for="MonthYear" class="mr-2">Month Year*</label>
+                        <!-- <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" data-date-format="MM yyyy" 
+                        ClientIdMode="static" placeholder="From Date"> -->
+                        <input type="month" id="MonthYear" name="MonthYear" class="form-control" ClientIdMode="static" />
+                    </div> 
+                
+                    <div class="form-group col-lg-2">                                         
+                        <a class="btn btn-primary" style=" color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
                         <a id="lnkDownload" style="display:none;"></a>
                     </div>
                 </div>
