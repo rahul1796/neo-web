@@ -6227,3 +6227,21 @@ SELECT					cb.name as candidate_name,
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
         
 
+    def AllTrainerBasedOnUserRegions(RegionIds, status, UserId,UserRoleId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_get_trainer_based_on_user_regions] ?, ?, ?, ?'
+        values = (RegionIds, status, UserId,UserRoleId)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i] 
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h.copy())
+        cur.commit()
+        cur.close()
+        con.close()
+        return response
