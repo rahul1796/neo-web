@@ -21,10 +21,10 @@
                        <div class="page-title-right">
                            <ol class="breadcrumb m-0">
                                <li class="breadcrumb-item"><a href="javascript: void(0);">LN</a></li>
-                               <li class="breadcrumb-item active">Candidate</li>
+                               <li class="breadcrumb-item active">Candidate Data</li>
                            </ol>
                        </div>
-                       <h4 class="page-title">Candidate</h4>
+                       <h4 class="page-title">Candidate Data</h4>
                    </div>
                </div>
            </div>     
@@ -58,23 +58,21 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-lg-3">
                             <label for="ddlRegion" class="mr-2">Region</label>
                             <select class="form-control dropdown-search-filter" onchange="LoadCenter();" id="ddlRegion" multiple>
-                                <!-- <option selected="" value="">All</option> -->
+                                
                             </select>
                         </div>
                         <div class="col-lg-3">
                             <label for="ddlCenter" class="mr-2">Center</label>
                             <select class="form-control dropdown-search-filter" id="ddlCenter" multiple>
-                                <!-- <option selected="" value="">All</option> -->
                             </select>
                         </div>
                         <div class="col-lg-3">
                             <label for="ddlCenterType" class="mr-2">Center Type</label>
                             <select class="form-control dropdown-search-filter" id="ddlCenterType" multiple>
-                                <!-- <option selected="" value="">All</option> -->
                             </select>
                         </div>
                         <div class="col-lg-3">
@@ -85,92 +83,56 @@
                                 <option value="3">Training Completed</option>
                             </select>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="row"> 
                         <div class="col-lg-3">
                             <label for="ddlBatches" class="mr-2">Batch Code:</label>
                             <select class="form-control dropdown-search-filter" id="ddlBatches" multiple>
-                                <!-- <option selected="" value="">All</option> -->
                             </select>
                         </div>
-                        <div class="col-lg-3">
+                        <!-- <div class="col-lg-3">
                             <label for="FromDate" class="mr-2">From Date</label>
                             <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
                             onchange="Loadcandidatestatusddl();" ClientIdMode="static" placeholder="From Date">
-                        </div>
-                        <div class="col-lg-3">
+                        </div> -->
+                        <!-- <div class="col-lg-3">
                             <label for="ToDate" class="mr-2">To Date</label>
                             <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
                             onchange="Loadcandidatestatusddl();" ClientIdMode="static" placeholder="To Date">
-                        </div>
-                        <div class="col-lg-3" id="ddlstatus_div">
+                        </div> -->
+                        <!-- <div class="col-lg-3" id="ddlstatus_div">
                             <label for="ddlcandidateStage" class="mr-2">Candidate Stage</label>
                             <select class="form-control dropdown-search-filter" id="ddlcandidateStage">
                                 <option selected="" value="">All</option>
                             </select>
-                        </div>
+                        </div> -->
                         
                     </div>
                     <div class="row"> 
-                        <div class="col-lg-1" style="float: center; margin-top: 30px">
+                        <!-- <div class="col-lg-1" style="float: center; margin-top: 30px">
                             <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTable()">Search</button>
-                        </div>
+                        </div> -->
                         <div class="form-group col-lg-2">                                         
-                            <a class="btn btn-primary" style="float: right; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
+                            <a class="btn btn-primary" style=" color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
                             <a id="lnkDownload" style="display:none;"></a>
                         </div> 
                         <div class="form-group col-lg-4">
                             <div id="imgSpinner">
-                                <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-block;"/>
+                                <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
                                 <label style="display:inline-block;">Please wait while downloading report...</label>
                             </div> 
                         </div>
                     </div>
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-lg-12">
                             <label style="color: #031529;"><b>Date References :-</b> Enrollment : Enrollment Date  ||   Certification : Result Uploaded Date  || Placement : Date Of Join  ||  Self Employment : Self Employed Date</label>
                           </div>
-                    </div>
+                    </div> -->
                     <!-- end row -->
                 </div> <!-- end card-box -->
             </div><!-- end col-->
         </div>
-        <!-- end row -->
-           <div class="row">
-               <div class="col-12">
-                   <div class="card">
-                       <div class="card-body">
-                           <div class="row">
-                               <div class="col-lg-6">
-                                   <h4 class="header-title">Candidate List</h4>
-                               </div>
-                               <!-- <div class="col-lg-6" >                                        
-                                       <button style="float: right" type="submit" id="btn_create" class="btn btn-primary">Create Candidate</a>
-                               </div> -->
-                           </div>
-                           <br/>
-                           <div class="col-lg-12">
-                               <table id="tbl_candidate" class="table w-100 nowrap dataTable no-footer" >
-                                   <thead>
-                                       <tr>
-                                           <th>S No</th>
-                                           <th>Candidate Name</th>
-                                           <th>Source</th>
-                                           <th>Contact</th>
-                                           <th>Experience</th>
-                                           <th>Family</th>
-                                           <th>Id Proof</th>
-                                       </tr>
-                                   </thead>
-                               
-                               <tbody></tbody>
-                               </table>
-                           </div>
-                       </div> <!-- end card body-->
-                   </div> <!-- end card -->
-               </div><!-- end col-->
-           </div>
-           <!-- end row-->    
+          
        </div> <!-- end container -->
    
    <!-- end wrapper -->

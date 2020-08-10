@@ -290,6 +290,11 @@ function LoadTable()
             // },
              "data": function (row, type, val, meta) {
                 var varButtons = ""; 
+                if($('#hdn_home_user_role_id').val()=='1')
+                {
+                    varButtons += '<a onclick="CancelActualBatch(\'' + row.Batch_Id + '\')" class="btn" style="cursor:pointer" ><i title="Cancel Batch" class="fas fa-cut" ></i></a>';
+                
+                }
                 varButtons += '<a onclick="EditBatchDetail(\'' + row.Batch_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Batch" class="fas fa-edit" ></i></a>';
                 return varButtons;
                 }
@@ -403,6 +408,65 @@ function EditBatchDetail(BatchId)
 {
     $('#hdn_batch_id').val(BatchId);
     $('#form1').submit();
+    
+}
+
+function CancelBatchSubmit(batch_id)
+{
+    //alert(batch_id);
+    if ($('#TxtReason').val()=='')
+    {
+        alert('Please Enter Reason To Cancel The Batch.');
+    }
+    else
+    {
+       var URL=$('#hdn_web_url').val()+ "/cancel_actual_batch";
+            $.ajax({
+                type:"POST",
+                url:URL,
+                data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "actual_batch_id": batch_id,
+                    "cancel_reason": $('#TxtReason').val()
+                },
+                success:function(data){
+                    if(data.PopupMessage.message =="Batch Cancelled")
+                    {
+                        swal({   
+                            title:data.PopupMessage.message,
+                            text:data.PopupMessage.message+" Sucessfully!!",
+                            icon:"success",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                window.location.href = '/batch';                          
+                            });
+
+                    }
+                    else{
+                        swal({   
+                            title:data.PopupMessage.message,
+                            text:"Error!",
+                            icon:"error",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                               window.location.href = '/sub_project';                          
+                            });
+                    }
+                        
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+    }
+}
+
+function CancelActualBatch(batch_id)
+{
+    $('#hdn_actual_batch').val(batch_id);
+    $('#mdl_cancel_batch').modal('show');
     
 }
 

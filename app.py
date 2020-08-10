@@ -1168,6 +1168,13 @@ class cancel_planned_batch(Resource):
         planned_batch_code=request.form['planned_batch_code']
         cancel_reason=request.form['cancel_reason']               
         return Master.cancel_planned_batch(user_id,planned_batch_code,cancel_reason)
+class cancel_actual_batch(Resource):
+    @staticmethod
+    def post():
+        user_id=request.form['user_id']
+        actual_batch_id=request.form['actual_batch_id']
+        cancel_reason=request.form['cancel_reason']               
+        return Master.cancel_actual_batch(user_id,actual_batch_id,cancel_reason)
 
 api.add_resource(batch_list, '/batch_list')
 api.add_resource(batch_list_updated, '/batch_list_updated')
@@ -1189,6 +1196,7 @@ api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
 api.add_resource(tag_user_roles,'/tag_user_roles')
 api.add_resource(cancel_planned_batch,'/cancel_planned_batch')
+api.add_resource(cancel_actual_batch,'/cancel_actual_batch')
 ####################################################################################################
 
 #QP_API's
@@ -7411,6 +7419,36 @@ class AllTrainerBasedOnUserRegions(Resource):
                 return {'exception':str(e)}
 
 api.add_resource(AllTrainerBasedOnUserRegions,'/AllTrainerBasedOnUserRegions')
+
+class download_candidate_data(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
+                
+                candidate_id = request.form["candidate_id"]
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                status = request.form["status"]
+                customer = request.form["customer"]
+                project = request.form["project"]
+                sub_project = request.form["sub_project"]
+                batch = request.form["batch"]
+                region = request.form["region"]
+                center = request.form["center"]
+                center_type = request.form["center_type"]
+                Contracts = request.form["Contracts"]
+                candidate_stage = request.form["candidate_stage"]
+                from_date = request.form["from_date"]
+                to_date = request.form["to_date"]
+                
+                resp = Report.DownloadCandidateData(candidate_id, user_id, user_role_id, status, customer, project, sub_project, batch, region, center, center_type, Contracts, candidate_stage, from_date, to_date)
+                
+                return resp
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(download_candidate_data,'/download_candidate_data')
 
 if __name__ == '__main__':
     app.run(debug=True)
