@@ -22,6 +22,7 @@ import filter_tma_report
 import filter_tma_report_new
 import SL4Report_filter_new
 import Naton_Wise_Report
+import trainer_prodctivity_report
 import candidate_report
 import user_subproject_download
 import batch_report
@@ -7356,6 +7357,60 @@ class updated_new_NationalReport(Resource):
             except Exception as e:
                 return {"exceptione":str(e)}
 api.add_resource(updated_new_NationalReport,'/updated_new_NationalReport')
+
+############################## Trainer Productivity report 
+@app.route("/TrainerProductivityReport_page")
+def TrainerProductivityReport_page():
+    if g.user:
+        return render_template("Reports/Trainer_Productivity_report.html")
+    else:
+        return redirect("/")
+
+@app.route("/TrainerProductivityReport")
+def TrainerProductivityReport():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="TrainerProductivityReport_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class download_TrainerProductivityReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:     
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
+                region_ids = request.form['region_ids']
+                t_status  = request.form['t_status']
+                trainer_ids = request.form['trainer_ids']
+                from_date = request.form['from_date']
+                to_date  = request.form['to_date']
+                
+                report_name = "Trainer_Productivity_Report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                resp = trainer_prodctivity_report.create_report(user_id, user_role_id, region_ids, t_status, trainer_ids, from_date, to_date, report_name)
+                return resp
+                
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(download_TrainerProductivityReport,'/download_TrainerProductivityReport')
+
+class AllTrainerBasedOnUserRegions(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=[]
+            try:
+                RegionIds=request.args.get('RegionIds','',type=str)
+                status=request.args.get('status','',type=str)
+                UserId=request.args.get('user_id',0,type=int)
+                UserRoleId=request.args.get('user_role_id',0,type=int)
+                #print((RegionIds, status, UserId,UserRoleId))
+                response=Database.AllTrainerBasedOnUserRegions(RegionIds, status, UserId,UserRoleId)
+                return {'Trainer':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(AllTrainerBasedOnUserRegions,'/AllTrainerBasedOnUserRegions')
 
 if __name__ == '__main__':
     app.run(debug=True)
