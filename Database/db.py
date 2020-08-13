@@ -1523,11 +1523,11 @@ class Database:
         cur.close()
         con.close()
         return content
-    def add_client_details(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType):
+    def add_client_details(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType, POC_details):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_client] ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType)
+        sql = 'exec	[masters].[sp_add_edit_client] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType, POC_details)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -6215,3 +6215,22 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return response
+
+    def GetCustomerSpoc(customer_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_customer_spoc] ?'  
+        values=(customer_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]      
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    
