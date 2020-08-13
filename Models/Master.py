@@ -284,3 +284,8 @@ class Master:
 
     def GetCustomerSpoc(customer_id):
         return Database.GetCustomerSpoc(customer_id)
+
+    def cancel_actual_batch(user_id,actual_batch_id,cancel_reason):
+        popupMessage = {"PopupMessage": Database.cancel_actual_batch(user_id,actual_batch_id,cancel_reason)}
+        return popupMessage
+

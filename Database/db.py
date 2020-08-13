@@ -1230,6 +1230,19 @@ class Database:
         con.close()
         msg={"message":"Batch Cancelled"}
         return msg
+    def cancel_actual_batch(user_id,actual_batch_id,cancel_reason):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'UPDATE [batches].[tbl_batches] SET is_cancelled=1 ,cancel_reason= ? where batch_id=?'
+        sql2 = 'update candidate_details.tbl_map_candidate_intervention_skilling set is_dropped=1,dropped_reason=?,dropped_date=getdate() where batch_id=?'
+        values = (cancel_reason,actual_batch_id)
+        cur.execute(sql,(values))
+        cur.execute(sql2,(values))
+        cur.commit()
+        cur.close()
+        con.close()
+        msg={"message":"Batch Cancelled"}
+        return msg
     def tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -4889,7 +4902,7 @@ SELECT					cb.name as candidate_name,
                 ,[result]
                 ,[Are you able to read and write local language?]
                 ,[Do you have a smart phone?]
-                ,[Are you willing to buy a smartphone?]
+                ,[Are you willing to buy a smartphone?]
                 ,[Do you own two wheeler?]
                 ,[Do you know how to operate a smartphone?]
                 ,[Are you/ Have you been an entrepreneur before?]
@@ -4930,8 +4943,8 @@ SELECT					cb.name as candidate_name,
                 ,[MoU signed date]
                 ,[Kit given date]
                 ,[Head of the household]
-                ,[Farm land ]
-                ,[If yes, acres of land ]
+                ,[Farm land]
+                ,[If yes, acres of land]
                 ,[created_on]
                 ,[created_by]
                 ,[is_active])
@@ -4962,8 +4975,8 @@ SELECT					cb.name as candidate_name,
                 for fam in child.findall('family_details'):
                     dt=fam.attrib
                     fam_query+="({},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',{},GETDATE(),1),".format(data['cand_id'],dt['memberSal'],dt['memberName'],dt['memberDob'],dt['memberAge'],dt['memberContact'],dt['memberEmail'],dt['memberGender'],dt['memberRelation'],dt['memberQuali'],dt['memberOccuptn'],user_id)
-
-                if data['mobilization_type']==1:
+                print(data['mobilization_type'])
+                if int(data['mobilization_type'])==2:
                     she_query="({},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(data['cand_id'],data['mobilization_type'],data['score'],data['result'],data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['operate_smart_phone'],data['entreprenuer_before'],data['permission_to_work_outside'],data['shg_member'],data['serve_as_she'],data['online_training_mentorship'],data['share_details_with_LN'],data['sign_contract_with_LN'],data['buy_tools_consumables'],data['adopt_digital_transaction'],data['register_business_in_social_platform'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['wear_mandatory_ppe'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['aadhar_address'],data['family_members'],data['rented_or_own'],data['size_of_house'],data['ration_card'],data['tv'],data['refrigerator'],data['washing_machine'],data['ac_cooler'],data['car'],data['kids_education'],data['medical_insurance'],data['life_insurance'],data['others'],data['educational_qualification'],data['age_proof'],data['signed_mou'],data['mou_signed_date'],data['kit_given_date'],data['head_of_household'],data['farm_land'],data['acres_of_land'],user_id)
                     insert_query_she += '\n'+she_query
 
@@ -4972,7 +4985,6 @@ SELECT					cb.name as candidate_name,
             curs.execute(query)
             curs.commit()
 
-            print(she_query)
             if she_query!="":
                 insert_query_she=insert_query_she[:-1]+';'
                 curs.execute(insert_query_she)
@@ -6196,6 +6208,24 @@ SELECT					cb.name as candidate_name,
         curs.close()
         conn.close()
         return h
+    def DownloadCandidateData(candidate_id, user_id, user_role_id, status, customer, project, sub_project, batch, region, center, center_type, Contracts, candidate_stage, from_date, to_date):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        sql = 'exec [candidate_details].[sp_get_candidate_data] ?,?,?,?,?'
+        values = (customer,Contracts,project, sub_project, batch)
+        print(values)
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]  
+        #print(sheet1_columns)      
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))
+
+        curs.close()
+        con.close()
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+        
 
     def AllTrainerBasedOnUserRegions(RegionIds, status, UserId,UserRoleId):
         response=[]
