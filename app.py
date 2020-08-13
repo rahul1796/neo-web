@@ -1515,10 +1515,12 @@ class add_client_details(Resource):
             IndustryType=request.form['IndustryType']
             CategoryType=request.form['CategoryType']
 
+            POC_details=request.form['POC_details']
+            #print(POC_details)
             user_id=g.user_id
             is_active=request.form['isactive']
             client_id=g.client_id
-            return Master.add_client(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType)
+            return Master.add_client(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType, POC_details)
 
 class get_client_details(Resource):
     @staticmethod
@@ -5243,9 +5245,9 @@ class GetUsersBasedOnRole(Resource):
     def get():
         if request.method=='GET':
             user_role_id=request.args.get('user_role_id',0,type=int)
-            print(user_role_id)
+            #print(user_role_id)
             response={"Users":Master.GetUsersBasedOnRole(user_role_id)}
-            print(response)
+            #print(response)
             return response
 api.add_resource(GetUsersBasedOnRole,'/GetUsersBasedOnRole')
 
@@ -7420,6 +7422,15 @@ class AllTrainerBasedOnUserRegions(Resource):
 
 api.add_resource(AllTrainerBasedOnUserRegions,'/AllTrainerBasedOnUserRegions')
 
+class GetCustomerSpoc(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            customer_id=request.args.get('customer_id',0,type=int)
+            response={"SPOC":Master.GetCustomerSpoc(customer_id)}
+            return response
+api.add_resource(GetCustomerSpoc,'/GetCustomerSpoc')
+
 class download_candidate_data(Resource):
     @staticmethod
     def post():
@@ -7450,5 +7461,7 @@ class download_candidate_data(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(download_candidate_data,'/download_candidate_data')
 
+
 if __name__ == '__main__':
+    #app.run(host="0.0.0.0", port=int("80"), debug=True)
     app.run(debug=True)
