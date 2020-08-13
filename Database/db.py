@@ -4814,7 +4814,50 @@ SELECT					cb.name as candidate_name,
             quer2='''
             update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type={},identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',created_by='{}',aadhar_image_name='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
             '''
-
+            quer3 = '''
+            update candidate_details.tbl_candidates set isFresher={},created_by='{}',created_by_role_id='{}',is_active=1 where candidate_id='{}';
+            '''
+            
+            insert_query_she='''
+            INSERT INTO [candidate_details].[tbl_candidate_she_details]
+                ([candidate_id]
+                ,[mobilization_type]
+                ,[score]
+                ,[result]
+                ,[Are you able to read and write local language?]
+                ,[Do you have a smart phone?]
+                ,[Are you willing to buy a smartphone?]
+                ,[Do you own two wheeler?]
+                ,[Do you know how to operate a smartphone?]
+                ,[Are you/ Have you been an entrepreneur before?]
+                ,[Do you have permission from your family to work outside?]
+                ,[Are you a member of SHG?]
+                ,[Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?]
+                ,[Are you willing to undergo online trainings and mentorship program for 6 month?]
+                ,[Are you willing to share details of customer, revenue, expenses frequently with LN?]
+                ,[Are you willing to work and sign the work contract with LN?]
+                ,[Are you willing to buy tools and consumables required to run your business?]
+                ,[Are you willing to adopt digital transactions in your business?]
+                ,[Are you willing to register your business in Social platforms like WhatsApp, Face book, Geo listing, Just dial etc.?]
+                ,[Have you availed any loan in the past?]
+                ,[Do you have any active loan?]
+                ,[Are you willing to take up a loan to purchase tools and consumables?]
+                ,[Are you covered under any health insurance?]
+                ,[Are you allergic to any chemicals and dust?]
+                ,[Will you able to wear mandatory PPEs during the work?]
+                ,[Are you willing to follow  Environment, Health and Safety Norms in your business?]
+                ,[Have you ever been subjected to any legal enquiry for Non ethical work/business?]
+                ,[Date of birth (age between 18 to 40)]
+                ,[Are you 8th Pass?]
+                ,[Do you have any work experience in the past?]
+                ,[Will you able to work full time or at least 6 hours a day?]
+                ,[Are you willing to travel from one place to another within panchayat?]
+                ,[Do you have a bank account?]
+                ,[created_on]
+                ,[created_by]
+                ,[is_active])
+            VALUES
+            '''
             url = candidate_xml_weburl + xml
             r = requests.get(url)
             data = r.text
@@ -4825,11 +4868,23 @@ SELECT					cb.name as candidate_name,
                 aadhar_image_name=''
                 if 'aadhar_image_name' in data:
                     aadhar_image_name=data['aadhar_image_name']
-                query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1 if data['dobEntered']=='true' else 0,data['yrsExp'],data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],user_id,role_id,data['cand_id'])
-                query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['aadhaarNo'],data['idType'],data['idNum'],data['idCopy'],data['empType'],data['prefJob'],data['relExp'],data['lastCtc'],data['prefLocation'],data['willTravel'],data['workShift'],data['bocwId'],data['expectCtc'],user_id,aadhar_image_name,data['cand_id'])
-            
-            curs.execute(query)
-            curs.commit()
+                if 'yrsExp' in data:
+                    query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1 if data['dobEntered']=='true' else 0,data['yrsExp'],data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],user_id,role_id,data['cand_id'])
+                if 'candPic' in data:
+                    query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['aadhaarNo'],data['idType'],data['idNum'],data['idCopy'],data['empType'],data['prefJob'],data['relExp'],data['lastCtc'],data['prefLocation'],data['willTravel'],data['workShift'],data['bocwId'],data['expectCtc'],user_id,aadhar_image_name,data['cand_id'])
+                
+                if int(data['mobilization_type'])==2:
+                    she_query="({},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(data['cand_id'],data['mobilization_type'],data['score'],data['result'],data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['operate_smart_phone'],data['entreprenuer_before'],data['permission_to_work_outside'],data['shg_member'],data['serve_as_she'],data['online_training_mentorship'],data['share_details_with_LN'],data['sign_contract_with_LN'],data['buy_tools_consumables'],data['adopt_digital_transaction'],data['register_business_in_social_platform'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['wear_mandatory_ppe'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['age_18_40'],data['8th_pass'],data['past_work_exp'],data['full_time_work'],data['trvl_within_panchayat'],data['bank_act'],user_id)
+                    insert_query_she += '\n'+she_query
+                query += '\n' + quer3.format(1 if data['isFresher']=='true' else 0 ,user_id,role_id,data['cand_id'])
+                
+            if query!="":     
+                curs.execute(query)
+                curs.commit()
+            if she_query!="":
+                insert_query_she=insert_query_she[:-1]+';'
+                curs.execute(insert_query_she)
+                curs.commit()
 
             out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
         except Exception as e:
@@ -4894,61 +4949,34 @@ SELECT					cb.name as candidate_name,
             VALUES
             '''
 
-            insert_query_she='''
-            INSERT INTO [candidate_details].[tbl_candidate_she_details]
-                ([candidate_id]
-                ,[mobilization_type]
-                ,[score]
-                ,[result]
-                ,[Are you able to read and write local language?]
-                ,[Do you have a smart phone?]
-                ,[Are you willing to buy a smartphone?]
-                ,[Do you own two wheeler?]
-                ,[Do you know how to operate a smartphone?]
-                ,[Are you/ Have you been an entrepreneur before?]
-                ,[Do you have permission from your family to work outside?]
-                ,[Are you a member of SHG?]
-                ,[Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?]
-                ,[Are you willing to undergo online trainings and mentorship program for 6 month?]
-                ,[Are you willing to share details of customer, revenue, expenses frequently with LN?]
-                ,[Are you willing to work and sign the work contract with LN?]
-                ,[Are you willing to buy tools and consumables required to run your business?]
-                ,[Are you willing to adopt digital transactions in your business?]
-                ,[Are you willing to register your business in Social platforms like WhatsApp, Face book, Geo listing, Just dial etc.?]
-                ,[Have you availed any loan in the past?]
-                ,[Do you have any active loan?]
-                ,[Are you willing to take up a loan to purchase tools and consumables?]
-                ,[Are you covered under any health insurance?]
-                ,[Are you allergic to any chemicals and dust?]
-                ,[Will you able to wear mandatory PPEs during the work?]
-                ,[Are you willing to follow  Environment, Health and Safety Norms in your business?]
-                ,[Have you ever been subjected to any legal enquiry for Non ethical work/business?]
-                ,[Address as per Aadhar Card (incl pin code)]
-                ,[Number of members earning in the family]
-                ,[Rented or own house?]
-                ,[Size of the house]
-                ,[Ration card (APL or BPL)]
-                ,[TV]
-                ,[Refrigerator]
-                ,[Washing Machine]
-                ,[AC /Cooler]
-                ,[Car]
-                ,[Kids education]
-                ,[Medical Insurance]
-                ,[Life Insurance]
-                ,[Others]
-                ,[Educational qualification]
-                ,[Age proof]
-                ,[Signed MoU]
-                ,[MoU signed date]
-                ,[Kit given date]
-                ,[Head of the household]
-                ,[Farm land]
-                ,[If yes, acres of land]
-                ,[created_on]
-                ,[created_by]
-                ,[is_active])
-            VALUES
+            update_query_she='''
+            UPDATE [candidate_details].[tbl_candidate_she_details] SET
+                    [Address as per Aadhar Card (incl pin code)]='{}'
+                ,	[Number of members earning in the family]='{}'
+                ,	[Rented or own house?]='{}'
+                ,	[Size of the house]='{}'
+                ,	[Ration card (APL or BPL)]='{}'
+                ,	[TV]='{}'
+                ,	[Refrigerator]='{}'
+                ,	[Washing Machine]='{}'
+                ,	[AC /Cooler]='{}'
+                ,	[Car]='{}'
+                ,	[Kids education]='{}'
+                ,	[Medical Insurance]='{}'
+                ,	[Life Insurance]='{}'
+                ,	[Others]='{}'
+                ,	[Educational qualification]='{}'
+                ,	[Age proof]='{}'
+                ,	[Signed MoU]='{}'
+                ,	[MoU signed date]='{}'
+                ,	[Kit given date]='{}'
+                ,	[Head of the household]='{}'
+                ,	[Farm land ]='{}'
+                ,	[If yes, acres of land ]='{}'
+                ,   [created_on]=GETDATE()
+                ,   [created_by]='{}'
+                ,   [is_active]=1
+                where candidate_id='{}';
             '''
             url = candidate_xml_weburl + xml
             r = requests.get(url)
@@ -4975,19 +5003,15 @@ SELECT					cb.name as candidate_name,
                 for fam in child.findall('family_details'):
                     dt=fam.attrib
                     fam_query+="({},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',{},GETDATE(),1),".format(data['cand_id'],dt['memberSal'],dt['memberName'],dt['memberDob'],dt['memberAge'],dt['memberContact'],dt['memberEmail'],dt['memberGender'],dt['memberRelation'],dt['memberQuali'],dt['memberOccuptn'],user_id)
-                print(data['mobilization_type'])
                 if int(data['mobilization_type'])==2:
-                    she_query="({},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(data['cand_id'],data['mobilization_type'],data['score'],data['result'],data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['operate_smart_phone'],data['entreprenuer_before'],data['permission_to_work_outside'],data['shg_member'],data['serve_as_she'],data['online_training_mentorship'],data['share_details_with_LN'],data['sign_contract_with_LN'],data['buy_tools_consumables'],data['adopt_digital_transaction'],data['register_business_in_social_platform'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['wear_mandatory_ppe'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['aadhar_address'],data['family_members'],data['rented_or_own'],data['size_of_house'],data['ration_card'],data['tv'],data['refrigerator'],data['washing_machine'],data['ac_cooler'],data['car'],data['kids_education'],data['medical_insurance'],data['life_insurance'],data['others'],data['educational_qualification'],data['age_proof'],data['signed_mou'],data['mou_signed_date'],data['kit_given_date'],data['head_of_household'],data['farm_land'],data['acres_of_land'],user_id)
-                    insert_query_she += '\n'+she_query
-
-            
+                    she_query += update_query_she.format(data['aadhar_address'],data['family_members'],data['rented_or_own'],data['size_of_house'],data['ration_card'],data['tv'],data['refrigerator'],data['washing_machine'],data['ac_cooler'],data['car'],data['kids_education'],data['medical_insurance'],data['life_insurance'],data['others'],data['educational_qualification'],data['age_proof'],data['signed_mou'],data['mou_signed_date'],data['kit_given_date'],data['head_of_household'],data['farm_land'],data['acres_of_land'],user_id,data['candidate_id'])
+                              
             
             curs.execute(query)
             curs.commit()
 
             if she_query!="":
-                insert_query_she=insert_query_she[:-1]+';'
-                curs.execute(insert_query_she)
+                curs.execute(she_query)
                 curs.commit()
 
             quer4 = quer4[:-1]+';'
@@ -5005,10 +5029,16 @@ SELECT					cb.name as candidate_name,
                 quer6 += fam_query[:-1]+';'
                 curs.execute(quer6)
                 curs.commit()
-
-            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
+            response_data=[]
+            response_query = 'SELECT c.candidate_id,c.first_name as candidate_name,c.primary_contact_no as candidate_contact,cis.intervention_value as enrollment_id FROM candidate_details.tbl_candidate_interventions ci LEFT JOIN candidate_details.tbl_candidates as c on c.candidate_id=ci.candidate_id LEFT JOIN candidate_details. tbl_map_candidate_intervention_skilling as cis on cis.intervention_id=ci.candidate_intervention_id where ci.candidate_intervention_id IN'+d
+            curs.execute(response_query)
+            columns = [column[0].title() for column in cur.description]
+            for row in curs:
+                h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3]}
+                response_data.append(h)
+            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True,'data':response_data}
         except Exception as e:
-            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+            out = {'success': False, 'description': "error: "+str(e), 'app_status':True,'data':response_data}
         finally:
             curs.close()
             conn.close()
