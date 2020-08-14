@@ -5481,7 +5481,6 @@ class submit_candidate_updated(Resource):
             device_model = str(request.form['device_model'])
             imei_num = str(request.form['imei_num'])
             android_version = str(request.form['android_version'])
-            
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
                 if cand_stage==1:
                     out = Database.get_submit_candidate_mobi(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
@@ -7376,20 +7375,20 @@ class download_candidate_data(Resource):
                 candidate_id = request.form["candidate_id"]
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
-                status = request.form["status"]
+                project_types = request.form["project_types"]
                 customer = request.form["customer"]
                 project = request.form["project"]
                 sub_project = request.form["sub_project"]
                 batch = request.form["batch"]
                 region = request.form["region"]
                 center = request.form["center"]
-                center_type = request.form["center_type"]
+                created_by = request.form["created_by"]
                 Contracts = request.form["Contracts"]
                 candidate_stage = request.form["candidate_stage"]
                 from_date = request.form["from_date"]
                 to_date = request.form["to_date"]
                 
-                resp = Report.DownloadCandidateData(candidate_id, user_id, user_role_id, status, customer, project, sub_project, batch, region, center, center_type, Contracts, candidate_stage, from_date, to_date)
+                resp = Report.DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date)
                 
                 return resp
             except Exception as e:
