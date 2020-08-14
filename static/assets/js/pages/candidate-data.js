@@ -9,7 +9,7 @@ $(document).ready(function () {
     });
     $("#tbl_candidate").dataTable().fnDestroy();
     hideEnrollmentDiv();
-    
+    Loadcreatedbyddl();   
       
     role_id=parseInt($('#hdn_home_user_role_id').val());
     if(role_id == 5)
@@ -25,6 +25,45 @@ function hideEnrollmentDiv(){
     $("#batch_div").hide();        
    
     
+}
+function Loadcreatedbyddl(){
+    var URL=$('#hdn_web_url').val()+ "/AllCreatedByBasedOnUser"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id" : $('#hdn_home_user_role_id').val()
+        },
+
+        success: function (data){
+            if(data.CreatedBy != null)
+            {
+                $('#ddlcreated_by').empty();
+                var count=data.CreatedBy.length;
+                if( count> 0)
+                {
+                    //$('#ddlRegion').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlcreated_by').append(new Option(data.CreatedBy[i].User_Name,data.CreatedBy[i].User_Id));
+                    //$('#ddlCourse').val('-1');
+                }
+                else
+                {
+                    $('#ddlcreated_by').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading BU! Please try again');
+            return false;
+        }
+    });
+    return false;
 }
 function ChangeEnrollmentDiv(){
     if (($('#ddlStages').val()=='1')|($('#ddlStages').val()=='2'))
@@ -593,9 +632,14 @@ function CandidateFamilyDetails(Candidate_Id)
 
 
 function DownloadTableBasedOnSearch(){
-    $("#imgSpinner").show();
-    var URL=$('#hdn_web_url').val()+ "/download_candidate_data"
-    $.ajax({
+    if($('#FromDate').val()==''||$('#ToDate').val()=='')
+    {
+        alert("Please select start date and end date!");
+    }
+    else{
+        $("#imgSpinner").show();
+        var URL=$('#hdn_web_url').val()+ "/download_candidate_data"
+        $.ajax({
             type: "POST",
             dataType: "json",
             url: URL, 
@@ -603,14 +647,14 @@ function DownloadTableBasedOnSearch(){
                     'candidate_id':0,
                     'user_id':$('#hdn_home_user_id').val(),
                     'user_role_id':$('#hdn_home_user_role_id').val(),
-                    'status':'',//$('#ddlStatus').val().toString(),
+                    'project_types':$('#ddlProjectTypes').val().toString(),
                     'customer':$('#ddlClient').val().toString(),
                     'project': $('#ddlProject').val().toString(),
                     'sub_project':$('#ddlSubProject').val().toString(),
                     'batch':$('#ddlBatches').val().toString(),
                     'region':'',//$('#ddlRegion').val().toString(),
                     'center':'',//$('#ddlCenter').val().toString(),
-                    'center_type':'',//$('#ddlCenterType').val().toString(),
+                    'created_by':$('#ddlcreated_by').val().toString(),
                     'Contracts' :$('#ddlContract').val().toString(),
                     'candidate_stage':$('#ddlStages').val().toString(),
                     'from_date' : $('#FromDate').val(),
@@ -667,6 +711,8 @@ function DownloadTableBasedOnSearch(){
                 //$("#imgSpinner").hide();
             }
         });
+    }
+    
 }
 
 function ForceDownload(varUrl, varFileName)
