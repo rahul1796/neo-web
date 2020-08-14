@@ -4815,7 +4815,7 @@ SELECT					cb.name as candidate_name,
             update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type={},identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',created_by='{}',aadhar_image_name='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
             '''
             quer3 = '''
-            update candidate_details.tbl_candidates set isFresher={} project_type='{}',created_by='{}',is_active=1 where candidate_id='{}';
+            update candidate_details.tbl_candidates set isFresher={}, project_type={},created_by='{}',is_active=1 where candidate_id='{}';
             '''
             
             insert_query_she='''
@@ -4862,6 +4862,7 @@ SELECT					cb.name as candidate_name,
             print(url)
             r = requests.get(url)
             data = r.text
+            print(data)
             root = ET.fromstring(data)
             query = ""
             she_query=""
@@ -4874,11 +4875,10 @@ SELECT					cb.name as candidate_name,
                     query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1 if data['dobEntered']=='true' else 0,data['yrsExp'],data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],user_id,role_id,data['cand_id'])
                 if 'aadhaarNo' in data:
                     query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['aadhaarNo'],data['idType'],data['idNum'],data['idCopy'],data['empType'],data['prefJob'],data['relExp'],data['lastCtc'],data['prefLocation'],data['willTravel'],data['workShift'],data['bocwId'],data['expectCtc'],user_id,aadhar_image_name,data['cand_id'])
-                
                 if int(data['mobilization_type'])==2:
-                    she_query="({},{},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),int(data['score']),int(data['result']),data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['operate_smart_phone'],data['entreprenuer_before'],data['permission_to_work_outside'],data['shg_member'],data['serve_as_she'],data['online_training_mentorship'],data['share_details_with_LN'],data['sign_contract_with_LN'],data['buy_tools_consumables'],data['adopt_digital_transaction'],data['register_business_in_social_platform'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['wear_mandatory_ppe'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['age_18_40'],data['8th_pass'],data['past_work_exp'],data['full_time_work'],data['trvl_within_panchayat'],data['bank_act'],user_id)
+                    she_query="({},{},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),int(data['score']),int(data['result']),data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['operate_smart_phone'],data['entreprenuer_before'],data['permission_to_work_outside'],data['shg_member'],data['serve_as_she'],data['online_training_mentorship'],data['share_details_with_LN'],data['sign_contract_with_LN'],data['buy_tools_consumables'],data['adopt_digital_transaction'],data['register_business_in_social_platform'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['wear_mandatory_ppe'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['age_18_40'],data['eight_pass'],data['past_work_exp'],data['full_time_work'],data['trvl_within_panchayat'],data['bank_act'],user_id)
                     insert_query_she += '\n'+she_query
-                query += '\n' + quer3.format(1 if data['isFresher']=='true' else 0,data['mobilization_type'] ,user_id,data['cand_id'])
+                query += '\n' + quer3.format(1 if data['isFresher']=='true' else 0,int(data['mobilization_type']) ,user_id,data['cand_id'])
                 
             if query!="":     
                 curs.execute(query)
@@ -6245,12 +6245,8 @@ SELECT					cb.name as candidate_name,
         curs = con.cursor()
         sheet1=[]
         sheet1_columns=[]
-        #sql = 'exec [candidate_details].[sp_get_candidate_data] ?,?,?,?,?,?,?,?,?'
-        sql = 'exec [candidate_details].[sp_get_candidate_data] ?,?,?,?,?'
-        #values = (customer,Contracts,project, sub_project, batch,project_types,created_by,from_date,to_date,candidate_stage)
-        values = (customer,Contracts,project, sub_project, batch)
-        
-        print(values)
+        sql = 'exec [candidate_details].[sp_get_candidate_data] ?,?,?,?,?,?,?,?,?,?'
+        values = (customer,Contracts,project, sub_project, batch,project_types,created_by,from_date,to_date,candidate_stage)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]  
         #print(sheet1_columns)      
