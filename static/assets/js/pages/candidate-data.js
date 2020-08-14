@@ -1,36 +1,48 @@
 var varTable;
 $(document).ready(function () {
     $("#imgSpinner").hide();
+    
     $('.dropdown-search-filter').select2();
     $(".date-picker").flatpickr({
         dateFormat:'d-M-Y',
         minDate: '01.Apr.2019'
     });
     $("#tbl_candidate").dataTable().fnDestroy();
-    Loadcandidatestatusddl();
-    LoadCenterType();
-    LoadRegionddl();
-    loadClient();
+    hideEnrollmentDiv();
+    
+      
     role_id=parseInt($('#hdn_home_user_role_id').val());
     if(role_id == 5)
         $('#btn_create').hide();
     //LoadTable();
 });
-function Loadcandidatestatusddl(){
-    if (($('#FromDate').val()=='')|($('#ToDate').val()==''))
+function hideEnrollmentDiv(){
+     
+    $("#customer_div").hide();  
+    $("#contract_div").hide();  
+    $("#project_div").hide();  
+    $("#subproject_div").hide();  
+    $("#batch_div").hide();        
+   
+    
+}
+function ChangeEnrollmentDiv(){
+    if (($('#ddlStages').val()=='1')|($('#ddlStages').val()=='2'))
     {   
-        $("#ddlstatus_div").hide();
-        $('#ddlcandidateStage').val("");
+        $("#customer_div").hide();  
+        $("#contract_div").hide();  
+        $("#project_div").hide();  
+        $("#subproject_div").hide();  
+        $("#batch_div").hide();        
     }
-    else
-    {
-        $("#ddlstatus_div").show();
-        $('#ddlcandidateStage').empty();
-        $('#ddlcandidateStage').append(new Option('Enrolled','1'));
-        $('#ddlcandidateStage').append(new Option('Certified','2'));
-        $('#ddlcandidateStage').append(new Option('Placed (Date Of Join)','3'));
-        $('#ddlcandidateStage').append(new Option('Placed (Offer Uploaded Date)','4'));
-    }    
+    else{
+        $("#customer_div").show();  
+        $("#contract_div").show();  
+        $("#project_div").show();  
+        $("#subproject_div").show();  
+        $("#batch_div").show();  
+        loadClient();
+    }
 }
 function LoadRegionddl(){
     var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
@@ -600,9 +612,9 @@ function DownloadTableBasedOnSearch(){
                     'center':'',//$('#ddlCenter').val().toString(),
                     'center_type':'',//$('#ddlCenterType').val().toString(),
                     'Contracts' :$('#ddlContract').val().toString(),
-                    'candidate_stage':'',//$('#ddlcandidateStage').val().toString(),
-                    'from_date' : '',//$('#FromDate').val(),
-                    'to_date' : '',//$('#ToDate').val()
+                    'candidate_stage':$('#ddlStages').val().toString(),
+                    'from_date' : $('#FromDate').val(),
+                    'to_date' : $('#ToDate').val()
 
             },
             success: function(resp) 

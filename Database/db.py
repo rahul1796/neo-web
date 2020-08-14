@@ -5030,7 +5030,7 @@ SELECT					cb.name as candidate_name,
                 curs.execute(quer6)
                 curs.commit()
             response_data=[]
-            response_query = 'SELECT c.candidate_id,c.first_name as candidate_name,c.primary_contact_no as candidate_contact,cis.intervention_value as enrollment_id FROM candidate_details.tbl_candidate_interventions ci LEFT JOIN candidate_details.tbl_candidates as c on c.candidate_id=ci.candidate_id LEFT JOIN candidate_details. tbl_map_candidate_intervention_skilling as cis on cis.intervention_id=ci.candidate_intervention_id where ci.candidate_intervention_id IN'+d
+            response_query = 'SELECT c.candidate_id as Candidate_Id,c.first_name as First_Name,COALESCE(middle_name,'') as Middle_Name,COALESCE(last_name,'') as Last_Name,c.primary_contact_no as Mobile_Number,cis.intervention_value as Enrollment_Id FROM candidate_details.tbl_candidate_interventions ci LEFT JOIN candidate_details.tbl_candidates as c on c.candidate_id=ci.candidate_id LEFT JOIN candidate_details. tbl_map_candidate_intervention_skilling as cis on cis.intervention_id=ci.candidate_intervention_id where ci.candidate_intervention_id IN'+d
             curs.execute(response_query)
             columns = [column[0].title() for column in cur.description]
             for row in curs:
