@@ -4953,32 +4953,32 @@ SELECT					cb.name as candidate_name,
 
             update_query_she='''
             UPDATE [candidate_details].[tbl_candidate_she_details] SET
-                    [Address as per Aadhar Card (incl pin code)]='{}'
-                ,	[Number of members earning in the family]='{}'
-                ,	[Rented or own house?]='{}'
-                ,	[Size of the house]='{}'
-                ,	[Ration card (APL or BPL)]='{}'
-                ,	[TV]='{}'
-                ,	[Refrigerator]='{}'
-                ,	[Washing Machine]='{}'
-                ,	[AC /Cooler]='{}'
-                ,	[Car]='{}'
-                ,	[Kids education]='{}'
-                ,	[Medical Insurance]='{}'
-                ,	[Life Insurance]='{}'
-                ,	[Others]='{}'
-                ,	[Educational qualification]='{}'
-                ,	[Age proof]='{}'
-                ,	[Signed MoU]='{}'
-                ,	[MoU signed date]='{}'
-                ,	[Kit given date]='{}'
-                ,	[Head of the household]='{}'
-                ,	[Farm land ]='{}'
-                ,	[If yes, acres of land ]='{}'
-                ,   [created_on]=GETDATE()
-                ,   [created_by]='{}'
-                ,   [is_active]=1
-                where candidate_id='{}';
+                [Address as per Aadhar Card (incl pin code)]='{}'
+                ,[Number of members earning in the family]='{}'
+                ,[Rented or own house?]='{}'
+                ,[Size of the house]='{}'
+                ,[Ration card (APL or BPL)]='{}'
+                ,[TV]='{}'
+                ,[Refrigerator]='{}'
+                ,[Washing Machine]='{}'
+                ,[AC /Cooler]='{}'
+                ,[Car]='{}'
+                ,[Kids education]='{}'
+                ,[Medical Insurance]='{}'
+                ,[Life Insurance]='{}'
+                ,[Others]='{}'
+                ,[Educational qualification]='{}'
+                ,[Age proof]='{}'
+                ,[Signed MoU]='{}'
+                ,[MoU signed date]='{}'
+                ,[Kit given date]='{}'
+                ,[Head of the household]='{}'
+                ,[Farm land]='{}'
+                ,[If yes, acres of land]='{}'
+                ,[created_on]=GETDATE()
+                ,[created_by]={}
+                ,[is_active]=1
+                where candidate_id={};
             '''
             url = candidate_xml_weburl + xml
             r = requests.get(url)
@@ -4994,31 +4994,25 @@ SELECT					cb.name as candidate_name,
                 query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,data['mobilization_type'],1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
                 query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['presAddrOne'],data['permAddrOne'],data['highQuali'],data['candStream'],data['compKnow'],data['techKnow'],data['houseIncome'],data['bankName'],data['accNum'],user_id,data['cand_id'])
                 query += '\n' + quer3.format(data['presAddrTwo'],data['presVillage'],data['presPanchayat'],data['presTaluk'],data['permAddrTwo'],data['permVillage'],data['permPanchayat'],data['permTaluk'],data['instiName'],data['university'],data['yrPass'],data['percentage'],data['branchName'],data['ifscCode'],data['accType'],data['bankCopy'],user_id,data['cand_id'])
-
                 intervention_category="SAE"
                 if data['candProduct']=="Placement":
                     intervention_category="EAL"                
                 quer = "({},'{}',GETDATE(),{},1),".format(data['cand_id'],intervention_category,user_id)
                 #quer = "({},'SAE',GETDATE(),{},1),".format(data['cand_id'],user_id)
                 quer4 += '\n'+quer
-                
                 for fam in child.findall('family_details'):
                     dt=fam.attrib
                     fam_query+="({},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',{},GETDATE(),1),".format(data['cand_id'],dt['memberSal'],dt['memberName'],dt['memberDob'],dt['memberAge'],dt['memberContact'],dt['memberEmail'],dt['memberGender'],dt['memberRelation'],dt['memberQuali'],dt['memberOccuptn'],user_id)
                 if int(data['mobilization_type'])==2:
-                    she_query += update_query_she.format(data['aadhar_address'],data['family_members'],data['rented_or_own'],data['size_of_house'],data['ration_card'],data['tv'],data['refrigerator'],data['washing_machine'],data['ac_cooler'],data['car'],data['kids_education'],data['medical_insurance'],data['life_insurance'],data['others'],data['educational_qualification'],data['age_proof'],data['signed_mou'],data['mou_signed_date'],data['kit_given_date'],data['head_of_household'],data['farm_land'],data['acres_of_land'],user_id,data['candidate_id'])
-                              
-            
+                    she_query += '\n' + update_query_she.format(data['aadhar_address'],data['family_members'],data['rented_or_own'],data['size_of_house'],data['ration_card'],data['tv'],data['refrigerator'],data['washing_machine'],data['ac_cooler'],data['car'],data['kids_education'],data['medical_insurance'],data['life_insurance'],data['others'],data['educational_qualification'],data['age_proof'],data['signed_mou'],data['mou_signed_date'],data['kit_given_date'],data['head_of_household'],data['farm_land'],data['acres_of_land'],int(user_id),int(data['cand_id']))
+                             
             curs.execute(query)
             curs.commit()
-
             if she_query!="":
                 curs.execute(she_query)
                 curs.commit()
-
             quer4 = quer4[:-1]+';'
             curs.execute(quer4)
-            
             d = list(map(lambda x:x[0],curs.fetchall()))
             curs.commit()
             for i in range(len(d)):
@@ -5032,18 +5026,20 @@ SELECT					cb.name as candidate_name,
                 curs.execute(quer6)
                 curs.commit()
             response_data=[]
-            response_query = 'SELECT c.candidate_id as Candidate_Id,c.first_name as First_Name,COALESCE(middle_name,'') as Middle_Name,COALESCE(last_name,'') as Last_Name,c.primary_contact_no as Mobile_Number,cis.intervention_value as Enrollment_Id FROM candidate_details.tbl_candidate_interventions ci LEFT JOIN candidate_details.tbl_candidates as c on c.candidate_id=ci.candidate_id LEFT JOIN candidate_details. tbl_map_candidate_intervention_skilling as cis on cis.intervention_id=ci.candidate_intervention_id where ci.candidate_intervention_id IN'+d
+            intervention_string =','.join(map(str, d))
+            response_query = 'SELECT c.candidate_id as Candidate_Id,c.first_name as First_Name,COALESCE(middle_name,\'\') as Middle_Name,COALESCE(last_name,\'\') as Last_Name,c.primary_contact_no as Mobile_Number,cis.intervention_value as Enrollment_Id FROM candidate_details.tbl_candidate_interventions ci LEFT JOIN candidate_details.tbl_candidates as c on c.candidate_id=ci.candidate_id LEFT JOIN candidate_details. tbl_map_candidate_intervention_skilling as cis on cis.intervention_id=ci.candidate_intervention_id where ci.candidate_intervention_id IN ('+intervention_string+');'
+            print(response_query)
             curs.execute(response_query)
-            columns = [column[0].title() for column in cur.description]
+            columns = [column[0].title() for column in curs.description]
             for row in curs:
-                h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3]}
+                h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5]}
                 response_data.append(h)
             out = {'success': True, 'description': "Submitted Successfully", 'app_status':True,'data':response_data}
-        except Exception as e:
-            out = {'success': False, 'description': "error: "+str(e), 'app_status':True,'data':response_data}
-        finally:
             curs.close()
             conn.close()
+            return out
+        except Exception as e:            
+            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
             return out
           
     def get_batch_list_updated(user_id,candidate_id,role_id,mobilization_type):
