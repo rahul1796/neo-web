@@ -196,7 +196,7 @@
 
             function add_popup_message(){
                 if (POC_Object.length<=0){
-                    alert('please select atleaset one POC')
+                    alert('Please select atleast one POC');
                 }
                 else{
                     var URL=$('#hdn_web_url').val()+ "/add_client_details";
@@ -269,12 +269,13 @@
                     varHtml+='<div class="form-group">';
                     varHtml+='<div class="row">';
                     if (id==0){
-                        varHtml+='<div class="col-lg-6"> <label for="POC_Number_'+id+'">POC Number * :</label> </div>';    
+                        varHtml+='<div class="col-lg-6"> <label for="POC_Number_'+id+'">Mobile Number * :</label> </div>';    
                     }
                     else{
-                        varHtml+='<div class="col-lg-6"> <label for="POC_Number_'+id+'">POC Number :</label> </div>';
+                        varHtml+='<div class="col-lg-6"> <label for="POC_Number_'+id+'">Mobile Number :</label> </div>';
                     }
-                    varHtml+='<div class="col-lg-6"> <input type="number" maxlength="25" class="form-control" name="POC_Number_'+id+'" id="POC_Number_'+id+'" required placeholder="POC Number"> </div>';
+
+                    varHtml+='<div class="col-lg-6"> <input type="tel" pattern="[1-9]{1}[0-9]{9}" class="form-control" name="POC_Number_'+id+'" id="POC_Number_'+id+'" required placeholder="Mobile Number"> </div>';
                     varHtml+= '</div>';
                     varHtml+= '</div>';
 
@@ -298,7 +299,7 @@
                     else{
                         varHtml+='<div class="col-lg-6"> <label for="POC_designation_'+id+'">POC Designation :</label> </div>';
                     }
-                    varHtml+='<div class="col-lg-6"> <input type="text" maxlength="25" class="form-control" name="POC_designation_'+id+'" id="POC_designation_'+id+'" required placeholder="POC Designation"> </div>';
+                    varHtml+='<div class="col-lg-6"> <input type="text" maxlength="25" class="form-control" name="POC_designation_'+id+'" id="POC_designation_'+id+'" placeholder="POC Designation"> </div>';
                     varHtml+= '</div>';
                     varHtml+= '</div>';
                     
@@ -511,6 +512,21 @@
                                     
                                     <div class="form-group">
                                         <div class="row">
+                                            <div class="col-lg-1">
+                                                <a onclick="AddMilestone($('#hdn_home_total_SPOC').val());" class="btn" style="cursor:pointer; margin-left: -13px; margin-top: -9px;"><i title="Add Point of Contact" class="fas fa-plus" ></i></a>
+                                                <!-- <button type="button" class="btn btn-secondary btn-rounded" 
+                                                id="btnAddMilestones" onclick="AddMilestone();">Add Customer Contact</button> -->
+                                            </div>
+                                            <div class="col-lg-6" style="margin-left: -66px;">
+                                                Add Point of Contact
+                                            </div>
+                                        </div>                                     
+                                    </div>
+                                    <div id="div_POC_details">
+                            
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
                                             <div class="col-lg-6">
                                                 <label>Is Active :</label>
                                             </div>
@@ -522,24 +538,7 @@
                                                 </div>
                                             </div>   
                                         </div>                                     
-                                    </div>  
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-lg-1">
-                                                <a onclick="AddMilestone($('#hdn_home_total_SPOC').val());" class="btn" style="cursor:pointer; margin-left: -13px; margin-top: -9px;"><i title="Add Customer Contact" class="fas fa-plus" ></i></a>
-                                                <!-- <button type="button" class="btn btn-secondary btn-rounded" 
-                                                id="btnAddMilestones" onclick="AddMilestone();">Add Customer Contact</button> -->
-                                            </div>
-                                            <div class="col-lg-6" style="margin-left: -66px;">
-                                                Add customer Contact
-                                            </div>
-                                        </div>                                     
-                                    </div>
-                                    <div id="div_POC_details">
-                            
-                                    </div>
-
-    
+                                    </div> 
                                     <div class="form-group mb-0">
                                         <button class="btn btn-primary" type="submit">Save</button>
                                     </div>
