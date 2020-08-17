@@ -4486,8 +4486,7 @@ SELECT					cb.name as candidate_name,
         sql = 'exec [masters].[sp_get_users_based_on_sub_project]  ?'
         values = (sub_project_id,)
         cur2.execute(sql,(values))
-        #print(values)
-        #print(cur2.description)
+        
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
             for i in range(len(columns)):
