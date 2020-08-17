@@ -580,7 +580,7 @@
                         if(goto !="" && goto!="dashboard")
                             $("#box").load(goto);
                         break;
-                        case 27:             //Assessment Management
+                    case 27:             //Assessment Management
                         $('#Home').hide();
 						$('#Mobilization_Menu').hide();
                         $('#Registration_Menu').hide();
@@ -615,6 +615,43 @@
                             $('#TrainerProductivityReport').hide();
                         console.log(goto);
                         if(goto !="" && goto!="dashboard")
+                            $("#box").load(goto);
+                        break;
+                    case 38:             //Project Coordinator
+                        $('#Home').show();
+						$('#Mobilization_Menu').show();
+                        $('#Registration_Menu').show();
+                        $('#Enrollment_Menu').show();
+                        $('#Candidate_Menu').show();
+                        $('#Assessment_Menu').show();
+                        $('#Content_Menu').show();
+                            $('#AnchorSectors').hide();
+                            $('#AnchorQP').show();
+                            $('#AnchorCourses').show();
+                        $('#Master_Menu').show();
+                            $('#AnchorClients').hide();
+                            $('#AnchorContracts').hide();
+                            $('#Project_Menu').show();    
+                                $('#AnchorProjects').show();  
+                                $('#AnchorSubProjects').show();   
+                                $('#AnchorBatch').show();
+                            $('#AnchorCenters').show();
+                            $('#AnchorUsers').show();
+                            $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').hide();
+                            $('#AnchorSalesDashboard').hide();
+                            $('#AnchorOperationDashboard').hide();
+                        $('#Report_Menu').show();
+                            $('#ECP_report').show();
+                            $('#Qp_wise_report').hide();
+                            $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').show();
+                        $('#TMA_attendance_Menu').show();
+                        $('#TMA_content').show();
+                            $('#tma_report_filter').show();
+                        if(goto !="")
                             $("#box").load(goto);
                         break;
                 }
