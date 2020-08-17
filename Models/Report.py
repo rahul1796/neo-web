@@ -899,6 +899,7 @@ class Report:
     
     def DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date):
         try:
+            print("hi")
             data=Database.DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.CandidateDataFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
@@ -909,7 +910,7 @@ class Report:
                 os.remove( DownloadPath + i)
             path = '{}{}'.format(DownloadPath,report_name)
             res={}
-            res=Report.CreateExcelForCandidateData(data,path)
+            res=Report.CreateExcelForCandidateData(data,path,project_types,candidate_stage)
             if res['success']:
                 return {"success":True,"msg":"File Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
             else:
@@ -917,7 +918,7 @@ class Report:
         except Exception as e:
             return {"success":False,"msg":str(e)}
 
-    def CreateExcelForCandidateData(data,path):
+    def CreateExcelForCandidateData(data,path,project_types,candidate_stage):
         try:
             writer = pd.ExcelWriter(path, engine='xlsxwriter')
             workbook  = writer.book
@@ -931,32 +932,25 @@ class Report:
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
             
             
-            df_mob=df[['Candidate_Id', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 'Age', 'Primary_Contact_No', 'Secondary_Contact_No', 'Email_Id', 'Gender', 'Marital_Status', 'Caste', 'Disability_Status', 'Religion', 'Mother_Tongue', 'Occupation', 'Average_Annual_Income', 'Interested_Course', 'Product','Source_Of_Information']]
+            df_mob=df[['Candidate_Id', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 'Age', 'Primary_Contact_No', 'Secondary_Contact_No', 'Email_Id', 'Gender', 'Marital_Status', 'Caste', 'Disability_Status', 'Religion', 'Mother_Tongue', 'Occupation', 'Average_Annual_Income', 'Interested_Course', 'Product','Source_Of_Information','Mobilized_On','Mobilized_By']]
             df_mob.drop_duplicates(keep='first',inplace=True) 
             df_mob.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Mobilization') 
-            worksheet = writer.sheets['Mobilization']
-            default_column = ['Candidate_Id', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 'Age', 'Primary_Contact_No', 'Secondary_Contact_No', 'Email_Id', 'Gender', 'Marital_Status', 'Caste', 'Disability_Status', 'Religion', 'Mother_Tongue', 'Occupation', 'Average_Annual_Income', 'Interested_Course', 'Product','Source_Of_Information']
+            worksheet1 = writer.sheets['Mobilization']
+            default_column = ['Candidate_Id', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 'Age', 'Primary_Contact_No', 'Secondary_Contact_No', 'Email_Id', 'Gender', 'Marital_Status', 'Caste', 'Disability_Status', 'Religion', 'Mother_Tongue', 'Occupation', 'Average_Annual_Income', 'Interested_Course', 'Product','Source_Of_Information','Mobilized_On','Mobilized_By']
             for i in range(len(default_column)):
-                worksheet.write(0,i ,default_column[i], header_format)
+                worksheet1.write(0,i ,default_column[i], header_format)
 
-            df_reg=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Present_Address_Line1','Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block','Present_District', 'Present_State', 'Present_Pincode', 'Present_Country', 'Permanaet_Address_Line1','Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 'Permanent_Taluk_Block','Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country','Aadhar_No', 'Identifier_Type', 'Identity_Number','Employment_Type', 'Preferred_Job_Role', 'Relevant_Years_Of_Experience', 'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc']]
+            df_reg=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Present_Address_Line1','Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block','Present_District', 'Present_State', 'Present_Pincode', 'Present_Country', 'Permanaet_Address_Line1','Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 'Permanent_Taluk_Block','Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country','Aadhar_No', 'Identifier_Type', 'Identity_Number','Employment_Type', 'Preferred_Job_Role', 'Relevant_Years_Of_Experience', 'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc','Project_Type','Registered_On','Registered_By']]
             df_reg.drop_duplicates(keep='first',inplace=True) 
             df_reg.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Registration') 
-            worksheet = writer.sheets['Registration']
-            default_column_reg = ['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Present_Address_Line1','Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block','Present_District', 'Present_State', 'Present_Pincode', 'Present_Country', 'Permanaet_Address_Line1','Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 'Permanent_Taluk_Block','Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country','Aadhar_No', 'Identifier_Type', 'Identity_Number','Employment_Type', 'Preferred_Job_Role', 'Relevant_Years_Of_Experience', 'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc']
+            worksheet2 = writer.sheets['Registration']
+            default_column_reg = ['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Present_Address_Line1','Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block','Present_District', 'Present_State', 'Present_Pincode', 'Present_Country', 'Permanaet_Address_Line1','Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 'Permanent_Taluk_Block','Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country','Aadhar_No', 'Identifier_Type', 'Identity_Number','Employment_Type', 'Preferred_Job_Role', 'Relevant_Years_Of_Experience', 'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc','Project_Type','Registered_On','Registered_By']
             for i in range(len(default_column_reg)):
-                worksheet.write(0,i ,default_column_reg[i], header_format)
+                worksheet2.write(0,i ,default_column_reg[i], header_format)
             
-
-            df_enr=df[['Candidate_Id','Batch_Code','Intervention_Value',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Highest_Qualification', 'Stream_Specialization', 'Computer_Knowledge', 'Technical_Knowledge','Name_Of_Institute', 'University', 'Year_Of_Pass', 'Percentage','Family Salutation', 'Name', 'Family_Date_Of_Birth', 'Family_Age', 'Family_Primary_Contact', 'Family_Email_Address', 'Family Gender', 'Relationship', 'Education_Qualification', 'Members_Occupation','Bank_Name', 'Account_Number','Branch_Name', 'Branch_Code', 'Account_Type']]
-            #df_enr.drop_duplicates(keep='first',inplace=True) 
-            df_enr.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Enrolment') 
-            worksheet = writer.sheets['Enrolment']
-            default_column_enr = ['Candidate_Id','Batch_Code','Intervention_Value', 'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Highest_Qualification', 'Stream_Specialization', 'Computer_Knowledge', 'Technical_Knowledge','Name_Of_Institute', 'University', 'Year_Of_Pass', 'Percentage','Family Salutation', 'Name', 'Family_Date_Of_Birth', 'Family_Age', 'Family_Primary_Contact', 'Family_Email_Address', 'Family Gender', 'Relationship', 'Education_Qualification', 'Members_Occupation','Bank_Name', 'Account_Number','Branch_Name', 'Branch_Code', 'Account_Type']
-            for i in range(len(default_column_enr)):
-                worksheet.write(0,i ,default_column_enr[i], header_format)
-            
-            df_she=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id',
+            df_she=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Result','Age18To40','Eight_Pass','Past_Experience','Full_Time','Travel','Bank_Acount',
+                       #'Date of birth (age between 18 to 40)' , 'Are you 8th Pass?','Do you have any work experience in the past?','Will you able to work full time or at least 6 hours a day?','Are you willing to travel from one place to another within panchayat?','Do you have a bank account?',
+                       
                        'Are You Able To Read And Write Local Language?', 'Do You Have A Smart Phone?', 'Are You Willing To Buy A Smartphone?', 'Do You Own Two Wheeler?', 'Do You Know How To Operate A Smartphone?', 'Are You/ Have You Been An Entrepreneur Before?', 'Do You Have Permission From Your Family To Work Outside?', 'Are You A Member Of Shg?', 
                        'Are You Willing To Serve The Community At This Time Of Covid-19 Pandemic As Sanitization & Hygiene Entrepreneurs (She)?', 'Are You Willing To Undergo Online Trainings And Mentorship Program For 6 Month?', 'Are You Willing To Share Details Of Customer, Revenue, Expenses Frequently With Ln?', 
                        'Are You Willing To Work And Sign The Work Contract With Ln?', 'Are You Willing To Buy Tools And Consumables Required To Run Your Business?', 'Are You Willing To Adopt Digital Transactions In Your Business?', 'Are You Willing To Register Your Business In Social Platforms Like Whatsapp, Face Book, Geo Listing, Just Dial Etc.?', 
@@ -964,15 +958,35 @@ class Report:
                        'Are You Willing To Follow  Environment, Health And Safety Norms In Your Business?', 'Have You Ever Been Subjected To Any Legal Enquiry For Non Ethical Work/Business?', 'Address As Per Aadhar Card (Incl Pin Code)', 'Number Of Members Earning In The Family', 'Rented Or Own House?', 'Size Of The House', 'Ration Card (Apl Or Bpl)', 'Tv', 'Refrigerator', 'Washing Machine', 'Ac /Cooler', 'Car', 'Kids Education', 'Medical Insurance', 'Life Insurance', 'Others', 'Educational Qualification', 'Age Proof', 'Signed Mou', 'Mou Signed Date', 'Kit Given Date', 'Head Of The Household', 'Farm Land', 'If Yes, Acres Of Land']]
             df_she.drop_duplicates(keep='first',inplace=True) 
             df_she.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='SHE') 
-            worksheet = writer.sheets['SHE']
-            default_column_she = ['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id',
+            worksheet3 = writer.sheets['SHE']
+            default_column_she = ['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Result',
+                       'Date of birth (age between 18 to 40)' , 'Are you 8th Pass?','Do you have any work experience in the past?','Will you able to work full time or at least 6 hours a day?','Are you willing to travel from one place to another within panchayat?','Do you have a bank account?',
                        'Are You Able To Read And Write Local Language?', 'Do You Have A Smart Phone?', 'Are You Willing To Buy A Smartphone?', 'Do You Own Two Wheeler?', 'Do You Know How To Operate A Smartphone?', 'Are You/ Have You Been An Entrepreneur Before?', 'Do You Have Permission From Your Family To Work Outside?', 'Are You A Member Of Shg?', 
                        'Are You Willing To Serve The Community At This Time Of Covid-19 Pandemic As Sanitization & Hygiene Entrepreneurs (She)?', 'Are You Willing To Undergo Online Trainings And Mentorship Program For 6 Month?', 'Are You Willing To Share Details Of Customer, Revenue, Expenses Frequently With Ln?', 
                        'Are You Willing To Work And Sign The Work Contract With Ln?', 'Are You Willing To Buy Tools And Consumables Required To Run Your Business?', 'Are You Willing To Adopt Digital Transactions In Your Business?', 'Are You Willing To Register Your Business In Social Platforms Like Whatsapp, Face Book, Geo Listing, Just Dial Etc.?', 
                        'Have You Availed Any Loan In The Past?', 'Do You Have Any Active Loan?', 'Are You Willing To Take Up A Loan To Purchase Tools And Consumables?', 'Are You Covered Under Any Health Insurance?', 'Are You Allergic To Any Chemicals And Dust?', 'Will You Able To Wear Mandatory Ppes During The Work?', 
                        'Are You Willing To Follow  Environment, Health And Safety Norms In Your Business?', 'Have You Ever Been Subjected To Any Legal Enquiry For Non Ethical Work/Business?', 'Address As Per Aadhar Card (Incl Pin Code)', 'Number Of Members Earning In The Family', 'Rented Or Own House?', 'Size Of The House', 'Ration Card (Apl Or Bpl)', 'Tv', 'Refrigerator', 'Washing Machine', 'Ac /Cooler', 'Car', 'Kids Education', 'Medical Insurance', 'Life Insurance', 'Others', 'Educational Qualification', 'Age Proof', 'Signed Mou', 'Mou Signed Date', 'Kit Given Date', 'Head Of The Household', 'Farm Land', 'If Yes, Acres Of Land']
             for i in range(len(default_column_she)):
-                worksheet.write(0,i ,default_column_she[i], header_format)
+                worksheet3.write(0,i ,default_column_she[i], header_format)
+
+            df_enr=df[['Candidate_Id','Batch_Code','Intervention_Value',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Highest_Qualification', 'Stream_Specialization', 'Computer_Knowledge', 'Technical_Knowledge','Name_Of_Institute', 'University', 'Year_Of_Pass', 'Percentage','Family Salutation', 'Name', 'Family_Date_Of_Birth', 'Family_Age', 'Family_Primary_Contact', 'Family_Email_Address', 'Family Gender', 'Relationship', 'Education_Qualification', 'Members_Occupation','Bank_Name', 'Account_Number','Branch_Name', 'Branch_Code', 'Account_Type','Project_Type','Enrolled_On','Enrolled_By']]
+            #df_enr.drop_duplicates(keep='first',inplace=True) 
+            df_enr.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Enrolment') 
+            worksheet4 = writer.sheets['Enrolment']
+            default_column_enr = ['Candidate_Id','Batch_Code','Enrollment Id', 'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Highest_Qualification', 'Stream_Specialization', 'Computer_Knowledge', 'Technical_Knowledge','Name_Of_Institute', 'University', 'Year_Of_Pass', 'Percentage','Family Salutation', 'Name', 'Family_Date_Of_Birth', 'Family_Age', 'Family_Primary_Contact', 'Family_Email_Address', 'Family Gender', 'Relationship', 'Education_Qualification', 'Members_Occupation','Bank_Name', 'Account_Number','Branch_Name', 'Branch_Code', 'Account_Type','Project_Type','Enrolled_On','Enrolled_By']
+            for i in range(len(default_column_enr)):
+                worksheet4.write(0,i ,default_column_enr[i], header_format)
+                      
+            if candidate_stage == '2':
+                worksheet4.hide()
+                
+            if candidate_stage == '1':
+                worksheet2.hide()
+                worksheet3.hide()
+                worksheet4.hide()
+             
+            if project_types == '1':
+                worksheet3.hide()
             
             writer.save()
 

@@ -1233,7 +1233,7 @@ class Database:
     def cancel_actual_batch(user_id,actual_batch_id,cancel_reason):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'UPDATE [batches].[tbl_batches] SET is_cancelled=1 ,cancel_reason= ? where batch_id=?'
+        sql = 'UPDATE [batches].[tbl_batches] SET is_cancelled=1 ,cancel_reason= ? ,planned_batch_id=Null where batch_id=?'
         sql2 = 'update candidate_details.tbl_map_candidate_intervention_skilling set is_dropped=1,dropped_reason=?,dropped_date=getdate() where batch_id=?'
         values = (cancel_reason,actual_batch_id)
         cur.execute(sql,(values))
@@ -6245,7 +6245,6 @@ SELECT					cb.name as candidate_name,
         values = (customer,Contracts,project, sub_project, batch,project_types,created_by,from_date,to_date,candidate_stage)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]  
-        #print(sheet1_columns)      
         data = curs.fetchall()
         sheet1 = list(map(lambda x:list(x), data))
 
