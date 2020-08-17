@@ -5211,6 +5211,7 @@ class GetUsersBasedOnSubProject(Resource):
         if request.method=='GET':
             sub_project_id=request.args.get('sub_project_id',0,type=int)
             response={"Users":Master.GetUsersBasedOnSubProject(sub_project_id)}
+            print(response)
             return response
 api.add_resource(GetUsersBasedOnSubProject,'/GetUsersBasedOnSubProject')
 
