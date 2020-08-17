@@ -7437,7 +7437,6 @@ class download_candidate_data(Resource):
         if request.method=='POST':
             try:
                 #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
-                
                 candidate_id = request.form["candidate_id"]
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
@@ -7460,7 +7459,6 @@ class download_candidate_data(Resource):
             except Exception as e:
                 return {"exceptione":str(e)}
 api.add_resource(download_candidate_data,'/download_candidate_data')
-
 
 if __name__ == '__main__':
     #app.run(host="0.0.0.0", port=int("80"), debug=True)
