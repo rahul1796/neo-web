@@ -85,6 +85,7 @@
                             $('#Batch_Status_report').show();
                             $('#ops_productivity_report').show();
                             $('#Candidate_Date').show();
+                            $('#TrainerProductivityReport').show();
                         $('#Productivity_Report').show();
                             $('#region_productivity_report').show();
                             $('#mobilizer_productivity_report').show();
@@ -100,7 +101,7 @@
                         if(goto !="")
                             $("#box").load(goto);
                         break;
-                    case 37:             //Admin
+                    case 37:             //MIS
                         $('#Home').show();
 						$('#Mobilization_Menu').show();
                         $('#Registration_Menu').show();
@@ -126,12 +127,13 @@
                         $('#Insight_Menu').show();
                             $('#AnchorSalesDashboard').show();
                             $('#AnchorOperationDashboard').show();
-                        $('#My_Projects_Menu').hide();
+                        $('#My_Projects_Menu').show();
                         $('#Report_Menu').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
                             $('#Batch_Status_report').show();
                             $('#ops_productivity_report').show();
+                            $('#TrainerProductivityReport').hide();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
                         $('#Productivity_Report').show();
@@ -142,6 +144,7 @@
                             $('#TMA_attendance_Menu').hide();
                             $('#TMA_deployment_Menu').hide();
                         $('#TMA_attendance_Menu').show();
+                        
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -176,6 +179,7 @@
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -210,6 +214,7 @@
                             $('#Qp_wise_report').show();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -243,6 +248,7 @@
                             $('#Qp_wise_report').show();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').show();
                         $('#TMA_attendance_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
@@ -280,6 +286,7 @@
 
                             $('#Batch_Status_report').show();
                             $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').show();
                         $('#TMA_attendance_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
@@ -318,6 +325,7 @@
                             $('#Qp_wise_report').hide();
 							          $('#Batch_Status_report').show();
                             $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').show();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -351,6 +359,7 @@
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').show();
                         $('#TMA_attendance_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
@@ -387,6 +396,7 @@
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').hide();
                         $('#TMA_attendance_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
@@ -423,6 +433,7 @@
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -456,6 +467,7 @@
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').hide();
                         $('#TMA_attendance_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
@@ -492,6 +504,7 @@
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -526,6 +539,7 @@
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -561,11 +575,12 @@
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').hide();
                         console.log(goto);
                         if(goto !="" && goto!="dashboard")
                             $("#box").load(goto);
                         break;
-                        case 27:             //Assessment Management
+                    case 27:             //Assessment Management
                         $('#Home').hide();
 						$('#Mobilization_Menu').hide();
                         $('#Registration_Menu').hide();
@@ -597,8 +612,46 @@
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').hide();
                         console.log(goto);
                         if(goto !="" && goto!="dashboard")
+                            $("#box").load(goto);
+                        break;
+                    case 38:             //Project Coordinator
+                        $('#Home').show();
+						$('#Mobilization_Menu').show();
+                        $('#Registration_Menu').show();
+                        $('#Enrollment_Menu').show();
+                        $('#Candidate_Menu').show();
+                        $('#Assessment_Menu').show();
+                        $('#Content_Menu').show();
+                            $('#AnchorSectors').hide();
+                            $('#AnchorQP').show();
+                            $('#AnchorCourses').show();
+                        $('#Master_Menu').show();
+                            $('#AnchorClients').hide();
+                            $('#AnchorContracts').hide();
+                            $('#Project_Menu').show();    
+                                $('#AnchorProjects').show();  
+                                $('#AnchorSubProjects').show();   
+                                $('#AnchorBatch').show();
+                            $('#AnchorCenters').show();
+                            $('#AnchorUsers').show();
+                            $('#AnchorTrainers').show();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').hide();
+                            $('#AnchorSalesDashboard').hide();
+                            $('#AnchorOperationDashboard').hide();
+                        $('#Report_Menu').show();
+                            $('#ECP_report').show();
+                            $('#Qp_wise_report').hide();
+                            $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').show();
+                        $('#TMA_attendance_Menu').hide();
+                        $('#TMA_content').hide();
+                            $('#tma_report_filter').show();
+                        if(goto !="")
                             $("#box").load(goto);
                         break;
                 }
@@ -837,6 +890,9 @@
                                                  <li id="mobilizer_productivity_report">
                                                      <a href="/mobilizer_productivity_report" class="active">Mobilizer Productivity Report<div class="button"></div></a>
                                                  </li>
+                                                 <li id="TrainerProductivityReport">
+                                                    <a href="/TrainerProductivityReport" class="active">Trainer Productivity Report<div class="button"></div></a>
+                                                </li>
                                                  <li id="Ops_Productivity_Report">
                                                      <a href="/ops_productivity_report" class="active">Ops Productivity Report<div class="button"></div></a>
                                                  </li>
@@ -870,7 +926,7 @@
                                         </ul>
                                     </li>
                                     <li  id="SL4Report_Menu" style="display:none">
-                                        <a href="/SL4Report" id="SL4Report" class="active">SL4 Customer wise report<div class="button"></div></a>
+                                        <a href="/SL4Report" id="SL4Report" class="active">Customer wise MIS report<div class="button"></div></a>
                                     </li>
                                     <li  id="NationalReport_Menu" style="display:none">
                                         <a href="/NationalReport" id="NationalReport" class="active">Nation Wise Report<div class="button"></div></a>

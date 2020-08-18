@@ -22,6 +22,7 @@ import filter_tma_report
 import filter_tma_report_new
 import SL4Report_filter_new
 import Naton_Wise_Report
+import trainer_prodctivity_report
 import candidate_report
 import user_subproject_download
 import batch_report
@@ -1514,10 +1515,12 @@ class add_client_details(Resource):
             IndustryType=request.form['IndustryType']
             CategoryType=request.form['CategoryType']
 
+            POC_details=request.form['POC_details']
+            #print(POC_details)
             user_id=g.user_id
             is_active=request.form['isactive']
             client_id=g.client_id
-            return Master.add_client(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType)
+            return Master.add_client(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType, POC_details)
 
 class get_client_details(Resource):
     @staticmethod
@@ -5208,6 +5211,7 @@ class GetUsersBasedOnSubProject(Resource):
         if request.method=='GET':
             sub_project_id=request.args.get('sub_project_id',0,type=int)
             response={"Users":Master.GetUsersBasedOnSubProject(sub_project_id)}
+            print(response)
             return response
 api.add_resource(GetUsersBasedOnSubProject,'/GetUsersBasedOnSubProject')
 
@@ -5242,9 +5246,9 @@ class GetUsersBasedOnRole(Resource):
     def get():
         if request.method=='GET':
             user_role_id=request.args.get('user_role_id',0,type=int)
-            print(user_role_id)
+            #print(user_role_id)
             response={"Users":Master.GetUsersBasedOnRole(user_role_id)}
-            print(response)
+            #print(response)
             return response
 api.add_resource(GetUsersBasedOnRole,'/GetUsersBasedOnRole')
 
@@ -5481,7 +5485,6 @@ class submit_candidate_updated(Resource):
             device_model = str(request.form['device_model'])
             imei_num = str(request.form['imei_num'])
             android_version = str(request.form['android_version'])
-            
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
                 if cand_stage==1:
                     out = Database.get_submit_candidate_mobi(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
@@ -7308,7 +7311,7 @@ class updated_new_SL4Report(Resource):
                 to_date = request.form["to_date"]
                 Customers = request.form["Customers"]
                 
-                report_name = "SL4_Customer_wise_report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                report_name = "Customer_wise_MIS_report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
                 resp = SL4Report_filter_new.create_report(from_date, to_date, Customers, user_id, user_role_id, report_name)
                 return resp
                 
@@ -7365,6 +7368,68 @@ class updated_new_NationalReport(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(updated_new_NationalReport,'/updated_new_NationalReport')
 
+############################## Trainer Productivity report 
+@app.route("/TrainerProductivityReport_page")
+def TrainerProductivityReport_page():
+    if g.user:
+        return render_template("Reports/Trainer_Productivity_report.html")
+    else:
+        return redirect("/")
+
+@app.route("/TrainerProductivityReport")
+def TrainerProductivityReport():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="TrainerProductivityReport_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class download_TrainerProductivityReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:     
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
+                region_ids = request.form['region_ids']
+                t_status  = request.form['t_status']
+                trainer_ids = request.form['trainer_ids']
+                from_date = request.form['from_date']
+                to_date  = request.form['to_date']
+                
+                report_name = "Trainer_Productivity_Report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                resp = trainer_prodctivity_report.create_report(user_id, user_role_id, region_ids, t_status, trainer_ids, from_date, to_date, report_name)
+                return resp
+                
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(download_TrainerProductivityReport,'/download_TrainerProductivityReport')
+
+class AllTrainerBasedOnUserRegions(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=[]
+            try:
+                RegionIds=request.args.get('RegionIds','',type=str)
+                status=request.args.get('status','',type=str)
+                UserId=request.args.get('user_id',0,type=int)
+                UserRoleId=request.args.get('user_role_id',0,type=int)
+                #print((RegionIds, status, UserId,UserRoleId))
+                response=Database.AllTrainerBasedOnUserRegions(RegionIds, status, UserId,UserRoleId)
+                return {'Trainer':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(AllTrainerBasedOnUserRegions,'/AllTrainerBasedOnUserRegions')
+
+class GetCustomerSpoc(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            customer_id=request.args.get('customer_id',0,type=int)
+            response={"SPOC":Master.GetCustomerSpoc(customer_id)}
+            return response
+api.add_resource(GetCustomerSpoc,'/GetCustomerSpoc')
 
 class download_candidate_data(Resource):
     @staticmethod
@@ -7372,29 +7437,38 @@ class download_candidate_data(Resource):
         if request.method=='POST':
             try:
                 #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
-                
                 candidate_id = request.form["candidate_id"]
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
-                status = request.form["status"]
+                project_types = request.form["project_types"]
                 customer = request.form["customer"]
                 project = request.form["project"]
                 sub_project = request.form["sub_project"]
                 batch = request.form["batch"]
                 region = request.form["region"]
                 center = request.form["center"]
-                center_type = request.form["center_type"]
+                created_by = request.form["created_by"]
                 Contracts = request.form["Contracts"]
                 candidate_stage = request.form["candidate_stage"]
                 from_date = request.form["from_date"]
                 to_date = request.form["to_date"]
                 
-                resp = Report.DownloadCandidateData(candidate_id, user_id, user_role_id, status, customer, project, sub_project, batch, region, center, center_type, Contracts, candidate_stage, from_date, to_date)
+                resp = Report.DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date)
                 
                 return resp
             except Exception as e:
                 return {"exceptione":str(e)}
 api.add_resource(download_candidate_data,'/download_candidate_data')
 
+class GetPOCForCustomer(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            customer_id=request.args.get('customer_id',0,type=int)
+            response={"POC":Master.GetPOCForCustomer(customer_id)}
+            return response
+api.add_resource(GetPOCForCustomer,'/GetPOCForCustomer')
+
 if __name__ == '__main__':
+    #app.run(host="0.0.0.0", port=int("80"), debug=True)
     app.run(debug=True)

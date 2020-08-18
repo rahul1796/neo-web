@@ -11,7 +11,7 @@
                 // $('.dropdown-search-filter').select2();
                 //    { placeholder:''}
                 // 
-                
+                var POC_Object='123';
                 LoadFunding_Resourcesdl();
                 LoadCustomer_Groupdl();
                 Loadddlindustrytypedl();
@@ -39,6 +39,8 @@
                                         $('#isactive').prop('checked',true);
                                     else
                                         $('#isactive').prop('checked',false);
+
+                                    GetCustomerSpoc('{{client_id}}');
                                }
                            } 
                         },
@@ -48,6 +50,7 @@
                     });
                 }
             });
+            POC_Object=[];
             
             function LoadCustomer_Groupdl(){
             var URL=$('#hdn_web_url').val()+ "/Get_all_Customer_Group"
@@ -192,7 +195,11 @@
             }
 
             function add_popup_message(){
-                var URL=$('#hdn_web_url').val()+ "/add_client_details";
+                if (POC_Object.length<=0){
+                    alert('Please select atleast one POC');
+                }
+                else{
+                    var URL=$('#hdn_web_url').val()+ "/add_client_details";
                     $.ajax({
                         type:"POST",
                         url:URL,
@@ -204,6 +211,8 @@
                             "CustomerGroup" : $('#ddl_customer_group').val(),
                             "IndustryType" : $('#ddlindustrytype').val(),
                             "CategoryType" : $('#ddl_category_type').val(),
+
+                            "POC_details":create_json(),
 
                             "isactive" : $('#isactive').prop('checked')
                         },
@@ -234,10 +243,169 @@
                             alert('error');
                         }
                     });
+                }
             }
+            function AddMilestone(id)
+                {
+                    POC_Object.push(parseInt(id));
+                    //console.log(POC_Object);
+
+                    $('#hdn_home_total_SPOC').val(parseInt(id)+1);
+
+                    let varHtml='';
+                    varHtml+='<div id="div_POC_'+id+'">';
+                    varHtml+='<div class="form-group">';
+                    varHtml+='<div class="row">';
+                    if (id==0){
+                        varHtml+='<div class="col-lg-6"> <label for="POC_Name_'+id+'">POC Name * :</label> </div>';
+                    }
+                    else{
+                        varHtml+='<div class="col-lg-6"> <label for="POC_Name_'+id+'">POC Name :</label> </div>';
+                    }
+                    varHtml+='<div class="col-lg-6"> <input type="text" maxlength="25" class="form-control" name="POC_Name_'+id+'" id="POC_Name_'+id+'" required placeholder="POC Name"> </div>';
+                    varHtml+= '</div>';
+                    varHtml+= '</div>';
+
+                    varHtml+='<div class="form-group">';
+                    varHtml+='<div class="row">';
+                    if (id==0){
+                        varHtml+='<div class="col-lg-6"> <label for="POC_Number_'+id+'">Mobile Number * :</label> </div>';    
+                    }
+                    else{
+                        varHtml+='<div class="col-lg-6"> <label for="POC_Number_'+id+'">Mobile Number :</label> </div>';
+                    }
+
+                    varHtml+='<div class="col-lg-6"> <input type="tel" pattern="[1-9]{1}[0-9]{9}" class="form-control" name="POC_Number_'+id+'" id="POC_Number_'+id+'" required oninvalid="this.setCustomValidity(\'please enter valid mobile number\')" placeholder="Mobile Number"> </div>';
+                    varHtml+= '</div>';
+                    varHtml+= '</div>';
+
+                    varHtml+='<div class="form-group">';
+                    varHtml+='<div class="row">';
+                    if (id==0){
+                        varHtml+='<div class="col-lg-6"> <label for="POC_email_'+id+'">POC Email * :</label> </div>';    
+                    }
+                    else{
+                        varHtml+='<div class="col-lg-6"> <label for="POC_email_'+id+'">POC Email :</label> </div>';
+                    }
+                    varHtml+='<div class="col-lg-6"> <input type="email" class="form-control" name="POC_email_'+id+'" id="POC_email_'+id+'" required placeholder="POC Email"> </div>';
+                    varHtml+= '</div>';
+                    varHtml+= '</div>';
+
+                    varHtml+='<div class="form-group">';
+                    varHtml+='<div class="row">';
+                    if (id==0){
+                        varHtml+='<div class="col-lg-6"> <label for="POC_designation_'+id+'">POC Designation :</label> </div>';    
+                    }
+                    else{
+                        varHtml+='<div class="col-lg-6"> <label for="POC_designation_'+id+'">POC Designation :</label> </div>';
+                    }
+                    varHtml+='<div class="col-lg-6"> <input type="text" maxlength="25" class="form-control" name="POC_designation_'+id+'" id="POC_designation_'+id+'" placeholder="POC Designation"> </div>';
+                    varHtml+= '</div>';
+                    varHtml+= '</div>';
+                    
+                    varHtml+='  <div class="form-group col-lg-12" style="float:right">';
+                    varHtml+='<button type="button" id="POC_del_btn_'+id+'" data-value="'+id+'" class="btn btn-danger waves-effect waves-light" style="float:right" onclick="removePOC(event)"><i class="mdi mdi-close"></i></button>';
+                    varHtml+= '</div>';
+                
+                    varHtml+= '</div>';
+                    varHtml+= '<br>'
+                    $('#div_POC_details').append(varHtml);
+                }
+
+                function removePOC(e) {
+                    let isBoss = confirm("Are you sure you want to remove POC?");
+                    if(isBoss){
+                        let position = e.currentTarget.getAttribute('data-value');
+                        $('#div_POC_'+position).remove();
+                        let ax= POC_Object.indexOf(parseInt(position))
+                        if (ax != -1){
+                            console.log(ax)
+                            POC_Object.splice(ax, 1);
+                        }
+                    }
+                    return false;
+                }
+                function create_json(){
+                    var varJson='';
+                    $('#div_POC_details').children('div').each(function(){
+                        let name, number, email, designation;
+                        var vardiv=$(this).children('div'); 
+                        $(vardiv).children('div').each(function(){
+                            var chi=$(this).children('div');  
+                            var chi2=$(chi).children('input'); 
+                            var id = $(chi2).attr('id').toString();
+                            switch(id.substring(0, id.lastIndexOf("_") + 1))
+                            {
+                                case 'POC_Name_':
+                                    name=$('#'+id).val();
+                                    break;
+                                case 'POC_Number_':
+                                    number=$('#'+id).val();
+                                    break;
+                                case 'POC_email_':
+                                    email=$('#'+id).val();
+                                    break;
+                                case 'POC_designation_':
+                                    designation =$('#'+id).val();
+                                    break;
+                            }
+                        });
+                        varJson+='{"name":"'+name+'" ,"number":"'+number+'" ,"email" :"'+email+'" ,"designation" :"'+designation+'"},';
+                    });
+                    varJson='[ ' + varJson.substring(0, varJson.length - 1) + ' ]';
+                    console.log(varJson);
+                    return varJson;
+                }
+
+                function GetCustomerSpoc(customer_id)
+                {
+                    var URL=$('#hdn_web_url').val()+ "/GetCustomerSpoc"
+                        $.ajax({
+                        type:"GET",
+                        url:URL,
+                        async:false,        
+                        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                        datatype:"json",
+                        data:
+                        {   
+                            "customer_id":customer_id
+                        },
+                        success: function (data){
+
+
+
+                            if(data.SPOC != null)
+                            {
+                                var count=data.SPOC.length;
+                                if( count> 0)
+                                {   
+                                    $('#div_POC_details').empty();
+                                    for(var i=0;i<count;i++)
+                                    {   
+                                        AddMilestone(i);
+                                        $('#POC_Name_'+i).val(data.SPOC[i].Contact_Person_Name);
+                                        $('#POC_Number_'+i).val(data.SPOC[i].Number);
+                                        $('#POC_email_'+i).val(data.SPOC[i].Email_Id);
+                                        $('#POC_designation_'+i).val(data.SPOC[i].Designation);
+                                    }
+                                }
+                                else{
+                                    alert('no poc data available')
+                                }
+                            }
+                        },
+                        error:function(err)
+                        {
+                            alert('Error while fetching milestone data');
+                            return false;
+                        }
+                    });
+                    return false;
+                }
         </script>
                 <div class="container-fluid">
                     <form action="javascript:add_popup_message();">
+                        <input type="hidden" id="hdn_home_total_SPOC" name="hdn_home_total_SPOC" value='0'>
                     <!-- start page title -->
                     <div class="row">
                         <div class="col-12">
@@ -344,6 +512,21 @@
                                     
                                     <div class="form-group">
                                         <div class="row">
+                                            <div class="col-lg-1">
+                                                <a onclick="AddMilestone($('#hdn_home_total_SPOC').val());" class="btn" style="cursor:pointer; margin-left: -13px; margin-top: -9px;"><i title="Add Point of Contact" class="fas fa-plus" ></i></a>
+                                                <!-- <button type="button" class="btn btn-secondary btn-rounded" 
+                                                id="btnAddMilestones" onclick="AddMilestone();">Add Customer Contact</button> -->
+                                            </div>
+                                            <div class="col-lg-6" style="margin-left: -66px;">
+                                                Add Point of Contact
+                                            </div>
+                                        </div>                                     
+                                    </div>
+                                    <div id="div_POC_details">
+                            
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
                                             <div class="col-lg-6">
                                                 <label>Is Active :</label>
                                             </div>
@@ -355,8 +538,7 @@
                                                 </div>
                                             </div>   
                                         </div>                                     
-                                    </div>    
-    
+                                    </div> 
                                     <div class="form-group mb-0">
                                         <button class="btn btn-primary" type="submit">Save</button>
                                     </div>
@@ -366,7 +548,6 @@
                         </div> <!-- end col-->
                     </div>
                     <!-- end row-->
-    
                 </form>
                 
                 </div> <!-- end container -->
