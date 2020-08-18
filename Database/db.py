@@ -4991,7 +4991,10 @@ SELECT					cb.name as candidate_name,
             for child in root:
                 data = child.attrib
                 out.append(data['assign_batch'])
-                query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,data['mobilization_type'],1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
+                if 'mobilization_type' in data:
+                    query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,data['mobilization_type'],1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
+                else:
+                    query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1,1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
                 query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['presAddrOne'],data['permAddrOne'],data['highQuali'],data['candStream'],data['compKnow'],data['techKnow'],data['houseIncome'],data['bankName'],data['accNum'],user_id,data['cand_id'])
                 query += '\n' + quer3.format(data['presAddrTwo'],data['presVillage'],data['presPanchayat'],data['presTaluk'],data['permAddrTwo'],data['permVillage'],data['permPanchayat'],data['permTaluk'],data['instiName'],data['university'],data['yrPass'],data['percentage'],data['branchName'],data['ifscCode'],data['accType'],data['bankCopy'],user_id,data['cand_id'])
                 intervention_category="SAE"
@@ -5006,7 +5009,6 @@ SELECT					cb.name as candidate_name,
                 if 'mobilization_type' in data:
                     if int(data['mobilization_type'])==2:
                         she_query += '\n' + update_query_she.format(data['aadhar_address'],data['family_members'],data['rented_or_own'],data['size_of_house'],data['ration_card'],data['tv'],data['refrigerator'],data['washing_machine'],data['ac_cooler'],data['car'],data['kids_education'],data['medical_insurance'],data['life_insurance'],data['others'],data['educational_qualification'],data['age_proof'],data['signed_mou'],data['mou_signed_date'],data['kit_given_date'],data['head_of_household'],data['farm_land'],data['acres_of_land'],int(user_id),int(data['cand_id']))
-                             
             curs.execute(query)
             curs.commit()
             if she_query!="":
@@ -5029,7 +5031,6 @@ SELECT					cb.name as candidate_name,
             response_data=[]
             intervention_string =','.join(map(str, d))
             response_query = 'SELECT c.candidate_id as Candidate_Id,c.first_name as First_Name,COALESCE(middle_name,\'\') as Middle_Name,COALESCE(last_name,\'\') as Last_Name,c.primary_contact_no as Mobile_Number,cis.intervention_value as Enrollment_Id FROM candidate_details.tbl_candidate_interventions ci LEFT JOIN candidate_details.tbl_candidates as c on c.candidate_id=ci.candidate_id LEFT JOIN candidate_details. tbl_map_candidate_intervention_skilling as cis on cis.intervention_id=ci.candidate_intervention_id where ci.candidate_intervention_id IN ('+intervention_string+');'
-            print(response_query)
             curs.execute(response_query)
             columns = [column[0].title() for column in curs.description]
             for row in curs:
