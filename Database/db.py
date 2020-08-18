@@ -4815,7 +4815,7 @@ SELECT					cb.name as candidate_name,
             update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type={},identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',created_by='{}',aadhar_image_name='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
             '''
             quer3 = '''
-            update candidate_details.tbl_candidates set isFresher={}, project_type={},created_by='{}',is_active=1 where candidate_id='{}';
+            update candidate_details.tbl_candidates set isFresher={}, project_type={},created_by='{}',is_active=1,created_on=getdate() where candidate_id='{}';
             '''
             
             insert_query_she='''
@@ -6241,8 +6241,8 @@ SELECT					cb.name as candidate_name,
         curs = con.cursor()
         sheet1=[]
         sheet1_columns=[]
-        sql = 'exec [candidate_details].[sp_get_candidate_data] ?,?,?,?,?,?,?,?,?,?'
-        values = (customer,Contracts,project, sub_project, batch,project_types,created_by,from_date,to_date,candidate_stage)
+        sql = 'exec [candidate_details].[sp_get_candidate_data] ?,?,?,?,?,?,?,?,?,?,?,?'
+        values = (customer,Contracts,project, sub_project, batch,project_types,created_by,from_date,to_date,candidate_stage ,user_id, user_role_id)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]  
         data = curs.fetchall()
