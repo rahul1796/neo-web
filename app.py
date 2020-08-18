@@ -7460,6 +7460,15 @@ class download_candidate_data(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(download_candidate_data,'/download_candidate_data')
 
+class GetPOCForCustomer(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            customer_id=request.args.get('customer_id',0,type=int)
+            response={"POC":Master.GetPOCForCustomer(customer_id)}
+            return response
+api.add_resource(GetPOCForCustomer,'/GetPOCForCustomer')
+
 if __name__ == '__main__':
     #app.run(host="0.0.0.0", port=int("80"), debug=True)
     app.run(debug=True)

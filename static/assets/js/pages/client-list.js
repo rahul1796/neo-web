@@ -177,6 +177,18 @@ function LoadTable()
             },
             { "data": "Client_Name" },
             { "data": "Client_Code" },
+            { "visible":true,
+            "data": function (row, type, val, meta) {
+                var varButtons = ""; 
+                if(row.Poc_Count=="" || row.Poc_Count==0)
+                    varButtons=row.Poc_Count;
+                else
+                {
+                    varButtons += '<a onclick="GetPOC(\'' + row.Client_Id + '\',\''+row.Client_Name+ '\')"  style="color:blue;cursor:pointer" >' + row.Poc_Count + '</a>';
+                }
+                return varButtons;
+                }
+            },
             { "data": "Funding_Source_Name" },
             { "data": "Customer_Group_Name" },
             { "data": "Category_Type_Name" },
@@ -203,3 +215,67 @@ function EditClientDetail(ClientId)
     $('#form1').submit();
     
 }
+
+function GetPOC(customer_id, client_name)
+{
+    console.log(customer_id)
+    $('#HdCustomer').text(client_name);
+    var URL=$('#hdn_web_url').val()+ "/GetPOCForCustomer?customer_id="+customer_id;
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            varHtml='';
+            $("#tbl_POC_Cusgtomer").dataTable().fnDestroy();
+            $("#tbl_POC_Cusgtomer tbody").empty();
+            if(!jQuery.isEmptyObject(data))
+            {   if (data.POC != null){
+                    count=data.POC.length;
+                    if (count>0)
+                    {   varHtml='';
+                        console.log(count);
+                        for(var i=0;i<count;i++)
+                        {
+                            td_open= '  <td style="text-align:center;">' ;
+                            td_close=   '</td>';       
+                            varHtml+='<tr>';
+                            varHtml+='  <td style="text-align:center;">'+ data.POC[i].S_No +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.POC[i].Contact_Person_Name +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.POC[i].Email_Id +'</td>';                    
+                            varHtml+='  <td style="text-align:center;">'+ data.POC[i].Number +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.POC[i].Designation +'</td>';     
+                            varHtml+='</tr>';                            
+                        }
+                        $("#tbl_POC_Cusgtomer tbody").append(varHtml);
+                            $("#tbl_POC_Cusgtomer").DataTable();
+                            $('#divPOCList').modal('show');
+                            varHtml='';
+                    }
+                    else
+                    {
+                        varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                        $("#tbl_POC_Cusgtomer tbody").append(varHtml);
+                        $('#divPOCList').modal('show');
+                    } 
+                    
+                }
+            }
+            else
+            {
+                varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                $("#tbl_POC_Cusgtomer tbody").append(varHtml);
+                $('#divPOCList').modal('show');
+            }   
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+} 
