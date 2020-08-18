@@ -289,3 +289,5 @@ class Master:
         popupMessage = {"PopupMessage": Database.cancel_actual_batch(user_id,actual_batch_id,cancel_reason)}
         return popupMessage
 
+    def GetPOCForCustomer(customer_id):
+        return Database.GetPOCForCustomer(customer_id)
