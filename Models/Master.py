@@ -87,8 +87,8 @@ class Master:
     def client_list(user_id,user_role_id,client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_sources,customer_groups,category_type_ids):
         client_l = Database.client_list(user_id,user_role_id,client_id,Is_Active,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, funding_sources,customer_groups,category_type_ids)
         return client_l
-    def add_client(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType):
-        popupMessage = {"PopupMessage": Database.add_client_details(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType)}
+    def add_client(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType, POC_details):
+        popupMessage = {"PopupMessage": Database.add_client_details(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType, POC_details)}
         return popupMessage
     def get_client(glob_client_id):
         indi_client={"ClientDetail":Database.get_client_detail(glob_client_id)}
@@ -281,6 +281,13 @@ class Master:
     def cancel_planned_batch(user_id,planned_batch_code,cancel_reason):
         popupMessage = {"PopupMessage": Database.cancel_planned_batch(user_id,planned_batch_code,cancel_reason)}
         return popupMessage
+
+    def GetCustomerSpoc(customer_id):
+        return Database.GetCustomerSpoc(customer_id)
+
     def cancel_actual_batch(user_id,actual_batch_id,cancel_reason):
         popupMessage = {"PopupMessage": Database.cancel_actual_batch(user_id,actual_batch_id,cancel_reason)}
         return popupMessage
+
+    def GetPOCForCustomer(customer_id):
+        return Database.GetPOCForCustomer(customer_id)

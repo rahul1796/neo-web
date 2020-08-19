@@ -1536,11 +1536,11 @@ class Database:
         cur.close()
         con.close()
         return content
-    def add_client_details(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType):
+    def add_client_details(client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType, POC_details):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_client] ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType)
+        sql = 'exec	[masters].[sp_add_edit_client] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (client_name,client_code,user_id,is_active,client_id,FundingSource, CustomerGroup, IndustryType, CategoryType, POC_details)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -4486,8 +4486,7 @@ SELECT					cb.name as candidate_name,
         sql = 'exec [masters].[sp_get_users_based_on_sub_project]  ?'
         values = (sub_project_id,)
         cur2.execute(sql,(values))
-        #print(values)
-        #print(cur2.description)
+        
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
             for i in range(len(columns)):
@@ -6255,3 +6254,56 @@ SELECT					cb.name as candidate_name,
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
         
 
+    def AllTrainerBasedOnUserRegions(RegionIds, status, UserId,UserRoleId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_get_trainer_based_on_user_regions] ?, ?, ?, ?'
+        values = (RegionIds, status, UserId,UserRoleId)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i] 
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h.copy())
+        cur.commit()
+        cur.close()
+        con.close()
+        return response
+
+    def GetCustomerSpoc(customer_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_customer_spoc] ?'  
+        values=(customer_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]      
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    def GetPOCForCustomer(customer_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_POC_for_Customer]  ?'
+        values = (customer_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+        
