@@ -53,10 +53,11 @@
         return false;
     }
     function DownloadTableBasedOnSearch(){
-        if($('#FromDate').val()=='' || $('#ToDate').val()==''){
-		alert('Please Select both Dates');
-		}
-        else if($('#ddlCustomer').val().toString()==''){
+        // if($('#FromDate').val()=='' || $('#ToDate').val()==''){
+		// alert('Please Select both Dates');
+		// }
+        // else 
+        if($('#ddlCustomer').val().toString()==''){
 		alert('Please Select Customer');
 		}
 		else{            
@@ -151,12 +152,12 @@
                         </select>
                     </div>
                     <div class="col-lg-4">
-                        <label for="FromDate" class="mr-2">From Date*</label>
+                        <label for="FromDate" class="mr-2">From Date</label>
                         <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
                         ClientIdMode="static" placeholder="From Date">
                     </div>
                     <div class="col-lg-4">
-                        <label for="ToDate" class="mr-2">To Date*</label>
+                        <label for="ToDate" class="mr-2">To Date</label>
                         <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
                         ClientIdMode="static" placeholder="To Date">
                     </div>
