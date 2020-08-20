@@ -105,7 +105,6 @@ class Database:
         cur.close()
         con.close()
         practiceforuser={'Pratices': prac}
-        print(practiceforuser)
         return practiceforuser
     def CourseBasedOnUserPractice(user_id,practice_id):
         courses =[]
@@ -121,7 +120,7 @@ class Database:
             #courseid = row[4].split(",")
             #oursename = row[5].split(",")
             #lent=len(courseid)
-            print(course_json)
+            #print(course_json)
         for course in course_json:
             h = { 'Course_Id': course[0], 'Course_Name':course[1]}
             courses.append(h)
@@ -458,7 +457,7 @@ class Database:
         cur = con.cursor()
         sql = "exec	[masters].[sp_GetsubprojectDetails] ?"
         values = (glob_project_id,)
-        print(values)
+    
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -557,6 +556,19 @@ class Database:
         cur.close()
         con.close()
         return bu
+    def Get_all_Sponser():
+        sponser = []
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'SELECT sponser_id, sponser_name FROM [masters].[tbl_sponser] where is_active=1;'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            sponser.append(h)
+        cur.close()
+        con.close()
+        return sponser
     def get_all_Cluster_Based_On_Region(region_id):
         cluster = []
         con = pyodbc.connect(conn_str)
@@ -569,7 +581,7 @@ class Database:
             cluster.append(h)
         cur.close()
         con.close()
-        print(cluster)
+        #print(cluster)
         return cluster
     def GetCountry():
         countries = []
@@ -941,12 +953,13 @@ class Database:
 
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
+        print(columns)
         record="0"
         fil="0"
         for row in cur:
-            record=row[len(columns)-1]
-            fil=row[len(columns)-2]
-            for i in range(len(columns)-2):
+            record=row[len(columns)-2]
+            fil=row[len(columns)-1]
+            for i in range(len(columns)-1):
                 h[columns[i]]=row[i]
             d.append(h.copy())
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
@@ -1187,6 +1200,23 @@ class Database:
         else:
             msg={"message":"Error fetching batch data for Droping"}
         return msg
+    def tag_sponser_candidate(skilling_ids,sponser_ids,user_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[candidate_details].[tag_sponser_candidate] ?, ?, ?'
+        values = (skilling_ids,sponser_ids,user_id)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Candidate(s) Tagged To Sponser"}
+        else:
+            msg={"message":"Error in tagging"}
+        return msg
+    
     def untag_users_from_sub_project(user_ids,sub_project_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -1248,7 +1278,6 @@ class Database:
         cur = con.cursor()
         sql = 'exec	[users].[sp_tag_user_roles] ?, ?, ?,?,?'
         values = (login_user_id,user_id,neo_role,jobs_role,crm_role)
-        print(values)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[0]
@@ -1346,7 +1375,7 @@ class Database:
         cur = con.cursor()
         sql = 'exec [reports].[sp_get_user_sub_project_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
         values = (customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
-        print(values)
+        #print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -3667,7 +3696,7 @@ SELECT					cb.name as candidate_name,
         cur2 = con.cursor()
         sql = 'exec [batches].[sp_get_batch_details_for_assessment]  ?'
         values = (batch_code,)
-        print(values)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -4268,14 +4297,13 @@ SELECT					cb.name as candidate_name,
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            for i in range(len(columns)-1):
+            for i in range(len(columns)):
                 h[columns[i]]=row[i]
             #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
             response.append(h.copy())
         out = {"candidates":response,"batch_name":row[9],"center_name":row[10],"course_name":row[11]}
         cur.close()
         con.close() 
-        print(response)      
         return out
     def CandidateFamilyDetails(candidate_id):
         response = []
@@ -4816,6 +4844,8 @@ SELECT					cb.name as candidate_name,
             quer3 = '''
             update candidate_details.tbl_candidates set isFresher={}, project_type={},created_by='{}',is_active=1,created_on=getdate() where candidate_id='{}';
             '''
+
+           
             
             insert_query_she='''
             INSERT INTO [candidate_details].[tbl_candidate_she_details]
@@ -4949,7 +4979,9 @@ SELECT					cb.name as candidate_name,
                 ,[is_active])
             VALUES
             '''
-
+            quer7 = '''
+            DELETE FROM [candidate_details].[tbl_candidate_family_details]  where candidate_id='{}';
+            '''
             update_query_she='''
             UPDATE [candidate_details].[tbl_candidate_she_details] SET
                 [Address as per Aadhar Card (incl pin code)]='{}'
@@ -4996,6 +5028,7 @@ SELECT					cb.name as candidate_name,
                     query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1,1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
                 query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['presAddrOne'],data['permAddrOne'],data['highQuali'],data['candStream'],data['compKnow'],data['techKnow'],data['houseIncome'],data['bankName'],data['accNum'],user_id,data['cand_id'])
                 query += '\n' + quer3.format(data['presAddrTwo'],data['presVillage'],data['presPanchayat'],data['presTaluk'],data['permAddrTwo'],data['permVillage'],data['permPanchayat'],data['permTaluk'],data['instiName'],data['university'],data['yrPass'],data['percentage'],data['branchName'],data['ifscCode'],data['accType'],data['bankCopy'],user_id,data['cand_id'])
+                query += '\n' + quer7.format(data['cand_id'])
                 intervention_category="SAE"
                 if data['candProduct']=="Placement":
                     intervention_category="EAL"                

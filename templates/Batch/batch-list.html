@@ -282,6 +282,7 @@
             <tr>
                 <th>S No</th>
                 <th>DROP</th>
+                
                 <th>Candidate Id</th>
                 <th>Candidate Name</th>
                 <th>Course Name</th>
@@ -581,9 +582,36 @@
             </div>
         </div><!--/.modal-->
 
+       
+        <div id="sponser_modal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Tag Sponser</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body">
+                        
+                        <div class="row">
+							<div class="col-md-12">
+                                <label for="ddlSponser" class="mr-2">Select Sponsers:</label>
+                                <select class="form-control" id="ddlSponser" multiple>  <!-- onchange="LoadCenter();"-->>
+                                    <option selected="" value="">All</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal" >Back</button> 
+                        <button type="button" class="btn btn-secondary waves-effect" onclick="javascript:tagSponserSubmit();" type="submit">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->
         <div id="tr_candidate_detail" class="modal fade" role="dialog">
             <div class="modal-dialog modal-xl">
-                <div class="modal-content ">
+                <div class="modal-content " style="width: 1300px;">
                     <div class="modal-header">
                         <h4 class="modal-title">Candidate Details</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -642,7 +670,7 @@
                             <thead>
                                 <tr style="background-color: #f5f6f8;">
                                     <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
-                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Drop</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Select</th>
                                     <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Enrolment No</th>
                                     <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Candidate Name</th>
                                     <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Date Of Birth</th>
@@ -651,6 +679,8 @@
                                     <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Email</th>
                                     <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Father Name</th>
                                     <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Annual Income</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sponsers</th>
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -659,6 +689,7 @@
                         </table>	
                     </div>
                     <div class="modal-footer">
+                        <button type="button" id="btnSponser" class="btn btn-primary waves-effect" onclick="TagSponser()" style="display: none;">Tag Sponsers</button>
                         <button type="button" class="btn btn-primary waves-effect" onclick="DropCandidates()">Drop Candidates</button>
                         <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
                         <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->

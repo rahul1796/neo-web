@@ -899,7 +899,6 @@ class Report:
     
     def DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date):
         try:
-            print("hi")
             data=Database.DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.CandidateDataFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
@@ -930,8 +929,8 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
-            
-            
+            if(len(data['sheet1']) < 1):
+                return({'msg':'No Records Found For Selected Filters!', 'success':False})
             df_mob=df[['Candidate_Id', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 'Age', 'Primary_Contact_No', 'Secondary_Contact_No', 'Email_Id', 'Gender', 'Marital_Status', 'Caste', 'Disability_Status', 'Religion', 'Mother_Tongue', 'Occupation', 'Average_Annual_Income', 'Interested_Course', 'Product','Source_Of_Information','Mobilized_On','Mobilized_By']]
             df_mob.drop_duplicates(keep='first',inplace=True) 
             df_mob.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Mobilization') 
