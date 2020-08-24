@@ -4858,23 +4858,14 @@ SELECT					cb.name as candidate_name,
                 ,[Do you have a smart phone?]
                 ,[Are you willing to buy a smartphone?]
                 ,[Do you own two wheeler?]
-                ,[Do you know how to operate a smartphone?]
-                ,[Are you/ Have you been an entrepreneur before?]
-                ,[Do you have permission from your family to work outside?]
-                ,[Are you a member of SHG?]
                 ,[Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?]
-                ,[Are you willing to undergo online trainings and mentorship program for 6 month?]
-                ,[Are you willing to share details of customer, revenue, expenses frequently with LN?]
                 ,[Are you willing to work and sign the work contract with LN?]
-                ,[Are you willing to buy tools and consumables required to run your business?]
                 ,[Are you willing to adopt digital transactions in your business?]
-                ,[Are you willing to register your business in Social platforms like WhatsApp, Face book, Geo listing, Just dial etc.?]
                 ,[Have you availed any loan in the past?]
                 ,[Do you have any active loan?]
                 ,[Are you willing to take up a loan to purchase tools and consumables?]
                 ,[Are you covered under any health insurance?]
                 ,[Are you allergic to any chemicals and dust?]
-                ,[Will you able to wear mandatory PPEs during the work?]
                 ,[Are you willing to follow  Environment, Health and Safety Norms in your business?]
                 ,[Have you ever been subjected to any legal enquiry for Non ethical work/business?]
                 ,[Date of birth (age between 18 to 40)]
@@ -4906,7 +4897,7 @@ SELECT					cb.name as candidate_name,
                 if 'aadhaarNo' in data:
                     query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['aadhaarNo'],data['idType'],data['idNum'],data['idCopy'],data['empType'],data['prefJob'],data['relExp'],data['lastCtc'],data['prefLocation'],data['willTravel'],data['workShift'],data['bocwId'],data['expectCtc'],user_id,aadhar_image_name,data['cand_id'])
                 if int(data['mobilization_type'])==2:
-                    she_query="({},{},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),int(data['score']),int(data['result']),data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['operate_smart_phone'],data['entreprenuer_before'],data['permission_to_work_outside'],data['shg_member'],data['serve_as_she'],data['online_training_mentorship'],data['share_details_with_LN'],data['sign_contract_with_LN'],data['buy_tools_consumables'],data['adopt_digital_transaction'],data['register_business_in_social_platform'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['wear_mandatory_ppe'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['age_18_40'],data['eight_pass'],data['past_work_exp'],data['full_time_work'],data['trvl_within_panchayat'],data['bank_act'],user_id)
+                    she_query="({},{},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),int(data['score']),int(data['result']),data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['serve_as_she'],data['sign_contract_with_LN'],data['adopt_digital_transaction'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['age_18_40'],data['eight_pass'],data['past_work_exp'],data['full_time_work'],data['trvl_within_panchayat'],data['bank_act'],user_id)
                     insert_query_she += '\n'+she_query
                 query += '\n' + quer3.format(1 if data['isFresher']=='true' else 0,int(data['mobilization_type']) ,user_id,data['cand_id'])
                 
@@ -4994,8 +4985,7 @@ SELECT					cb.name as candidate_name,
                 ,[Refrigerator]='{}'
                 ,[Washing Machine]='{}'
                 ,[AC /Cooler]='{}'
-                ,[Car]='{}'
-                ,[Kids education]='{}'
+                ,[Car]='{}'                
                 ,[Medical Insurance]='{}'
                 ,[Life Insurance]='{}'
                 ,[Others]='{}'
@@ -5041,7 +5031,7 @@ SELECT					cb.name as candidate_name,
                     fam_query+="({},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',{},GETDATE(),1),".format(data['cand_id'],dt['memberSal'],dt['memberName'],dt['memberDob'],dt['memberAge'],dt['memberContact'],dt['memberEmail'],dt['memberGender'],dt['memberRelation'],dt['memberQuali'],dt['memberOccuptn'],user_id)
                 if 'mobilization_type' in data:
                     if int(data['mobilization_type'])==2:
-                        she_query += '\n' + update_query_she.format(data['aadhar_address'],data['family_members'],data['rented_or_own'],data['size_of_house'],data['ration_card'],data['tv'],data['refrigerator'],data['washing_machine'],data['ac_cooler'],data['car'],data['kids_education'],data['medical_insurance'],data['life_insurance'],data['others'],data['educational_qualification'],data['age_proof'],data['signed_mou'],data['mou_signed_date'],data['kit_given_date'],data['head_of_household'],data['farm_land'],data['acres_of_land'],int(user_id),int(data['cand_id']))
+                        she_query += '\n' + update_query_she.format(data['aadhar_address'],data['family_members'],data['rented_or_own'],data['size_of_house'],data['ration_card'],data['tv'],data['refrigerator'],data['washing_machine'],data['ac_cooler'],data['car'],data['medical_insurance'],data['life_insurance'],data['others'],data['educational_qualification'],data['age_proof'],data['signed_mou'],data['mou_signed_date'],data['kit_given_date'],data['head_of_household'],data['farm_land'],data['acres_of_land'],int(user_id),int(data['cand_id']))
             curs.execute(query)
             curs.commit()
             if she_query!="":
