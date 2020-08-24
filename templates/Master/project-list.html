@@ -13,6 +13,7 @@
         
         <script type="text/javascript">
         $(document).ready(function () {
+            $("#imgSpinner").hide();
     $("#tbl_projects").dataTable().fnDestroy();
 	$('.dropdown-search-filter').select2({
                 placeholder:''
@@ -138,7 +139,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-lg-6" >
+                                    <div class="col-lg-1" >
 										
                                         <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
                                         onclick="LoadTable()">Search</button>
@@ -146,6 +147,16 @@
                                         
                                         <!--button style="margin-top: 30px" type="button" class="btn btn-primary waves-effect waves-light submit" 
                                         onclick="Download()">Download</button-->
+                                    </div>
+                                    <div class="form-group col-lg-2">                                         
+                                        <a class="btn btn-primary" style="color:white;font-weight:bold;cursor:pointer;margin-top:30px; float: right;" onclick="DownloadTableBasedOnFilter()">Download</a>  <!-- float: right; -->
+                                        <a id="lnkDownload" style="display:none;"></a>
+                                    </div>
+                                    <div class="form-group col-lg-3">
+                                        <div id="imgSpinner">
+                                            <img src="static/assets/images/spinner1.gif" style="margin-top:30px; height:30px;display:inline-block;"/>
+                                            <label style="display:inline-block;">Please wait while downloading report...</label>
+                                        </div> 
                                     </div>
                                     <div class="col-lg-6" >                                        
                                         <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-primary">Create Project</a>
@@ -189,6 +200,8 @@
                                                     <th>BU</th>
                                                     <th>Product</th>
                                                     <th>Project Manager</th>
+                                                    <th>Start Date</th>
+                                                    <th>End Date</th>
                                                     <th>Status</th>
                                                 </tr>
                                             </thead>
