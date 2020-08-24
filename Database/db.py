@@ -374,6 +374,7 @@ class Database:
         cur.close()
         con.close()
         return content
+        
     def GetALLClient(user_id,user_role_id):
         client = []
         h={}
