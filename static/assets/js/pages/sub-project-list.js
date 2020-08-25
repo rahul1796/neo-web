@@ -371,6 +371,7 @@ function LoadTrainers(){
     });
     return false;
 }
+
 function LoadTable()
 {
     vartable1 = $("#tbl_projects").DataTable({
@@ -379,7 +380,8 @@ function LoadTable()
         "paging": true,
         "pageLength": 10,
         "sPaginationType": "full_numbers",
-        "scrollX": true,
+        "scrollX": false,
+        //"scrollX": true,
         "destroy": true,
         "processing": true,
         "language": { "processing": 'Loading..!' },
@@ -416,24 +418,6 @@ function LoadTable()
                 return varButtons;
                 }
             },
-
-            { "data": "Entity_Name"},
-            {
-                "data": function (row, type, val, meta) {
-                    var varButtons = ""; 
-                    if(row.Customer_Name=="")
-                        varButtons=row.Customer_Name;
-                    else
-                    {
-                        varButtons += '<a onclick="GetCustomerList(\'' + row.Customer_Id + '\')"  style="color:blue;cursor:pointer" >' + row.Customer_Name + '</a>';
-                    }
-                    
-                    return varButtons;
-                    }
-            },
-            
-            { "data": "Project_Code"},
-            { "data": "Project_Name"},
             { "data": "Sub_Project_Code"},
             { "data": "Sub_Project_Name"},
             { "visible":true,
@@ -488,6 +472,24 @@ function LoadTable()
                 return varButtons;
                 }
             },
+            { "data": "Entity_Name"},
+            {
+                "data": function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Customer_Name=="")
+                        varButtons=row.Customer_Name;
+                    else
+                    {
+                        varButtons += '<a onclick="GetCustomerList(\'' + row.Customer_Id + '\')"  style="color:blue;cursor:pointer" >' + row.Customer_Name + '</a>';
+                    }
+                    
+                    return varButtons;
+                    }
+            },
+            
+            { "data": "Project_Code"},
+            { "data": "Project_Name"},
+            
             { "data": "Project_Group_Name"},
             { "data": "Project_Type_Name"},
             { "data": "Block_Name"},
