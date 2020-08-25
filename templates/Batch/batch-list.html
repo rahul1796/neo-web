@@ -22,6 +22,10 @@
             .hidedialog {
                 display: none;
             }
+
+            .modal {
+                overflow-y:auto;
+            }
             </style>
 
             <script type="text/javascript">
@@ -603,15 +607,15 @@
                         
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal" >Back</button> 
-                        <button type="button" class="btn btn-secondary waves-effect" onclick="javascript:tagSponserSubmit();" type="submit">Submit</button>
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Back</button> 
+                        <button type="button" class="btn btn-primary waves-effect" onclick="javascript:tagSponserSubmit();" type="submit">Submit</button>
                     </div>
                 </div>
             </div>
         </div><!--/.modal-->
-        <div id="tr_candidate_detail" class="modal fade" role="dialog">
+        <div id="tr_candidate_detail" class="modal fade" role="dialog" style="padding-right: 20px;">
             <div class="modal-dialog modal-xl">
-                <div class="modal-content " style="width: 1300px;">
+                <div class="modal-content " style="width: 1200px;">
                     <div class="modal-header">
                         <h4 class="modal-title">Candidate Details</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -666,7 +670,7 @@
                                 </div> <!-- end card-->
                             </div>
                         </div> 
-                        <table id="tblcandidate_details" class="table table-bordered dt-responsive wrap w-100" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                        <table id="tblcandidate_details" class="table table-bordered dt-responsive wrap w-100" style="border-color: lightgray;width:100% !important;font-size: 10px;">
                             <thead>
                                 <tr style="background-color: #f5f6f8;">
                                     <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
