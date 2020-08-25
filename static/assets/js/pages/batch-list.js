@@ -867,6 +867,7 @@ function add_map_message(){
         function GetCandidate_Detail(batch_id,project_type){
             //alert(Project_Id)
             $('#con_close_modal').modal('hide');
+            $('#sponser_modal').modal('hide');                              
             
             var URL=$('#hdn_web_url').val()+ "/Getcandidatebybatch?batch_id="+batch_id;
             $.ajax({
@@ -1038,7 +1039,7 @@ function add_map_message(){
         else
         {
             $('#hdn_mdl_skilling_id').val(cands);
-            $('#map_cand').modal('hide');
+            $('#tr_candidate_detail').modal('hide');
             $('#con_close_modal').modal('show');
         }
     }
@@ -1124,8 +1125,8 @@ function add_map_message(){
                             icon:"success",
                             confirmButtonClass:"btn btn-confirm mt-2"
                             }).then(function(){
-                                $('#sponser_modal').modal('hide');
                                 GetCandidate_Detail($('#hdn_mdl_batch_id').val(),2)
+                               
                                 //window.location.href = '/batch';
                             });
                     },
