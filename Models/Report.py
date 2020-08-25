@@ -951,7 +951,7 @@ class Report:
             df_she.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='SHE') 
             worksheet3 = writer.sheets['SHE']
             default_column_she = ['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','MCL Result',
-                       'Date of birth (age between 18 to 40)' , 'Are you 8th Pass?','Do you have any work experience in the past?','Will you able to work full time or at least 6 hours a day?','Are you willing to travel from one place to another within panchayat?','Do you have a bank account?',
+                       'Date of birth (age between 18 to 40)' , 'Are you 8th Pass?','Do you have any work experience','Will you able to work full time or at least 6 hours a day?','Are you willing to travel for work ','Do you have a bank account?',
                        'Are You Able To Read And Write Local Language?', 'Do You Have A Smart Phone?', 'Are You Willing To Buy A Smartphone?', 'Do You Own Two Wheeler?', 
                        'Are You Willing To Serve The Community At This Time Of Covid-19 Pandemic As Sanitization & Hygiene Entrepreneurs (She)?', 
                        'Are You Willing To Work And Sign The Work Contract With Ln?', 'Are You Willing To Adopt Digital Transactions In Your Business?', 
