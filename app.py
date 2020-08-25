@@ -360,6 +360,12 @@ class get_all_BU(Resource):
     def get():
         if request.method == 'GET':
             return Master.get_all_BU()
+
+class Get_all_Sponser(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            return Master.Get_all_Sponser()
 class get_all_Cluster_Based_On_Region(Resource):
     @staticmethod
     def post():
@@ -395,6 +401,7 @@ class download_centers_list(Resource):
 api.add_resource(download_centers_list,'/download_centers_list')
 
 api.add_resource(get_all_BU,'/Get_all_BU')
+api.add_resource(Get_all_Sponser,'/Get_all_Sponser')
 api.add_resource(get_all_Cluster_Based_On_Region,'/Get_all_Cluster_Based_On_Region')
 api.add_resource(center_api.center_list, '/center_list')
 api.add_resource(center_api.all_center_type, '/AllCenterTypes')
@@ -1139,6 +1146,13 @@ class drop_edit_map_candidate_batch(Resource):
         user_id= request.form['user_id']
         drop_remark = request.form['drop_remark']
         return Batch.drop_edit_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark)
+class tag_sponser_candidate(Resource):
+    @staticmethod
+    def post():
+        skilling_ids=request.form['skilling_ids'] 
+        user_id= request.form['user_id']
+        sponser_ids = request.form['sponser_ids']
+        return Batch.tag_sponser_candidate(skilling_ids,sponser_ids,user_id)
 class untag_users_from_sub_project(Resource):
     @staticmethod
     def post():
@@ -1191,6 +1205,7 @@ api.add_resource(candidates_maped_in_batch,'/ALLCandidatesMapedInBatch')
 api.add_resource(candidates_enrolled_in_batch,'/ALLCandidatesEnrolledInBatch')
 api.add_resource(add_edit_map_candidate_batch,'/add_edit_map_candidate_batch')
 api.add_resource(drop_edit_map_candidate_batch,'/drop_edit_candidate_batch')
+api.add_resource(tag_sponser_candidate,'/tag_sponser_candidate')
 api.add_resource(untag_users_from_sub_project,'/untag_users_from_sub_project')
 api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
@@ -7468,6 +7483,63 @@ class GetPOCForCustomer(Resource):
             response={"POC":Master.GetPOCForCustomer(customer_id)}
             return response
 api.add_resource(GetPOCForCustomer,'/GetPOCForCustomer')
+
+class download_Project_list(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:  
+                entity = request.form['entity']
+                customer = request.form['customer']
+                p_group = request.form['p_group']
+                block = request.form['block']
+                practice = request.form['practice']
+                bu = request.form['bu']
+                product = request.form['product']
+                status = request.form['status']
+                
+                user_id = request.form['user_id']
+                user_role_id = request.form['user_role_id'] 
+                user_region_id = request.form['user_region_id']
+                
+                #Master.project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status)
+                report_name = "Project_List_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                resp = Report.project_list_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,report_name)
+                
+                return resp
+                
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(download_Project_list,'/download_Project_list')
+
+
+class download_sub_project_list(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:  
+                entity = request.form['entity']
+                customer = request.form['customer']
+                p_group = request.form['p_group']
+                block = request.form['block']
+                practice = request.form['practice']
+                bu = request.form['bu']
+                product = request.form['product']
+                status = request.form['status']            
+                user_id = request.form['user_id']
+                user_role_id = request.form['user_role_id'] 
+                user_region_id = request.form['user_region_id']
+                project=request.form['project']
+
+                #Master.sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project)
+                report_name = "Sub_Project_List_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                resp = Report.sub_project_list_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project,report_name)
+                
+                return resp
+                
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(download_sub_project_list,'/download_sub_project_list')
 
 if __name__ == '__main__':
     #app.run(host="0.0.0.0", port=int("80"), debug=True)

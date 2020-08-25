@@ -105,7 +105,6 @@ class Database:
         cur.close()
         con.close()
         practiceforuser={'Pratices': prac}
-        print(practiceforuser)
         return practiceforuser
     def CourseBasedOnUserPractice(user_id,practice_id):
         courses =[]
@@ -121,7 +120,7 @@ class Database:
             #courseid = row[4].split(",")
             #oursename = row[5].split(",")
             #lent=len(courseid)
-            print(course_json)
+            #print(course_json)
         for course in course_json:
             h = { 'Course_Id': course[0], 'Course_Name':course[1]}
             courses.append(h)
@@ -375,6 +374,7 @@ class Database:
         cur.close()
         con.close()
         return content
+        
     def GetALLClient(user_id,user_role_id):
         client = []
         h={}
@@ -458,7 +458,7 @@ class Database:
         cur = con.cursor()
         sql = "exec	[masters].[sp_GetsubprojectDetails] ?"
         values = (glob_project_id,)
-        print(values)
+    
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -557,6 +557,19 @@ class Database:
         cur.close()
         con.close()
         return bu
+    def Get_all_Sponser():
+        sponser = []
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'SELECT sponser_id, sponser_name FROM [masters].[tbl_sponser] where is_active=1;'
+        cur.execute(sql)
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            sponser.append(h)
+        cur.close()
+        con.close()
+        return sponser
     def get_all_Cluster_Based_On_Region(region_id):
         cluster = []
         con = pyodbc.connect(conn_str)
@@ -569,7 +582,7 @@ class Database:
             cluster.append(h)
         cur.close()
         con.close()
-        print(cluster)
+        #print(cluster)
         return cluster
     def GetCountry():
         countries = []
@@ -941,12 +954,13 @@ class Database:
 
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
+        print(columns)
         record="0"
         fil="0"
         for row in cur:
-            record=row[len(columns)-1]
-            fil=row[len(columns)-2]
-            for i in range(len(columns)-2):
+            record=row[len(columns)-2]
+            fil=row[len(columns)-1]
+            for i in range(len(columns)-1):
                 h[columns[i]]=row[i]
             d.append(h.copy())
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
@@ -1187,6 +1201,23 @@ class Database:
         else:
             msg={"message":"Error fetching batch data for Droping"}
         return msg
+    def tag_sponser_candidate(skilling_ids,sponser_ids,user_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[candidate_details].[tag_sponser_candidate] ?, ?, ?'
+        values = (skilling_ids,sponser_ids,user_id)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Candidate(s) Tagged To Sponser"}
+        else:
+            msg={"message":"Error in tagging"}
+        return msg
+    
     def untag_users_from_sub_project(user_ids,sub_project_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -1248,7 +1279,6 @@ class Database:
         cur = con.cursor()
         sql = 'exec	[users].[sp_tag_user_roles] ?, ?, ?,?,?'
         values = (login_user_id,user_id,neo_role,jobs_role,crm_role)
-        print(values)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[0]
@@ -1346,7 +1376,7 @@ class Database:
         cur = con.cursor()
         sql = 'exec [reports].[sp_get_user_sub_project_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
         values = (customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
-        print(values)
+        #print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -3667,7 +3697,7 @@ SELECT					cb.name as candidate_name,
         cur2 = con.cursor()
         sql = 'exec [batches].[sp_get_batch_details_for_assessment]  ?'
         values = (batch_code,)
-        print(values)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -4268,14 +4298,13 @@ SELECT					cb.name as candidate_name,
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            for i in range(len(columns)-1):
+            for i in range(len(columns)):
                 h[columns[i]]=row[i]
             #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
             response.append(h.copy())
         out = {"candidates":response,"batch_name":row[9],"center_name":row[10],"course_name":row[11]}
         cur.close()
         con.close() 
-        print(response)      
         return out
     def CandidateFamilyDetails(candidate_id):
         response = []
@@ -4816,6 +4845,8 @@ SELECT					cb.name as candidate_name,
             quer3 = '''
             update candidate_details.tbl_candidates set isFresher={}, project_type={},created_by='{}',is_active=1,created_on=getdate() where candidate_id='{}';
             '''
+
+           
             
             insert_query_she='''
             INSERT INTO [candidate_details].[tbl_candidate_she_details]
@@ -4827,23 +4858,14 @@ SELECT					cb.name as candidate_name,
                 ,[Do you have a smart phone?]
                 ,[Are you willing to buy a smartphone?]
                 ,[Do you own two wheeler?]
-                ,[Do you know how to operate a smartphone?]
-                ,[Are you/ Have you been an entrepreneur before?]
-                ,[Do you have permission from your family to work outside?]
-                ,[Are you a member of SHG?]
                 ,[Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?]
-                ,[Are you willing to undergo online trainings and mentorship program for 6 month?]
-                ,[Are you willing to share details of customer, revenue, expenses frequently with LN?]
                 ,[Are you willing to work and sign the work contract with LN?]
-                ,[Are you willing to buy tools and consumables required to run your business?]
                 ,[Are you willing to adopt digital transactions in your business?]
-                ,[Are you willing to register your business in Social platforms like WhatsApp, Face book, Geo listing, Just dial etc.?]
                 ,[Have you availed any loan in the past?]
                 ,[Do you have any active loan?]
                 ,[Are you willing to take up a loan to purchase tools and consumables?]
                 ,[Are you covered under any health insurance?]
                 ,[Are you allergic to any chemicals and dust?]
-                ,[Will you able to wear mandatory PPEs during the work?]
                 ,[Are you willing to follow  Environment, Health and Safety Norms in your business?]
                 ,[Have you ever been subjected to any legal enquiry for Non ethical work/business?]
                 ,[Date of birth (age between 18 to 40)]
@@ -4875,7 +4897,7 @@ SELECT					cb.name as candidate_name,
                 if 'aadhaarNo' in data:
                     query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['aadhaarNo'],data['idType'],data['idNum'],data['idCopy'],data['empType'],data['prefJob'],data['relExp'],data['lastCtc'],data['prefLocation'],data['willTravel'],data['workShift'],data['bocwId'],data['expectCtc'],user_id,aadhar_image_name,data['cand_id'])
                 if int(data['mobilization_type'])==2:
-                    she_query="({},{},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),int(data['score']),int(data['result']),data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['operate_smart_phone'],data['entreprenuer_before'],data['permission_to_work_outside'],data['shg_member'],data['serve_as_she'],data['online_training_mentorship'],data['share_details_with_LN'],data['sign_contract_with_LN'],data['buy_tools_consumables'],data['adopt_digital_transaction'],data['register_business_in_social_platform'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['wear_mandatory_ppe'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['age_18_40'],data['eight_pass'],data['past_work_exp'],data['full_time_work'],data['trvl_within_panchayat'],data['bank_act'],user_id)
+                    she_query="({},{},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),int(data['score']),int(data['result']),data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['serve_as_she'],data['sign_contract_with_LN'],data['adopt_digital_transaction'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['age_18_40'],data['eight_pass'],data['past_work_exp'],data['full_time_work'],data['trvl_within_panchayat'],data['bank_act'],user_id)
                     insert_query_she += '\n'+she_query
                 query += '\n' + quer3.format(1 if data['isFresher']=='true' else 0,int(data['mobilization_type']) ,user_id,data['cand_id'])
                 
@@ -4949,7 +4971,9 @@ SELECT					cb.name as candidate_name,
                 ,[is_active])
             VALUES
             '''
-
+            quer7 = '''
+            DELETE FROM [candidate_details].[tbl_candidate_family_details]  where candidate_id='{}';
+            '''
             update_query_she='''
             UPDATE [candidate_details].[tbl_candidate_she_details] SET
                 [Address as per Aadhar Card (incl pin code)]='{}'
@@ -4961,8 +4985,7 @@ SELECT					cb.name as candidate_name,
                 ,[Refrigerator]='{}'
                 ,[Washing Machine]='{}'
                 ,[AC /Cooler]='{}'
-                ,[Car]='{}'
-                ,[Kids education]='{}'
+                ,[Car]='{}'                
                 ,[Medical Insurance]='{}'
                 ,[Life Insurance]='{}'
                 ,[Others]='{}'
@@ -4996,6 +5019,7 @@ SELECT					cb.name as candidate_name,
                     query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1,1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
                 query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['presAddrOne'],data['permAddrOne'],data['highQuali'],data['candStream'],data['compKnow'],data['techKnow'],data['houseIncome'],data['bankName'],data['accNum'],user_id,data['cand_id'])
                 query += '\n' + quer3.format(data['presAddrTwo'],data['presVillage'],data['presPanchayat'],data['presTaluk'],data['permAddrTwo'],data['permVillage'],data['permPanchayat'],data['permTaluk'],data['instiName'],data['university'],data['yrPass'],data['percentage'],data['branchName'],data['ifscCode'],data['accType'],data['bankCopy'],user_id,data['cand_id'])
+                query += '\n' + quer7.format(data['cand_id'])
                 intervention_category="SAE"
                 if data['candProduct']=="Placement":
                     intervention_category="EAL"                
@@ -5007,7 +5031,7 @@ SELECT					cb.name as candidate_name,
                     fam_query+="({},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',{},GETDATE(),1),".format(data['cand_id'],dt['memberSal'],dt['memberName'],dt['memberDob'],dt['memberAge'],dt['memberContact'],dt['memberEmail'],dt['memberGender'],dt['memberRelation'],dt['memberQuali'],dt['memberOccuptn'],user_id)
                 if 'mobilization_type' in data:
                     if int(data['mobilization_type'])==2:
-                        she_query += '\n' + update_query_she.format(data['aadhar_address'],data['family_members'],data['rented_or_own'],data['size_of_house'],data['ration_card'],data['tv'],data['refrigerator'],data['washing_machine'],data['ac_cooler'],data['car'],data['kids_education'],data['medical_insurance'],data['life_insurance'],data['others'],data['educational_qualification'],data['age_proof'],data['signed_mou'],data['mou_signed_date'],data['kit_given_date'],data['head_of_household'],data['farm_land'],data['acres_of_land'],int(user_id),int(data['cand_id']))
+                        she_query += '\n' + update_query_she.format(data['aadhar_address'],data['family_members'],data['rented_or_own'],data['size_of_house'],data['ration_card'],data['tv'],data['refrigerator'],data['washing_machine'],data['ac_cooler'],data['car'],data['medical_insurance'],data['life_insurance'],data['others'],data['educational_qualification'],data['age_proof'],data['signed_mou'],data['mou_signed_date'],data['kit_given_date'],data['head_of_household'],data['farm_land'],data['acres_of_land'],int(user_id),int(data['cand_id']))
             curs.execute(query)
             curs.commit()
             if she_query!="":

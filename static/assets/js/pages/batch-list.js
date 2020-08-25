@@ -316,7 +316,7 @@ function LoadTable()
                     {   //console.log(row.Trainer_Id)
                         //console.log(row.Center_Id);
                         //varButtons += '<a onclick="GetProjectDetails(\'' + row.Center_Id +  '\' )"  style="color:blue;cursor:pointer" >' + row.Center_Id + '</a>';
-                        varButtons += '<a onclick="GetCandidate_Detail(\'' + row.Batch_Id + '\' )"  style="color:blue;cursor:pointer" >' + row.Candidate_Count + '</a>';
+                        varButtons += '<a onclick="GetCandidate_Detail(\'' + row.Batch_Id + '\',\'' + row.Project_Type + '\' )"  style="color:blue;cursor:pointer" >' + row.Candidate_Count + '</a>';
                     }
                     
                     return varButtons;
@@ -864,9 +864,11 @@ function add_map_message(){
             return false;
         }
 
-        function GetCandidate_Detail(batch_id){
+        function GetCandidate_Detail(batch_id,project_type){
             //alert(Project_Id)
             $('#con_close_modal').modal('hide');
+            $('#sponser_modal').modal('hide');                              
+            
             var URL=$('#hdn_web_url').val()+ "/Getcandidatebybatch?batch_id="+batch_id;
             $.ajax({
                 type:"GET",
@@ -902,12 +904,31 @@ function add_map_message(){
                                     varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Email_Id +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Father_Name +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Annual_Income +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Sponsers +'</td>';
                                     varHtml+='</tr>';
                                 }
                                 
                             }
                             $("#tblcandidate_details tbody").append(varHtml);
-                            $("#tblcandidate_details").DataTable();
+                            $("#tblcandidate_details").DataTable( {
+                                "columnDefs": [
+                                    {
+                                        "targets": [10],
+                                        "visible": false
+                                    }
+                                ]
+                            });
+                            if(project_type.toString() == "2")
+                            {
+                                $('#btnSponser').show();
+                                $("#tblcandidate_details").DataTable().column(10).visible(true);
+
+                            }
+                            else
+                            {
+                                $('#btnSponser').hide();
+                                $("#tblcandidate_details").DataTable().column(10).visible(false);
+                            }
                             $('#tr_candidate_detail').modal('show');                            
                             $('#hdn_mdl_batch_id').val(batch_id);
                         }
@@ -1017,17 +1038,106 @@ function add_map_message(){
         }
         else
         {
-            alert(cands);
             $('#hdn_mdl_skilling_id').val(cands);
-            $('#map_cand').modal('hide');
+            $('#tr_candidate_detail').modal('hide');
             $('#con_close_modal').modal('show');
         }
     }
     function back()
     {
-        GetCandidate_Detail($('#hdn_mdl_batch_id').val());
+        GetCandidate_Detail($('#hdn_mdl_batch_id').val(),1);
+    }
+    function TagSponser()
+    {
+        var cands='';
+        $('[name=checkcase1]:checked').each(function () {
+            cands+= $(this).val()+',';
+        });
+        cands=cands.substring(0,cands.length-1)
+        if (cands=='')
+        {
+            alert('Select at least one candidate to Tag.');
+        }
+        else
+        {
+            $('#tr_candidate_detail').modal('hide');            
+            $('#hdn_mdl_skilling_id').val(cands);
+            loadSponsers();
+            $('#sponser_modal').modal('show');
+        }
     }
 
+    function loadSponsers()
+    {
+        var URL=$('#hdn_web_url').val()+ "/Get_all_Sponser" 
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                if(data.Sponser != null)
+                {  
+                    $('#ddlSponser').empty();
+                    var count=data.Sponser.length;
+                    if( count> 0)
+                    {
+                        for(var i=0;i<count;i++)
+                            $('#ddlSponser').append(new Option(data.Sponser[i].Sponser_Name,data.Sponser[i].Sponser_Id));
+                    }
+                    else
+                    {
+                        $('#ddlSponser').append(new Option('ALL','-1'));
+                    }
+                }
+            },
+            error:function(err)
+            {
+                //alert($('#ddlClient').val().toString())
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+    }
+
+    function tagSponserSubmit()
+    {
+        if($('#ddlSponser').val()=='' || $('#ddlSponser').val()=='-1')
+        {
+            alert('Please select atleast on sponser.');
+        }
+        else
+        {
+            var URL=$('#hdn_web_url').val()+ "/tag_sponser_candidate";
+            $.ajax({
+                    type:"POST",
+                    url:URL,
+                    data:{
+                        "skilling_ids": $('#hdn_mdl_skilling_id').val(),
+                        "sponser_ids": $('#ddlSponser').val().toString(),
+                        "user_id":$('#hdn_home_user_id').val()
+                    },
+                    success:function(data){
+                        swal({   
+                            title:data.PopupMessage.message,
+                            text:data.PopupMessage.message+" Successfully !!",
+                            icon:"success",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                GetCandidate_Detail($('#hdn_mdl_batch_id').val(),2)
+                               
+                                //window.location.href = '/batch';
+                            });
+                    },
+                    error:function(err)
+                    {
+                        alert('Error! Please try again');
+                        return false;
+                    }
+                });
+        }
+    }
     function DownloadTableBasedOnSearch(){
         $("#imgSpinner").show();
         /*if($('#ddlCustomer').val()==''|| $('#ddlCustomer').val()==null){
