@@ -1212,7 +1212,7 @@ class Database:
         cur.close()
         con.close()
         if pop ==1:
-            msg={"message":"Candidate(s) Tagged To Sponser"}
+            msg={"message":"Candidate(s) tagged to sponsor"}
         else:
             msg={"message":"Error in tagging"}
         return msg
