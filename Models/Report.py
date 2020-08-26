@@ -995,4 +995,65 @@ class Report:
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
     
-    
+    def project_list_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,report_name):
+        try:
+            name_withpath = config.neo_report_file_path + 'report file/'+ report_name
+            
+            writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
+            workbook  = writer.book
+
+            header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+
+            resp = Database.project_list(user_id,user_role_id,user_region_id,0,10000,'','','asc','',entity,customer,p_group,block,practice,bu,product,status)['data']
+            df = pd.DataFrame(resp)
+            columns = ['Entity_Name', 'Customer_Name', 'Contract_Name','Project_Code', 'Project_Name','Center_Count', 'Course_Count', 'Project_Group_Name', 'Project_Type_Name', 'Block_Name', 'Practice_Name', 'Bu_Name', 'Product_Name', 'Project_Manager', 'Course_Name','Start_Date', 'End_Date', 'Status']
+            df=df[columns]
+
+            header = ['Entity Name', 'Customer Name', 'Contract Name', 'Project Code', 'Project Name','Center Count', 'Course Count', 'Group', 'Type', 'Block', 'Practice', 'Bu', 'Product', 'Project Manager', 'Course Name', 'Start Date', 'End Date', 'Status']
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Project_list')
+            worksheet = writer.sheets['Project_list']
+            for col_num, value in enumerate(header):
+                worksheet.write(0, col_num, value, header_format)
+                
+            writer.save()
+            return({'Description':'created excel', 'Status':True, 'filename':report_name})
+            
+        except Exception as e:
+            return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
+        
+    def sub_project_list_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project,report_name):
+        try:
+            name_withpath = config.neo_report_file_path + 'report file/'+ report_name
+            
+            writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
+            workbook  = writer.book
+            header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+
+            resp = Database.sub_project_list(user_id,user_role_id,user_region_id,0,10000,'','','asc','',entity,customer,p_group,block,practice,bu,product,status,project)['data']
+            df = pd.DataFrame(resp)
+
+            columns = ['Entity_Name', 'Customer_Name', 'Project_Code', 'Project_Name', 'Sub_Project_Code', 'Sub_Project_Name', 'Region_Name', 'State_Name', 'Center_Count', 'Center_Name', 'Course_Count', 'Course_Name', 'Users_Count', 'Planned_Batches', 'Project_Group_Name', 'Project_Type_Name', 'Block_Name', 'Practice_Name', 'Bu_Name', 'Product_Name', 'Project_Manager', 'Start_Date', 'End_Date', 'Status']
+            df=df[columns]
+
+            header = ['Entity Name', 'Customer Name', 'Project Code', 'Project Name', 'Sub Project Code', 'Sub Project Name', 'Region Name', 'State Name', 'Center Count', 'Center Name', 'Course Count', 'Course Name', 'Users Count', 'Planned Batches', 'Group', 'Type', 'Block', 'Practice', 'Bu', 'Product', 'Project Manager', 'Start Date', 'End Date', 'Status']
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Sub_Project_list')
+            worksheet = writer.sheets['Sub_Project_list']
+            for col_num, value in enumerate(header):
+                worksheet.write(0, col_num, value, header_format)
+                
+            writer.save()
+            return({'Description':'created excel', 'Status':True, 'filename':report_name})
+            
+        except Exception as e:
+            return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
+        

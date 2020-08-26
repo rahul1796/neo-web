@@ -371,6 +371,7 @@ function LoadTrainers(){
     });
     return false;
 }
+
 function LoadTable()
 {
     vartable1 = $("#tbl_projects").DataTable({
@@ -379,7 +380,8 @@ function LoadTable()
         "paging": true,
         "pageLength": 10,
         "sPaginationType": "full_numbers",
-        "scrollX": true,
+        "scrollX": false,
+        //"scrollX": true,
         "destroy": true,
         "processing": true,
         "language": { "processing": 'Loading..!' },
@@ -416,24 +418,6 @@ function LoadTable()
                 return varButtons;
                 }
             },
-
-            { "data": "Entity_Name"},
-            {
-                "data": function (row, type, val, meta) {
-                    var varButtons = ""; 
-                    if(row.Customer_Name=="")
-                        varButtons=row.Customer_Name;
-                    else
-                    {
-                        varButtons += '<a onclick="GetCustomerList(\'' + row.Customer_Id + '\')"  style="color:blue;cursor:pointer" >' + row.Customer_Name + '</a>';
-                    }
-                    
-                    return varButtons;
-                    }
-            },
-            
-            { "data": "Project_Code"},
-            { "data": "Project_Name"},
             { "data": "Sub_Project_Code"},
             { "data": "Sub_Project_Name"},
             { "visible":true,
@@ -488,6 +472,24 @@ function LoadTable()
                 return varButtons;
                 }
             },
+            { "data": "Entity_Name"},
+            {
+                "data": function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Customer_Name=="")
+                        varButtons=row.Customer_Name;
+                    else
+                    {
+                        varButtons += '<a onclick="GetCustomerList(\'' + row.Customer_Id + '\')"  style="color:blue;cursor:pointer" >' + row.Customer_Name + '</a>';
+                    }
+                    
+                    return varButtons;
+                    }
+            },
+            
+            { "data": "Project_Code"},
+            { "data": "Project_Name"},
+            
             { "data": "Project_Group_Name"},
             { "data": "Project_Type_Name"},
             { "data": "Block_Name"},
@@ -495,6 +497,8 @@ function LoadTable()
             { "data": "Bu_Name"},
             { "data": "Product_Name"},
             { "data": "Project_Manager"},
+            { "data": "Start_Date"},
+            { "data": "End_Date"},
             { "data": "Status"}
             
         ],
@@ -1276,3 +1280,98 @@ function CancelPlannedBatch(planned_batch_code)
     $('#mdl_cancel_batch').modal('show');
     
 }
+
+function DownloadTableBasedOnFilter(){
+    $("#imgSpinner").show();
+    // from candidate
+    if($('#To_Date').val()=='')
+        {
+            alert("Please select date.");
+            $("#imgSpinner").hide();
+        }
+    else{
+        var URL=$('#hdn_web_url').val()+ "/download_sub_project_list"
+        $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: URL, 
+                    data: {
+                        "entity":$('#ddlEntity').val().toString(),
+                        "customer":$('#ddlCustomer').val().toString(),
+                        "p_group":$('#ddlP_Group').val().toString(),
+                        "block":$('#ddlBlock').val().toString(),
+                        "practice":$('#ddlPractice').val().toString(),
+                        "bu":$('#ddlBU').val().toString(),
+                        "product":$('#ddlProduct').val().toString(),
+                        "status":$('#ddlStatus').val().toString(),
+                        "project":$('#ddlProject').val().toString(),
+
+                        "user_id":$('#hdn_home_user_id').val(),
+                        "user_role_id":$('#hdn_home_user_role_id').val(),
+                        "user_region_id":$('#hdn_user_region_id').val()
+                    },
+                    success: function(resp) 
+                    {
+                        if (resp.Status){
+                            var varAnchor = document.getElementById('lnkDownload');
+                            varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
+                            $("#imgSpinner").hide();
+                            try 
+                                { 
+                                    //in firefox
+                                    varAnchor.click();
+                                    return;
+                                } catch(ex) {}
+                                
+                                try 
+                                { 
+                                    // in chrome
+                                    if(document.createEvent) 
+                                    {
+                                        var e = document.createEvent('MouseEvents');
+                                        e.initEvent( 'click', true, true );
+                                        varAnchor.dispatchEvent(e);
+                                        return;
+                                    }
+                                } catch(ex) {}
+                                
+                                try 
+                                { 
+                                    // in IE
+                                    if(document.createEventObject) 
+                                    {
+                                         var evObj = document.createEventObject();
+                                         varAnchor.fireEvent("onclick", evObj);
+                                         return;
+                                    }
+                                } catch(ex) {}
+                            
+                        }
+                        else{
+                            console.log(resp)
+                            //alert('Not success')
+                            $("#imgSpinner").hide();
+                            
+                        }
+                    },
+                    error:function()
+                    {
+                        //$("#imgSpinner").hide();
+                    }
+                });
+        
+    }
+    //$("#imgSpinner").hide();
+}
+
+function ForceDownload(varUrl, varFileName)
+        {
+            var link = document.createElement('a');
+            link.setAttribute('href', varUrl);
+            link.setAttribute('download', varFileName);
+            link.setAttribute('target', '_blank');
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
