@@ -1121,7 +1121,7 @@ function add_map_message(){
                     success:function(data){
                         swal({   
                             title:data.PopupMessage.message,
-                            text:data.PopupMessage.message+" Successfully !!",
+                            text:data.PopupMessage.message+" successfully !!",
                             icon:"success",
                             confirmButtonClass:"btn btn-confirm mt-2"
                             }).then(function(){
