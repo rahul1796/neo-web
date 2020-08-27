@@ -275,7 +275,7 @@
                         varHtml+='<div class="col-lg-6"> <label for="POC_Number_'+id+'">Mobile Number :</label> </div>';
                     }
 
-                    varHtml+='<div class="col-lg-6"> <input type="tel" pattern="[1-9]{1}[0-9]{9}" class="form-control" name="POC_Number_'+id+'" id="POC_Number_'+id+'" required oninvalid="this.setCustomValidity(\'please enter valid mobile number\')" placeholder="Mobile Number"> </div>';
+                    varHtml+='<div class="col-lg-6"> <input type="tel" pattern="[1-9]{1}[0-9]{9}" class="form-control" name="POC_Number_'+id+'" id="POC_Number_'+id+'" required oninvalid="this.setCustomValidity(\'please enter valid mobile number\')" oninput="this.setCustomValidity(\'\')" placeholder="Mobile Number"> </div>';
                     varHtml+= '</div>';
                     varHtml+= '</div>';
 
