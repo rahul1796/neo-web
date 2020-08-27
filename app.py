@@ -2813,7 +2813,7 @@ class project_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            print(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+            print(start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
             return Master.project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status)
 
 class add_project_details(Resource):
