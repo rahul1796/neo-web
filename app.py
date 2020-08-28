@@ -6274,17 +6274,15 @@ class upload_assessment_result(Resource):
                 errors = schema.validate(df)
                 errors_index_rows = [e.row for e in errors]
                 len_error = len(errors_index_rows)
+                os.remove(file_name)
                 if len_error>0:
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename+'_' + 'errors.csv')
                     return {"Status":False, "message":"Uploaded Failed (fails to validate data)" }
                 else:
                     out = Database.upload_assessment_result(df,user_id,assessment_id,batch_id,stage_id)
                     return out
-
-
             except Exception as e:
-                 return {"Status":False, "message":"Unable to upload " + str(e)}  
-             
+                 return {"Status":False, "message":"Unable to upload " + str(e)}         
 api.add_resource(upload_assessment_result,'/upload_assessment_result')
 
 class batch_download_report(Resource):
@@ -6312,9 +6310,7 @@ class batch_download_report(Resource):
                 EndToDate = request.form["EndToDate"]
                 file_name='batch_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
                 #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
-                
                 resp = batch_report.create_report(batch_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate, file_name)
-                
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:
@@ -6328,7 +6324,6 @@ class GetECPReportDonload(Resource):
         if request.method=='POST':
             #try:
                 #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
-                
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
             customer_ids = request.form["customer_ids"]
@@ -6338,9 +6333,7 @@ class GetECPReportDonload(Resource):
             to_date = request.form["to_date"]
             file_name='ecp_report_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
             #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
-            
             resp = ecp_report_down.create_report(user_id, user_role_id, customer_ids, contract_ids, region_ids, from_date, to_date, file_name)
-            
             return resp
             #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             # except Exception as e:
