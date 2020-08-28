@@ -1600,9 +1600,7 @@ function UploadFileData()
             var files=document.getElementById("myFile").files;
             var file=files[0];
 
-            var d = new Date()
-
-            var file_path=$('#hdn_AWS_S3_path').val()+"bulk_upload/assessment/" + $('#hdn_home_user_id').val() + '_' + d.getFullYear()+'_'+d.getMonth()+'_'+d.getDate()+'_'+d.getHours()*60+d.getMinutes() + '_' + file.name;
+            var file_path=$('#hdn_AWS_S3_path').val()+"bulk_upload/assessment/" + $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + file.name;
             var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
             
             var xhr = new XMLHttpRequest();
