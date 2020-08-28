@@ -148,6 +148,8 @@ def before_request():
         g.user_role_name = session['user_role_name']
         g.user_region_id=session['user_region_id']
         g.base_url = session['base_url']
+        g.COL_url=session['COL_url']
+        g.AWS_path = session['AWS_path']
         # print(g.user,g.user_id,g.user_role)
         g.User_detail_with_ids.append(g.user)
         g.User_detail_with_ids.append(g.user_id)
@@ -155,6 +157,8 @@ def before_request():
         g.User_detail_with_ids.append(g.user_role_name)
         g.User_detail_with_ids.append(g.base_url)
         g.User_detail_with_ids.append(g.user_region_id)
+        g.User_detail_with_ids.append(g.COL_url)
+        g.User_detail_with_ids.append(g.AWS_path)
     if 'course_id' in session.keys():
         g.course_id = session['course_id']
     if 'center_category_id' in session.keys():
@@ -269,6 +273,8 @@ def login():
                 session['user_role_name'] = role_name
                 session['user_region_id'] = tr[0]['Region_Id']  
                 session['base_url'] = config.Base_URL
+                session['COL_url'] = config.COL_URL
+                session['AWS_path'] = config.aws_location
                 config.displaymsg=""
                 return redirect(url_for('home'))
                 #assign_sessions()
@@ -2813,7 +2819,7 @@ class project_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            print(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+            print(start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
             return Master.project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status)
 
 class add_project_details(Resource):
@@ -6283,17 +6289,15 @@ class upload_assessment_result(Resource):
                 errors = schema.validate(df)
                 errors_index_rows = [e.row for e in errors]
                 len_error = len(errors_index_rows)
+                os.remove(file_name)
                 if len_error>0:
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename+'_' + 'errors.csv')
                     return {"Status":False, "message":"Uploaded Failed (fails to validate data)" }
                 else:
                     out = Database.upload_assessment_result(df,user_id,assessment_id,batch_id,stage_id)
                     return out
-
-
             except Exception as e:
-                 return {"Status":False, "message":"Unable to upload " + str(e)}  
-             
+                 return {"Status":False, "message":"Unable to upload " + str(e)}         
 api.add_resource(upload_assessment_result,'/upload_assessment_result')
 
 class batch_download_report(Resource):
@@ -6321,9 +6325,7 @@ class batch_download_report(Resource):
                 EndToDate = request.form["EndToDate"]
                 file_name='batch_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
                 #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
-                
                 resp = batch_report.create_report(batch_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate, file_name)
-                
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:
@@ -6337,7 +6339,6 @@ class GetECPReportDonload(Resource):
         if request.method=='POST':
             #try:
                 #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
-                
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
             customer_ids = request.form["customer_ids"]
@@ -6347,9 +6348,7 @@ class GetECPReportDonload(Resource):
             to_date = request.form["to_date"]
             file_name='ecp_report_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
             #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
-            
             resp = ecp_report_down.create_report(user_id, user_role_id, customer_ids, contract_ids, region_ids, from_date, to_date, file_name)
-            
             return resp
             #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             # except Exception as e:
@@ -6684,6 +6683,7 @@ class upload_batch_target_plan(Resource):
                 errors = schema.validate(df)
                 errors_index_rows = [e.row for e in errors]
                 len_error = len(errors_index_rows)
+                os.remove(file_name)
                 if len_error>0:
                     file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
