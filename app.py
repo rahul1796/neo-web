@@ -7545,5 +7545,5 @@ class download_sub_project_list(Resource):
 api.add_resource(download_sub_project_list,'/download_sub_project_list')
 
 if __name__ == '__main__':
-    #app.run(host="0.0.0.0", port=int("80"), debug=True)
+    app.run(host="0.0.0.0", port=int("80"), debug=True)
     app.run(debug=True)
