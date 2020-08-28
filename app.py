@@ -5700,6 +5700,7 @@ class upload_bulk_upload(Resource):
                 #df_clean = df.drop(index=errors_index_rows)
                 #df_clean.to_csv('clean_data.csv',index=None)
                 len_error = len(errors_index_rows)
+                os.remove(file_name)
                 if len_error>0:
                     file_name = str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv'
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
@@ -5788,6 +5789,7 @@ class upload_bulk_upload(Resource):
                 #df_clean = df.drop(index=errors_index_rows)
                 #df_clean.to_csv('clean_data.csv',index=None)
                 len_error = len(errors_index_rows)
+                os.remove(file_name)
                 if len_error>0:
                     file_name = str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv'
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
@@ -5900,6 +5902,7 @@ class upload_bulk_upload(Resource):
                 errors_index_rows = [e.row for e in errors]
 
                 len_error = len(errors_index_rows)
+                os.remove(file_name)
                 if len_error>0:
                     file_name = str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv'
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
