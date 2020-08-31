@@ -6739,13 +6739,14 @@ class upload_user(Resource):
                 errors = schema.validate(df)
                 errors_index_rows = [e.row for e in errors]
                 len_error = len(errors_index_rows)
+                os.remove(file_name)
                 if len_error>0:
-                    print("1")
+                    #print("1")
                     file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
                     return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
                 else:
-                    print("2")
+                    #print("2")
                     df.columns = df.columns.str.replace(" ", "_")
                     df.columns = df.columns.str.replace("*", "")
                     df.insert(0, 'row_index', range(len(df)))
@@ -6756,9 +6757,8 @@ class upload_user(Resource):
                         return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
                     else:
                         return out
-                
             except Exception as e:
-                 print(e)
+                 #print(e)
                  return {"Status":False, "message":"Unable to upload " + str(e)}  
              
 api.add_resource(upload_user,'/upload_user')

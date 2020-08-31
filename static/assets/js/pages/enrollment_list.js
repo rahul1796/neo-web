@@ -68,7 +68,7 @@ function toggleCheckbox(e)
                         if(xhr.readyState === 4){
                         if(xhr.status === 200){
                             var response = JSON.parse(xhr.responseText);
-                            //console.log(response);
+                            console.log(response);
                             uploadFileToS3(file, response.data, response.url);
                         }
                         else{
@@ -96,7 +96,7 @@ function toggleCheckbox(e)
             if(xhr.readyState === 4){
             if(xhr.status === 200 || xhr.status === 204){
                 var response = xhr;
-                //console.log(response);
+                console.log(response);
                 UploadFileToProcess();
             }
             else{
