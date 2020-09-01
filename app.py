@@ -6591,15 +6591,10 @@ class add_edit_center_room(Resource):
                 Room_Capacity=request.form['Room_Capacity']
                 center_id=request.form['center_id']
                 room_id=request.form['room_id']
-                uploaded_files = request.files.getlist("fileToUpload[]")
                 course_ids=request.form['course_ids']
-
-                file_name = ''
-                for file in uploaded_files:
-                    file_name += file.filename + ','
-                    file.save(os.getcwd() + config.upload_data_path +'RoomImages/' + file.filename)
-                file_name = file_name[:-1]
-                out = Master.add_edit_center_room(Room_Name, user_id, is_active, Room_Type, Room_Size, Room_Capacity, center_id, room_id, file_name, course_ids)
+                room_images = request.form['room_images']
+                
+                out = Master.add_edit_center_room(Room_Name, user_id, is_active, Room_Type, Room_Size, Room_Capacity, center_id, room_id, room_images, course_ids)
             except Exception as e:
                 out = {"PopupMessage":{"message":"Error " + str(e), "status":False}}
             finally:

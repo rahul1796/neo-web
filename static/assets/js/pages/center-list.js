@@ -667,42 +667,83 @@ function GetRoomCenters(CenterId,CenterName)
         $('#mdl_add_edit_rooms').modal('show');
         
     }
+
+    function uploadFileToS3(file, s3Data, url){
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", s3Data.url);
+    
+        var postData = new FormData();
+        for(key in s3Data.fields){
+            postData.append(key, s3Data.fields[key]);
+        }
+        postData.append('file', file);
+    
+        xhr.onreadystatechange = function() {
+            if(xhr.readyState === 4){
+            if(xhr.status === 200 || xhr.status === 204){
+                var response = xhr;
+                console.log(response);
+                //UploadFileToProcess();
+            }
+            else{
+                alert("Could not upload file to s3.");
+            }
+        }
+        };
+        xhr.send(postData);
+    }
+
+    function UploadFileData(file,file_name)
+    {
+        // var files=document.getElementById("myFile").files;
+        // var file=files[0];
+
+        var file_path=$('#hdn_AWS_S3_path').val()+"bulk_upload/room_image/" + file_name; 
+        var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
+        
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET",api_url );
+            xhr.onreadystatechange = function(){
+                if(xhr.readyState === 4){
+                if(xhr.status === 200){
+                    var response = JSON.parse(xhr.responseText);
+                    console.log(response);
+                    uploadFileToS3(file, response.data, response.url);
+                }
+                else{
+                    alert("Could not get signed URL.");
+                }
+                }
+            };
+            xhr.send();
+        
+    }
+
     function AddeEditCenterRoom()
-    {   var room_type=''
+    {
+        var room_type=''
         if ($('#Room_Type').val() == 'Others'){
             room_type = $('#If_Others').val()
         }
         else{
             room_type = $('#Room_Type').val()
         }
-
-        var form_data = new FormData(); //$('#formUpload')[0]
         var ins = document.getElementById('images').files.length;
         //alert(ins);
         var validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
         var imstatus=1;
         var sizestatus=1;
         for (var x = 0; x < ins; x++) {
-            form_data.append("fileToUpload[]", document.getElementById('images').files[x]);
             var file = document.getElementById('images').files[x]
-            if (file.size > 1024) { 
+            console.log(file.size)
+            if (file.size > 1024*1024) { 
                 sizestatus=0;
             }
-            alert()
-
+            //alert()
             if (!validImageTypes.includes(file['type'])) {
                 imstatus=0;
             }
-            }
-            form_data.append('Room_Name',$('#Room_Name').val());
-            form_data.append('Room_Type',room_type);
-            form_data.append('Room_Size',$('#Room_Size').val());
-            form_data.append('Room_Capacity',$('#Room_Capacity').val());
-            form_data.append('isactive',$('#isactive').prop('checked'));
-            form_data.append('center_id',$('#hdn_center_id_m2').val());
-            form_data.append('room_id',$('#hdn_room_id').val());
-            form_data.append('course_ids',$('#map_course').val().toString());
-
+        }
         if (imstatus==0){
             alert('Image format is not valid')
         }
@@ -711,7 +752,33 @@ function GetRoomCenters(CenterId,CenterName)
         }
         else{
 
-            var URL=$('#hdn_web_url').val()+ "/add_edit_center_room";
+//            $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + 
+
+            var filename=[]
+            var file_name = ''
+            for (var x = 0; x < ins; x++) {
+                var file = document.getElementById('images').files[x]
+                file_name=$('#hdn_center_id_m2').val() + '_' +room_type+'_' + file.name
+                UploadFileData(file,file_name)
+                filename.push(file_name)
+        }
+        //console.log()
+        var form_data = new FormData(); //$('#formUpload')[0]
+        form_data.append('Room_Name',$('#Room_Name').val());
+        form_data.append('Room_Type',room_type);
+        form_data.append('Room_Size',$('#Room_Size').val());
+        form_data.append('Room_Capacity',$('#Room_Capacity').val());
+        form_data.append('isactive',$('#isactive').prop('checked'));
+        form_data.append('center_id',$('#hdn_center_id_m2').val());
+        form_data.append('room_id',$('#hdn_room_id').val());
+        form_data.append('course_ids',$('#map_course').val().toString());
+        form_data.append('room_images',filename.toString());
+
+        console.log(filename.toString())
+        // for (var x = 0; x < ins; x++) {
+        //     form_data.append("fileToUpload[]", document.getElementById('images').files[x]);
+
+        var URL=$('#hdn_web_url').val()+ "/add_edit_center_room";
         $.ajax({
             type:"POST",
             url:URL,
