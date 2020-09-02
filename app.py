@@ -367,6 +367,12 @@ class get_all_BU(Resource):
     def get():
         if request.method == 'GET':
             return Master.get_all_BU()
+
+class Get_all_Sponser(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            return Master.Get_all_Sponser()
 class get_all_Cluster_Based_On_Region(Resource):
     @staticmethod
     def post():
@@ -402,6 +408,7 @@ class download_centers_list(Resource):
 api.add_resource(download_centers_list,'/download_centers_list')
 
 api.add_resource(get_all_BU,'/Get_all_BU')
+api.add_resource(Get_all_Sponser,'/Get_all_Sponser')
 api.add_resource(get_all_Cluster_Based_On_Region,'/Get_all_Cluster_Based_On_Region')
 api.add_resource(center_api.center_list, '/center_list')
 api.add_resource(center_api.all_center_type, '/AllCenterTypes')
@@ -1146,6 +1153,13 @@ class drop_edit_map_candidate_batch(Resource):
         user_id= request.form['user_id']
         drop_remark = request.form['drop_remark']
         return Batch.drop_edit_candidate_batch(skilling_ids,batch_id,course_id,user_id,drop_remark)
+class tag_sponser_candidate(Resource):
+    @staticmethod
+    def post():
+        skilling_ids=request.form['skilling_ids'] 
+        user_id= request.form['user_id']
+        sponser_ids = request.form['sponser_ids']
+        return Batch.tag_sponser_candidate(skilling_ids,sponser_ids,user_id)
 class untag_users_from_sub_project(Resource):
     @staticmethod
     def post():
@@ -1198,6 +1212,7 @@ api.add_resource(candidates_maped_in_batch,'/ALLCandidatesMapedInBatch')
 api.add_resource(candidates_enrolled_in_batch,'/ALLCandidatesEnrolledInBatch')
 api.add_resource(add_edit_map_candidate_batch,'/add_edit_map_candidate_batch')
 api.add_resource(drop_edit_map_candidate_batch,'/drop_edit_candidate_batch')
+api.add_resource(tag_sponser_candidate,'/tag_sponser_candidate')
 api.add_resource(untag_users_from_sub_project,'/untag_users_from_sub_project')
 api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
@@ -7586,4 +7601,3 @@ api.add_resource(GetDocumentForExcel_S3_certiplate,'/GetDocumentForExcel_S3_cert
 if __name__ == '__main__':
     #app.run(host="0.0.0.0", port=int("80"), debug=True)
     app.run(debug=True)
-

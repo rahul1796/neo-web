@@ -81,6 +81,9 @@ class Master:
     def get_all_BU():
         BU={"BU":Database.get_all_BU()}
         return BU
+    def Get_all_Sponser():
+        Sponser={"Sponser":Database.Get_all_Sponser()}
+        return Sponser
     def get_all_Cluster_Based_On_Region(region_id):
         Cluster={"States":Database.get_all_Cluster_Based_On_Region(region_id)}
         return Cluster

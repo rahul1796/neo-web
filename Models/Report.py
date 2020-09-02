@@ -899,7 +899,6 @@ class Report:
     
     def DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date):
         try:
-            print("hi")
             data=Database.DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.CandidateDataFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
@@ -930,8 +929,8 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
-            
-            
+            if(len(data['sheet1']) < 1):
+                return({'msg':'No Records Found For Selected Filters!', 'success':False})
             df_mob=df[['Candidate_Id', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 'Age', 'Primary_Contact_No', 'Secondary_Contact_No', 'Email_Id', 'Gender', 'Marital_Status', 'Caste', 'Disability_Status', 'Religion', 'Mother_Tongue', 'Occupation', 'Average_Annual_Income', 'Interested_Course', 'Product','Source_Of_Information','Mobilized_On','Mobilized_By']]
             df_mob.drop_duplicates(keep='first',inplace=True) 
             df_mob.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Mobilization') 
@@ -942,22 +941,21 @@ class Report:
 
             df_she=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Result','Age18To40','Eight_Pass','Past_Experience','Full_Time','Travel','Bank_Acount',
                        #'Date of birth (age between 18 to 40)' , 'Are you 8th Pass?','Do you have any work experience in the past?','Will you able to work full time or at least 6 hours a day?','Are you willing to travel from one place to another within panchayat?','Do you have a bank account?',
-                       
-                       'Are You Able To Read And Write Local Language?', 'Do You Have A Smart Phone?', 'Are You Willing To Buy A Smartphone?', 'Do You Own Two Wheeler?', 'Do You Know How To Operate A Smartphone?', 'Are You/ Have You Been An Entrepreneur Before?', 'Do You Have Permission From Your Family To Work Outside?', 'Are You A Member Of Shg?', 
-                       'Are You Willing To Serve The Community At This Time Of Covid-19 Pandemic As Sanitization & Hygiene Entrepreneurs (She)?', 'Are You Willing To Undergo Online Trainings And Mentorship Program For 6 Month?', 'Are You Willing To Share Details Of Customer, Revenue, Expenses Frequently With Ln?', 
-                       'Are You Willing To Work And Sign The Work Contract With Ln?', 'Are You Willing To Buy Tools And Consumables Required To Run Your Business?', 'Are You Willing To Adopt Digital Transactions In Your Business?', 'Are You Willing To Register Your Business In Social Platforms Like Whatsapp, Face Book, Geo Listing, Just Dial Etc.?', 
-                       'Have You Availed Any Loan In The Past?', 'Do You Have Any Active Loan?', 'Are You Willing To Take Up A Loan To Purchase Tools And Consumables?', 'Are You Covered Under Any Health Insurance?', 'Are You Allergic To Any Chemicals And Dust?', 'Will You Able To Wear Mandatory Ppes During The Work?', 
-                       'Are You Willing To Follow  Environment, Health And Safety Norms In Your Business?', 'Have You Ever Been Subjected To Any Legal Enquiry For Non Ethical Work/Business?', 'Address As Per Aadhar Card (Incl Pin Code)', 'Number Of Members Earning In The Family', 'Rented Or Own House?', 'Size Of The House', 'Ration Card (Apl Or Bpl)', 'Tv', 'Refrigerator', 'Washing Machine', 'Ac /Cooler', 'Car', 'Kids Education', 'Medical Insurance', 'Life Insurance', 'Others', 'Educational Qualification', 'Age Proof', 'Signed Mou', 'Mou Signed Date', 'Kit Given Date', 'Head Of The Household', 'Farm Land', 'If Yes, Acres Of Land']]
-            df_she.drop_duplicates(keep='first',inplace=True)
+                       'Are You Able To Read And Write Local Language?', 'Do You Have A Smart Phone?', 'Are You Willing To Buy A Smartphone?', 'Do You Own Two Wheeler?', 
+                       'Are You Willing To Serve The Community At This Time Of Covid-19 Pandemic As Sanitization & Hygiene Entrepreneurs (She)?',  
+                       'Are You Willing To Work And Sign The Work Contract With Ln?', 'Are You Willing To Adopt Digital Transactions In Your Business?', 
+                       'Have You Availed Any Loan In The Past?', 'Do You Have Any Active Loan?', 'Are You Willing To Take Up A Loan To Purchase Tools And Consumables?', 'Are You Covered Under Any Health Insurance?', 'Are You Allergic To Any Chemicals And Dust?',
+                       'Are You Willing To Follow  Environment, Health And Safety Norms In Your Business?', 'Have You Ever Been Subjected To Any Legal Enquiry For Non Ethical Work/Business?', 'Address As Per Aadhar Card (Incl Pin Code)', 'Number Of Members Earning In The Family', 'Rented Or Own House?', 'Size Of The House', 'Ration Card (Apl Or Bpl)', 'Tv', 'Refrigerator', 'Washing Machine', 'Ac /Cooler', 'Car',  'Medical Insurance', 'Life Insurance', 'Others', 'Educational Qualification', 'Age Proof', 'Signed Mou', 'Mou Signed Date', 'Kit Given Date', 'Head Of The Household', 'Farm Land', 'If Yes, Acres Of Land','Sponsor']]
+            df_she.drop_duplicates(keep='first',inplace=True) 
             df_she.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='SHE') 
             worksheet3 = writer.sheets['SHE']
             default_column_she = ['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','MCL Result',
-                       'Date of birth (age between 18 to 40)' , 'Are you 8th Pass?','Do you have any work experience in the past?','Will you able to work full time or at least 6 hours a day?','Are you willing to travel from one place to another within panchayat?','Do you have a bank account?',
-                       'Are You Able To Read And Write Local Language?', 'Do You Have A Smart Phone?', 'Are You Willing To Buy A Smartphone?', 'Do You Own Two Wheeler?', 'Do You Know How To Operate A Smartphone?', 'Are You/ Have You Been An Entrepreneur Before?', 'Do You Have Permission From Your Family To Work Outside?', 'Are You A Member Of Shg?', 
-                       'Are You Willing To Serve The Community At This Time Of Covid-19 Pandemic As Sanitization & Hygiene Entrepreneurs (She)?', 'Are You Willing To Undergo Online Trainings And Mentorship Program For 6 Month?', 'Are You Willing To Share Details Of Customer, Revenue, Expenses Frequently With Ln?', 
-                       'Are You Willing To Work And Sign The Work Contract With Ln?', 'Are You Willing To Buy Tools And Consumables Required To Run Your Business?', 'Are You Willing To Adopt Digital Transactions In Your Business?', 'Are You Willing To Register Your Business In Social Platforms Like Whatsapp, Face Book, Geo Listing, Just Dial Etc.?', 
-                       'Have You Availed Any Loan In The Past?', 'Do You Have Any Active Loan?', 'Are You Willing To Take Up A Loan To Purchase Tools And Consumables?', 'Are You Covered Under Any Health Insurance?', 'Are You Allergic To Any Chemicals And Dust?', 'Will You Able To Wear Mandatory Ppes During The Work?', 
-                       'Are You Willing To Follow  Environment, Health And Safety Norms In Your Business?', 'Have You Ever Been Subjected To Any Legal Enquiry For Non Ethical Work/Business?', 'Address As Per Aadhar Card (Incl Pin Code)', 'Number Of Members Earning In The Family', 'Rented Or Own House?', 'Size Of The House', 'Ration Card (Apl Or Bpl)', 'Tv', 'Refrigerator', 'Washing Machine', 'Ac /Cooler', 'Car', 'Kids Education', 'Medical Insurance', 'Life Insurance', 'Others', 'Educational Qualification', 'Age Proof', 'Signed Mou', 'Mou Signed Date', 'Kit Given Date', 'Head Of The Household', 'Farm Land', 'If Yes, Acres Of Land']
+                       'Date of birth (age between 18 to 40)' , 'Are you 8th Pass?','Do you have any work experience','Will you able to work full time or at least 6 hours a day?','Are you willing to travel for work ','Do you have a bank account?',
+                       'Are You Able To Read And Write Local Language?', 'Do You Have A Smart Phone?', 'Are You Willing To Buy A Smartphone?', 'Do You Own Two Wheeler?', 
+                       'Are You Willing To Serve The Community At This Time Of Covid-19 Pandemic As Sanitization & Hygiene Entrepreneurs (She)?', 
+                       'Are You Willing To Work And Sign The Work Contract With Ln?', 'Are You Willing To Adopt Digital Transactions In Your Business?', 
+                       'Have You Availed Any Loan In The Past?', 'Do You Have Any Active Loan?', 'Are You Willing To Take Up A Loan To Purchase Tools And Consumables?', 'Are You Covered Under Any Health Insurance?', 'Are You Allergic To Any Chemicals And Dust?',
+                       'Are You Willing To Follow  Environment, Health And Safety Norms In Your Business?', 'Have You Ever Been Subjected To Any Legal Enquiry For Non Ethical Work/Business?', 'Address As Per Aadhar Card (Incl Pin Code)', 'Number Of Members Earning In The Family', 'Rented Or Own House?', 'Size Of The House', 'Ration Card (Apl Or Bpl)', 'Tv', 'Refrigerator', 'Washing Machine', 'Ac /Cooler', 'Car',  'Medical Insurance', 'Life Insurance', 'Others', 'Educational Qualification', 'Age Proof', 'Signed Mou', 'Mou Signed Date', 'Kit Given Date', 'Head Of The Household', 'Farm Land', 'If Yes, Acres Of Land','Sponsor']
             for i in range(len(default_column_she)):
                 worksheet3.write(0,i ,default_column_she[i], header_format)
             
