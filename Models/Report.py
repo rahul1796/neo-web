@@ -948,7 +948,7 @@ class Report:
                        'Are You Willing To Work And Sign The Work Contract With Ln?', 'Are You Willing To Buy Tools And Consumables Required To Run Your Business?', 'Are You Willing To Adopt Digital Transactions In Your Business?', 'Are You Willing To Register Your Business In Social Platforms Like Whatsapp, Face Book, Geo Listing, Just Dial Etc.?', 
                        'Have You Availed Any Loan In The Past?', 'Do You Have Any Active Loan?', 'Are You Willing To Take Up A Loan To Purchase Tools And Consumables?', 'Are You Covered Under Any Health Insurance?', 'Are You Allergic To Any Chemicals And Dust?', 'Will You Able To Wear Mandatory Ppes During The Work?', 
                        'Are You Willing To Follow  Environment, Health And Safety Norms In Your Business?', 'Have You Ever Been Subjected To Any Legal Enquiry For Non Ethical Work/Business?', 'Address As Per Aadhar Card (Incl Pin Code)', 'Number Of Members Earning In The Family', 'Rented Or Own House?', 'Size Of The House', 'Ration Card (Apl Or Bpl)', 'Tv', 'Refrigerator', 'Washing Machine', 'Ac /Cooler', 'Car', 'Kids Education', 'Medical Insurance', 'Life Insurance', 'Others', 'Educational Qualification', 'Age Proof', 'Signed Mou', 'Mou Signed Date', 'Kit Given Date', 'Head Of The Household', 'Farm Land', 'If Yes, Acres Of Land']]
-            df_she.drop_duplicates(keep='first',inplace=True) 
+            df_she.drop_duplicates(keep='first',inplace=True)
             df_she.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='SHE') 
             worksheet3 = writer.sheets['SHE']
             default_column_she = ['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','MCL Result',
@@ -960,6 +960,10 @@ class Report:
                        'Are You Willing To Follow  Environment, Health And Safety Norms In Your Business?', 'Have You Ever Been Subjected To Any Legal Enquiry For Non Ethical Work/Business?', 'Address As Per Aadhar Card (Incl Pin Code)', 'Number Of Members Earning In The Family', 'Rented Or Own House?', 'Size Of The House', 'Ration Card (Apl Or Bpl)', 'Tv', 'Refrigerator', 'Washing Machine', 'Ac /Cooler', 'Car', 'Kids Education', 'Medical Insurance', 'Life Insurance', 'Others', 'Educational Qualification', 'Age Proof', 'Signed Mou', 'Mou Signed Date', 'Kit Given Date', 'Head Of The Household', 'Farm Land', 'If Yes, Acres Of Land']
             for i in range(len(default_column_she)):
                 worksheet3.write(0,i ,default_column_she[i], header_format)
+            
+            df.loc[:,'Educational Qualification'] = df.loc[:,'Educational Qualification'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
+            df.loc[:,'Signed Mou'] = df.loc[:,'Signed Mou'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
+            df.loc[:,'Age Proof'] = df.loc[:,'Age Proof'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
 
             df_reg=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Present_Address_Line1','Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block','Present_District', 'Present_State', 'Present_Pincode', 'Present_Country', 'Permanaet_Address_Line1','Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 'Permanent_Taluk_Block','Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country','Aadhar_No', 'Identifier_Type', 'Identity_Number','Employment_Type', 'Preferred_Job_Role', 'Relevant_Years_Of_Experience', 'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc','Project_Type','Registered_On','Registered_By']]
             df_reg.drop_duplicates(keep='first',inplace=True) 
@@ -969,8 +973,6 @@ class Report:
             for i in range(len(default_column_reg)):
                 worksheet2.write(0,i ,default_column_reg[i], header_format)
             
-            
-
             df_enr=df[['Candidate_Id','Batch_Code','Intervention_Value',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Highest_Qualification', 'Stream_Specialization', 'Computer_Knowledge', 'Technical_Knowledge','Name_Of_Institute', 'University', 'Year_Of_Pass', 'Percentage','Family Salutation', 'Name', 'Family_Date_Of_Birth', 'Family_Age', 'Family_Primary_Contact', 'Family_Email_Address', 'Family Gender', 'Relationship', 'Education_Qualification', 'Members_Occupation','Bank_Name', 'Account_Number','Branch_Name', 'Branch_Code', 'Account_Type','Project_Type','Enrolled_On','Enrolled_By']]
             #df_enr.drop_duplicates(keep='first',inplace=True) 
             df_enr.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Enrolment') 
