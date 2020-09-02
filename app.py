@@ -40,6 +40,7 @@ from pandas_schema.validation import CustomElementValidation
 import numpy as np
 import requests
 from email.utils import parseaddr
+import hyperlink
 #import excel_validation
 #String check
 def check_str(st):
@@ -3445,7 +3446,7 @@ api.add_resource(change_password_api,'/change_password_api')
 @app.route("/data/<path:path>")
 def get_file(path):
     """Download a file."""
-    filename = r"{}{}".format(config.ReportDownloadPathLocal,path)
+    filename = r"{}data/{}".format(config.ReportDownloadPathLocal,path)
     print(filename)
     if not(os.path.exists(filename)):
         filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathWeb)
@@ -7539,6 +7540,64 @@ class download_sub_project_list(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(download_sub_project_list,'/download_sub_project_list')
 
+class GetDocumentForExcel(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            image_name=request.args.get('image_name','',type=str)
+            image_path=request.args.get('image_path','',type=str)
+            #response={"POC":Master.GetPOCForCustomer(customer_id)}
+            #url = hyperlink.parse(u'www.google.co.in')
+            image_name =  '2_Class room_Untitled.png'
+            path = 'C:/Users/Jagdish P K/Desktop/APP/code/neo-web_qa/data/TMA/'
+            filename = '{}{}'.format(path,image_name)
+            if os.path.exists(filename):
+                filename = 'http://127.0.0.1:5000/data/tma/{}'.format(image_name)
+            else:
+                path = 'neo_skills/qa/bulk_upload/room_image/1_Class room_Untitled.png'
+
+                URL = config.COL_URL + 's3_signed_url_for_file_updated'
+                PARAMS = {'file_path':path} 
+                r = requests.get(url = URL, params = PARAMS) 
+                if r.text !='':
+                    filename = r.text
+                else:
+                    filename = 'http://127.0.0.1:5000/data/tma/{}'.format(image_name) # no image found
+            
+            return redirect(filename)
+api.add_resource(GetDocumentForExcel,'/GetDocumentForExcel')
+
+class GetDocumentForExcel_S3_certiplate(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            image_name=request.args.get('image_name','',type=str)
+            image_path=request.args.get('image_path','',type=str)
+
+            URL=config.neo_certiplate+image_name
+            r = requests.get(url = URL) 
+
+            if r.status_code==200:
+                filename =  URL
+            elif r.status_code==404:
+                path = config.aws_location +'bulk_upload/room_image/'+image_name
+
+                URL = config.COL_URL + 's3_signed_url_for_file_updated'
+                PARAMS = {'file_path':path} 
+                r = requests.get(url = URL, params = PARAMS) 
+                if r.text !='':
+                    filename = r.text
+                else:
+                    filename = ''
+            else:
+                filename=''
+            
+            if filename =='':
+                filename= Base_URL + 'data/No-image-found.jpg'
+            
+            return redirect(filename)
+api.add_resource(GetDocumentForExcel_S3_certiplate,'/GetDocumentForExcel_S3_certiplate')
+
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=int("80"), debug=True)
+    #app.run(host="0.0.0.0", port=int("80"), debug=True)
     app.run(debug=True)
