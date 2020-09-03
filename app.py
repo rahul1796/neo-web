@@ -7599,5 +7599,5 @@ class GetDocumentForExcel_S3_certiplate(Resource):
 api.add_resource(GetDocumentForExcel_S3_certiplate,'/GetDocumentForExcel_S3_certiplate')
 
 if __name__ == '__main__':
-    #app.run(host="0.0.0.0", port=int("80"), debug=True)
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int("80"), debug=True)
+    #app.run(debug=True)
