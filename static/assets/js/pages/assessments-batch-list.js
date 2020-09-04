@@ -1581,75 +1581,127 @@ function add_map_message(){
         }); 
     }
 
-    function UploadFileData()
+    
+function UploadFileData()
+{
+    if ($('#myFile').get(0).files.length === 0) {
+        console.log("No files selected.");
+    }
+    else
     {
-        if ($('#myFile').get(0).files.length === 0) {
-            console.log("No files selected.");
+        var fileExtension = ['xlsx']
+        if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            alert("Formats allowed are : "+fileExtension.join(', '));
+            return false;
         }
         else
         {
-            var fileExtension = ['xlsx']
-            if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
-                alert("Formats allowed are : "+fileExtension.join(', '));
-                return false;
-            }
-            else
-            {
-                $("#imgSpinner1").show();
-                var form_data = new FormData($('#formUpload')[0]);
-                form_data.append('user_id',$('#hdn_home_user_id_modal').val());
-                form_data.append('user_role_id',$('#hdn_home_user_role_id_modal').val());
-                form_data.append('assessment_id',$('#hdn_upl_assessment_id').val());
-                form_data.append('batch_id',$('#hdn_upl_batch_id').val());
-                form_data.append('stage_id',$('#hdn_upl_stage_id').val());
-                $.ajax({
-                    type: 'POST',
-                    url: $('#hdn_web_url').val()+ "/upload_assessment_result",
-                    enctype: 'multipart/form-data',
-                    data: form_data,
-                    contentType: false,
-                    cache: false,
-                    processData: false,
-                    success: function(data) 
-                    {
-                        var message="",title="",icon="";
-                        if(data.Status){
-                            message=data.message;
-                            title="Success";
-                            icon="success";
-                        }
-                        else{
-                            message=data.message;
-                            title="Error";
-                            icon="error";
-                        }
-                        swal({   
-                                    title:title,
-                                    text:message,
-                                    icon:icon,
-                                    confirmButtonClass:"btn btn-confirm mt-2"
-                                    }).then(function(){
-                                        window.location.href = '/assessment';
-                                    }); 
-                    
-                            
-                    },
-                    error:function(err)
-                    {
-                        swal({   
-                            title:"Error",
-                            text:'Error! Please try again',
-                            icon:"error",
-                            confirmButtonClass:"btn btn-confirm mt-2"
-                            }).then(function(){
-                                window.location.href = '/assessment';
-                            }); 
-                       
+            $("#imgSpinner1").show();
+            var files=document.getElementById("myFile").files;
+            var file=files[0];
+
+            var file_path=$('#hdn_AWS_S3_path').val()+"bulk_upload/assessment/" + $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + file.name;
+            var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET",api_url );
+                xhr.onreadystatechange = function(){
+                    if(xhr.readyState === 4){
+                    if(xhr.status === 200){
+                        var response = JSON.parse(xhr.responseText);
+                        //console.log(response);
+                        uploadFileToS3(file, response.data, response.url);
                     }
-                });
-            }
+                    else{
+                        alert("Could not get signed URL.");
+                    }
+                    }
+                };
+                xhr.send();
         }
     }
+}
+
+function uploadFileToS3(file, s3Data, url){
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", s3Data.url);
+
+    var postData = new FormData();
+    for(key in s3Data.fields){
+        postData.append(key, s3Data.fields[key]);
+    }
+    postData.append('file', file);
+
+    xhr.onreadystatechange = function() {
+        if(xhr.readyState === 4){
+        if(xhr.status === 200 || xhr.status === 204){
+            var response = xhr;
+            //console.log(response);
+            UploadFileToProcess();
+        }
+        else{
+            alert("Could not upload file to s3.");
+        }
+    }
+    };
+    xhr.send(postData);
+}
+
+function UploadFileToProcess()
+{
+    //console.log()
+    var form_data = new FormData($('#formUpload')[0]);
+    form_data.append('user_id',$('#hdn_home_user_id_modal').val());
+    form_data.append('user_role_id',$('#hdn_home_user_role_id_modal').val());
+    form_data.append('assessment_id',$('#hdn_upl_assessment_id').val());
+    form_data.append('batch_id',$('#hdn_upl_batch_id').val());
+    form_data.append('stage_id',$('#hdn_upl_stage_id').val());
+    
+    $.ajax({
+        type: 'POST',
+        url: $('#hdn_web_url').val()+ "/upload_assessment_result",
+        enctype: 'multipart/form-data',
+        data: form_data,
+        contentType: false,
+        cache: false,
+        processData: false,
+        success: function(data) 
+        {
+            var message="",title="",icon="";
+            if(data.Status){
+                message=data.message;
+                title="Success";
+                icon="success";
+            }
+            else{
+                message=data.message;
+                title="Error";
+                icon="error";
+            }
+            swal({   
+                        title:title,
+                        text:message,
+                        icon:icon,
+                        confirmButtonClass:"btn btn-confirm mt-2"
+                        }).then(function(){
+                            window.location.href = '/assessment';
+                        }); 
+        },
+        error:function(err)
+        {
+            swal({   
+                title:"Error",
+                text:'Error! Please try again',
+                icon:"error",
+                confirmButtonClass:"btn btn-confirm mt-2"
+                }).then(function(){
+                    window.location.href = '/assessment';
+                }); 
+           
+        }
+    });
+}
+
     function Back()
     {
         window.location.href = '/assessment';
