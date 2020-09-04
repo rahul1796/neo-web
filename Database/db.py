@@ -719,37 +719,45 @@ class Database:
         cur2.close()
         con.close()
         return center
-    def add_course_details(course_name,project_id,user_id,is_active,center_ids,qp_id,course_id,items,course_code):
+    def add_course_details(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, isactive, user_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[content].[sp_add_edit_course] ?, ?, ?, ?, ?, ?, ?, ?,?'
-        values = (course_name,project_id,user_id,is_active,center_ids,qp_id,course_id,items,course_code)
+        sql = 'exec	[content].[sp_add_edit_course] ?, ?, ?, ?, ?, ?, ?, ?,?, ?'
+        values = (CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, isactive, user_id)
         cur.execute(sql,(values))
+
         for row in cur:
             pop=row[1]
+            if pop != 2:
+                batch_code=row[2]
         cur.commit()
         cur.close()
         con.close()
         if pop ==1:
-            msg={"message":"Updated"}
-        else:
-            msg={"message":"Created"}
+            msg={"message":"{} Updated Successfully".format(batch_code),"course_flag":1}
+        else: 
+                if pop==0:
+                    msg={"message":batch_code+" Created Successfully","course_flag":0}
+                else:
+                    if pop==2:
+                        msg={"message":"Course with the Course code already exists","course_flag":2}
         return msg
+
     def get_course_details(course_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec [content].[sp_get_course_detail] ?'
         values = (course_id)
         cur.execute(sql,(values,))
+        h={}
         columns = [column[0].title() for column in cur.description]
-        response=[]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
-            response.append(h)
-        data = {"CourseDetail":response,""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9]}
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            
         cur.close()
         con.close()
-        return data
+        return h.copy()
 
     def get_qp_course():
         qp = []
@@ -6319,6 +6327,7 @@ SELECT					cb.name as candidate_name,
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
+
         sql = 'exec [masters].[sp_get_POC_for_Customer]  ?'
         values = (customer_id,)
         cur2.execute(sql,(values))
@@ -6331,3 +6340,34 @@ SELECT					cb.name as candidate_name,
         con.close()
         return response
         
+    def get_qp_for_sector(sector_ids):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [content].[sp_qp_basedon_sectors]  ?'
+        values = (sector_ids,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+    def GetAllParentCourse():
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [content].[sp_get_parent_courses]'
+        cur2.execute(sql)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response

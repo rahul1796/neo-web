@@ -23,15 +23,11 @@ class Content:
         return center_list    
 
     
-    def add_course(course_name,project_id,user_id,is_active,center_ids,qp_id,course_id,items,course_code):
-        if items == "[]":
-            popupMessage = {"PopupMessage": Database.add_course_details(course_name,project_id,user_id,is_active,center_ids,qp_id,course_id,'',course_code)}
-            return popupMessage
-        else:
-            popupMessage = {"PopupMessage": Database.add_course_details(course_name,project_id,user_id,is_active,center_ids,qp_id,course_id,items,course_code)}
-            return popupMessage
+    def add_course(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, isactive, user_id):
+        popupMessage = {"PopupMessage": Database.add_course_details(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, isactive, user_id)}
+        return popupMessage
     def get_course(course_id):
-        indi_course=Database.get_course_details(course_id)
+        indi_course={"CourseDetail":Database.get_course_details(course_id)}
         return indi_course
     def get_qp_for_course():
         qp_t={"Qp":Database.get_qp_course()}
@@ -111,3 +107,10 @@ class Content:
     def get_session_detail(session_id):
         indi_session={"SessionDetail":Database.get_session_detail(session_id)}
         return indi_session
+
+    def get_qp_for_sector(sector_ids):
+        qp_t={"Qp":Database.get_qp_for_sector(sector_ids)}
+        return qp_t
+    def GetAllParentCourse():
+        Course={"Course":Database.GetAllParentCourse()}
+        return Course
