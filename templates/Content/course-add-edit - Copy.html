@@ -7,10 +7,10 @@
         <script type="text/javascript">
             $(document).ready(function(){
                 $('.dropdown-search-filter').select2();
-                LoadSectorddl();
+                LoadCenterddl();
                 LoadQpddl();
-                LoadParentCourse();
-                if('{{course_id}}' > 0)
+                LoadProjectddl();
+                if('{{course_id}}' !=-1)
                 {
                     var URL=$('#hdn_web_url').val()+ "/GetCourseDetails?course_id=" + '{{course_id}}';
                     $.ajax({
@@ -21,18 +21,26 @@
                            {
                                if(data.CourseDetail!="")
                                {
+                                    
+                                   //alert(JSON.stringify(data.CourseDetail));
+                                   
                                    $('#CourseName').val(data.CourseDetail.Course_Name);
                                    $('#CourseCode').val(data.CourseDetail.Course_Code);
-                                   $('#ddlSector').val(data.CourseDetail.Sector_Id).change();
-                                   $('#ddlQp').val(data.CourseDetail.Qp_Id.split(','));
-                                   $('#Parent_Course').val(data.CourseDetail.Parent_Course_Id);
-                                   $('#ddlCourse_Duration_day').val(data.CourseDetail.Course_Duration_Days);
-                                   $('#ddlCourse_Duration_hour').val(data.CourseDetail.Course_Duration_Hour);
-                                   if(data.CourseDetail.Is_Active){
+                                   $('#ddlQp').val(data.CourseDetail.Qp_Id).change();
+                                   $('#ddlCenter').val(data.CourseDetail.Center_Id.split(',')).change();
+                                   $('#ddlProject').val(data.CourseDetail.Project_Id).change();
+                                    if(data.CourseDetail.Is_Active){
                                         $('#isactive').prop('checked',true);}
                                     else{
                                         $('#isactive').prop('checked',false);}
 
+                                    var object = JSON.parse(data.CourseDetail.Session_Details);  
+                                    //alert(object);
+                                    var session_count=JSON.parse(data.CourseDetail.Session_Details).length;
+									$('#session-name-container').html("");
+                                    $('#session-duration-container').html("");
+                                    $('#session-delete-container').html("");
+                                    Updatesessions(session_count,object);
                                }
                            } 
                         },
@@ -42,75 +50,60 @@
                     });
                 }
             });
-            function LoadParentCourse(){
-                var URL=$('#hdn_web_url').val()+ "/GetAllParentCourse"
-                $.ajax({
-                    type:"GET",
-                    url:URL,
-                    async:false,
-                    beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                    datatype:"json",
-                    success: function (data){
-                        if(data.Course != null)
-                        {
-                            $('#Parent_Course').empty();
-                            var count=data.Course.length;
-                            if( count> 0)
-                            {
-                                $('#Parent_Course').append(new Option('Choose Parent Course',''));
-                                for(var i=0;i<count;i++)
-                                    $('#Parent_Course').append(new Option(data.Course[i].Course_Name,data.Course[i].Course_Id));
-                            }
-                            else
-                            {
-                                $('#Parent_Course').append(new Option('Choose Parent Course',''));
-                            }
-                        }
-                    },
-                    error:function(err)
-                    {
-                        alert('Error! Please try again');
-                        return false;
-                    }
-                });
-                return false;
-            }
-            function LoadSectorddl(){
-                var URL=$('#hdn_web_url').val()+ "/All_Sector"
-                $.ajax({
-                    type:"GET",
-                    url:URL,
-                    async:false,
-                    beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                    datatype:"json",
-                    success: function (data){
-                        if(data.Sectors != null)
-                        {
-                            $('#ddlSector').empty();
-                            var count=data.Sectors.length;
-                            if( count> 0)
-                            {
-                                $('#ddlSector').append(new Option('Choose Qualification Pack',''));
-                                for(var i=0;i<count;i++)
-                                    $('#ddlSector').append(new Option(data.Sectors[i].Sector_Name,data.Sectors[i].Sector_Id));
-                            }
-                            else
-                            {
-                                $('#ddlSector').append(new Option('Choose Qualification Pack',''));
-                            }
-                        }
-                    },
-                    error:function(err)
-                    {
-                        alert('Error! Please try again');
-                        return false;
-                    }
-                });
-                return false;
+            function Updatesessions(count,session_object){
+                for(var i=0;i<count;i++){
+                    let textbox = $('<input type="text" placeholder="Session Name" required="">').attr('class', 'form-control').attr('id', 'session_text_'+divId).attr('name','session_name').attr('value',session_object[i].session_name);
+                    let durationBox = $('<input type="number" placeholder="Session Duration in Hours" required="">').attr('class', 'form-control').attr('id', 'session_duration_'+divId).attr('name','session_duration').attr('value',session_object[i].session_duration);
+                    let deleteField = $('<button type="button" class="btn btn-danger waves-effect waves-light" onclick="removeSessionField(event)"><i class="mdi mdi-close"></i></button>').attr('id', 'session_del_btn_'+divId).attr('data-value', divId);
+                    $('#session-name-container').append(textbox);
+                    $('#session-duration-container').append(durationBox);
+                    $('#session-delete-container').append(deleteField);
+                    fieldCount++;
+                    divId++;
+                }
             }
 
+            function LoadProjectddl()
+            {
+                var URL=$('#hdn_web_url').val()+ "/AllProjectsBasedOnPractice"
+                $.ajax({
+                    type:"POST",
+                    url:URL,
+                    async:false,
+                    beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                    datatype:"json",
+                    data:{
+                        "practice_id": 0,
+                        "project_id" : 0
+                    },
+                    success: function (data){
+                        if(data.Projects != null)
+                        {
+                            $('#ddlProject').empty();
+                            var count=data.Projects.length;
+                            if( count> 0)
+                            {
+                                $('#ddlProject').append(new Option('Choose Project',''));
+                                for(var i=0;i<count;i++)
+                                    $('#ddlProject').append(new Option(data.Projects[i].Project_Name,data.Projects[i].Project_Id));
+                            }
+                            else
+                            {
+                                $('#ddlProject').append(new Option('Choose Project',''));
+                            }
+                        }
+                    },
+                    error:function(err)
+                    {
+                        alert('Error! Please try again');
+                        return false;
+                    }
+                });
+                return false;
+            }
+            
             function LoadQpddl(){
-                var URL=$('#hdn_web_url').val()+ "/GetQP_basedon_Sector?sector_ids=" + $('#ddlSector').val();
+                var URL=$('#hdn_web_url').val()+ "/get_qp_for_course"
                 $.ajax({
                     type:"GET",
                     url:URL,
@@ -142,52 +135,118 @@
                 });
                 return false;
             }
+
+            function LoadCenterddl(){
+                var URL=$('#hdn_web_url').val()+ "/AllCenterList"
+                $.ajax({
+                    type:"GET",
+                    url:URL,
+                    async:false,
+                    beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                    datatype:"json",
+                    success: function (data){
+                        if(data.Centers != null)
+                        {
+                            $('#ddlCenter').empty();
+                            var count=data.Centers.length;
+                            if( count> 0)
+                            {
+                                
+                                // $('#ddlCenter').append(new Option('Choose Center',''));
+                                for(var i=0;i<count;i++)
+                                    $('#ddlCenter').append(new Option(data.Centers[i].Center_Name,data.Centers[i].Center_Id));
+                            }
+                            else
+                            {
+                                $('#ddlCenter').append(new Option('Choose Center',''));
+                            }
+                        }
+                    },
+                    error:function(err)
+                    {
+                        alert('Error! Please try again');
+                        return false;
+                    }
+                });
+                return false;
+            }
             
             function add_popup_message(){
-
-                var URL=$('#hdn_web_url').val()+ "/add_course_details";
+                var jsonString='';
+                let sessionname=[],sessionDuration=[];
+                if(fieldCount > 0)
+                {
+                    $('#session-name-container').children('input').each(function(){
+                        sessionname.push($(this).val());
+                    });
+                    $('#session-duration-container').children('input').each(function(){
+                        sessionDuration.push($(this).val());
+                    });
+                    for(let i=0;i<fieldCount;i++)
+                    {
+                        jsonString+='{ "session_name" : "'+ sessionname[i] + '", "session_duration" : '+  sessionDuration[i] +' },';
+                    }         
+                    jsonString = jsonString.substring(0, jsonString.length - 1);
+                    jsonString='[ ' + jsonString + ' ]';
+                    //alert(jsonString);        
+                }
+                else
+                    jsonString='[]';
+               // console.log(jsonObject);
+			   //alert();
+               var URL=$('#hdn_web_url').val()+ "/add_course_details";
                    $.ajax({
                        type:"POST",
                        url:URL,
                        data:{
-                           "CourseId":'{{course_id}}',
                            "CourseName" : $('#CourseName').val(),
-                           "CourseCode":$('#CourseCode').val(),
-                           "Sector":$('#ddlSector').val().toString(),
-                           "Qp":$('#ddlQp').val().toString(),
-                           "Parent_Course":$('#Parent_Course').val(),
-                           "Course_Duration_day":$('#ddlCourse_Duration_day').val(),
-                           "Course_Duration_hour":$('#ddlCourse_Duration_hour').val(),
-                           "isactive" : $('#isactive').prop('checked')
+                           "ProjectId" : $('#ddlProject').val(),
+                           "isactive" : $('#isactive').prop('checked'),
+                           "CenterId":$('#ddlCenter').val().toString(),
+                           "QpId":$('#ddlQp').val(),
+                           "SessionJSON":jsonString,
+                           "CourseId":'{{course_id}}',
+                           "CourseCode":$('#CourseCode').val()
                        },
                        success:function(data){
-                            var message="",title="",icon="";
-                            if(data.PopupMessage.course_flag==2){
-                                message=data.PopupMessage.message;
-                                title="Error";
-                                icon="error";
-                            }
-                            else{
-                                message=data.PopupMessage.message;
-                                title="Success";
-                                icon="success";
-                            }
-                            swal({   
-                                        title:title,
-                                        text:message,
-                                        icon:icon,
-                                        confirmButtonClass:"btn btn-confirm mt-2"
-                                        }).then(function(){
-                                            window.location.href = '/after_popup_course';
-                                        });        
-                        },
-                        error:function(err)
-                        {
-                            alert('Error! Please try again');
-                        }
-                    });
+                           swal({   title:data.PopupMessage.message,
+                                   text:data.PopupMessage.message+" Successfully !!",
+                                   icon:"success",
+                                   confirmButtonClass:"btn btn-confirm mt-2"
+                                   }).then(function(){
+                                       window.location.href = '/after_popup_course';
+                                   }
+                                   );
+                       },
+                       error:function(x){
+                           alert('error');
+                       }
+                   });
+          
            }
         
+            var fieldCount = 0,divId=0;
+            function addSessionField() {
+                //alert(fieldCount);
+                let textbox = $('<input type="text" placeholder="Session Name" required="">').attr('class', 'form-control').attr('id', 'session_text_'+divId).attr('name','session_name');
+                let durationBox = $('<input type="number" placeholder="Session Duration in Hours" required="">').attr('class', 'form-control').attr('id', 'session_duration_'+divId).attr('name','session_duration');
+                let deleteField = $('<button type="button" class="btn btn-danger waves-effect waves-light" onclick="removeSessionField(event)"><i class="mdi mdi-close"></i></button>').attr('id', 'session_del_btn_'+divId).attr('data-value', divId);
+                $('#session-name-container').append(textbox);
+                $('#session-duration-container').append(durationBox);
+                $('#session-delete-container').append(deleteField);
+                fieldCount++;
+                divId++;
+            }
+            function removeSessionField(e) {
+                //alert(e);
+                let position = e.currentTarget.getAttribute('data-value');
+                //alert(position);
+                    $('#session_text_'+position).remove();
+                    $('#session_duration_'+position).remove();
+                    $('#session_del_btn_'+position).remove();
+                    if(position !=null)
+                        fieldCount--;
+            }
         </script>
                 <div class="container-fluid">
                     <form action="javascript:add_popup_message();">
@@ -245,17 +304,29 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group" >
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <label for="ddlSector">Sector *:</label>
+                                                <label for="ddlProject">Project *:</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="ddlSector" class="form-control dropdown-search-filter" data-live-search="true"  name="ddlSector" ClientIdMode="static" required="" onchange="LoadQpddl();"multiple> 
-                                                    <option value="">Choose Sector</option>
+                                                <select id="ddlProject" class="form-control" name="ProjectId" ClientIdMode="static" >
+                                                    <option value="">Choose Project</option>
                                                 </select>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <label for="ddlCenter">Center *:</label>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <select id="ddlCenter" class="form-control dropdown-search-filter" data-live-search="true" multiple data-selected-text-format="count > 3" name="CenterId" ClientIdMode="static" placeholder="Choose Center" required="">
+                                                        <option value="">Choose Center</option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                     </div>
                                     <div class="form-group">
                                         <div class="row">
@@ -263,44 +334,33 @@
                                                 <label for="ddlQp">Qualification Pack *:</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="ddlQp" class="form-control dropdown-search-filter" data-live-search="true"  name="QpId" ClientIdMode="static" required="" multiple>
+                                                <select id="ddlQp" class="form-control dropdown-search-filter" data-live-search="true"  name="QpId" ClientIdMode="static" required="" >
                                                     <option value="">Choose Qualification Pack</option>
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <div class="row">
+                                    <div style="display: none;">
+                                    <div class="form-group row">
                                             <div class="col-lg-6">
-                                                <label for="Parent_Course">Parent Course :</label>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="Parent_Course" class="form-control dropdown-search-filter" data-live-search="true"  name="Parent_Course" ClientIdMode="static">
-                                                    <option value="">Choose Parent Course</option>
-                                                </select>
+                                                <button onclick="addSessionField();" type="button" class="btn btn-info btn-rounded waves-effect waves-light"> Add Session</button>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-lg-6">
-                                                <label for="ddlCourse_Duration_day">Course Duration Day *:</label>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <input type="number" class="form-control" name="ddlCourse_Duration_day" id="ddlCourse_Duration_day" required placeholder="Course Duration Day">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-lg-6">
-                                                <label for="ddlCourse_Duration_hour">Course Duration Hour *:</label>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <input type="number" class="form-control" name="ddlCourse_Duration_hour" id="ddlCourse_Duration_hour" required placeholder="Course Duration Hour">
+                                        <form id="Sessions">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-lg-4" id="session-name-container" >                                                   
+                                                </div>
+                                                <div class="col-lg-4" id="session-duration-container" >
+                                                </div>
+                                                <div class="col-lg-1" id="session-delete-container" >
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </form>
+                                </div>
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-lg-6">
