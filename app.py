@@ -597,10 +597,6 @@ def course_add_edit():
 
 @app.route("/assign_course_add_edit_to_home", methods=['GET','POST'])
 def assign_course_type_add_edit_to_home():
-    
-    #global glob_course_id
-    #return(request.form['hdn_course_id'])
-    #glob_course_id= request.form['hdn_course_id']
     session['course_id'] = request.form['hdn_course_id']
     if g.user:
         return render_template("home.html",values=g.User_detail_with_ids,html="course_add_edit")
@@ -620,17 +616,18 @@ class add_course_details(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
-            course_name=request.form['CourseName']
-            #project_id=13    ### WHY project id is fixed
-            project_id=request.form['ProjectId']
+            CourseId=request.form['CourseId']
+            CourseName=request.form['CourseName']
+            CourseCode=request.form['CourseCode']
+            Sector=request.form['Sector']
+            Qp=request.form['Qp']
+            Parent_Course=request.form['Parent_Course']
+            Course_Duration_day=request.form['Course_Duration_day']
+            Course_Duration_hour=request.form['Course_Duration_hour']
+            isactive=request.form['isactive']
             user_id=g.user_id
-            qp_id=request.form['QpId']
-            is_active=request.form['isactive']
-            center_ids=request.form['CenterId']
-            items=request.form['SessionJSON']
-            course_id=request.form['CourseId']
-            course_code=request.form['CourseCode']
-            return Content.add_course(course_name,project_id,user_id,is_active,center_ids,qp_id,course_id,items,course_code)
+            
+            return Content.add_course(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, isactive, user_id)
             
 class GetCourseDetails(Resource):
     @staticmethod
@@ -7597,6 +7594,21 @@ class GetDocumentForExcel_S3_certiplate(Resource):
             
             return redirect(filename)
 api.add_resource(GetDocumentForExcel_S3_certiplate,'/GetDocumentForExcel_S3_certiplate')
+
+class GetQP_basedon_Sector(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sector_ids=request.args.get('sector_ids','',type=str)
+            return Content.get_qp_for_sector(sector_ids)
+api.add_resource(GetQP_basedon_Sector,'/GetQP_basedon_Sector')
+
+class GetAllParentCourse(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            return Content.GetAllParentCourse()
+api.add_resource(GetAllParentCourse,'/GetAllParentCourse')
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)

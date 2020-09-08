@@ -38,7 +38,8 @@ function LoadTable(sectors, qps, status)
             "data": function (row, type, val, meta) {
                 var varButtons = ""; 
                 //if(role_id != 3 && role_id != 8)
-                varButtons += '<a onclick="AddSessionCourseDetail('+row.Course_Id+' )" class="btn" style="cursor:pointer" ><i title="Add Session" class="fas fa-plus" ></i></a>';
+                //varButtons += '<a onclick="AddSessionCourseDetail('+row.Course_Id+' )" class="btn" style="cursor:pointer" ><i title="Add Session" class="fas fa-plus" ></i></a>';
+                varButtons += '<a onclick="EditCourseDetail(\'' + row.Course_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Course" class="fas fa-edit" ></i></a>';
                 return varButtons;
                 }
             },
@@ -108,16 +109,11 @@ function LoadTable(sectors, qps, status)
 
     });
 }
-function EditCourseDetail(CourseId,SectorId,QpId)
+function EditCourseDetail(Course_Id)
 {
-    $('#hdn_course_id').val(CourseId);
-    $('#form1').submit(); 
-    
-}
-function AddSessionCourseDetail(CourseId){
-    $('#hdn_course_id').val(CourseId);
-    $('#form1').attr('action', '/assign_course_id_for_session');
+    $('#hdn_course_id').val(Course_Id);
     $('#form1').submit();
+    
 }
 
 function LoadSectorddl()
