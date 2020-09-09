@@ -7296,6 +7296,14 @@ class SyncShikshaAttendanceData(Resource):
             return response
 api.add_resource(SyncShikshaAttendanceData,'/SyncShikshaAttendanceData')
 
+class SyncShikshaCandidateData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=Master.SyncShikshaCandidateData()
+            return response
+api.add_resource(SyncShikshaCandidateData,'/SyncShikshaCandidateData')
+
 ################################### SL4 report
 @app.route("/SL4Report_page")
 def SL4Report_page():

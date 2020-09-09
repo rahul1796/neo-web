@@ -2,6 +2,7 @@ from Database import Database
 from flask_restful import Resource
 import pandas as pd
 from flask import request,make_response
+from datetime import datetime
 import requests
 import json
 
@@ -281,6 +282,12 @@ class Master:
         data=shiksha_response.json()
         data=json.dumps(data)
         return Database.UploadShikshaAttendanceData(data)
+    def SyncShikshaCandidateData():
+        last_sync_date=Database.GetShikshaLastSyncDate()
+        shiksha_response=requests.get('https://shiksha.ai/webservice/rest/server.php?wstoken=9690041e9c6d116e3d6414d6188f3a8b&wsfunction=get_simple_dell_report&report[startdate]='+last_sync_date+'&moodlewsrestformat=json&report[enddate]='+datetime.today().strftime('%Y-%m-%d'))
+        data=shiksha_response.json()
+        data=json.dumps(data)
+        return Database.SyncShikshaCandidateData(data)
     def cancel_planned_batch(user_id,planned_batch_code,cancel_reason):
         popupMessage = {"PopupMessage": Database.cancel_planned_batch(user_id,planned_batch_code,cancel_reason)}
         return popupMessage

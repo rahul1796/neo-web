@@ -6249,6 +6249,19 @@ SELECT					cb.name as candidate_name,
         con.close()
         return max_attendance_id
     
+    def GetShikshaLastSyncDate():
+        last_sync_date = ''
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()        
+        quer = "Select COALESCE(cast(MAX(last_sync_date) as date),cast('2019-04-01' as date)) as last_sync_date from [masters].[tbl_shiksha_candidate_data];"
+        cur2.execute(quer)
+        data=cur2.fetchall()
+        data = '' if data==[] else data[0][0]
+        last_sync_date = datetime.strptime(data,'%Y-%m-%d').strftime('%Y-%m-%d')
+        cur2.close()
+        con.close()        
+        return last_sync_date
+    
     def UploadShikshaAttendanceData(attandance_data):
         try: 
             # print(str(df.to_json(orient='records')))
@@ -6273,6 +6286,29 @@ SELECT					cb.name as candidate_name,
             # print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
 
+    def SyncShikshaCandidateData(candidate_data):
+        try: 
+            # print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            sql = 'exec	[masters].[sp_sync_shiksha_candidate_report]  ?'
+            values = (candidate_data,)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop >0 :
+                Status=True
+                msg="Synced Successfully"
+            else:
+                msg="Error in Syncing"
+                Status=False
+            return {"Status":Status,'Message':msg}
+        except Exception as e:
+            # print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
 
 
     def app_get_release_date_msg():
