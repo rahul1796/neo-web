@@ -1,0 +1,495 @@
+
+<!-- Plugins css -->
+<link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- third party css -->
+    
+<link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
+<!-- third party css end -->
+<style>
+    .center {
+        margin: auto;
+        width: 90%;
+        padding: 20px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+    
+    .hidedialog {
+        display: none;
+    }    
+</style>
+<script>
+    $(document).ready(function () {
+        $("#tbl_list").dataTable().fnDestroy();
+        $('.dropdown-search-filter').select2({
+            placeholder:''
+        });
+        
+        LoadPartnerTypes();		
+        LoadTable(); 
+        role_id=parseInt($('#hdn_home_user_role_id').val());
+        if(role_id == 1 || role_id==15)
+        {
+            $('#btn_create').show();
+            $('#btn_add').show();
+        }
+        else
+        {
+            $('#btn_create').hide();
+            $('#btn_add').hide();
+        }
+
+    });
+    function LoadPartnerTypes()
+    {
+        var URL=$('#hdn_web_url').val()+ "/GetPartnerTypes";
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.PartnerTypes != null)
+                    {
+                        $('#ddlPartnerTypes').empty();
+                        var count=data.PartnerTypes.length;
+                        if( count> 0)
+                        {
+                            for(var i=0;i<count;i++)
+                                $('#ddlPartnerTypes').append(new Option(data.PartnerTypes[i].Partner_Type_Name,data.PartnerTypes[i].Partner_Type_Id));
+                            
+                        }
+                        else
+                        {
+                            $('#ddlPartnerTypes').append(new Option('ALL',''));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
+    }
+    function LoadTable()
+    {
+        vartable1 = $("#tbl_list").DataTable({
+            "serverSide": true,
+            "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
+            "paging": true,
+            "pageLength": 10,
+            "sPaginationType": "full_numbers",
+            "scrollX": false,
+            "destroy": true,
+            "processing": true,
+            "language": { "processing": 'Loading..!' },
+            "ajax": {
+                "url": $('#hdn_web_url').val()+ "/partner_list",
+                "type": "POST",
+                "dataType": "json",
+                "data": function (d) {
+                    d.partner_type_ids = $('#ddlPartnerTypes').val().toString() ;
+                },
+                error: function (e) {
+                    $("#tbl_list tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
+                }
+
+            },
+
+            "columns": [
+                { "data": "S_No"},
+                {
+                    "data": function (row, type, val, meta) {
+                        var varButtons = ""; 
+                        if(role_id == 1|| role_id==15)
+                            varButtons += '<a onclick="EditPartnerDetail(\'' + row.Partner_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Partner" class="fas fa-edit" ></i></a>';
+                        return varButtons;
+                    }
+                },
+                { "data": "Partner_Name" },
+                { "data": "Partner_Type_Name"},
+                { 
+                    "data": function (row, type, val, meta) {
+                        var varButtons = ""; /*
+                        if(row.User_Count=="")
+                            varButtons=row.User_Count;
+                        else
+                        {
+                            varButtons += '<a onclick="GetPartnerUsers(\'' + row.Partner_Id + '\',\''+row.Partner_Type_Id+ '\')"  style="color:blue;cursor:pointer" >' + row.User_Count + '</a>';
+                        }*/
+                        varButtons += '<a onclick="GetPartnerUsers(\'' + row.Partner_Id + '\',\''+row.Partner_Type_Id+ '\',\'' + row.Partner_Name + '\')"  style="color:blue;cursor:pointer" >' + row.User_Count + '</a>';
+                        return varButtons;
+                        }
+                    },
+                { "data": "Address"},
+                { "data": function (row, type, val, meta) {
+                    var varStatus = ""; 
+                    if(row.Is_Active)
+                        varStatus="Active";
+                    else
+                        varStatus="In Active";
+                    return varStatus;
+                    }
+                }
+            ],
+            drawCallback: function(){
+                $('#tbl_list_paginate ul.pagination').addClass("pagination-rounded");
+            }
+        });
+    }
+    function EditPartnerDetail(PartnerId)
+    {
+        $('#hdn_partner_id').val(PartnerId);
+        $('#form1').submit();
+    }
+    function GetPartnerUsers(PartnerId,PartnerTypeId,PartnerName)
+    {
+        $('#hdn_modal_partner_id').val(PartnerId);
+        $('#headerUsers').text(PartnerName);
+        var URL=$('#hdn_web_url').val()+ "/GetPartnerUsers?partner_id="+PartnerId;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            overflow:true,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                varHtml='';
+                $("#tbl_users").dataTable().fnDestroy();
+                $("#tbl_users tbody").empty();
+                if(!jQuery.isEmptyObject(data))
+                {   if (data.PartnerUsers != null){
+                        count=data.PartnerUsers.length;
+                        if (count>0)
+                        {   varHtml='';
+                            console.log(count);
+                            for(var i=0;i<count;i++)
+                            {
+                                td_open= '  <td style="text-align:center;">' ;
+                                td_close=   '</td>';       
+                                varHtml+='<tr>';
+                                varHtml+='  <td style="text-align:center;">'+ data.PartnerUsers[i].S_No +'</td>';
+                                if($('#hdn_home_user_role_id').val()!='37')
+                                    varHtml+='  <td style="text-align:center;">'+'<a onclick="EditModal(\'' + data.PartnerUsers[i].User_Name + '\',\'' + data.PartnerUsers[i].Email + '\',\'' + data.PartnerUsers[i].Mobile + '\',\'' + data.PartnerUsers[i].Is_Active + '\',\'' + data.PartnerUsers[i].Partner_User_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Partner User" class="fas fa-edit" ></i></a>'+'</td>';
+                                else
+                                    varHtml+='  <td style="text-align:center;">'+ ''+'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.PartnerUsers[i].User_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.PartnerUsers[i].Email +'</td>';                    
+                                varHtml+='  <td style="text-align:center;">'+ data.PartnerUsers[i].Mobile +'</td>';  
+                                varHtml+='</tr>';                            
+                            }
+                            $("#tbl_users tbody").append(varHtml);
+                                $("#tbl_users").DataTable({
+                                drawCallback: function(){
+                                    $('#tbl_users_paginate ul.pagination').addClass("pagination-rounded");
+                                }
+                            });
+                                $('#mdl_Partner_Users').modal('show');
+                                varHtml='';
+                        }
+                        else
+                        {
+                            //varHtml='<tr><td colspan="4" style="text-align:center;">No records found</td></tr>'                            
+                            //$("#tbl_users tbody").append(varHtml);
+                            $("#tbl_users").DataTable();
+                            $('#mdl_Partner_Users').modal('show');
+                        } 
+                        
+                    }
+                }
+                else
+                {
+                    //varHtml='<tr><td colspan="4" style="text-align:center;">No records found</td></tr>'
+                    //$("#tbl_users tbody").append(varHtml);
+                    $("#tbl_users").DataTable();
+                    $('#mdl_Partner_Users').modal('show');
+                }   
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function AddModal()
+    {       
+        $('#isactive').prop('checked',true);
+        $('#mdl_Partner_Users').modal('hide');
+        $('#mdl_add_edit_Users').modal('show');
+    }
+    function EditModal(Name,Email,Mobile,IsActive,PartnerUserId)
+    {       
+        if(IsActive)
+            $('#isactive').prop('checked',true);
+        else 
+            $('#isactive').prop('checked',false);
+        $('#UserName').val(Name);
+        $('#Email').val(Email);
+        $('#Mobile').val(Mobile);
+        $('#hdn_partner_user_id').val(PartnerUserId);
+        $('#mdl_Partner_Users').modal('hide');
+        $('#mdl_add_edit_Users').modal('show');
+    }
+    function AddeEditPartnerUser()
+    {
+        if($('#Mobile').val().length!=10)
+        {
+            alert('Please enter 10 digit mobile number.');
+            return false;
+        }
+        var URL=$('#hdn_web_url').val()+ "/add_edit_partner_user";
+        $.ajax({
+            type:"POST",
+            url:URL,
+            data:{
+                "UserName" : $('#UserName').val(),
+                "Mobile" : $('#Mobile').val(),
+                "Email" : $('#Email').val(),
+                "isactive" : $('#isactive').prop('checked'),
+                "PartnerId":$('#hdn_modal_partner_id').val(),
+                "PartnerUserId":$('#hdn_partner_user_id').val()
+            },
+            success:function(data){
+                var message="",title="",icon="";
+                if(data.PopupMessage.qp_flag==2){
+                    message=data.PopupMessage.message;
+                    title="Error";
+                    icon="error";
+                }
+                else{
+                    message=data.PopupMessage.message;
+                    title="Success";
+                    icon="success";
+                }
+                swal({   
+                            title:title,
+                            text:message,
+                            icon:icon,
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                $('#mdl_add_edit_Users').modal('hide');
+                                LoadTable();
+                            }); 
+            },
+            error:function(x){
+                alert('error');
+            }
+        });
+    }
+</script>
+<!-- ============================================================== -->
+<!-- Start Page Content here -->
+<!-- ============================================================== -->
+<div class="container-fluid">
+
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">NEO</a></li>
+                        <li class="breadcrumb-item active">Partners</li>
+                    </ol>
+                </div>
+                <h4 class="page-title">Partners</h4>
+            </div>
+        </div>
+    </div>     
+    <!-- end page title -->
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card-box">
+                <form id="form1" action="/assign_partner_add_edit_to_home" method="POST">
+                    <input type="hidden" id="hdn_partner_id" name="hdn_partner_id" value="0">
+                    <div class="row"> 
+                        <div class="col-lg-3">
+                            <label for="ddlPartnerTypes" class="mr-2">Partner Types</label>
+                                <select class="form-control dropdown-search-filter" id="ddlPartnerTypes" multiple >
+                            </select>
+                        </div>   
+                        
+                        <div class="col-lg-3" >
+                            <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+                        </div>
+                        <div class="col-lg-6" >                                        
+                            <button style="margin-top: 30px; float: right;" type="submit" id="btn_create" class="btn btn-primary">Create Partner</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div id="get" class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <h4 class="header-title">Partner List</h4>
+                        </div>
+                        
+                    </div>
+                    <br/>
+                    <div class="col-lg-12">
+                        <table id="tbl_list" class="table dt-responsive wrap">
+                            <thead>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Actions</th>
+                                    <th>Partner Name</th>
+                                    <th>Partner Type</th>
+                                    <th>POC</th>
+                                    <th>Address</th>
+                                    <th>Status</th>                                    
+                                </tr>
+                            </thead>
+                        
+                        <tbody></tbody>
+                        </table>
+                    </div>
+                </div> <!-- end card body-->
+            </div> <!-- end card -->
+        </div><!-- end col-->
+    </div>
+    <!-- end row-->    
+</div> <!-- end container -->
+    
+    <!-- end wrapper -->
+</form>
+
+<div id="mdl_Partner_Users" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title" ><span id="headerUsers"></span></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>                    
+            <div class="modal-body">
+                <input type="hidden" id="hdn_modal_partner_id" name="hdn_modal_partner_id" value="0">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button style="float: right;" type="button" id="btn_add" onclick="AddModal()" class="btn btn-primary">Add User</a>
+                    </div>
+                </div>
+            </br>
+                <div >
+                    <table id="tbl_users" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                        <thead>
+                            <tr style="background-color: #f5f6f8;">
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Action</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Name</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Email</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Mobile</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+            </div>
+        </div>
+    </div>
+</div><!--/.modal-->
+
+<div id="mdl_add_edit_Users" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <form action="javascript:AddeEditPartnerUser();" method="POST" >
+                <div class="modal-header">
+                    <h4 class="modal-title" ><span id="header">Partner User Details</span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>                    
+                <div class="modal-body">
+                    <div class="col-12">
+                        <input type="hidden" id="hdn_partner_user_id" name="hdn_partner_user_id" value="0">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="UserName">Name * :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="text" class="form-control" name="UserName" id="UserName" required placeholder="Name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="Mobile">Mobile * :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="number" class="form-control" name="Mobile" id="Mobile" required placeholder="Mobile">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="Email">Email * :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="email" class="form-control" name="Email" id="Email" required placeholder="Email">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label>Is Active :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="checkbox checkbox-pink mb-0">
+                                        <input type="checkbox" name="isactive" id="isactive" ClientIdMode="static" 
+                                                        value="1" data-parsley-mincheck="1" >
+                                        <label for="isactive"> Is active </label>
+                                    </div>
+                                </div>   
+                            </div>                                     
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary waves-effect" > Save</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div><!--/.modal-->
+<!-- ============================================================== -->
+<!-- End Page content -->
+<!-- ============================================================== -->
+<!-- Footer Start -->
+
+
+
+<!-- third party js -->
+<script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.select.min.js"></script>        
+<!-- third party js ends -->
+<!-- <script src="static/assets/js/pages/qp-list.js"></script> -->

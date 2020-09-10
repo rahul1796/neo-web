@@ -1,0 +1,415 @@
+        <link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+
+        <!-- App css -->
+        <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+        
+        <!-- <script type="text/javascript" src="static/assets/libs/jquery/jquery.min.js"></script> -->
+        <script type="text/javascript">
+            $(document).ready(function(){
+                // $('.dropdown-search-filter').select2();
+                //    { placeholder:''}
+                $(".date-picker").flatpickr();
+                // 
+                
+                LoadCustomerdl();
+                LoadEntitydl();
+                Loadsalescattegorydl();
+                Load_sales_Department();
+                //alert('{{contract_id}}')
+
+                if('{{contract_id}}' !=0)
+                {
+                    var URL=$('#hdn_web_url').val()+ "/GetContractDetails";
+                    $.ajax({
+                        type:"GET",
+                        url:URL,
+                        success:function(data){
+                           if(data!=null)
+                           {
+                               if(data.Contract_details!="")
+                               {  
+                                $('#ContractName').val(data.Contract_details.Contract_Name);
+                                $('#ContractCode').val(data.Contract_details.Contract_Code);
+                                $('#ClientName').val(data.Contract_details.Customer_Id);
+                                $('#EntityName').val(data.Contract_details.Entity_Id);
+                                $('#ddlsalescatergoryname').val(data.Contract_details.Sales_Category_Id);
+                                $('#StartDate').val(data.Contract_details.Start_Date);
+                                $('#EndDate').val(data.Contract_details.End_Date);
+                                $('#ddlSalesManager').val(data.Contract_details.Sales_Manager_Id);
+                                $('#ContractValue').val(data.Contract_details.Value);
+                                if (data.Contract_details.Is_Active)
+                                        $('#isactive').prop('checked',true);
+                                    else
+                                        $('#isactive').prop('checked',false);
+                               }
+                           } 
+                        },
+                        error:function(x){
+                            alert('error');
+                        }
+                    });
+                }
+            });
+
+            function Load_sales_Department()
+        {  
+            var URL=$('#hdn_web_url').val()+ "/sales_Department_user"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.sales_Department_role != null)
+                    {
+                        $('#ddlSalesManager').empty();
+                        var count=data.sales_Department_role.length;
+                        if( count> 0)
+                        {
+                            $('#ddlSalesManager').append(new Option('Choose Sales Manager',''));
+                            for(var i=0;i<count;i++)
+                                $('#ddlSalesManager').append(new Option(data.sales_Department_role[i].Name,data.sales_Department_role[i].User_Id));
+                        }
+                        else
+                        {
+                            $('#ddlSalesManager').append(new Option('Choose Sales Manager',''));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            
+            return false;
+        }
+
+            function Loadsalescattegorydl(){    
+            var URL=$('#hdn_web_url').val()+ "/GetAllSalesCategory"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.SalesCategory != null)
+                    {
+                        $('#ddlsalescatergoryname').empty();
+                        var count=data.SalesCategory.length;
+                        if( count> 0)
+                        {
+                            $('#ddlsalescatergoryname').append(new Option('Choose Sales Category',''));
+                            for(var i=0;i<count;i++)
+                                $('#ddlsalescatergoryname').append(new Option(data.SalesCategory[i].Sales_Category_Name, data.SalesCategory[i].Sales_Category_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                            $('#ddlsalescatergoryname').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+            function LoadEntitydl(){
+            var URL=$('#hdn_web_url').val()+ "/All_entity"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                success: function (data){
+                    if(data.Entity != null)
+                    {
+                        $('#EntityName').empty();
+                        var count=data.Entity.length;
+                        if( count> 0)
+                        {
+                            $('#EntityName').append(new Option('Choose Entity',''));
+                            for(var i=0;i<count;i++)
+                                $('#EntityName').append(new Option(data.Entity[i].Entity_Name, data.Entity[i].Entity_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                            $('#EntityName').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+            function LoadCustomerdl(){
+            var URL=$('#hdn_web_url').val()+ "/GetALLClient"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+				data:{
+						"user_id": $('#hdn_home_user_id').val(),
+						"user_role_id": $('#hdn_home_user_role_id').val()
+					},
+                success: function (data){
+                    if(data.Clients != null)
+                    {
+                        $('#ClientName').empty();
+                        var count=data.Clients.length;
+                        if( count> 0)
+                        {
+                            $('#ClientName').append(new Option('Choose Customer',''));
+                            for(var i=0;i<count;i++)
+                                $('#ClientName').append(new Option(data.Clients[i].Customer_Name, data.Clients[i].Customer_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                            $('#ClientName').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+            
+
+
+            function add_popup_message(){
+                var URL=$('#hdn_web_url').val()+ "/add_contract_details";
+                    $.ajax({
+                        type:"POST",
+                        url:URL,
+                        data:{
+                            "ContractName" : $('#ContractName').val(),
+                            "ContractCode" : $('#ContractCode').val(),
+                            "ClientName" : $('#ClientName').val(),
+                            "EntityName" : $('#EntityName').val(),
+                            "SalesCatergory" : $('#ddlsalescatergoryname').val(),
+                            "StartDate" : $('#StartDate').val(),
+                            "EndDate" : $('#EndDate').val(),
+                            "SalesManager" : $('#ddlSalesManager').val(),
+                            "ContractValue" : $('#ContractValue').val(),
+                            "isactive" : $('#isactive').prop('checked')
+                        },
+                        success:function(data){
+                            var message="",title="",icon="";
+                    if(data.PopupMessage.client_flag==2){
+                        message=data.PopupMessage.message;
+                        title="Error";
+                        icon="error";
+                    }
+                    else{
+                        message=data.PopupMessage.message;
+                        title="Success";
+                        icon="success";
+                    }
+                    swal({   
+                                title:title,
+                                text:message,
+                                icon:icon,
+                                confirmButtonClass:"btn btn-confirm mt-2"
+                                }).then(function(){
+                                    window.location.href = '/after_popup_contract';
+                                });
+                        //    alert("The Inserted/Upadated Id is "+data.PopupMessage.message);
+                        //    window.location.href="/after_popup"; 
+                        },
+                        error:function(x){
+                            alert('error');
+                        }
+                    });
+            }
+        </script>
+                <div class="container-fluid">
+                    <form action="javascript:add_popup_message();">
+                    <!-- start page title -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="page-title-box">
+                                <div class="page-title-right">
+                                    <ol class="breadcrumb m-0">
+                                        <li class="breadcrumb-item"><a href="javascript: void(0);">NEO</a></li>
+                                        <li class="breadcrumb-item"><a href="/contract">Contract</a></li>
+                                        <li class="breadcrumb-item active">Add-Edit Contract</li>
+                                    </ol>
+                                </div>
+                                <h4 class="page-title">Contract Details</h4>
+                            </div>
+                        </div>
+                    </div>     
+                    <!-- end page title --> 
+    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card-box">
+                                <h4 class="header-title">Contract Details</h4>
+                                <br/>
+                                <div class="alert alert-warning d-none fade show">
+                                    <h4>Oh snap!</h4>
+                                    <p class="mb-0">This form seems to be invalid :(</p>
+                                </div>
+    
+                                <div class="alert alert-info d-none fade show">
+                                    <h4>Yay!</h4>
+                                    <p class="mb-0">Everything seems to be ok :)</p>
+                                </div>
+    
+                                <form id="demo-form" data-parsley-validate="">
+                                    
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ContractName">Contract Name :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <input type="text" maxlength="25" class="form-control" name="ContractName" id="ContractName" required placeholder="Contract name">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ContractCode">Contract Code :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <input type="text" maxlength="25" class="form-control" name="ContractCode" id="ContractCode" required placeholder="Contract Code">
+                                            </div>
+                                        </div>
+                                    </div> 
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ContractValue">Contract Value :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <input type="number" step="0.01" class="form-control" name="ContractValue" id="ContractValue" required placeholder="Contract Value">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ClientName">Customer Name :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ClientName" class="form-control dropdown-search-filter" name="Customer_Name" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                                    <option value="">Choose Funding Source</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="EntityName">Entity Name :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="EntityName" class="form-control dropdown-search-filter" name="Entity_Name" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                                    <option value="">Choose Entity Name</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ddlsalescatergoryname">Sales Category Name</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ddlsalescatergoryname" class="form-control dropdown-search-filter" name="sales_catergoryname" onchange="" ClientIdMode="static" required=""> <!-- LoadCenterList(this.value,0) -->>
+                                                    <option value="">Choose Sales Catergory</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="SalesManager">Sales Manager</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select id="ddlSalesManager" class="form-control dropdown-search-filter" name="ddlSalesManager" ClientIdMode="static"  required="">
+                                                    <option value="">Choose Sales Manager</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                    <div class="form-group row ">
+                                        <div class="col-lg-6">
+                                                <label for="StartDate">Start Date *:</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                        <input type="text" id="StartDate" name="StartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date">
+                                    </div>
+                                </div>
+                                <div class="form-group row ">
+                                        <div class="col-lg-6">
+                                                <label for="EndDate">End Date *:</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                        <input type="text" id="EndDate" name="EndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date">
+                                    </div>
+                                </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label>Is Active :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="checkbox checkbox-pink mb-0">
+                                                    <input type="checkbox" name="isactive" id="isactive" ClientIdMode="static" 
+                                                                    value="1" data-parsley-mincheck="1" >
+                                                    <label for="isactive"> Is active </label>
+                                                </div>
+                                            </div>   
+                                        </div>                                     
+                                    </div>    
+    
+                                    <div class="form-group mb-0">
+                                        <button class="btn btn-primary" type="submit">Save</button>
+                                    </div>
+    
+                                </form>
+                            </div> <!-- end card-box-->
+                        </div> <!-- end col-->
+                    </div>
+                    <!-- end row-->
+    
+                </form>
+                
+                </div> <!-- end container -->
+
+        <script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>
+        <script src="static/assets/libs/jquery-knob/jquery.knob.min.js"></script>
+        <script src="static/assets/libs/jquery-sparkline/jquery.sparkline.min.js"></script>
+
+
+        <script src="static/assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+        <link href="static/assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" />
+        <script src="static/assets/libs/clockpicker/bootstrap-clockpicker.min.js"></script>
+        <link href="static/assets/libs/bootstrap-colorpicker/bootstrap-colorpicker.min.css" rel="stylesheet" type="text/css" />
+       

@@ -1,0 +1,164 @@
+<link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+        
+<!-- third party css -->
+<link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
+<!-- third party css end -->
+
+<!-- App css -->
+<link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+       <div class="container-fluid">
+
+           <!-- start page title -->
+           <div class="row">
+               <div class="col-12">
+                   <div class="page-title-box">
+                       <div class="page-title-right">
+                           <ol class="breadcrumb m-0">
+                               <li class="breadcrumb-item"><a href="javascript: void(0);">LN</a></li>
+                               <li class="breadcrumb-item active">User Sub Project report</li>
+                           </ol>
+                       </div>
+                       <h4 class="page-title">User Sub Project report</h4>
+                   </div>
+               </div>
+           </div>     
+           <!-- end page title -->
+           <div class="row">
+            <div class="col-12">
+                <div class="card-box">
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <label for="ddlClient" class="mr-2">Customer</label>
+                            <select class="form-control dropdown-search-filter" onchange="loadbasedonclient();" id="ddlClient" multiple>
+                                <!-- <option selected="" value="">All</option> -->
+                            </select>
+                        </div>
+                       
+                        <div class="col-lg-3">
+                            <label for="ddlProject" class="mr-2">Project</label>
+                            <select class="form-control dropdown-search-filter" onchange="LoadSubProject();" id="ddlProject" multiple>
+                                <!-- <option selected="" value="">All</option> -->
+                            </select>
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="ddlSubProject" class="mr-2">Sub Project</label>
+                            <select class="form-control dropdown-search-filter" id="ddlSubProject" multiple>  <!-- onchange="LoadCenter();"-->>
+                                <!-- <option selected="" value="">All</option> -->
+                            </select>
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="ddlRegion" class="mr-2">Region</label>
+                            <select class="form-control dropdown-search-filter" id="ddlRegion" multiple>
+                                <!-- <option selected="" value="">All</option> -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        
+                        
+                       
+                        <div class="col-lg-3">
+                            <label for="ddlStatus" class="mr-2">User Status</label>
+                            <select class="form-control dropdown-search-filter" id="ddlUserStatus" multiple>
+                                <option value="1">Active</option>
+                                <option  value="2">Inactive</option>
+                                 </select>
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="ddlStatus" class="mr-2">Sub Project Status</label>
+                            <select class="form-control dropdown-search-filter" id="ddlSubProjectStatus" multiple>
+                                <option value="1">Open</option>
+                                <option  value="2">Expired</option>
+                                 </select>
+                        </div>
+                        <div class="col-lg-1" style="float: center; margin-top: 30px">
+                            <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTable()">Search</button>
+                        </div>
+                        <div class="form-group col-lg-2">                                         
+                            <a class="btn btn-primary" style="float: right; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
+                            <a id="lnkDownload" style="display:none;"></a>
+                        </div>
+                    </div>
+                    
+                    <div class="row">  
+                        <div class="form-group col-lg-4">
+                            <div id="imgSpinner" >
+                                <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-block;"/>
+                                <label style="display:inline-block;">Please wait while downloading report...</label>
+                            </div> 
+                        </div>
+                    </div>
+                    <!-- end row -->
+                </div> <!-- end card-box -->
+            </div><!-- end col-->
+        </div>
+        <!-- end row -->
+           <div class="row">
+               <div class="col-12">
+                   <div class="card">
+                       <div class="card-body">
+                           <div class="row">
+                               <div class="col-lg-6">
+                                   <h4 class="header-title">User-Sub Project List</h4>
+                               </div>
+                               <!-- <div class="col-lg-6" >                                        
+                                       <button style="float: right" type="submit" id="btn_create" class="btn btn-primary">Create Candidate</a>
+                               </div> -->
+                           </div>
+                           <br/>
+                           <div class="col-lg-12">
+                               <table id="tbl_user_sub_project" class="table w-100 wrap dataTable no-footer" >
+                                   <thead>
+                                       <tr>
+                                           <th>S No</th>
+                                           <th>Employee Code</th>
+                                           <th>Employee Name</th>
+                                           <th>Employee Email</th>
+                                           <th>Sub Project Code</th>
+                                           <th>Sub Project Name</th>
+                                           <th>Employee Neo Role</th>
+                                           <th>Employement Type</th>
+                                           </tr>
+                                   </thead>
+                               
+                               <tbody></tbody>
+                               </table>
+                           </div>
+                       </div> <!-- end card body-->
+                   </div> <!-- end card -->
+               </div><!-- end col-->
+           </div>
+           <!-- end row-->    
+       </div> <!-- end container -->
+   
+
+<!-- ============================================================== -->
+<!-- End Page content -->
+<!-- ============================================================== -->
+
+<!-- Footer Start -->
+
+
+<!-- third party js -->
+<script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<!-- third party js ends -->
+
+<!-- datatables init js-->
+<script src="static/assets/js/pages/user_sub_project.js"></script>
+
+
+

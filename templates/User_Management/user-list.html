@@ -8,12 +8,32 @@
         <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />        
         <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+        <!-- <link href="static\assets\libs\DemoMonth\MonthPicker.min.css" rel="stylesheet" type="text/css" />
+        <script src="static\assets\libs\DemoMonth\MonthPicker.min.js"></script> -->
+        <!-- <link href="static\assets\libs\DemoMonth\MonthPicker.css" rel="stylesheet" type="text/css" />
+        <script src="static\assets\libs\DemoMonth\MonthPicker.js"></script> -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+
         <script type="text/javascript">
             $(document).ready(function () {
+                // $('#From_Date').MonthPicker({
+                //                             ShowIcon: false,
+                //                             StartYear: 2020
+                //                         });
+                // $('#To_Date').MonthPicker({
+                //     ShowIcon: false,
+                //     StartYear: 2020
+                // });
+                // $(".month-picker").flatpickr(
+                //     {
+                //         dateFormat: "M-Y" // Displays: 2017-01-22Z
+                       
+                //     }
+                // );
+
             $("#tbl_users").dataTable().fnDestroy();
-            $('.dropdown-search-filter').select2({
-                placeholder:''
-            });
+            $('.dropdown-search-filter').select2();
 
             //LoadRM_Role_ddl();
             LoadRegionddl();
@@ -26,12 +46,16 @@
             LoadTable('{{role}}'); 
             role_id=parseInt($('#hdn_home_user_role_id').val());
             if(role_id == 5)
-                $('#btn_create').hide();
+                $('#btn_create').hide();                
+            if(role_id == 1)
+                $('#btn_upload').show();
+            else 
+                $('#btn_upload').hide();
         });
         </script>
        <form id='form1' method="POST" action="/assign_user_add_edit_to_home">
             
-                <input type="hidden" id="hdn_user_id" name="hdn_user_id" value="0">
+                <input type="hidden" id="hdn_neo_user_id" name="hdn_neo_user_id" value="0">
                 <div class="container-fluid">
     
                     <!-- start page title -->
@@ -40,7 +64,7 @@
                             <div class="page-title-box">
                                 <div class="page-title-right">
                                     <ol class="breadcrumb m-0">
-                                        <li class="breadcrumb-item"><a href="javascript: void(0);">LN</a></li>
+                                        <li class="breadcrumb-item"><a href="javascript: void(0);">NEO</a></li>
                                         <li class="breadcrumb-item active">Users</li>
                                     </ol>
                                 </div>
@@ -69,12 +93,13 @@
                                         </select>
                                     </div>
                                     <div class="col-lg-3">
-                                        <label for="ddlRole" class="mr-2">Role</label>
+                                        <label for="ddlRole" class="mr-2"> HR Role</label>
                                         <select class="form-control dropdown-search-filter" id="ddlRole" multiple>
                                             <option selected="" value="">All</option>
                                             
                                         </select>
                                     </div>
+                                    
                                     <div class="col-lg-3">
                                         <label for="ddlRegion" class="mr-2">Region</label>
                                         <select class="form-control dropdown-search-filter" id="ddlRegion"  multiple>
@@ -108,7 +133,11 @@
                                         onclick="LoadTable('-1')">Search</button>
                                         
                                     </div>
+                                    <div class="col-lg-3" >                                        
+                                        <button style="float: left; margin-top: 30px; display: none;"  id="btn_upload" onclick="UploadUserMdl()" type="button" class="btn btn-info waves-effect waves-light">Add/Modify Employees</a>
+                                    </div>
                                 </div>
+                               
                             </div>
                         </div>
                     </div>
@@ -126,17 +155,21 @@
                                         </div>
                                     </div>
                                     <br/>
-                                    <div class="col-lg-12">
-                                        <table id="tbl_users" class="table dt-responsive wrap">
+                                    <div class="col-lg-14">
+                                        <table id="tbl_users" class="table dt-responsive  w-100 nowrap dataTable">
                                             <thead>
                                                 <tr>
                                                     <th>S.No</th>
-                                                    <th>Actions</th>
+                                                    <th id ="col_to_hide" style="display:none;">Actions</th>
                                                     <th>User Name</th>
                                                     <th>Email</th>
+                                                    <th>Employee Code</th>
                                                     <th>Entity</th>
                                                     <th>Department</th>
-                                                    <th>Role</th>
+                                                    <th>HR Role</th>
+                                                    <th>NEO Role</th>
+                                                    <th>JOBS Role</th>
+                                                    <th>CRM Role</th>
                                                     <th>Region</th>
                                                     <th>Project</th>
                                                     <th>Reporting Manager</th>
@@ -163,8 +196,277 @@
         <!-- ============================================================== -->
 
         <!-- Footer Start -->
+        <div id="divSubProjectList" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Sub Project List</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <table id="tblSubProject" class="table table-bordered dt-responsive wrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                            <thead>                        
+                                <tr style="background-color: #f5f6f8;">
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Name</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Code</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Name</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Code</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Name</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Business Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
         
+                            </tbody>
+                        </table>	
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->  
+        <div id="mdl_add_edit_role" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content " >
+                    <form id="frAddEditRole" data-parsley-validate="" action="javascript:UpdateRole()">
+                    <div class="modal-header">
+                        <h4 class="modal-title" ><span id="hdBatchName">Update User Roles:</span></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>                    
+                    <div class="modal-body" style="overflow: auto;width: 100%;height:400px;">  
+                        <div >
+                            <div class="form-group" id="DivEmpName">
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <label for="TxtEmpName">User Name:</label>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <input type="text" id="TxtEmpName" name="TxtEmpName" class="form-control " ClientIdMode="static" placeholder="User Name" disabled>
+                                    </div>
+                                    <div class="col-lg-4"></div>
+                                </div>
+                            </div>  
+                            <div class="form-group" id="DivEmpCode">
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <label for="TxtEmpCode">Employee Code :</label>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <input type="text" id="TxtEmpCode" name="TxtEmpCode" class="form-control " ClientIdMode="static" placeholder="Employee Code" disabled >
+                                    </div>
+                                    <div class="col-lg-4"></div>
+                                </div>
+                            </div> 
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <label for="ddlNeoRole">Neo Role :</label>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <select id="ddlNeoRole" class="form-control dropdown-search-filter" name="ddlNeoRole" ClientIdMode="static"  required="" multiple>
+                                         </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <label for="ddlJobsRole">Neo Jobs Role:</label>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <select id="ddlJobsRole" class="form-control " name="ddlJobsRole">
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-4"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <label for="ddlCRMRole">CRM Role :</label>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <select id="ddlCRMRole" class="form-control " name="ddlCRMRole" >
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-4"></div>
+                                </div>
+                            </div>    
+                        </div>             
+                    </div>
+                    <div class="modal-footer">   
+                        <button class="btn btn-success" type="submit"> Submit </button>                
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Back</button>                    
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div><!--/.modal-->
+        
+<div id="mdl_user_target" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title" ><span id="headertarget"></span></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>                    
+            <div class="modal-body">
+                <input type="hidden" id="hdn_modal_user_id" name="hdn_modal_user_id" value="0">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button style="float: right;" type="button" id="btn_add" onclick="AddModal()" class="btn btn-primary">Add Monthly Target</a>
+                    </div>
+                </div>
+            </br>
+                <div >
+                    <table id="tbl_target" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                        <thead>
+                            <tr style="background-color: #f5f6f8;">
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Action</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">From</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">To</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Product</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Target</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Updated by</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Last updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
+                        </tbody>
+                    </table>
+                </div>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+            </div>
+        </div>
+    </div>
+</div><!--/.modal-->
+
+
+<div id="mdl_add_edit_targets" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <form action="javascript:AddeEdittUserTarget();" method="POST" >
+                <div class="modal-header">
+                    <h4 class="modal-title" ><span id="header">Target Details</span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="col-12">
+                        <input type="hidden" id="hdn_user_target_id" name="hdn_user_target_id" value="0">
+                        <input type="hidden" id="hdn_user_id_m2" name="hdn_user_id_m2" value="0">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="From_Date">From Month :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="month" class="form-control" name="From_Date" id="From_Date" required placeholder="From Date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="To_Date">To Month :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="month" class="form-control" name="To_Date" id="To_Date" required placeholder="To Date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="ddlproduct">Product :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <select id="ddlproduct" class="form-control" name="ddlproduct" ClientIdMode="static">   <!--dropdown-search-filter data-live-search="true" -->
+                                        <option  value="1">Training</option>
+                                        <option  value="5">Certification</option>
+                                        <option  value="7">Placement</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="target">Target :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="number" class="form-control" name="target" id="target" required placeholder="Target">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label>Is Active :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="checkbox checkbox-pink mb-0">
+                                        <input type="checkbox" name="isactive" id="isactive" ClientIdMode="static" 
+                                                        value="1" data-parsley-mincheck="1" >
+                                        <label for="isactive"> Is active </label>
+                                    </div>
+                                </div>   
+                            </div>                                     
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary waves-effect" > Save</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div><!--/.modal-->
+
+
+<div id="mdl_upload_user_plan" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content ">
+            <form id="formUpload" action="javascript:UploadFileData()">
+            <div class="modal-header">
+                <h4 class="modal-title"><span id="HduploadFile"></span></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <label for="myFile">Upload File* :</label>
+                        </div>
+                        <div class="col-lg-4">
+                            <input type="file" id="myFile" name="filename">
+                        </div>
+                        <div class="col-lg-4">
+                            <button class="btn btn-info btn-sm waves-effect waves-light" type="button" onclick="DownloadUserTemplate()">Download Template</button>
+                        </div>
+                    </div>
+                </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary waves-effect" type="submit" >Upload</button>
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Close</button>
+            </div>
+            <div id="imgSpinner1">
+                <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                <label style="display:inline-block;">Please wait while uploading...</label>
+            </div> 
+        </form>
+        </div>
+    </div>
+</div><!--/.modal-->
+        
         <!-- third party js -->
         <script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
         <script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
@@ -182,3 +484,4 @@
 
         <!-- datatables init js-->
         <script src="static/assets/js/pages/user-list.js"></script>
+

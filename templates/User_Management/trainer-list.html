@@ -12,12 +12,18 @@
         <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
         
 		<script type="text/javascript">
-        $(document).ready(function(){       
+        $(document).ready(function(){    
+            role_id=parseInt($('#hdn_home_user_role_id').val());
+            if(role_id == 1 || role_id ==15)
+                $('#btn_create').show();
+            else 
+                $('#btn_create').hide();   
             $("#tbl_users").dataTable().fnDestroy();                
             
 			$('.dropdown-search-filter').select2({
                 placeholder:''
             });
+            
             LoadBuddl();
             LoadDeptdl();
             Loadentityddl();
@@ -25,8 +31,12 @@
             LoadProjectddl();
             LoadSectorddl();
             LoadStatusddl();
+            $('#ddlTrainerType').empty();
+            $('#ddlTrainerType').append(new Option('ALL','0'));
+            $('#ddlTrainerType').append(new Option('Internal','1'));
+			$('#ddlTrainerType').append(new Option('External','2'));
             LoadTable("0","-1");
-			
+            
 			// $('#ddlStatus').append(new Option('ALL','-1'));
 			// $('#ddlStatus').append(new Option('Active','1'));
 			// $('#ddlStatus').append(new Option('InActive','0'));
@@ -394,6 +404,7 @@ function LoadClusterddl(){
                 d.entity_ids = $('#ddlentity').val().toString();
                 d.project_ids = $('#ddl_Project').val().toString();
                 d.sector_ids = $('#ddlSector').val().toString();
+                d.TrainerType = $('#ddlTrainerType').val();
             },
             error: function (e) {
                 $("#tbl_users tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -408,7 +419,19 @@ function LoadClusterddl(){
             { "data": "Entity_Name" },
             { "data": "Employee_Department_Name" },
             { "data": "Region_Name" },
-            { "data": "Project_Name" },
+            { 
+                "data": 
+                function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Project==0)
+                        varButtons=row.Project_Name;
+                    else
+                    {
+                        varButtons += '<a onclick="GetProjectDetails(\'' + row.User_Id + '\',\'' + row.User_Name + '\')"  style="color:blue;cursor:pointer" >' + row.Project_Name + '</a>';
+                    }                    
+                    return varButtons;
+                }
+            },
             { "data": "Sector_Name" },
             { "data": "Employment_Status_Name" },
 
@@ -479,7 +502,70 @@ function LoadClusterddl(){
             });
         }
     }
-    
+    function GetProjectDetails(User_Id,User_Name)
+    {
+        var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForUser?user_id="+User_Id;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            overflow:true,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                varHtml='';
+                $("#tblSubProject").dataTable().fnDestroy();
+                $("#tblSubProject tbody").empty();
+                if(!jQuery.isEmptyObject(data.SubProjects))
+                {   if (data.SubProjects != null){
+                        count=data.SubProjects.length;
+                        if (count>0)
+                        {   varHtml='';
+                            console.log(count);
+                            for(var i=0;i<count;i++)
+                            {
+                                td_open= '  <td style="text-align:center;">' ;
+                                td_close=   '</td>';       
+                                varHtml+='<tr>';
+                                varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].S_No +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ User_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Sub_Project_Code +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Sub_Project_Name +'</td>';                    
+                                varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Code +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Name +'</td>';  
+                                varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Bu +'</td>';         
+                                varHtml+='</tr>';
+                                
+                            }
+                                $("#tblSubProject tbody").append(varHtml);
+                                $("#tblSubProject").DataTable();
+                                $('#divSubProjectList').modal('show');
+                                varHtml='';
+                        }
+                        else
+                        {
+                            varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                            $("#tblSubProject tbody").append(varHtml);
+                            $('#divSubProjectList').modal('show');
+                        } 
+                        
+                    }
+                }
+                else
+                {
+                    varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                    $("#tblSubProject tbody").append(varHtml);
+                    $('#divSubProjectList').modal('show');
+                }   
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
 </script>
 	<div class="container-fluid">
                    <!-- start page title -->
@@ -488,7 +574,7 @@ function LoadClusterddl(){
                             <div class="page-title-box">
                                 <div class="page-title-right">
                                     <ol class="breadcrumb m-0">
-                                        <li class="breadcrumb-item"><a href="javascript: void(0);">LN</a></li>
+                                        <li class="breadcrumb-item"><a href="javascript: void(0);">NEO</a></li>
                                         <li class="breadcrumb-item active">Trainers</li>
                                     </ol>
                                 </div>
@@ -501,14 +587,12 @@ function LoadClusterddl(){
 	<div class="row">
         <div class="col-12">
             <div class="card-box">
-                <form id="DownloadReport" action="javascript:DownloadReport();" name="DownloadReport" method="POST">
-                    
+                <form id="DownloadReport" action="/assign_External_treiner_add_edit" method="POST">
 					<div class="row">
                         <div class="col-lg-3">
                             <label for="ddlentity" class="mr-2">Entity</label>
                             <select class="form-control dropdown-search-filter" id="ddlentity" multiple>
                                 <option selected="" value="">All</option>
-                                
                             </select>
                         </div> 
                         <div class="col-lg-3">
@@ -552,9 +636,17 @@ function LoadClusterddl(){
 							</select>
 						</div>
 					    
-                        
+                        <div class="col-lg-3">
+                            <label for="ddlTrainerType" class="mr-2">Status</label>
+                            <select class="form-control dropdown-search-filter" id="ddlTrainerType">
+                                <option  value="">All</option>
+                            </select>
+                        </div>
                         <div class="col-lg-1" >
                             <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+                        </div>
+                        <div class="col-lg-4" >                                        
+                             <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-success">Create External Trainer</a>
                         </div>
                         <div class="col-lg-1" >
                             <!-- <button class="btn btn-primary" type="submit" >Download Report</button> -->
@@ -618,7 +710,38 @@ function LoadClusterddl(){
         <!-- ============================================================== -->
 
         <!-- Footer Start -->
+        <div id="divSubProjectList" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Sub Project List</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <table id="tblSubProject" class="table table-bordered dt-responsive wrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                            <thead>                        
+                                <tr style="background-color: #f5f6f8;">
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Name</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Code</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Name</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Code</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Name</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Business Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
         
+                            </tbody>
+                        </table>	
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->  
 
         <!-- third party js -->
         <script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>

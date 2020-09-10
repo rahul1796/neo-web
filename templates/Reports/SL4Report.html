@@ -1,0 +1,190 @@
+<link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+        
+<!-- third party css -->
+<link href="static/assets/libs/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript">
+    var Candidates = {};
+        $(document).ready(function(){  
+			$("#imgSpinner").hide();
+            $('.dropdown-search-filter').select2();
+            $(".date-picker").flatpickr({
+                dateFormat:'d-M-Y'
+            });
+            LoadCustomerdl();
+        });
+        function LoadCustomerdl(){
+        var URL=$('#hdn_web_url').val()+ "/GetALLClient"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "user_id": $('#hdn_home_user_id').val(),
+                "user_role_id": $('#hdn_home_user_role_id').val()
+            },
+            success: function (data){
+                if(data.Clients != null)
+                {
+                    $('#ddlCustomer').empty();
+                    var count=data.Clients.length;
+                    if( count> 0)
+                    {
+                        $('#ddlCustomer').append(new Option('ALL','0'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
+                        //$('#ddlCourse').val('0');
+                    }
+                    else
+                    {
+                    // $('#ddlCustomer').append(new Option('No Customer','-1'));
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error while loading BU! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function DownloadTableBasedOnSearch(){
+        // if($('#FromDate').val()=='' || $('#ToDate').val()==''){
+		// alert('Please Select both Dates');
+		// }
+        // else 
+        if($('#ddlCustomer').val().toString()==''){
+		alert('Please Select Customer');
+		}
+		else{            
+            $("#imgSpinner").show();
+			var URL=$('#hdn_web_url').val()+ "/updated_new_SL4Report"
+			//window.location = URL + "?ActivityDate=2019-09-09"
+			$.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: URL, 
+                        data: { 
+                        'user_id':$('#hdn_home_user_id').val(),
+                        'user_role_id':$('#hdn_home_user_role_id').val(),
+						'from_date':$('#FromDate').val(),
+						'to_date':$('#ToDate').val(),
+						'Customers':$('#ddlCustomer').val().toString()
+						},
+                        success: function(resp) 
+                        {
+
+							$("#imgSpinner").hide();
+                            if (resp.Status){
+                                var varAnchor = document.getElementById('lnkDownload');
+                                varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
+                                
+                                try 
+									{ 
+                                        //in firefox
+										varAnchor.click();
+										return;
+									} catch(ex) {}
+									
+									try 
+									{ 
+                                        // in chrome
+										if(document.createEvent) 
+										{
+											var e = document.createEvent('MouseEvents');
+											e.initEvent( 'click', true, true );
+											varAnchor.dispatchEvent(e);
+											return;
+										}
+									} catch(ex) {}
+									
+									try 
+									{ 
+                                        // in IE
+										if(document.createEventObject) 
+										{
+											 var evObj = document.createEventObject();
+											 varAnchor.fireEvent("onclick", evObj);
+											 return;
+										}
+									} catch(ex) {}
+
+                            }
+                            else{
+                                alert('Not success')
+                            }
+                        },
+                        error:function()
+                        {
+                            $("#imgSpinner").hide();
+                        }
+                    });
+        }
+    }
+	
+	function ForceDownload(varUrl, varFileName)
+            {
+                var link = document.createElement('a');
+                link.setAttribute('href', varUrl);
+                link.setAttribute('download', varFileName);
+                link.setAttribute('target', '_blank');
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } 
+</script>
+   
+</br>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card-box">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <label for="ddlCustomer" class="mr-2">Customer*</label>
+                        <select class="form-control dropdown-search-filter" id="ddlCustomer" multiple >
+                            <option value="">All</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="FromDate" class="mr-2">From Date</label>
+                        <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
+                        ClientIdMode="static" placeholder="From Date">
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="ToDate" class="mr-2">To Date</label>
+                        <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
+                        ClientIdMode="static" placeholder="To Date">
+                    </div>
+                </div>
+				
+                <div class="row">  
+                    <div class="form-group col-lg-4">                                         
+                        <a class="btn btn-primary" style="margin-right: 20px;color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
+                        <a id="lnkDownload" style="display:none;"></a>
+                    </div>
+                </div>
+				<div class="row">  
+					<div class="form-group col-lg-4">
+                        <div id="imgSpinner">
+                            <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-block;"/>
+                            <label style="display:inline-block;">Please wait while downloading report...</label>
+                        </div> 
+                    </div>
+				</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- third party js -->
+<script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>  
+<!-- third party js ends -->
+<!--<script src="static/assets/js/pages/trainer-deployment-report.js"></script>-->
+<!-- <script src="static/assets/libs/custombox/custombox.min.js"></script> -->

@@ -158,7 +158,7 @@ function TableforSessions(ModuleId){
             { "data": "Session_Code" },
             { "data": "Session_Order"},
             { "data": "Session_Duration" },
-            { "data": "Session_Type" },
+            // { "data": "Session_Type" },
             
         ],
     });
@@ -315,4 +315,37 @@ function EditSessionDetail(SessionId){
             });
             $('#getsessions').hide();
             $('#add_edit_session').show();
+}
+
+function AddSessionPlanPopUp()
+{
+    $('#AddSessionPlan').show();
+    $('#getsessionplan').hide();
+    $('#getmodule').hide();
+    $('#getsessions').hide();
+    $('#AddModule').hide();
+    $('#add_edit_session').hide();
+    $('#isactive').prop('checked',true);
+}
+
+function AddModulePopUp()
+{
+    $('#AddModule').show();
+    $('#getmodule').hide();
+    $('#getsessionplan').hide();
+    $('#getsessions').hide();
+    $('#AddSessionPlan').hide();
+    $('#add_edit_session').hide();
+    $('#module_isactive').prop('checked',true);
+}
+
+function AddSessionPopUp()
+{
+    $('#add_edit_session').show();
+    $('#getsessions').hide();
+    $('#getsessionplan').hide();
+    $('#getmodule').hide();
+    $('#AddSessionPlan').hide();
+    $('#AddModule').hide();
+    $('#session_isactive').prop('checked',true);
 }

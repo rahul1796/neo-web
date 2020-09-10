@@ -24,6 +24,8 @@
         <form id='form1' method="POST" action="/assign_batch_add_edit_to_home">
             
                 <input type="hidden" id="hdn_batch_id" name="hdn_batch_id" value="0">
+                <input type="hidden" id="hdn_actual_batch" name="hdn_actual_batch" value="0">
+               
                 <div class="container-fluid">
     
                     <!-- start page title -->
@@ -111,8 +113,9 @@
         <!-- ============================================================== -->
         <!-- End Page content -->
         <!-- ============================================================== -->
-        
+             
 <div id="map_cand" class="center hidedialog col-lg-12">
+    <input type="hidden" id="hdn_mdl_skilling_id" name="hdn_mdl_skilling_id" value="0">
     <button id="close" class="btn btn-primary " style="float: right;"onclick="javascript:$('#get').show(); $('.center').hide();">X</button>
     <table id="tbl_candidate"  class="table dt-responsive nowrap">
         <thead>
@@ -157,7 +160,34 @@
     </div>
     
 </div>
-
+<div id="mdl_cancel_batch" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content ">  
+             <div class="modal-header">
+                <h4 class="modal-title" id="HdActualBatches">Reason For Cancel Batch* </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            
+                            <input type="text" id="TxtReason" name="TxtReason" class="form-control"  ClientIdMode="static">
+                       </div>
+                       
+                    </div>
+                </div>
+               
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary waves-effect" type="submit" onclick="CancelBatchSubmit($('#hdn_actual_batch').val())">Cancel Batch</button>
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Back</button>
+            </div>
+           
+         
+        </div>
+    </div>
+</div><!--/.modal-->  
 <!--div id="drop_cand_popup" class="center hidedialog col-lg-12">
     <button id="drop_close" class="btn btn-primary " style="float: right;"onclick="javascript:$('#get').show(); $('.center').hide();">X</button>
     <div>can we drop all the candidagte</div>
@@ -187,7 +217,7 @@
         <script src="static/assets/libs/datatables/dataTables.select.min.js"></script>        
         <!-- third party js ends -->
         <script src="static/assets/js/pages/batch-list.js"></script>
-
+       
 
         <div id="con_close_modal" class="modal fade" role="dialog">
             <div class="modal-dialog">
