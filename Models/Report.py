@@ -978,6 +978,14 @@ class Report:
             default_column_enr = ['Candidate_Id','Batch_Code','Enrollment Id', 'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Highest_Qualification', 'Stream_Specialization', 'Computer_Knowledge', 'Technical_Knowledge','Name_Of_Institute', 'University', 'Year_Of_Pass', 'Percentage','Family Salutation', 'Name', 'Family_Date_Of_Birth', 'Family_Age', 'Family_Primary_Contact', 'Family_Email_Address', 'Family Gender', 'Relationship', 'Education_Qualification', 'Members_Occupation','Bank_Name', 'Account_Number','Branch_Name', 'Branch_Code', 'Account_Type','Project_Type','Enrolled_On','Enrolled_By']
             for i in range(len(default_column_enr)):
                 worksheet4.write(0,i ,default_column_enr[i], header_format)
+            
+            df_dell=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Aspirational District','Educational Marksheet','Income Certificate']]
+            #df_enr.drop_duplicates(keep='first',inplace=True) 
+            df_dell.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Dell') 
+            worksheet5 = writer.sheets['Dell']
+            default_column_dell = ['Candidate_Id','Batch_Code','Enrollment Id', 'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Aspirational District','Educational Marksheet','Income Certificate']
+            for i in range(len(default_column_dell)):
+                worksheet4.write(0,i ,default_column_enr[i], header_format)
                       
             if candidate_stage == '2':
                 worksheet4.hide()
@@ -986,9 +994,13 @@ class Report:
                 worksheet2.hide()
                 worksheet3.hide()
                 worksheet4.hide()
+                worksheet5.hide()
              
             if project_types == '1':
                 worksheet3.hide()
+                worksheet5.hide()
+            if project_types == '2':                
+                worksheet5.hide()
             
             writer.save()
 

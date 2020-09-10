@@ -4788,7 +4788,7 @@ SELECT					cb.name as candidate_name,
             '''
             quer2='''
             insert into candidate_details.tbl_candidate_reg_enroll_details
-            (candidate_id,mother_tongue,current_occupation,average_annual_income,interested_course,product,candidate_photo,present_address_line1,permanaet_address_line1,created_on,created_by,is_active)
+            (candidate_id,whatsapp_number,mother_tongue,current_occupation,average_annual_income,interested_course,product,candidate_photo,present_address_line1,permanaet_address_line1,created_on,created_by,is_active)
             values
             '''
             quer3='''
@@ -4816,7 +4816,7 @@ SELECT					cb.name as candidate_name,
             curs.commit()
 
             for i in range(len(d)):
-                quer2 += '\n' + "({},'{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(d[i],out[i]['motherTongue'],out[i]['candOccuptn'],out[i]['annualIncome'],out[i]['interestCourse'],out[i]['candProduct'],out[i]['candPic'],out[i]['presAddrOne'],out[i]['permAddrOne'],user_id)
+                quer2 += '\n' + "({},'{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(d[i],out[i]['whatsapp_number'],out[i]['motherTongue'],out[i]['candOccuptn'],out[i]['annualIncome'],out[i]['interestCourse'],out[i]['candProduct'],out[i]['candPic'],out[i]['presAddrOne'],out[i]['permAddrOne'],user_id)
                 quer3 += '\n' + "({},'{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(d[i],out[i]['presAddrTwo'],out[i]['presVillage'],out[i]['presPanchayat'],out[i]['presTaluk'],out[i]['permAddrTwo'],out[i]['permVillage'],out[i]['permPanchayat'],out[i]['permTaluk'],user_id)
               
             quer2 = quer2[:-1]+';'
@@ -4848,7 +4848,7 @@ SELECT					cb.name as candidate_name,
             update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',candidate_stage_id=2,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}',is_active=1 where candidate_id='{}';
             '''
             quer2='''
-            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type={},identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',created_by='{}',aadhar_image_name='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            update candidate_details.tbl_candidate_reg_enroll_details set whatsapp_number='{}',candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type={},identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',created_by='{}',aadhar_image_name='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
             '''
             quer3 = '''
             update candidate_details.tbl_candidates set isFresher={}, project_type={},created_by='{}',is_active=1,created_on=getdate() where candidate_id='{}';
@@ -4887,6 +4887,18 @@ SELECT					cb.name as candidate_name,
                 ,[is_active])
             VALUES
             '''
+            insert_query_dell='''
+            INSERT INTO [candidate_details].[tbl_candidate_dell_details]
+                ([candidate_id]
+                ,[mobilization_type]
+                ,[Educational Marksheet]
+                ,[Aspirational District]
+                ,[Income Certificate]
+                ,[created_on]
+                ,[created_by]
+                ,[is_active])
+            VALUES
+            '''
             url = candidate_xml_weburl + xml
             print(url)
             r = requests.get(url)
@@ -4895,6 +4907,7 @@ SELECT					cb.name as candidate_name,
             root = ET.fromstring(data)
             query = ""
             she_query=""
+            dell_query=""
             for child in root:
                 data = child.attrib
                 aadhar_image_name=''
@@ -4903,10 +4916,13 @@ SELECT					cb.name as candidate_name,
                 if 'yrsExp' in data:
                     query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1 if data['dobEntered']=='true' else 0,data['yrsExp'],data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],user_id,role_id,data['cand_id'])
                 if 'aadhaarNo' in data:
-                    query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['aadhaarNo'],data['idType'],data['idNum'],data['idCopy'],data['empType'],data['prefJob'],data['relExp'],data['lastCtc'],data['prefLocation'],data['willTravel'],data['workShift'],data['bocwId'],data['expectCtc'],user_id,aadhar_image_name,data['cand_id'])
+                    query += '\n' + quer2.format(data['whatsapp_number'],data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['aadhaarNo'],data['idType'],data['idNum'],data['idCopy'],data['empType'],data['prefJob'],data['relExp'],data['lastCtc'],data['prefLocation'],data['willTravel'],data['workShift'],data['bocwId'],data['expectCtc'],user_id,aadhar_image_name,data['cand_id'])
                 if int(data['mobilization_type'])==2:
                     she_query="({},{},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),int(data['score']),int(data['result']),data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['serve_as_she'],data['sign_contract_with_LN'],data['adopt_digital_transaction'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['age_18_40'],data['eight_pass'],data['past_work_exp'],data['full_time_work'],data['trvl_within_panchayat'],data['bank_act'],user_id)
                     insert_query_she += '\n'+she_query
+                if int(data['mobilization_type'])==4:
+                    dell_query="({},{},'{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),data['edu_marsheet'],data['asp_district'],data['dell_income_certi'],user_id)
+                    insert_query_dell += '\n'+dell_query
                 query += '\n' + quer3.format(1 if data['isFresher']=='true' else 0,int(data['mobilization_type']) ,user_id,data['cand_id'])
                 
             if query!="":     
@@ -4915,6 +4931,10 @@ SELECT					cb.name as candidate_name,
             if she_query!="":
                 insert_query_she=insert_query_she[:-1]+';'
                 curs.execute(insert_query_she)
+                curs.commit()
+            if dell_query!="":
+                insert_query_dell=insert_query_dell[:-1]+';'
+                curs.execute(insert_query_dell)
                 curs.commit()
 
             out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
@@ -4943,7 +4963,7 @@ SELECT					cb.name as candidate_name,
             update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1 where candidate_id='{}';
             '''
             quer2='''
-            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',present_address_line1='{}',permanaet_address_line1='{}',highest_qualification='{}',stream_specialization='{}',computer_knowledge='{}',technical_knowledge='{}',average_household_income='{}',bank_name='{}',account_number='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            update candidate_details.tbl_candidate_reg_enroll_details set whatsapp_number='{}',candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',present_address_line1='{}',permanaet_address_line1='{}',highest_qualification='{}',stream_specialization='{}',computer_knowledge='{}',technical_knowledge='{}',average_household_income='{}',bank_name='{}',account_number='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
             '''
             quer3='''
             update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set present_address_line2='{}',present_village='{}',present_panchayat='{}',present_taluk_block='{}',permanent_address_line2='{}',permanent_village='{}',permanent_panchayat='{}',permanent_taluk_block='{}',name_of_institute='{}',university='{}',year_of_pass='{}',percentage='{}',branch_name='{}',branch_code='{}',account_type='{}',attachment_image_name='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
@@ -5025,7 +5045,7 @@ SELECT					cb.name as candidate_name,
                     query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,data['mobilization_type'],1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
                 else:
                     query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1,1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
-                query += '\n' + quer2.format(data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['presAddrOne'],data['permAddrOne'],data['highQuali'],data['candStream'],data['compKnow'],data['techKnow'],data['houseIncome'],data['bankName'],data['accNum'],user_id,data['cand_id'])
+                query += '\n' + quer2.format(data['whatsapp_number'],data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['presAddrOne'],data['permAddrOne'],data['highQuali'],data['candStream'],data['compKnow'],data['techKnow'],data['houseIncome'],data['bankName'],data['accNum'],user_id,data['cand_id'])
                 query += '\n' + quer3.format(data['presAddrTwo'],data['presVillage'],data['presPanchayat'],data['presTaluk'],data['permAddrTwo'],data['permVillage'],data['permPanchayat'],data['permTaluk'],data['instiName'],data['university'],data['yrPass'],data['percentage'],data['branchName'],data['ifscCode'],data['accType'],data['bankCopy'],user_id,data['cand_id'])
                 query += '\n' + quer7.format(data['cand_id'])
                 intervention_category="SAE"
@@ -6229,6 +6249,19 @@ SELECT					cb.name as candidate_name,
         con.close()
         return max_attendance_id
     
+    def GetShikshaLastSyncDate():
+        last_sync_date = ''
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()        
+        quer = "Select COALESCE(cast(MAX(last_sync_date) as date),cast('2019-04-01' as date)) as last_sync_date from [masters].[tbl_shiksha_candidate_data];"
+        cur2.execute(quer)
+        data=cur2.fetchall()
+        data = '' if data==[] else data[0][0]
+        last_sync_date = datetime.strptime(str(data),'%Y-%m-%d').strftime('%Y-%m-%d')
+        cur2.close()
+        con.close()        
+        return last_sync_date
+    
     def UploadShikshaAttendanceData(attandance_data):
         try: 
             # print(str(df.to_json(orient='records')))
@@ -6253,6 +6286,29 @@ SELECT					cb.name as candidate_name,
             # print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
 
+    def SyncShikshaCandidateData(candidate_data):
+        try: 
+            # print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            sql = 'exec	[masters].[sp_sync_shiksha_candidate_report]  ?'
+            values = (candidate_data,)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop >0 :
+                Status=True
+                msg="Synced Successfully"
+            else:
+                msg="Error in Syncing"
+                Status=False
+            return {"Status":Status,'Message':msg}
+        except Exception as e:
+            # print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
 
 
     def app_get_release_date_msg():
