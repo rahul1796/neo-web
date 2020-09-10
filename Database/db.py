@@ -6257,7 +6257,7 @@ SELECT					cb.name as candidate_name,
         cur2.execute(quer)
         data=cur2.fetchall()
         data = '' if data==[] else data[0][0]
-        last_sync_date = datetime.strptime(data,'%Y-%m-%d').strftime('%Y-%m-%d')
+        last_sync_date = datetime.strptime(str(data),'%Y-%m-%d').strftime('%Y-%m-%d')
         cur2.close()
         con.close()        
         return last_sync_date
