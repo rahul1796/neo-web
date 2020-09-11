@@ -5549,7 +5549,6 @@ SELECT					cb.name as candidate_name,
             cur.close()
             con.close()
             response= {"columns":col,"data":df}
-            print(response)
             return response
         except Exception as e:
             print(str(e))

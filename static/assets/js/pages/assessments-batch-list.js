@@ -906,7 +906,7 @@ function add_map_message(){
                                 {
                                     varHtml+='<tr>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].S_No +'</td>';
-                                    if((data.Assessments[i].Mobilization_Type==4 & $("#hdn_home_user_role_id ").val() == "5" )||(data.Assessments[i].Assessment_Stage_Id==4)) // Assessment Result Uploaded
+                                    if(data.Assessments[i].Assessment_Stage_Id==4) // Assessment Result Uploaded
                                         txt+='<a onclick="DownloadAssessmentResult(\'' + data.Assessments[i].Assessment_Id + '\',\'' + data.Assessments[i].Batch_Code + '\')" class="user-btn" style="cursor:pointer" ><i title="Download Assessment Result" class="fe-download" ></i></a>';
                                     if (data.Assessments[i].Assessment_Stage_Id<3 && (data.Assessments[i].Mobilization_Type!=4)  )
                                     {
