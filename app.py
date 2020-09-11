@@ -6263,9 +6263,10 @@ class upload_assessment_result(Resource):
                 stage_id = request.form["stage_id"]
                 file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
                 f.save(file_name)
-
+    
                 df= pd.read_excel(file_name,sheet_name='Template')
                 df = df.fillna('')
+                df = df.astype(str)
                 def check_dob(date_age):
                     try:
                         date_age = str(date_age)
@@ -6284,8 +6285,9 @@ class upload_assessment_result(Resource):
                         Column('Assessment_Date',str_validation + null_validation),
                         Column('Attendance(Absent_Present)',str_validation + null_validation),
                         Column('Score',flt_validation),
-                        Column('Grade',str_validation + null_validation),
-                        Column('Status(Certified_Notcertified)',status_validation)
+                        Column('Grade_Result',str_validation + null_validation),
+                        Column('Status(Certified_Notcertified)',status_validation),
+                        Column('Attempt',null_validation)
                         ])
                 errors = schema.validate(df)
                 errors_index_rows = [e.row for e in errors]
