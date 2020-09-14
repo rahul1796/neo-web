@@ -5760,7 +5760,8 @@ SELECT					cb.name as candidate_name,
                                 coalesce(ud.email,'') as email
                     from		users.tbl_users as u
                     left join	users.tbl_user_details as ud on ud.user_id=u.user_id
-                    where		u.user_role_id in (24,5)
+                    left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
+                    where		ur.user_role_id in (24,5)
                                 
                     """
         else:
@@ -5769,7 +5770,8 @@ SELECT					cb.name as candidate_name,
                                 coalesce(ud.email,'') as email
                     from		users.tbl_users as u
                     left join	users.tbl_user_details as ud on ud.user_id=u.user_id
-                    where		u.user_role_id in (2,24,5)
+                    left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
+                    where		ur.user_role_id in (2,24,5)
                     """
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
