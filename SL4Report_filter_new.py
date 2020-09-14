@@ -164,19 +164,83 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
                     worksheet.write(1, i, first_columns[i], second_header_format)
                     worksheet.write(2, i, third_row[j], light_header_format)
                     j+=1
+
+        def trainee_dell_tracker_fxn():
+            cnxn=pyodbc.connect(conn_str)
+            curs = cnxn.cursor()
+            sql = 'exec [reports].sp_dell_tracker_report ?, ?, ?, ?, ?'
+            values = (from_date, to_date, Customers, user_id, user_role_id)
+            curs.execute(sql,(values))
+            columns = [column[0].title() for column in curs.description]
+            data = curs.fetchall()
+            data = list(map(lambda x:list(x), data))
+            df = pd.DataFrame(data, columns=columns)
+            df.fillna('')
+            column  = ['Sub_Project_Name', 'Cer_Target', 'Cer_Actual', 'Candidate_Data_0_1', 'Candidate_Data_2', 'Candidate_Data_3', 'Candidate_Data_4', 'Total_Assesment', 'Total_Present', 'Total_Certified']
+            df = df[column]
+            header = ['Sub Project', 'Certification_Target', 'Course Assigned on LMS', '0% Course Completion', '(1%-30%) Course Completion', '50% Course Completion', '100% Course Completion', 'Final Assessment Scheduled', 'Present', 'Pass']
+
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Dell Tracker')
+
+            worksheet = writer.sheets['Dell Tracker']
+            for col_num, value in enumerate(header):
+                worksheet.write(0, col_num, value, header_format)
         
-        t1 = threading.Thread(target=trainee_fxn) 
-        t2 = threading.Thread(target=trainee_assesment_fxn)
-        t3 = threading.Thread(target=trainee_placemnet_fxn)
+        def trainee_dell_tracker2_fxn():
+            cnxn=pyodbc.connect(conn_str)
+            curs = cnxn.cursor()
+            sql = 'exec [reports].sp_dell_tracker2_report ?, ?, ?, ?, ?'
+            values = (from_date, to_date, Customers, user_id, user_role_id)
+            curs.execute(sql,(values))
+            columns = [column[0].title() for column in curs.description]
+            data = curs.fetchall()
+            data = list(map(lambda x:list(x), data))
+            df = pd.DataFrame(data, columns=columns)
+            df.fillna('')
+            column = ['Created_On', 'Partner_Name', 'Email', 'Name', 'Present_District', 'State_Name', 'Email_Id', 'Date_Of_Birth', 'Age', 'Primary_Contact_No', 'Whatsapp_Number',
+            'Educational Marksheet', 'Aadhar_Image_Name', 'Candidate_Photo', 'Aadhar_No', 'Course_Name', 'Disability_Status', 'Aspirational District', 'Gender', 'Shiksha_Sync_Status', 
+            'Created_On2', 'Course_Duration_Days', 'Actual_Course_Duration_Days', 'Course_Status', 'Total_Activity', 'Completed_Activity', 'Per', 'Last_Logged_In', 'Half_Completion', 
+            'Full_Completion', 'Course_End_Date', 'Certification_Status', 'Certificatio_Date', 'Certificate_Status', 'Acknowledge_Received']
+            
+            df = df[column]
 
-        t1.start()
-        t2.start()
-        t3.start()
+            header = ['Mobilization Date', 'Mobilized BY (LN/NAV)', 'Mobilized By', 'Candidate Name', 'Candidate_District', 'State', 'Email id', 'DOB', 'Age', 'Mobile Number', 'Whatsapp Number', 
+            'Educational Mark Sheet', 'Aadhaar', 'Candidate Image', 'Aadhaar Number', 'Assigned Course', 'PwD Status (Yes/No)', 'Aspirational District', 'Gender', 'Course Assigned Status (LMS)',
+            'Course Assigned Date', 'Max Time to complete Course', 'Actual No of days', 'Course Start Status', 'Total No. of sub modules', 'No. of sub modules Completed', '% of Completion', 'Last Login Date', '50 % Course Completed Status',
+            'Course Completed Status', 'Course Completion Date', 'Certification Status', 'Certification Date', 'Certificate Status', 'Acknowledge Received']
+            
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Dell Tracker2')
 
-        t1.join() 
-        t2.join()
-        t3.join()              
-                        
+            worksheet = writer.sheets['Dell Tracker2']
+            for col_num, value in enumerate(header):
+                worksheet.write(0, col_num, value, header_format)
+        
+
+        if  set('305,339'.split(',')) >= set(Customers.split(',')):
+            #print('dell')
+            t4 = threading.Thread(target=trainee_dell_tracker_fxn)
+            t5 = threading.Thread(target=trainee_dell_tracker2_fxn)
+
+            t4.start()
+            t5.start()
+            
+            t4.join()
+            t5.join()
+            
+        else:
+            #print('others')
+            t1 = threading.Thread(target=trainee_fxn) 
+            t2 = threading.Thread(target=trainee_assesment_fxn)
+            t3 = threading.Thread(target=trainee_placemnet_fxn)
+
+            t1.start()
+            t2.start()
+            t3.start()
+
+            t1.join() 
+            t2.join()
+            t3.join()
+  
         writer.save()
         return({'Description':'created excel', 'Status':True, 'filename':report_name})
         
