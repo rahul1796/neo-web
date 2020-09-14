@@ -45,19 +45,6 @@ function LoadTable(sectors, qps, status)
             },
             { "data": "Course_Code" },
             { "data": "Course_Name" },
-              { //"orderable":false,
-              "data": 
-              function (row, type, val, meta) {
-                  var varButtons = ""; 
-                  if(row.Course_Variant_Count==0)
-                      varButtons=row.Course_Variant_Count;
-                  else
-                  {
-                      varButtons += '<a onclick="Get_Course_Variants(\'' + row.Course_Id + '\',\'' + row.Course_Name + '\')"  style="color:blue;cursor:pointer" >' + row.Course_Variant_Count + '</a>';
-                  }                    
-                  return varButtons;
-              }
-          },
             { //"orderable":false,
                 "data": 
                 function (row, type, val, meta) {
@@ -99,6 +86,21 @@ function LoadTable(sectors, qps, status)
             },
             { "data": "Qp_Code" },
             { "data": "Qp_Name" },
+            { "data": "Course_Duration_Days" },
+            { "data": "Course_Duration_Hour" },
+            { //"orderable":false,
+              "data": 
+              function (row, type, val, meta) {
+                  var varButtons = ""; 
+                  if(row.Course_Variant_Count==0)
+                      varButtons=row.Course_Variant_Count;
+                  else
+                  {
+                      varButtons += '<a onclick="Get_Course_Variants(\'' + row.Course_Id + '\',\'' + row.Course_Name + '\')"  style="color:blue;cursor:pointer" >' + row.Course_Variant_Count + '</a>';
+                  }                    
+                  return varButtons;
+              }
+          },
             {"data": "Is_Active"}
         ],
         
