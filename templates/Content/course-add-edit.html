@@ -90,13 +90,13 @@
                             var count=data.Sectors.length;
                             if( count> 0)
                             {
-                                $('#ddlSector').append(new Option('Choose Qualification Pack',''));
+                                $('#ddlSector').append(new Option('Choose Sector',''));
                                 for(var i=0;i<count;i++)
                                     $('#ddlSector').append(new Option(data.Sectors[i].Sector_Name,data.Sectors[i].Sector_Id));
                             }
                             else
                             {
-                                $('#ddlSector').append(new Option('Choose Qualification Pack',''));
+                                $('#ddlSector').append(new Option('Choose Sector',''));
                             }
                         }
                     },

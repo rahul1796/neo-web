@@ -6933,7 +6933,7 @@ class DownloadOpsProductivityReport(Resource):
             role_id = request.form["role_id"]
             customer_ids = request.form["customer_ids"]
             contract_ids = request.form["contract_ids"]
-            print(month,role_id)
+            print(month,role_id,customer_ids,contract_ids)
             resp = Report.DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id)
             return resp
 
