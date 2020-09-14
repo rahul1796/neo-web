@@ -604,6 +604,8 @@ def assign_course_type_add_edit_to_home():
         return render_template("login.html",error="Session Time Out!!")
 
 
+
+
 @app.route("/after_popup_course")
 def after_popup_course():
     if g.user:
@@ -1279,10 +1281,11 @@ class add_qp_details(Resource):
         if request.method == 'POST':
             qp_name=request.form['QpName']
             qp_code=request.form['QpCode']
+            sector=request.form['Sector']
             user_id=g.user_id
             is_active=request.form['isactive']
             qp_id=g.qp_id
-            return Content.add_qp(qp_name,qp_code,user_id,is_active,qp_id)
+            return Content.add_qp(qp_name,qp_code,user_id,is_active,qp_id,sector)
 
 class get_qp_details(Resource):
     @staticmethod
