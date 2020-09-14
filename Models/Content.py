@@ -36,8 +36,8 @@ class Content:
     def qp_list(user_id,user_role_id,qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors):
         qp_l=Database.qp_list(user_id,user_role_id,qp_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, sectors)
         return qp_l
-    def add_qp(qp_name,qp_code,user_id,is_active,qp_id):
-        popupMessage = {"PopupMessage": Database.add_qp_details(qp_name,qp_code,user_id,is_active,qp_id)}    
+    def add_qp(qp_name,qp_code,user_id,is_active,qp_id,sector):
+        popupMessage = {"PopupMessage": Database.add_qp_details(qp_name,qp_code,user_id,is_active,qp_id,sector)}    
         return popupMessage
     def get_qp(glob_qp_id):
         indi_qp={"QpDetail":Database.get_qp_details(glob_qp_id)}

@@ -1318,11 +1318,11 @@ class Database:
         cur.close()
         con.close()
         return content
-    def add_qp_details(qp_name,qp_code,user_id,is_active,qp_id):
+    def add_qp_details(qp_name,qp_code,user_id,is_active,qp_id,sector):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	masters.sp_add_edit_qp ?, ?, ?, ?, ?'
-        values = (qp_id,qp_name,qp_code,user_id,is_active)
+        sql = 'exec	masters.sp_add_edit_qp ?, ?, ?, ?, ?,?'
+        values = (qp_id,qp_name,qp_code,user_id,is_active,sector)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -1346,7 +1346,7 @@ class Database:
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[4]+"":row[4],""+columns[5]+"":row[5]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[10]+"":row[10]}
         cur.close()
         con.close()
         return h
