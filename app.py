@@ -7553,7 +7553,7 @@ class GetDocumentForExcel(Resource):
             image_path=request.args.get('image_path','',type=str)
             #response={"POC":Master.GetPOCForCustomer(customer_id)}
             #url = hyperlink.parse(u'www.google.co.in')
-            image_name =  '2_Class room_Untitled.png'
+            #image_name =  '2_Class room_Untitled.png'
             path = 'C:/Users/Jagdish P K/Desktop/APP/code/neo-web_qa/data/TMA/'
             filename = '{}{}'.format(path,image_name)
             if os.path.exists(filename):
@@ -7598,7 +7598,7 @@ class GetDocumentForExcel_S3_certiplate(Resource):
                 filename=''
             
             if filename =='':
-                filename= Base_URL + 'data/No-image-found.jpg'
+                filename= config.Base_URL + 'data/No-image-found.jpg'
             
             return redirect(filename)
 api.add_resource(GetDocumentForExcel_S3_certiplate,'/GetDocumentForExcel_S3_certiplate')
