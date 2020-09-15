@@ -165,6 +165,7 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
                     worksheet.write(2, i, third_row[j], light_header_format)
                     j+=1
 
+
         def trainee_dell_tracker_fxn():
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
@@ -180,9 +181,9 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
             df = df[column]
             header = ['Sub Project', 'Certification_Target', 'Course Assigned on LMS', '0% Course Completion', '(1%-30%) Course Completion', '50% Course Completion', '100% Course Completion', 'Final Assessment Scheduled', 'Present', 'Pass']
 
-            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Dell Tracker')
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Summary')
 
-            worksheet = writer.sheets['Dell Tracker']
+            worksheet = writer.sheets['Summary']
             for col_num, value in enumerate(header):
                 worksheet.write(0, col_num, value, header_format)
         
@@ -196,7 +197,7 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
             data = curs.fetchall()
             data = list(map(lambda x:list(x), data))
             df = pd.DataFrame(data, columns=columns)
-            df.fillna('')
+            df = df.fillna('')
             column = ['Created_On', 'Partner_Name', 'Email', 'Name', 'Present_District', 'State_Name', 'Email_Id', 'Date_Of_Birth', 'Age', 'Primary_Contact_No', 'Whatsapp_Number',
             'Educational Marksheet', 'Aadhar_Image_Name', 'Candidate_Photo', 'Aadhar_No', 'Course_Name', 'Disability_Status', 'Aspirational District', 'Gender', 'Shiksha_Sync_Status', 
             'Created_On2', 'Course_Duration_Days', 'Actual_Course_Duration_Days', 'Course_Status', 'Total_Activity', 'Completed_Activity', 'Per', 'Last_Logged_In', 'Half_Completion', 
@@ -204,14 +205,20 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
             
             df = df[column]
 
+            df.loc[:,'Aadhar_Image_Name'] = df.loc[:,'Aadhar_Image_Name'].map(lambda x: x if (x=='') else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
+            df.loc[:,'Candidate_Photo'] = df.loc[:,'Candidate_Photo'].map(lambda x: x if (x=='') else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
+            df.loc[:,'Educational Marksheet'] = df.loc[:,'Educational Marksheet'].map(lambda x: x if (x=='') else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
+#            'Aadhar_Image_Name', 'Candidate_Photo'
+#            #df.loc[:,'Educational Qualification'] = df.loc[:,'Educational Qualification'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
+
             header = ['Mobilization Date', 'Mobilized BY (LN/NAV)', 'Mobilized By', 'Candidate Name', 'Candidate_District', 'State', 'Email id', 'DOB', 'Age', 'Mobile Number', 'Whatsapp Number', 
             'Educational Mark Sheet', 'Aadhaar', 'Candidate Image', 'Aadhaar Number', 'Assigned Course', 'PwD Status (Yes/No)', 'Aspirational District', 'Gender', 'Course Assigned Status (LMS)',
             'Course Assigned Date', 'Max Time to complete Course', 'Actual No of days', 'Course Start Status', 'Total No. of sub modules', 'No. of sub modules Completed', '% of Completion', 'Last Login Date', '50 % Course Completed Status',
             'Course Completed Status', 'Course Completion Date', 'Certification Status', 'Certification Date', 'Certificate Status', 'Acknowledge Received']
-            
-            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Dell Tracker2')
 
-            worksheet = writer.sheets['Dell Tracker2']
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Daily Tracker Report')
+
+            worksheet = writer.sheets['Daily Tracker Report']
             for col_num, value in enumerate(header):
                 worksheet.write(0, col_num, value, header_format)
         

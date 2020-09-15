@@ -663,7 +663,7 @@ function DownloadTableBasedOnSearch(){
             },
             success: function(resp) 
             {
-
+                console.log(resp)
                 if (resp.success){
                     var varAnchor = document.getElementById('lnkDownload');
                     varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.FileName;

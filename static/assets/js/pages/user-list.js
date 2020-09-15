@@ -774,6 +774,10 @@ function Getusertarget(UserId,UserName)
         }
         else
         {
+            UploadFileToProcess();
+        }
+    }
+    /*
             var fileExtension = ['xlsx']
             if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
                 alert("Formats allowed are : "+fileExtension.join(', '));
@@ -833,7 +837,7 @@ function Getusertarget(UserId,UserName)
         };
         xhr.send(postData);
     }
-    
+    */
     function UploadFileToProcess()
     {
         var form_data = new FormData($('#formUpload')[0]);

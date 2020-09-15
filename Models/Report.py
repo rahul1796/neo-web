@@ -906,7 +906,7 @@ class Report:
             lst=os.listdir(DownloadPath)
             newlist = list(filter(r.match, lst))
             for i in newlist:
-                os.remove( DownloadPath + i)
+                os.remove(DownloadPath + i)
             path = '{}{}'.format(DownloadPath,report_name)
             res={}
             res=Report.CreateExcelForCandidateData(data,path,project_types,candidate_stage)
@@ -928,8 +928,19 @@ class Report:
                 'valign': 'center',
                 'fg_color': '#D7E4BC',
                 'border': 1})
-            print(data['sheet1_columns'])
+            #print(data['sheet1_columns'])
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
+            df = df.fillna('')
+            df.loc[:,'Educational Qualification'] = df.loc[:,'Educational Qualification'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
+            df.loc[:,'Signed Mou'] = df.loc[:,'Signed Mou'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
+            df.loc[:,'Age Proof'] = df.loc[:,'Age Proof'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
+            df.loc[:,'Educational Marksheet'] = df.loc[:,'Educational Marksheet'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
+            df.loc[:,'Income Certificate'] = df.loc[:,'Income Certificate'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
+            df.loc[:,'Candidate_Image'] = df.loc[:,'Candidate_Image'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
+            df.loc[:,'Aadhar_Image'] = df.loc[:,'Aadhar_Image'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x.split(',')[0] +'","View Image")')
+            df.loc[:,'Identifier_Image'] = df.loc[:,'Identifier_Image'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
+            df.loc[:,'Account_Image'] = df.loc[:,'Account_Image'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
+
             if(len(data['sheet1']) < 1):
                 return({'msg':'No Records Found For Selected Filters!', 'success':False})
             df_mob=df[['Candidate_Id', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 'Age', 'Primary_Contact_No', 'Secondary_Contact_No', 'Email_Id', 'Gender', 'Marital_Status', 'Caste', 'Disability_Status', 'Religion', 'Mother_Tongue', 'Occupation', 'Average_Annual_Income', 'Interested_Course', 'Product','Source_Of_Information','Whatsapp_Number','Mobilized_On','Mobilized_By']]
@@ -960,9 +971,6 @@ class Report:
             for i in range(len(default_column_she)):
                 worksheet3.write(0,i ,default_column_she[i], header_format)
             
-            df.loc[:,'Educational Qualification'] = df.loc[:,'Educational Qualification'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
-            df.loc[:,'Signed Mou'] = df.loc[:,'Signed Mou'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
-            df.loc[:,'Age Proof'] = df.loc[:,'Age Proof'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
 
             df_reg=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Present_Address_Line1','Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block','Present_District', 'Present_State', 'Present_Pincode', 'Present_Country', 'Permanaet_Address_Line1','Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 'Permanent_Taluk_Block','Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country','Aadhar_No', 'Identifier_Type', 'Identity_Number','Employment_Type', 'Preferred_Job_Role', 'Relevant_Years_Of_Experience', 'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc','Project_Type','Candidate_Image','Aadhar_Image','Identifier_Image','Registered_On','Registered_By']]
             df_reg.drop_duplicates(keep='first',inplace=True) 
