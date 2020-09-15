@@ -930,6 +930,7 @@ class Report:
                 'border': 1})
             #print(data['sheet1_columns'])
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
+            df = df.fillna('')
             df.loc[:,'Educational Qualification'] = df.loc[:,'Educational Qualification'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
             df.loc[:,'Signed Mou'] = df.loc[:,'Signed Mou'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
             df.loc[:,'Age Proof'] = df.loc[:,'Age Proof'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
