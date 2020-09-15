@@ -197,7 +197,7 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
             data = curs.fetchall()
             data = list(map(lambda x:list(x), data))
             df = pd.DataFrame(data, columns=columns)
-            df.fillna('')
+            df = df.fillna('')
             column = ['Created_On', 'Partner_Name', 'Email', 'Name', 'Present_District', 'State_Name', 'Email_Id', 'Date_Of_Birth', 'Age', 'Primary_Contact_No', 'Whatsapp_Number',
             'Educational Marksheet', 'Aadhar_Image_Name', 'Candidate_Photo', 'Aadhar_No', 'Course_Name', 'Disability_Status', 'Aspirational District', 'Gender', 'Shiksha_Sync_Status', 
             'Created_On2', 'Course_Duration_Days', 'Actual_Course_Duration_Days', 'Course_Status', 'Total_Activity', 'Completed_Activity', 'Per', 'Last_Logged_In', 'Half_Completion', 

@@ -1085,6 +1085,7 @@ function UploadFileData()
             UploadFileToProcess();
         }
     }
+}
     /*
             $("#imgSpinner1").show();
             var files=document.getElementById("myFile").files;
