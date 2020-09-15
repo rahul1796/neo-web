@@ -1082,6 +1082,10 @@ function UploadFileData()
         }
         else
         {
+            UploadFileToProcess();
+        }
+    }
+    /*
             $("#imgSpinner1").show();
             var files=document.getElementById("myFile").files;
             var file=files[0];
@@ -1133,7 +1137,7 @@ function uploadFileToS3(file, s3Data, url){
     };
     xhr.send(postData);
 }
-
+*/
 function UploadFileToProcess()
 {
     //console.log()

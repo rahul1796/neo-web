@@ -1590,6 +1590,10 @@ function UploadFileData()
     }
     else
     {
+        UploadFileToProcess();
+    }
+}
+/*
         var fileExtension = ['xlsx']
         if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
             alert("Formats allowed are : "+fileExtension.join(', '));
@@ -1598,6 +1602,7 @@ function UploadFileData()
         else
         {
             $("#imgSpinner1").show();
+
             var files=document.getElementById("myFile").files;
             var file=files[0];
 
@@ -1647,7 +1652,7 @@ function uploadFileToS3(file, s3Data, url){
     };
     xhr.send(postData);
 }
-
+*/
 function UploadFileToProcess()
 {
     //console.log()
