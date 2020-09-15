@@ -7578,18 +7578,20 @@ class GetDocumentForExcel_S3_certiplate(Resource):
         if request.method=='GET':
             image_name=request.args.get('image_name','',type=str)
             image_path=request.args.get('image_path','',type=str)
-
+            
             URL=config.neo_certiplate+image_name
             r = requests.get(url = URL) 
-
             if r.status_code==200:
                 filename =  URL
             elif r.status_code==404:
+                print(image_name)
                 path = config.aws_location +'bulk_upload/room_image/'+image_name
-
                 URL = config.COL_URL + 's3_signed_url_for_file_updated'
                 PARAMS = {'file_path':path} 
                 r = requests.get(url = URL, params = PARAMS) 
+                
+                #print('hi'+r.text)
+
                 if r.text !='':
                     filename = r.text
                 else:
@@ -7598,8 +7600,8 @@ class GetDocumentForExcel_S3_certiplate(Resource):
                 filename=''
             
             if filename =='':
-                filename= config.Base_URL + 'data/No-image-found.jpg'
-            
+                filename= config.Base_URL + '/data/No-image-found.jpg'
+            print(filename)
             return redirect(filename)
 api.add_resource(GetDocumentForExcel_S3_certiplate,'/GetDocumentForExcel_S3_certiplate')
 
