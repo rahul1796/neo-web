@@ -752,8 +752,6 @@ function GetRoomCenters(CenterId,CenterName)
         }
         else{
 
-//            $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + 
-
             var filename=[]
             var file_name = ''
             for (var x = 0; x < ins; x++) {

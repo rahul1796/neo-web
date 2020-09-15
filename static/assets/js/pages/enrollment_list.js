@@ -47,6 +47,10 @@ function toggleCheckbox(e)
         }
         else
         {
+            UploadFileToProcess();
+        }
+    }
+    /*
             var fileExtension = ['xlsx']
             if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
                 alert("Formats allowed are : "+fileExtension.join(', '));
@@ -106,7 +110,7 @@ function toggleCheckbox(e)
         };
         xhr.send(postData);
     }
-    
+    */
     function UploadFileToProcess()
     {
     var form_data = new FormData($('#formUpload')[0]);
