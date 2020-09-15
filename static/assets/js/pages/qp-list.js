@@ -89,7 +89,7 @@ function LoadTable(sectors)
                 "data": function (row, type, val, meta) {
                     var varButtons = ""; 
                     if(role_id == 1 || role_id==16)
-                        varButtons += '<a onclick="EditQPDetail(\'' + row.Qp_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Client" class="fas fa-edit" ></i></a>';
+                        varButtons += '<a onclick="EditQPDetail(\'' + row.Qp_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit QP" class="fas fa-edit" ></i></a>';
                     return varButtons;
                 }
             },
