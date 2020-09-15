@@ -207,6 +207,7 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
 
             df.loc[:,'Aadhar_Image_Name'] = df.loc[:,'Aadhar_Image_Name'].map(lambda x: x if (x=='') else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
             df.loc[:,'Candidate_Photo'] = df.loc[:,'Candidate_Photo'].map(lambda x: x if (x=='') else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
+            df.loc[:,'Educational Mark Sheet'] = df.loc[:,'Educational Mark Sheet'].map(lambda x: x if (x=='') else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
 #            'Aadhar_Image_Name', 'Candidate_Photo'
 #            #df.loc[:,'Educational Qualification'] = df.loc[:,'Educational Qualification'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
 
