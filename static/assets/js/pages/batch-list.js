@@ -1040,7 +1040,7 @@ function add_map_message(){
         {
             $('#hdn_mdl_skilling_id').val(cands);
 			
-            //$('#tr_candidate_detail').modal('hide');
+            $('#tr_candidate_detail').modal('hide');
             $('#con_close_modal').modal('show');
         }
     }
