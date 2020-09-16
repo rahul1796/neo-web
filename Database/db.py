@@ -44,7 +44,7 @@ def to_xml(df, filename=None, mode='w'):
         for i, col_name in enumerate(row.index):
             xml.append('    <field name="{0}">{1}</field>'.format(col_name, row.iloc[i]))
         if 'Candidate_Family_Details_Id' in df1:
-            df3=df1.loc[(df1['Candidate_Id'] == row['Candidate_Id']) & (int(df1['Candidate_Family_Details_Id'])>0)]
+            df3=df1.loc[(df1['Candidate_Id'] == row['Candidate_Id']) & (df1['Candidate_Family_Details_Id']>0)]
             xml.append('    <family_details>')
             xml.append('\n'.join(df3.apply(nested_family_details_row_to_xml, axis=1)))
             xml.append('    </family_details>')
