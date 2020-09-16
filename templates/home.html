@@ -52,8 +52,9 @@
             {   
                 var role_id=parseInt($('#hdn_home_user_role_id').val());
                 //alert(role_id);
+                
                 switch(role_id)
-				{   
+				{
                     case 1:             //Admin
                         $('#Home').show();
 						$('#Mobilization_Menu').show();
@@ -217,6 +218,7 @@
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
                             $('#TrainerProductivityReport').hide();
+                        
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -366,6 +368,7 @@
                         $('#TMA_attendance_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
+
                         if(goto !="")
                             $("#box").load(goto);
                         break;
