@@ -937,9 +937,8 @@ class Report:
             df.loc[:,'Educational Marksheet'] = df.loc[:,'Educational Marksheet'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
             df.loc[:,'Income Certificate'] = df.loc[:,'Income Certificate'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
             df.loc[:,'Candidate_Image'] = df.loc[:,'Candidate_Image'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
-            df.loc[:,'Aadhar_Image_Front'] = df.loc[:,'Aadhar_Image'].map(lambda x: x if ((x.split(',')[0]=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x.split(',')[0] +'","View Image")')
-            df.loc[:,'Aadhar_Image_Back'] = df.loc[:,'Aadhar_Image'].map(lambda x: x if ((x.split(',')[1]=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x.split(',')[1] +'","View Image")')
-
+            df['Aadhar_Image_Front'] = df.loc[:,'Aadhar_Image'].map(lambda x: x.split(',')[0] if ((x.split(',')[0]=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x.split(',')[0] +'","View Image")')
+            df['Aadhar_Image_Back'] = df.loc[:,'Aadhar_Image'].map(lambda x: '' if len(x.split(','))<=1 else '=HYPERLINK("' + config.Base_URL +'/GetDocumentForExcel_S3_certiplate?image_name=' + x.split(',')[1] +'","View Image")')
             df.loc[:,'Identifier_Image'] = df.loc[:,'Identifier_Image'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
             df.loc[:,'Account_Image'] = df.loc[:,'Account_Image'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
 
