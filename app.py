@@ -5966,8 +5966,7 @@ class AllCreatedByBasedOnUser(Resource):
         if request.method=='GET':
             try:
                 UserId=request.args.get('user_id',0,type=int)
-                UserRoleId=request.args.get('user_role_id',0,type=int)
-                
+                UserRoleId=request.args.get('user_role_id',1,type=int)                
                 response=Database.AllCreatedByBasedOnUser(UserId,UserRoleId)
                 return {'CreatedBy':response}
             except Exception as e:
