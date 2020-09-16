@@ -200,7 +200,7 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
             df = df.fillna('')
 
             df.loc[:,'Aadhar_Image_Name'] = df.loc[:,'Aadhar_Image_Name'].map(lambda x: x if (x=='') else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
-            df['Aadhar_First_Side'] = df.loc[:,'Aadhar_Image_Name'].map(lambda x: x.split(',')[0] if ((x.split(',')[0]=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x.split(',')[0] +'","View Image")')
+            df['Aadhar_First_Side'] = df.loc[:,'Aadhar_Image_Name'].map(lambda x: '' if (x.split(',')[0]=='') else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x.split(',')[0] +'","View Image")')
             df['Aadhar_Second_Side'] = df.loc[:,'Aadhar_Image_Name'].map(lambda x: '' if len(x.split(','))<=1 else '=HYPERLINK("' + config.Base_URL +'/GetDocumentForExcel_S3_certiplate?image_name=' + x.split(',')[1] +'","View Image")')
             df.loc[:,'Candidate_Photo'] = df.loc[:,'Candidate_Photo'].map(lambda x: x if (x=='') else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
             df.loc[:,'Educational Marksheet'] = df.loc[:,'Educational Marksheet'].map(lambda x: x if (x=='') else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
