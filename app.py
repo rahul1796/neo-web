@@ -40,6 +40,7 @@ from pandas_schema.validation import CustomElementValidation
 import numpy as np
 import requests
 from email.utils import parseaddr
+import hyperlink
 #import excel_validation
 #String check
 def check_str(st):
@@ -148,6 +149,8 @@ def before_request():
         g.user_role_name = session['user_role_name']
         g.user_region_id=session['user_region_id']
         g.base_url = session['base_url']
+        g.COL_url=session['COL_url']
+        g.AWS_path = session['AWS_path']
         # print(g.user,g.user_id,g.user_role)
         g.User_detail_with_ids.append(g.user)
         g.User_detail_with_ids.append(g.user_id)
@@ -155,6 +158,8 @@ def before_request():
         g.User_detail_with_ids.append(g.user_role_name)
         g.User_detail_with_ids.append(g.base_url)
         g.User_detail_with_ids.append(g.user_region_id)
+        g.User_detail_with_ids.append(g.COL_url)
+        g.User_detail_with_ids.append(g.AWS_path)
     if 'course_id' in session.keys():
         g.course_id = session['course_id']
     if 'center_category_id' in session.keys():
@@ -269,6 +274,8 @@ def login():
                 session['user_role_name'] = role_name
                 session['user_region_id'] = tr[0]['Region_Id']  
                 session['base_url'] = config.Base_URL
+                session['COL_url'] = config.COL_URL
+                session['AWS_path'] = config.aws_location
                 config.displaymsg=""
                 return redirect(url_for('home'))
                 #assign_sessions()
@@ -590,15 +597,13 @@ def course_add_edit():
 
 @app.route("/assign_course_add_edit_to_home", methods=['GET','POST'])
 def assign_course_type_add_edit_to_home():
-    
-    #global glob_course_id
-    #return(request.form['hdn_course_id'])
-    #glob_course_id= request.form['hdn_course_id']
     session['course_id'] = request.form['hdn_course_id']
     if g.user:
         return render_template("home.html",values=g.User_detail_with_ids,html="course_add_edit")
     else:
         return render_template("login.html",error="Session Time Out!!")
+
+
 
 
 @app.route("/after_popup_course")
@@ -613,17 +618,18 @@ class add_course_details(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
-            course_name=request.form['CourseName']
-            #project_id=13    ### WHY project id is fixed
-            project_id=request.form['ProjectId']
+            CourseId=request.form['CourseId']
+            CourseName=request.form['CourseName']
+            CourseCode=request.form['CourseCode']
+            Sector=request.form['Sector']
+            Qp=request.form['Qp']
+            Parent_Course=request.form['Parent_Course']
+            Course_Duration_day=request.form['Course_Duration_day']
+            Course_Duration_hour=request.form['Course_Duration_hour']
+            isactive=request.form['isactive']
             user_id=g.user_id
-            qp_id=request.form['QpId']
-            is_active=request.form['isactive']
-            center_ids=request.form['CenterId']
-            items=request.form['SessionJSON']
-            course_id=request.form['CourseId']
-            course_code=request.form['CourseCode']
-            return Content.add_course(course_name,project_id,user_id,is_active,center_ids,qp_id,course_id,items,course_code)
+            
+            return Content.add_course(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, isactive, user_id)
             
 class GetCourseDetails(Resource):
     @staticmethod
@@ -1275,10 +1281,11 @@ class add_qp_details(Resource):
         if request.method == 'POST':
             qp_name=request.form['QpName']
             qp_code=request.form['QpCode']
+            sector=request.form['Sector']
             user_id=g.user_id
             is_active=request.form['isactive']
             qp_id=g.qp_id
-            return Content.add_qp(qp_name,qp_code,user_id,is_active,qp_id)
+            return Content.add_qp(qp_name,qp_code,user_id,is_active,qp_id,sector)
 
 class get_qp_details(Resource):
     @staticmethod
@@ -3439,7 +3446,7 @@ api.add_resource(change_password_api,'/change_password_api')
 @app.route("/data/<path:path>")
 def get_file(path):
     """Download a file."""
-    filename = r"{}{}".format(config.ReportDownloadPathLocal,path)
+    filename = r"{}data/{}".format(config.ReportDownloadPathLocal,path)
     print(filename)
     if not(os.path.exists(filename)):
         filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathWeb)
@@ -5694,6 +5701,7 @@ class upload_bulk_upload(Resource):
                 #df_clean = df.drop(index=errors_index_rows)
                 #df_clean.to_csv('clean_data.csv',index=None)
                 len_error = len(errors_index_rows)
+                os.remove(file_name)
                 if len_error>0:
                     file_name = str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv'
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
@@ -5782,6 +5790,7 @@ class upload_bulk_upload(Resource):
                 #df_clean = df.drop(index=errors_index_rows)
                 #df_clean.to_csv('clean_data.csv',index=None)
                 len_error = len(errors_index_rows)
+                os.remove(file_name)
                 if len_error>0:
                     file_name = str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv'
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
@@ -5894,6 +5903,7 @@ class upload_bulk_upload(Resource):
                 errors_index_rows = [e.row for e in errors]
 
                 len_error = len(errors_index_rows)
+                os.remove(file_name)
                 if len_error>0:
                     file_name = str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv'
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
@@ -5956,8 +5966,7 @@ class AllCreatedByBasedOnUser(Resource):
         if request.method=='GET':
             try:
                 UserId=request.args.get('user_id',0,type=int)
-                UserRoleId=request.args.get('user_role_id',0,type=int)
-                
+                UserRoleId=request.args.get('user_role_id',1,type=int)                
                 response=Database.AllCreatedByBasedOnUser(UserId,UserRoleId)
                 return {'CreatedBy':response}
             except Exception as e:
@@ -6256,9 +6265,10 @@ class upload_assessment_result(Resource):
                 stage_id = request.form["stage_id"]
                 file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
                 f.save(file_name)
-
+    
                 df= pd.read_excel(file_name,sheet_name='Template')
                 df = df.fillna('')
+                df = df.astype(str)
                 def check_dob(date_age):
                     try:
                         date_age = str(date_age)
@@ -6277,23 +6287,22 @@ class upload_assessment_result(Resource):
                         Column('Assessment_Date',str_validation + null_validation),
                         Column('Attendance(Absent_Present)',str_validation + null_validation),
                         Column('Score',flt_validation),
-                        Column('Grade',str_validation + null_validation),
-                        Column('Status(Certified_Notcertified)',status_validation)
+                        Column('Grade_Result',str_validation + null_validation),
+                        Column('Status(Certified_Notcertified)',status_validation),
+                        Column('Attempt',null_validation)
                         ])
                 errors = schema.validate(df)
                 errors_index_rows = [e.row for e in errors]
                 len_error = len(errors_index_rows)
+                os.remove(file_name)
                 if len_error>0:
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename+'_' + 'errors.csv')
                     return {"Status":False, "message":"Uploaded Failed (fails to validate data)" }
                 else:
                     out = Database.upload_assessment_result(df,user_id,assessment_id,batch_id,stage_id)
                     return out
-
-
             except Exception as e:
-                 return {"Status":False, "message":"Unable to upload " + str(e)}  
-             
+                 return {"Status":False, "message":"Unable to upload " + str(e)}         
 api.add_resource(upload_assessment_result,'/upload_assessment_result')
 
 class batch_download_report(Resource):
@@ -6321,9 +6330,7 @@ class batch_download_report(Resource):
                 EndToDate = request.form["EndToDate"]
                 file_name='batch_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
                 #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
-                
                 resp = batch_report.create_report(batch_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate, file_name)
-                
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:
@@ -6337,7 +6344,6 @@ class GetECPReportDonload(Resource):
         if request.method=='POST':
             #try:
                 #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
-                
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
             customer_ids = request.form["customer_ids"]
@@ -6347,9 +6353,7 @@ class GetECPReportDonload(Resource):
             to_date = request.form["to_date"]
             file_name='ecp_report_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
             #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
-            
             resp = ecp_report_down.create_report(user_id, user_role_id, customer_ids, contract_ids, region_ids, from_date, to_date, file_name)
-            
             return resp
             #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             # except Exception as e:
@@ -6604,15 +6608,10 @@ class add_edit_center_room(Resource):
                 Room_Capacity=request.form['Room_Capacity']
                 center_id=request.form['center_id']
                 room_id=request.form['room_id']
-                uploaded_files = request.files.getlist("fileToUpload[]")
                 course_ids=request.form['course_ids']
-
-                file_name = ''
-                for file in uploaded_files:
-                    file_name += file.filename + ','
-                    file.save(os.getcwd() + config.upload_data_path +'RoomImages/' + file.filename)
-                file_name = file_name[:-1]
-                out = Master.add_edit_center_room(Room_Name, user_id, is_active, Room_Type, Room_Size, Room_Capacity, center_id, room_id, file_name, course_ids)
+                room_images = request.form['room_images']
+                
+                out = Master.add_edit_center_room(Room_Name, user_id, is_active, Room_Type, Room_Size, Room_Capacity, center_id, room_id, room_images, course_ids)
             except Exception as e:
                 out = {"PopupMessage":{"message":"Error " + str(e), "status":False}}
             finally:
@@ -6684,6 +6683,7 @@ class upload_batch_target_plan(Resource):
                 errors = schema.validate(df)
                 errors_index_rows = [e.row for e in errors]
                 len_error = len(errors_index_rows)
+                os.remove(file_name)
                 if len_error>0:
                     file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
@@ -6736,13 +6736,14 @@ class upload_user(Resource):
                 errors = schema.validate(df)
                 errors_index_rows = [e.row for e in errors]
                 len_error = len(errors_index_rows)
+                os.remove(file_name)
                 if len_error>0:
-                    print("1")
+                    #print("1")
                     file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
                     return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
                 else:
-                    print("2")
+                    #print("2")
                     df.columns = df.columns.str.replace(" ", "_")
                     df.columns = df.columns.str.replace("*", "")
                     df.insert(0, 'row_index', range(len(df)))
@@ -6753,9 +6754,8 @@ class upload_user(Resource):
                         return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
                     else:
                         return out
-                
             except Exception as e:
-                 print(e)
+                 #print(e)
                  return {"Status":False, "message":"Unable to upload " + str(e)}  
              
 api.add_resource(upload_user,'/upload_user')
@@ -6937,7 +6937,7 @@ class DownloadOpsProductivityReport(Resource):
             role_id = request.form["role_id"]
             customer_ids = request.form["customer_ids"]
             contract_ids = request.form["contract_ids"]
-            print(month,role_id)
+            print(month,role_id,customer_ids,contract_ids)
             resp = Report.DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id)
             return resp
 
@@ -7300,6 +7300,14 @@ class SyncShikshaAttendanceData(Resource):
             return response
 api.add_resource(SyncShikshaAttendanceData,'/SyncShikshaAttendanceData')
 
+class SyncShikshaCandidateData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=Master.SyncShikshaCandidateData()
+            return response
+api.add_resource(SyncShikshaCandidateData,'/SyncShikshaCandidateData')
+
 ################################### SL4 report
 @app.route("/SL4Report_page")
 def SL4Report_page():
@@ -7541,6 +7549,81 @@ class download_sub_project_list(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(download_sub_project_list,'/download_sub_project_list')
 
+class GetDocumentForExcel(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            image_name=request.args.get('image_name','',type=str)
+            image_path=request.args.get('image_path','',type=str)
+            #response={"POC":Master.GetPOCForCustomer(customer_id)}
+            #url = hyperlink.parse(u'www.google.co.in')
+            #image_name =  '2_Class room_Untitled.png'
+            path = 'C:/Users/Jagdish P K/Desktop/APP/code/neo-web_qa/data/TMA/'
+            filename = '{}{}'.format(path,image_name)
+            if os.path.exists(filename):
+                filename = 'http://127.0.0.1:5000/data/tma/{}'.format(image_name)
+            else:
+                path = 'neo_skills/qa/bulk_upload/room_image/1_Class room_Untitled.png'
+
+                URL = config.COL_URL + 's3_signed_url_for_file_updated'
+                PARAMS = {'file_path':path} 
+                r = requests.get(url = URL, params = PARAMS) 
+                if r.text !='':
+                    filename = r.text
+                else:
+                    filename = 'http://127.0.0.1:5000/data/tma/{}'.format(image_name) # no image found
+            
+            return redirect(filename)
+api.add_resource(GetDocumentForExcel,'/GetDocumentForExcel')
+
+class GetDocumentForExcel_S3_certiplate(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            image_name=request.args.get('image_name','',type=str)
+            image_path=request.args.get('image_path','',type=str)
+            
+            URL=config.neo_certiplate+image_name
+            r = requests.get(url = URL) 
+            if r.status_code==200:
+                filename =  URL
+            elif r.status_code==404:
+                print(image_name)
+                path = config.aws_location +'bulk_upload/room_image/'+image_name
+                URL = config.COL_URL + 's3_signed_url_for_file_updated'
+                PARAMS = {'file_path':path} 
+                r = requests.get(url = URL, params = PARAMS) 
+                
+                #print('hi'+r.text)
+
+                if r.text !='':
+                    filename = r.text
+                else:
+                    filename = ''
+            else:
+                filename=''
+            
+            if filename =='':
+                filename= config.Base_URL + '/data/No-image-found.jpg'
+            print(filename)
+            return redirect(filename)
+api.add_resource(GetDocumentForExcel_S3_certiplate,'/GetDocumentForExcel_S3_certiplate')
+
+class GetQP_basedon_Sector(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            sector_ids=request.args.get('sector_ids','',type=str)
+            return Content.get_qp_for_sector(sector_ids)
+api.add_resource(GetQP_basedon_Sector,'/GetQP_basedon_Sector')
+
+class GetAllParentCourse(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            return Content.GetAllParentCourse()
+api.add_resource(GetAllParentCourse,'/GetAllParentCourse')
+
 if __name__ == '__main__':
-    #app.run(host="0.0.0.0", port=int("80"), debug=True)
-    app.run(debug=True)
+    app.run(host=config.app_host, port=int(config.app_port), debug=True)
+    #app.run(debug=True)

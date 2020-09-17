@@ -2,68 +2,140 @@ var varTable;
 var varTable1;
 var flag = "";
 var role_id;
+
 function UploadFileData()
-{   $("#imgSpinner1").show();
-    var form_data = new FormData($('#formUpload')[0]);
-    form_data.append('cand_stage',1);
-    form_data.append('user_id',$('#hdn_home_user_id_modal').val());
-    form_data.append('user_role_id',$('#hdn_home_user_role_id_modal').val());
-    $.ajax({
-            type: 'POST',
-            url: $('#hdn_web_url').val()+ "/upload_bulk_upload",
-            enctype: 'multipart/form-data',
-            data: form_data,
-            contentType: false,
-            cache: false,
-            processData: false,
-            success: function(data) 
-            {
-                var message="",title="",icon="";
-                if(data.Status){
-                    message=data.message;
-                    title="Success";
-                    icon="success";
-                }
-                else{
-                    if (data.message=="Validation_Error"){
-                        message=data.error;
-                        title="Error";
-                        icon="error";
-                    }
-                    else {
-                        message=data.message;
-                        title="Error";
-                        icon="error";
-                    }
-                }
-                var span = document.createElement("span");
-                span.innerHTML = message;
-                swal({   
-                            title:title,
-                            content: span,
-                            icon:icon,
-                            confirmButtonClass:"btn btn-confirm mt-2"
-                            }).then(function(){
-                                window.location.href = '/mobilization';
-                            }); 
+{   
+    if ($('#myFile').get(0).files.length === 0) {
+        console.log("No files selected.");
+    }
+    else
+    {
+        UploadFileToProcess();
+    }
+}
+/*
+        var fileExtension = ['xlsx']
+        if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            alert("Formats allowed are : "+fileExtension.join(', '));
+            return false;
+        }
+        else
+        {
+            $("#imgSpinner1").show();
+
+            var files=document.getElementById("myFile").files;
+            var file=files[0];
+
+            var file_path=$('#hdn_AWS_S3_path').val()+"bulk_upload/candidate/mobilization/" + $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + file.name; 
+            var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
             
-                    
-            },
-            error:function(err)
-            {
-                swal({   
-                    title:"Error",
-                    text:'Error! Please try again',
-                    icon:"error",
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET",api_url );
+                xhr.onreadystatechange = function(){
+                    if(xhr.readyState === 4){
+                    if(xhr.status === 200){
+                        var response = JSON.parse(xhr.responseText);
+                        //console.log(response);
+                        uploadFileToS3(file, response.data, response.url);
+                    }
+                    else{
+                        alert("Could not get signed URL.");
+                    }
+                    }
+                };
+                xhr.send();
+            
+        }
+    }
+}
+
+function uploadFileToS3(file, s3Data, url){
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", s3Data.url);
+
+    var postData = new FormData();
+    for(key in s3Data.fields){
+        postData.append(key, s3Data.fields[key]);
+    }
+    postData.append('file', file);
+
+    xhr.onreadystatechange = function() {
+        if(xhr.readyState === 4){
+        if(xhr.status === 200 || xhr.status === 204){
+            var response = xhr;
+            //console.log(response);
+            UploadFileToProcess();
+        }
+        else{
+            alert("Could not upload file to s3.");
+        }
+    }
+    };
+    xhr.send(postData);
+}
+*/
+function UploadFileToProcess()
+{
+var form_data = new FormData($('#formUpload')[0]);
+form_data.append('cand_stage',1);
+form_data.append('user_id',$('#hdn_home_user_id_modal').val());
+form_data.append('user_role_id',$('#hdn_home_user_role_id_modal').val());
+$.ajax({
+    type: 'POST',
+    url: $('#hdn_web_url').val()+ "/upload_bulk_upload",
+    enctype: 'multipart/form-data',
+    data: form_data,
+    contentType: false,
+    cache: false,
+    processData: false,
+    success: function(data) 
+    {
+        var message="",title="",icon="";
+        if(data.Status){
+            message=data.message;
+            title="Success";
+            icon="success";
+        }
+        else{
+            if (data.message=="Validation_Error"){
+                message=data.error;
+                title="Error";
+                icon="error";
+            }
+            else {
+                message=data.message;
+                title="Error";
+                icon="error";
+            }
+        }
+        var span = document.createElement("span");
+        span.innerHTML = message;
+        swal({   
+                    title:title,
+                    content: span,
+                    icon:icon,
                     confirmButtonClass:"btn btn-confirm mt-2"
                     }).then(function(){
                         window.location.href = '/mobilization';
                     }); 
-               
-            }
-        });
     
+            
+    },
+    error:function(err)
+    {
+        swal({   
+            title:"Error",
+            text:'Error! Please try again',
+            icon:"error",
+            confirmButtonClass:"btn btn-confirm mt-2"
+            }).then(function(){
+                window.location.href = '/mobilization';
+            }); 
+       
+    }
+});
 }
+   
 function Uploadfile(){
     $('#hdn_home_user_id_modal').val($('#hdn_home_user_id').val());
     $('#hdn_home_user_role_id_modal').val($('#hdn_home_user_role_id').val());
