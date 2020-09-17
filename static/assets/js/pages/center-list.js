@@ -735,7 +735,7 @@ function GetRoomCenters(CenterId,CenterName)
         var sizestatus=1;
         for (var x = 0; x < ins; x++) {
             var file = document.getElementById('images').files[x]
-            console.log(file.size)
+            //console.log(file.size)
             if (file.size > 1024*1024) { 
                 sizestatus=0;
             }
