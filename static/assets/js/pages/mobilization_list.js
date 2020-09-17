@@ -10,10 +10,9 @@ function UploadFileData()
     }
     else
     {
-        UploadFileToProcess();
-    }
-}
-/*
+//        UploadFileToProcess();
+ //   }
+//}
         var fileExtension = ['xlsx']
         if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
             alert("Formats allowed are : "+fileExtension.join(', '));
@@ -73,7 +72,7 @@ function uploadFileToS3(file, s3Data, url){
     };
     xhr.send(postData);
 }
-*/
+
 function UploadFileToProcess()
 {
 var form_data = new FormData($('#formUpload')[0]);
