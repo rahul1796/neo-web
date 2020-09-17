@@ -40,7 +40,7 @@ from pandas_schema.validation import CustomElementValidation
 import numpy as np
 import requests
 from email.utils import parseaddr
-import hyperlink
+#import hyperlink
 #import excel_validation
 #String check
 def check_str(st):
