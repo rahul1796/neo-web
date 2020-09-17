@@ -39,12 +39,17 @@
                 LoadTable('','','');
 
         role_id=parseInt($('#hdn_home_user_role_id').val());
-        // if(role_id == 3 || role_id == 8)
+        if(role_id == 1 || role_id == 16){
+            $('#btn_create').show();
+        }
+        // else{
         //     $('#btn_create').hide();
+        // }
+        
         });
     </script>
 		<form id='form1' method="POST" action="/assign_course_add_edit_to_home">
-            <input type="hidden" id="hdn_course_id" name="hdn_course_id" value="-1">
+            <input type="hidden" id="hdn_course_id" name="hdn_course_id" value="0">
 			<input type="hidden" id="hdn_is_course_variant" name="hdn_is_course_variant" value="0">
 				<div class="container-fluid">
                     
@@ -103,7 +108,7 @@
                                         <div class="col-lg-6">
                                             <h4 class="header-title">Course List</h4>
                                         </div>
-                                        <div class="col-lg-6" >                                        
+                                        <div class="col-lg-6">                                        
                                                 <button style="float: right; display: none;" type="submit" id="btn_create" clientIdMode="static" class="btn btn-primary">Create Course</a>
                                         </div>
                                     </div>
@@ -115,13 +120,15 @@
                                                     <th>S.No</th>
                                                     <th>Actions</th>
                                                     <th>Course Code</th> 
-                                                    <th>Course Name</th>  
-                                                    <th>Course Variant</th>       
+                                                    <th>Course Name</th>
                                                     <th>Projects</th>  
                                                     <th>Sub Projects</th>  
                                                     <th>Centers</th>                                           
                                                     <th>QP Code</th> 
                                                     <th>QP Name</th>
+                                                    <th>Duration in Days</th>
+                                                    <th>Duration in Hours</th>
+                                                    <th>Course Variant</th>
                                                     <th>Status</th>
                                                 </tr>
                                             </thead>

@@ -23,7 +23,9 @@
         <!-- ============================================================== -->
         <!-- Start Page Content here -->
         <!-- ============================================================== -->
-				<div class="container-fluid">
+        <form id='qp_form' method="POST" action="/assign_qp_add_edit_to_home">
+        <input type="hidden" id="hdn_qp_id" name="hdn_qp_id" value="0">        
+        <div class="container-fluid">
     
                     <!-- start page title -->
                     <div class="row">
@@ -56,7 +58,10 @@
 										
 										<div class="col-lg-1" >
 											<button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
-										</div>
+                                        </div>
+                                        <div class="col-lg-3" >                                        
+                                            <button style="float: right; display: none;margin-top: 30px" type="submit" id="btn_create" class="btn btn-primary">Create Qualification Pack</a>
+                                    </div>
 										
 									</div>
 								</form>
@@ -103,6 +108,7 @@
             
             <!-- end wrapper -->
         </form>
+    </form>
         <!-- ============================================================== -->
         <!-- End Page content -->
         <!-- ============================================================== -->

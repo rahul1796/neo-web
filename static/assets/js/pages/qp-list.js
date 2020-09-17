@@ -9,8 +9,8 @@ $(document).ready(function () {
 	LoadSector()		
     LoadTable(""); 
     role_id=parseInt($('#hdn_home_user_role_id').val());
-    if(role_id == 5)
-        $('#btn_create').hide();
+    if(role_id == 1 || role_id == 16 )
+        $('#btn_create').show();
 });
 
 function LoadSector()
@@ -85,11 +85,11 @@ function LoadTable(sectors)
 
         "columns": [
             { "data": "S_No"},
-            {"visible": false,
+            {"visible": true,
                 "data": function (row, type, val, meta) {
                     var varButtons = ""; 
-                    if(role_id != 5)
-                        varButtons += '<a onclick="EditCenterCategoryDetail(\'' + row.Qp_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Client" class="fas fa-edit" ></i></a>';
+                    if(role_id == 1 || role_id==16)
+                        varButtons += '<a onclick="EditQPDetail(\'' + row.Qp_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit QP" class="fas fa-edit" ></i></a>';
                     return varButtons;
                 }
             },
@@ -113,9 +113,9 @@ function LoadTable(sectors)
 
     });
 }
-function EditCenterCategoryDetail(QpId)
+function EditQPDetail(QpId)
 {
     $('#hdn_qp_id').val(QpId);
-    $('#form1').submit();
+    $('#qp_form').submit();
     
 }

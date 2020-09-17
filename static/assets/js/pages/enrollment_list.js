@@ -39,10 +39,80 @@ function toggleCheckbox(e)
         //console.log(check_list)
     }
 
+    function UploadFileData()
+    {
+        
+        if ($('#myFile').get(0).files.length === 0) {
+            console.log("No files selected.");
+        }
+        else
+        {
+            UploadFileToProcess();
+        }
+    }
+    /*
+            var fileExtension = ['xlsx']
+            if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                alert("Formats allowed are : "+fileExtension.join(', '));
+                return false;
+            }
+            else
+            {
+                $("#imgSpinner1").show();
 
-
-function UploadFileData()
-{   $("#imgSpinner1").show();
+                var files=document.getElementById("myFile").files;
+                var file=files[0];
+    
+                var file_path=$('#hdn_AWS_S3_path').val()+"bulk_upload/candidate/enrollment/" + $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + file.name; 
+                var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET",api_url );
+                    xhr.onreadystatechange = function(){
+                        if(xhr.readyState === 4){
+                        if(xhr.status === 200){
+                            var response = JSON.parse(xhr.responseText);
+                            console.log(response);
+                            uploadFileToS3(file, response.data, response.url);
+                        }
+                        else{
+                            alert("Could not get signed URL.");
+                        }
+                        }
+                    };
+                    xhr.send();
+                
+            }
+        }
+    }
+    
+    function uploadFileToS3(file, s3Data, url){
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", s3Data.url);
+    
+        var postData = new FormData();
+        for(key in s3Data.fields){
+            postData.append(key, s3Data.fields[key]);
+        }
+        postData.append('file', file);
+    
+        xhr.onreadystatechange = function() {
+            if(xhr.readyState === 4){
+            if(xhr.status === 200 || xhr.status === 204){
+                var response = xhr;
+                console.log(response);
+                UploadFileToProcess();
+            }
+            else{
+                alert("Could not upload file to s3.");
+            }
+        }
+        };
+        xhr.send(postData);
+    }
+    */
+    function UploadFileToProcess()
+    {
     var form_data = new FormData($('#formUpload')[0]);
     form_data.append('cand_stage',3);
     form_data.append('user_id',$('#hdn_home_user_id_modal').val());
@@ -102,8 +172,8 @@ function UploadFileData()
                
             }
         });
-    
-}
+    }
+
 function Uploadfile(){
     $('#hdn_home_user_id_modal').val($('#hdn_home_user_id').val());
     $('#hdn_home_user_role_id_modal').val($('#hdn_home_user_role_id').val());
