@@ -287,6 +287,8 @@ function LoadTable()
                 d.MinAge  = $('#MinAge').val();
                 d.MaxAge  = $('#MaxAge').val();
                 d.created_by  = $('#ddlcreated_by').val().toString();
+                d.FromDate  = $('#FromDate').val();
+                d.ToDate  = $('#ToDate').val();
             },
             error: function (e) {
                 $("#tbl_candidate tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
