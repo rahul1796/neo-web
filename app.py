@@ -5619,9 +5619,15 @@ class DownloadMobTemplate(Resource):
             try:
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
+                Project_Tpye = int(request.form["Project_Tpye"])
+                if Project_Tpye==1:
+                    filename = 'CandidateBulkUpload_Mobilization_DELL.xlsx'
+                elif Project_Tpye==2:
+                    filename = 'CandidateBulkUpload_Mobilization_SHE.xlsx'
+                else:
+                    filename = 'CandidateBulkUpload_Mobilization.xlsx'
                 
-                return {'Description':'Downloaded Template', 'Status':True, 'filename':'CandidateBulkUpload_Mobilization.xlsx'}
-                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+                return {'Description':'Downloaded Template', 'Status':True, 'filename':filename}
             except Exception as e:
                 #print(str(e))
                 return {"exceptione":str(e)}
@@ -5636,6 +5642,8 @@ class upload_bulk_upload(Resource):
             cand_stage =request.form['cand_stage']
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
+            ProjectType = request.form["ProjectType"]
+
             file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
             f.save(file_name)
             all_email=Database.all_email_validation(cand_stage)
@@ -5985,19 +5993,65 @@ class DownloadRegTemplate(Resource):
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
                 candidate_ids = request.form["candidate_ids"]
-                file_name='CandidateBulkUpload_Registration_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
-                data = Database.download_selected_registration_candidate(candidate_ids,file_name)
-                if len(data[0])==0:
-                    return {'Description':'candidates not available', 'Status':False}
+                Project_Type = int(request.form["Project_Type"])
+                
+                resp = Database.download_selected_registration_candidate(candidate_ids)
+
+                if(len(resp['data']) < 1):
+                    return({'msg':'No Records Found For Selected Filters!', 'success':False})
                 else:
-                    df = pd.read_excel(config.bulk_upload_path +'Master_Registration.xlsx')
-                    col = df.columns.to_list()
-                    d={}
-                    for i in range(len(data)):
-                        for j in range(len(col)):
-                            d[col[j]]=data[i][j]
-                        df = df.append(d,ignore_index=True)
-                    df.to_excel(config.bulk_upload_path + file_name,sheet_name='Registration',index=False)
+                    df = pd.DataFrame(resp['data'], columns=resp['columns'])
+                    col = ['Candidate_Id', 'Isfresher', 'Candidate_Photo', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 
+                    'Age', 'Primary_Contact_No', 'Secondary_Contact_No', 'Email_Id', 'Gender', 'Marital_Status', 'Caste', 'Disability_Status', 'Religion', 
+                    'Mother_Tongue', 'Occupation', 'Average_Annual_Income', 'Source_Of_Information', 'Interested_Course', 'Product', 'Present_Address_Line1', 
+                    'Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block', 'Present_District', 'Present_State', 
+                    'Present_Pincode', 'Present_Country', 'Permanent_Address_Line1', 'Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 
+                    'Permanent_Taluk_Block', 'Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country', 'Aadhar_No', 'Identifier_Type', 
+                    'Identity_Number', 'Document_Copy_Image_Name', 'Employment_Type', 'Preferred_Job_Role', 'Years_Of_Experience', 'Relevant_Years_Of_Experience', 
+                    'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc', 
+                    'Registered_By']
+
+                    Column = ['Candidate_id', 'Fresher/Experienced?*', 'Candidate Photo', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 
+                    'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 'Gender*', 'Marital Status*', 'Caste*', 'Disability Status*', 'Religion*', 
+                    'Mother Tongue*', 'Occupation*', 'Average annual income*', 'Source of Information*', 'Interested Course*', 'Product*', 'Present Address line1', 
+                    'Present Address line2', 'Present Village', 'Present Panchayat', 'Present Taluk/Block', 'Present District*', 'Present State*', 
+                    'Present Pincode*', 'Present Country*', 'Permanent Address line1', 'Permanent Address line2', 'Permanent Village', 'Permanent Panchayat', 
+                    'Permanent Taluk/Block', 'Permanent District*', 'Permanent State*', 'Permanent Pincode*', 'Permanent Country*', 'Aadhar No', 'Identifier Type', 
+                    'Identity number', 'Document copy', 'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 
+                    'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 'Expected CTC*']
+                
+                    if Project_Type==1:
+                        col += ['Aspirational District', 'Educational Marksheet', 'Income Certificate']
+                        Column += ['Aspirational District', 'Educational Marksheet', 'Income Certificate']
+
+                        filename = 'CandidateBulkUpload_Registration_DELL_'
+                    elif Project_Type==2:
+                        col += []
+                        Column += []
+                        filename = 'CandidateBulkUpload_Registration_SHE_'
+                    else:
+                        filename = 'CandidateBulkUpload_Registration_'
+
+                    file_name= filename +str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+
+                    df = df[col]
+                    
+                    writer = pd.ExcelWriter(config.bulk_upload_path + file_name, engine='xlsxwriter')
+                    workbook  = writer.book
+
+                    header_format = workbook.add_format({
+                        'bold': True,
+                        #'text_wrap': True,
+                        'valign': 'center',
+                        'fg_color': '#D7E4BC',
+                        'border': 1})
+                    df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Registration') 
+                    worksheet = writer.sheets['Registration']
+                            
+                    for i in range(len(Column)):
+                        worksheet.write(0,i ,Column[i], header_format)
+                    writer.save()
+
                     return {'Description':'Downloaded Template', 'Status':True, 'filename':file_name}
                 
             except Exception as e:

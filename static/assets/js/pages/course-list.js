@@ -27,7 +27,6 @@ function LoadTable(sectors, qps, status)
             error: function (e) {
                 $("#tbl_courses tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
             }
-
         },
 
         "columns": [
@@ -38,7 +37,7 @@ function LoadTable(sectors, qps, status)
             "data": function (row, type, val, meta) {
                 var varButtons = ""; 
                 //if(role_id != 3 && role_id != 8)
-                //varButtons += '<a onclick="AddSessionCourseDetail('+row.Course_Id+' )" class="btn" style="cursor:pointer" ><i title="Add Session" class="fas fa-plus" ></i></a>';
+                varButtons += '<a onclick="AddSessionCourseDetail('+row.Course_Id+' )" class="btn" style="cursor:pointer" ><i title="Add Session" class="fas fa-plus" ></i></a>';
                 varButtons += '<a onclick="EditCourseDetail(\'' + row.Course_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Course" class="fas fa-edit" ></i></a>';
                 return varButtons;
                 }
@@ -118,6 +117,12 @@ function EditCourseDetail(Course_Id)
     
 }
 
+function AddSessionCourseDetail(CourseId){
+    $('#hdn_course_id').val(CourseId);
+    $('#form1').attr('action', '/assign_course_id_for_session');
+    $('#form1').submit();
+}
+
 function LoadSectorddl()
 {
     var URL=$('#hdn_web_url').val()+ "/All_Sector"
@@ -137,7 +142,6 @@ function LoadSectorddl()
                         //$('#ddlSector').append(new Option('ALL',''));
                         for(var i=0;i<count;i++)
                             $('#ddlSector').append(new Option(data.Sectors[i].Sector_Name,data.Sectors[i].Sector_Id));
-                        
                     }
                     else
                     {

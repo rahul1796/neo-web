@@ -116,6 +116,8 @@ function toggleCheckbox(e)
         form_data.append('cand_stage',2);
         form_data.append('user_id',$('#hdn_home_user_id_modal').val());
         form_data.append('user_role_id',$('#hdn_home_user_role_id_modal').val());
+        form_data.append('ProjectType',$('#hdn_ProjectType_modal').val());
+
         $.ajax({
                 type: 'POST',
                 url: $('#hdn_web_url').val()+ "/upload_bulk_upload",
@@ -173,11 +175,13 @@ function toggleCheckbox(e)
             });
     }
 
-function Uploadfile(){
+function Uploadfile(project_type){
     $('#hdn_home_user_id_modal').val($('#hdn_home_user_id').val());
     $('#hdn_home_user_role_id_modal').val($('#hdn_home_user_role_id').val());
+    $('#hdn_ProjectType_modal').val(project_type);
     $("#imgSpinner1").hide();
     $('#myFile').val('');
+
     $('#mdl_bulkupload_candidate').modal('show');
 }
 function Loadcreatedbyddl(){
@@ -413,8 +417,9 @@ function CandidateContactDetails(primary_contact,SecondaryContact,Email,PresnetA
     $('#mdl_cand_contact').modal('show');
 }
 
-function DownloadRegTemplate(){
+function DownloadRegTemplate(Project_Type){
     $("#imgSpinner").show();
+    $('#mdl_project_type').modal('hide');
     var cands=check_list.toString();
 
     if ((cands.toString().length)==0)
@@ -434,7 +439,8 @@ function DownloadRegTemplate(){
                             
                             'user_id':$('#hdn_home_user_id').val(),
                             'user_role_id':$('#hdn_home_user_role_id').val(),
-                            'candidate_ids':cands.toString()
+                            'candidate_ids':cands.toString(),
+                            'Project_Type':Project_Type
                     },
                     success: function(resp) 
                     {
@@ -501,4 +507,18 @@ function ForceDownload(varUrl, varFileName)
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+function select_Project_Type(a){
+            //DownloadMobTemplate, Uploadfile
+            $('#hdn_upload_download_report').val(a)
+            $('#mdl_project_type').modal('show');
+        }
+function LoadProjectPage(){
+            if ($('#hdn_upload_download_report').val()==0){
+                DownloadRegTemplate($('#ddlProjectType').val())
+            }
+            else{
+                Uploadfile($('#ddlProjectType').val())
+                //UploadFileData($('#ddlProjectType').val())
+            }
         }
