@@ -49,11 +49,12 @@
                 select_roles(0);
 
             if(parseInt($('#hdn_home_user_role_id').val())>0)
-            {   1, 15, 11, 13, 5,7
+            {   
                 var role_id=parseInt($('#hdn_home_user_role_id').val());
                 //alert(role_id);
+                
                 switch(role_id)
-				{   
+				{
                     case 1:             //Admin
                         $('#Home').show();
 						$('#Mobilization_Menu').show();
@@ -217,6 +218,7 @@
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
                             $('#TrainerProductivityReport').hide();
+                        
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -254,6 +256,7 @@
                         $('#TMA_attendance_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
+                        $('#SL4Report_Menu').show();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -365,6 +368,7 @@
                         $('#TMA_attendance_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
+
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -874,6 +878,7 @@
                                     </li>
                                     <li>
 										<a href="/batch_status_report" id="Batch_Status_report" class="active">Batch Status Report<div class="button"></div></a>
+
                                     </li>
                                     <li class="has-submenu"  id="customer_reports" >
                                         <!--<li class="has-submenu dropdown-menu-left "  id="Productivity_Report" style="display:none"> -->
