@@ -1400,15 +1400,15 @@ class Database:
         con.close()
         return content
            
-    def mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,created_by):
+    def mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,created_by,FromDate, ToDate):
         content = {}
         d = []
         h={}
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_M] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,created_by)
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_M] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,created_by,FromDate, ToDate)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -5220,20 +5220,19 @@ SELECT					cb.name as candidate_name,
         con.close()
         return response
 
-    def download_selected_registration_candidate(candidate_ids,filename):
-        response=[]
-        h={}
+    def download_selected_registration_candidate(candidate_ids):
+        
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec	[candidate_details].[sp_get_candidate_download_new_R] ?'
         values = (candidate_ids,)
         cur.execute(sql,(values))
-        columns = [column[0].title() for column in cur.description]
-        data = list(map(lambda x:list(x),cur.fetchall()))
 
+        columns = [column[0].title() for column in cur.description]  
+        data = list(map(lambda x:list(x),cur.fetchall()))
         cur.close()
         con.close()
-        return data
+        return {'data':data,'columns':columns}
 
     def registration_web_inser(df,user_id):
         con = pyodbc.connect(conn_str)
