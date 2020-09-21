@@ -359,6 +359,7 @@ function LoadTable()
                     return varButtons;
                     }
             },
+            { "data": "Customer_Name" },
             { "data": "Status"},
             { "data": "Batch_Name" },
             { "data": "Product_Name" },
@@ -692,339 +693,339 @@ function add_map_message(){
                 }
             });
     }
-    function add_drop_message(){
-        
-        var cands='';
-        //alert(flag)
-        $('[name=checkcase]:checked').each(function () {
-            cands+= $(this).val()+',';
-        });
-        cands=cands.substring(0,cands.length-1)
-	
-        var URL=$('#hdn_web_url').val()+ "/drop_edit_candidate_batch";
-                $.ajax({
-                    type:"POST",
-                    url:URL,
-                    data:{
-                        "course_id": Course,
-                        "candidate_ids": cands.toString(),
-                        "batch_id": Batch,
-                        "drop_remark": $('#txtremark').val()
-                    },
-                    success:function(data){
-                        swal({   
-                            title:data.PopupMessage.message,
-                            text:data.PopupMessage.message+" Done Successfully !!",
-                            icon:"success",
-                            confirmButtonClass:"btn btn-confirm mt-2"
-                            }).then(function(){
-                                window.location.href = '/after_popup_batch';
-                            });
-                    },
-                    error:function(err)
-                    {
-                        alert('Error! Please try again');
-                        return false;
-                    }
-                });
-        }
+function add_drop_message(){
+    
+    var cands='';
+    //alert(flag)
+    $('[name=checkcase]:checked').each(function () {
+        cands+= $(this).val()+',';
+    });
+    cands=cands.substring(0,cands.length-1)
 
-        function GetProjectDetails(CenterId,CenterName)
-        {
-            var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForCenter?center_id="+CenterId;
+    var URL=$('#hdn_web_url').val()+ "/drop_edit_candidate_batch";
             $.ajax({
-                type:"GET",
+                type:"POST",
                 url:URL,
-                async:false,
-                overflow:true,        
-                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                datatype:"json",
-                success: function (data){
-                    varHtml='';
-                    $("#tblSubProject tbody").empty();
-                    if(!jQuery.isEmptyObject(data.SubProjects))
-                    {   if (data.SubProjects != null){
-                            count=data.SubProjects.length;
-                            if (count>0)
-                            {   varHtml='';
-                                console.log(count);
-                                for(var i=0;i<count;i++)
-                                {
-                                    td_open= '  <td style="text-align:center;">' ;
-                                    td_close=   '</td>';       
-                                    varHtml+='<tr>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].S_No +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ CenterName +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Sub_Project_Code +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Sub_Project_Name +'</td>';                    
-                                    varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Code +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Name +'</td>';  
-                                    varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Bu +'</td>';         
-                                    varHtml+='</tr>';
-                                    $("#tblSubProject tbody").append(varHtml);
-                                    $('#divSubProjectList').modal('show');
-                                    varHtml='';
-                                }
-                            }
-                            else
+                data:{
+                    "course_id": Course,
+                    "candidate_ids": cands.toString(),
+                    "batch_id": Batch,
+                    "drop_remark": $('#txtremark').val()
+                },
+                success:function(data){
+                    swal({   
+                        title:data.PopupMessage.message,
+                        text:data.PopupMessage.message+" Done Successfully !!",
+                        icon:"success",
+                        confirmButtonClass:"btn btn-confirm mt-2"
+                        }).then(function(){
+                            window.location.href = '/after_popup_batch';
+                        });
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+    }
+
+    function GetProjectDetails(CenterId,CenterName)
+    {
+        var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForCenter?center_id="+CenterId;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            overflow:true,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                varHtml='';
+                $("#tblSubProject tbody").empty();
+                if(!jQuery.isEmptyObject(data.SubProjects))
+                {   if (data.SubProjects != null){
+                        count=data.SubProjects.length;
+                        if (count>0)
+                        {   varHtml='';
+                            console.log(count);
+                            for(var i=0;i<count;i++)
                             {
-                                varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                                td_open= '  <td style="text-align:center;">' ;
+                                td_close=   '</td>';       
+                                varHtml+='<tr>';
+                                varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].S_No +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ CenterName +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Sub_Project_Code +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Sub_Project_Name +'</td>';                    
+                                varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Code +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Name +'</td>';  
+                                varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Bu +'</td>';         
+                                varHtml+='</tr>';
                                 $("#tblSubProject tbody").append(varHtml);
                                 $('#divSubProjectList').modal('show');
-                            } 
-                            
+                                varHtml='';
+                            }
                         }
+                        else
+                        {
+                            varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                            $("#tblSubProject tbody").append(varHtml);
+                            $('#divSubProjectList').modal('show');
+                        } 
+                        
+                    }
+                }
+                else
+                {
+                    varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
+                    $("#tblSubProject tbody").append(varHtml);
+                    $('#divSubProjectList').modal('show');
+                }   
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+
+    function LoadCenterType()
+    {       
+        var URL=$('#hdn_web_url').val()+ "/AllCenterTypes"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id" : $('#hdn_home_user_role_id').val()
+            },
+            success: function (data){
+                if(data.Center_Types != null)
+                {
+                    $('#ddlCenterType').empty();
+                    var count=data.Center_Types.length;
+                    if( count> 0)
+                    {
+                        for(var i=0;i<count;i++)
+                            $('#ddlCenterType').append(new Option(data.Center_Types[i].Center_Type_Name,data.Center_Types[i].Center_Type_Id));                    
                     }
                     else
                     {
-                        varHtml='<tr><td colspan="5" style="text-align:center;">No records found</td></tr>'
-                        $("#tblSubProject tbody").append(varHtml);
-                        $('#divSubProjectList').modal('show');
-                    }   
-                },
-                error:function(err)
-                {
-                    alert('Error! Please try again');
-                    return false;
+                        $('#ddlCenterType').append(new Option('ALL',''));
+                    }
+                    $("#ddlCenterType option[value='']").attr('disabled','disabled');
                 }
-            });
-            return false;
-        }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
 
-        function LoadCenterType()
-        {       
-            var URL=$('#hdn_web_url').val()+ "/AllCenterTypes"
-            $.ajax({
-                type:"GET",
-                url:URL,
-                async:false,        
-                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                datatype:"json",
-                data:{
-                        "user_id": $('#hdn_home_user_id').val(),
-                        "user_role_id" : $('#hdn_home_user_role_id').val()
-                },
-                success: function (data){
-                    if(data.Center_Types != null)
-                    {
-                        $('#ddlCenterType').empty();
-                        var count=data.Center_Types.length;
+    function GetUserDetail(user_id,type)
+    {
+        var URL=$('#hdn_web_url').val()+ "/get_user_details_new?user_id="+user_id;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            overflow:true,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+
+                $('#txtEmployee_Code').val(data.UserDetail.Employee_Code);
+                $('#txtname').val(data.UserDetail.Name);
+                $('#txtEmail').val(data.UserDetail.Email);
+                $('#txtMobile_Number').val(data.UserDetail.Mobile_Number);
+                $('#txtEmployment_Grade').val(data.UserDetail.Employment_Grade_Id);
+                $('#txtEmployment_Status').val(data.UserDetail.Employment_Status_Id);
+                $('#txtReporting_Manager_Name').val(data.UserDetail.Reporting_Manager_Name);
+                $('#txtEmployee_Department_Name').val(data.UserDetail.Employee_Department_Name);
+                $('#txtEntity_Name').val(data.UserDetail.Entity_Name);
+
+                $('#trainer_details_modal').modal('show');
+                        
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+
+    function GetCandidate_Detail(batch_id,project_type){
+        //alert(Project_Id)
+        $('#con_close_modal').modal('hide');
+        $('#sponser_modal').modal('hide');                              
+        
+        var URL=$('#hdn_web_url').val()+ "/Getcandidatebybatch?batch_id="+batch_id;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            overflow:true,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                varHtml='';
+                $("#tblcandidate_details").dataTable().fnDestroy();
+                $("#tblcandidate_details tbody").empty();
+                if(!jQuery.isEmptyObject(data.candidates))
+                {   //alert(data.Customer_Name)
+                    $('#txtbatch_name').val(data.batch_name);
+                    $('#txtcenter_name').val(data.center_name);
+                    $('#txtcourse_name').val(data.course_name);
+                    if (data.candidates != null){
+                    if (data.candidates[0].Candidate_Name != null){
+                        var count=data.candidates.length;
                         if( count> 0)
                         {
                             for(var i=0;i<count;i++)
-                                $('#ddlCenterType').append(new Option(data.Center_Types[i].Center_Type_Name,data.Center_Types[i].Center_Type_Id));                    
-                        }
-                        else
-                        {
-                            $('#ddlCenterType').append(new Option('ALL',''));
-                        }
-                        $("#ddlCenterType option[value='']").attr('disabled','disabled');
-                    }
-                },
-                error:function(err)
-                {
-                    alert('Error! Please try again');
-                    return false;
-                }
-            });
-            return false;
-        }
-
-        function GetUserDetail(user_id,type)
-        {
-            var URL=$('#hdn_web_url').val()+ "/get_user_details_new?user_id="+user_id;
-            $.ajax({
-                type:"GET",
-                url:URL,
-                async:false,
-                overflow:true,        
-                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                datatype:"json",
-                success: function (data){
-
-                    $('#txtEmployee_Code').val(data.UserDetail.Employee_Code);
-                    $('#txtname').val(data.UserDetail.Name);
-                    $('#txtEmail').val(data.UserDetail.Email);
-                    $('#txtMobile_Number').val(data.UserDetail.Mobile_Number);
-                    $('#txtEmployment_Grade').val(data.UserDetail.Employment_Grade_Id);
-                    $('#txtEmployment_Status').val(data.UserDetail.Employment_Status_Id);
-                    $('#txtReporting_Manager_Name').val(data.UserDetail.Reporting_Manager_Name);
-                    $('#txtEmployee_Department_Name').val(data.UserDetail.Employee_Department_Name);
-                    $('#txtEntity_Name').val(data.UserDetail.Entity_Name);
-
-                    $('#trainer_details_modal').modal('show');
-                          
-                },
-                error:function(err)
-                {
-                    alert('Error! Please try again');
-                    return false;
-                }
-            });
-            return false;
-        }
-
-        function GetCandidate_Detail(batch_id,project_type){
-            //alert(Project_Id)
-            $('#con_close_modal').modal('hide');
-            $('#sponser_modal').modal('hide');                              
-            
-            var URL=$('#hdn_web_url').val()+ "/Getcandidatebybatch?batch_id="+batch_id;
-            $.ajax({
-                type:"GET",
-                url:URL,
-                async:false,
-                overflow:true,        
-                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                datatype:"json",
-                success: function (data){
-                    varHtml='';
-                    $("#tblcandidate_details").dataTable().fnDestroy();
-                    $("#tblcandidate_details tbody").empty();
-                    if(!jQuery.isEmptyObject(data.candidates))
-                    {   //alert(data.Customer_Name)
-                        $('#txtbatch_name').val(data.batch_name);
-                        $('#txtcenter_name').val(data.center_name);
-                        $('#txtcourse_name').val(data.course_name);
-                        if (data.candidates != null){
-                        if (data.candidates[0].Candidate_Name != null){
-                            var count=data.candidates.length;
-                            if( count> 0)
                             {
-                                for(var i=0;i<count;i++)
+                                varHtml+='<tr>';
+                                varHtml+='  <td style="text-align:center;">'+ data.candidates[i].S_No +'</td>';
+                                varHtml += '<td style="text-align:center;"><input id="addedchk1" name="checkcase1" type="checkbox" value="'+data.candidates[i].Skilling_Id+'" ></td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Intervention_Value +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Candidate_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Date_Of_Birth +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Gender +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Mobile_Number +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Email_Id +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Father_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Annual_Income +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Sponsers +'</td>';
+                                varHtml+='</tr>';
+                            }
+                            
+                        }
+                        $("#tblcandidate_details tbody").append(varHtml);
+                        $("#tblcandidate_details").DataTable( {
+                            "columnDefs": [
                                 {
-                                    varHtml+='<tr>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].S_No +'</td>';
-                                    varHtml += '<td style="text-align:center;"><input id="addedchk1" name="checkcase1" type="checkbox" value="'+data.candidates[i].Skilling_Id+'" ></td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Intervention_Value +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Candidate_Name +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Date_Of_Birth +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Gender +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Mobile_Number +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Email_Id +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Father_Name +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Annual_Income +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.candidates[i].Sponsers +'</td>';
-                                    varHtml+='</tr>';
+                                    "targets": [10],
+                                    "visible": false
                                 }
-                                
-                            }
-                            $("#tblcandidate_details tbody").append(varHtml);
-                            $("#tblcandidate_details").DataTable( {
-                                "columnDefs": [
-                                    {
-                                        "targets": [10],
-                                        "visible": false
-                                    }
-                                ]
-                            });
-                            if(project_type.toString() == "2")
-                            {
-                                $('#btnSponser').show();
-                                $("#tblcandidate_details").DataTable().column(10).visible(true);
+                            ]
+                        });
+                        if(project_type.toString() == "2")
+                        {
+                            $('#btnSponser').show();
+                            $("#tblcandidate_details").DataTable().column(10).visible(true);
 
-                            }
-                            else
-                            {
-                                $('#btnSponser').hide();
-                                $("#tblcandidate_details").DataTable().column(10).visible(false);
-                            }
-                            $('#tr_candidate_detail').modal('show');                            
-                            $('#hdn_mdl_batch_id').val(batch_id);
                         }
                         else
                         {
-                            varHtml='<tr><td colspan="9" style="text-align:center;">No records found</td></tr>'
-                            $("#tblcandidate_details tbody").append(varHtml);
-                            $('#tr_candidate_detail').modal('show');
+                            $('#btnSponser').hide();
+                            $("#tblcandidate_details").DataTable().column(10).visible(false);
                         }
-                        }
-                        else
-                        {
-                            varHtml='<tr><td colspan="9" style="text-align:center;">No records found</td></tr>'
-                                $("#tblcandidate_details tbody").append(varHtml);
-                                $('#tr_candidate_detail').modal('show');
-                        }
-
+                        $('#tr_candidate_detail').modal('show');                            
+                        $('#hdn_mdl_batch_id').val(batch_id);
                     }
                     else
                     {
                         varHtml='<tr><td colspan="9" style="text-align:center;">No records found</td></tr>'
                         $("#tblcandidate_details tbody").append(varHtml);
                         $('#tr_candidate_detail').modal('show');
-                    }   
-                },
-                error:function(err)
-                {
-                    alert('Error! Please try again');
-                    return false;
-                }
-            });
-            return false;
-        } 
-
-        function GetCourseDetail(course_id)
-        {  
-            var URL=$('#hdn_web_url').val()+ "/GetCourseDetails?course_id="+course_id;
-            $.ajax({
-                type:"GET",
-                url:URL,
-                async:false,
-                overflow:true,        
-                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                datatype:"json",
-                success: function (data){
-                    varHtml='';
-                    $("#tblsubproject_details").dataTable().fnDestroy();
-                    $("#tblsubproject_details tbody").empty();
-                    if(!jQuery.isEmptyObject(data.CourseDetail))
-                    {   //alert(data.Customer_Name)
-                        $('#txtCourse_Code').val(data.Course_Code);
-                        $('#txtCourse_Name').val(data.Course_Name);
-                        if (data.CourseDetail[0].Sub_Project_Name != null){
-                            var count=data.CourseDetail.length;
-                            if( count> 0)
-                            {
-                                for(var i=0;i<count;i++)
-                                {   
-                                    varHtml+='<tr>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.CourseDetail[i].S_No +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.CourseDetail[i].Project_Name +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.CourseDetail[i].Sub_Project_Name +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.CourseDetail[i].Sub_Project_Code +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.CourseDetail[i].Product_Name +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.CourseDetail[i].Region_Name +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ data.CourseDetail[i].State_Name +'</td>';
-                                    varHtml+='</tr>';
-                                }
-                                
-                            }
-                            $("#tblsubproject_details tbody").append(varHtml);
-                            $("#tblsubproject_details").DataTable();
-                            $('#course_details_modal').modal('show');
-                        }
-                        else
-                    {
-                        varHtml='<tr><td colspan="3" style="text-align:center;">No records found</td></tr>'
-                        $("#tblsubproject_details tbody").append(varHtml);
-                        $('#course_details_modal').modal('show');
                     }
                     }
                     else
                     {
-                        varHtml='<tr><td colspan="3" style="text-align:center;">No records found</td></tr>'
-                        $("#tblsubproject_details tbody").append(varHtml);
-                        $('#course_details_modal').modal('show');
-                    }   
-                },
-                error:function(err)
-                {
-                    alert('Error! Please try again');
-                    return false;
+                        varHtml='<tr><td colspan="9" style="text-align:center;">No records found</td></tr>'
+                            $("#tblcandidate_details tbody").append(varHtml);
+                            $('#tr_candidate_detail').modal('show');
+                    }
+
                 }
-            });
-            return false;
-        } 
+                else
+                {
+                    varHtml='<tr><td colspan="9" style="text-align:center;">No records found</td></tr>'
+                    $("#tblcandidate_details tbody").append(varHtml);
+                    $('#tr_candidate_detail').modal('show');
+                }   
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    } 
+
+    function GetCourseDetail(course_id)
+    {  
+        var URL=$('#hdn_web_url').val()+ "/GetCourseDetails?course_id="+course_id;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            overflow:true,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                varHtml='';
+                $("#tblsubproject_details").dataTable().fnDestroy();
+                $("#tblsubproject_details tbody").empty();
+                if(!jQuery.isEmptyObject(data.CourseDetail))
+                {   //alert(data.Customer_Name)
+                    $('#txtCourse_Code').val(data.Course_Code);
+                    $('#txtCourse_Name').val(data.Course_Name);
+                    if (data.CourseDetail[0].Sub_Project_Name != null){
+                        var count=data.CourseDetail.length;
+                        if( count> 0)
+                        {
+                            for(var i=0;i<count;i++)
+                            {   
+                                varHtml+='<tr>';
+                                varHtml+='  <td style="text-align:center;">'+ data.CourseDetail[i].S_No +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.CourseDetail[i].Project_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.CourseDetail[i].Sub_Project_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.CourseDetail[i].Sub_Project_Code +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.CourseDetail[i].Product_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.CourseDetail[i].Region_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.CourseDetail[i].State_Name +'</td>';
+                                varHtml+='</tr>';
+                            }
+                            
+                        }
+                        $("#tblsubproject_details tbody").append(varHtml);
+                        $("#tblsubproject_details").DataTable();
+                        $('#course_details_modal').modal('show');
+                    }
+                    else
+                {
+                    varHtml='<tr><td colspan="3" style="text-align:center;">No records found</td></tr>'
+                    $("#tblsubproject_details tbody").append(varHtml);
+                    $('#course_details_modal').modal('show');
+                }
+                }
+                else
+                {
+                    varHtml='<tr><td colspan="3" style="text-align:center;">No records found</td></tr>'
+                    $("#tblsubproject_details tbody").append(varHtml);
+                    $('#course_details_modal').modal('show');
+                }   
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    } 
     function DropCandidates()
     {
         var cands='';
