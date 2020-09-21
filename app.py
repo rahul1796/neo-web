@@ -5642,7 +5642,7 @@ class upload_bulk_upload(Resource):
             cand_stage =request.form['cand_stage']
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
-            ProjectType = request.form["ProjectType"]
+            ProjectType = int(request.form["ProjectType"])
 
             file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
             f.save(file_name)
@@ -5677,6 +5677,7 @@ class upload_bulk_upload(Resource):
                         Column('Permanent Village',null_validation),
                         Column('Permanent Panchayat',null_validation),
                         Column('Permanent Taluk/Block',null_validation),
+                        Column('Whatsapp Number',null_validation),
                         #str+null check
                         Column('Fresher/Experienced?*',str_validation + null_validation),
                         Column('Salutation*',str_validation + null_validation),
@@ -5727,7 +5728,8 @@ class upload_bulk_upload(Resource):
                 df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
                 df['ids']=df['Aadhar No'].astype(str)+df['Identity number'].astype(str)
                 #print(df.columns.to_list())
-                schema = Schema([
+                if ProjectType==1:
+                    schema = Schema([
                         #nan check column non mandate
                         Column('Candidate_id',null_validation),
                         Column('Candidate Photo',null_validation),
@@ -5745,8 +5747,81 @@ class upload_bulk_upload(Resource):
                         Column('Permanent Village',null_validation),
                         Column('Permanent Panchayat',null_validation),
                         Column('Permanent Taluk/Block',null_validation),
-                        Column('Document copy'),
-                        Column('BOCW Registration Id'),
+                        Column('Document copy',null_validation),
+                        Column('BOCW Registration Id',null_validation),
+                        Column('Whatsapp Number',null_validation),
+                        #str+null check
+                        Column('Fresher/Experienced?*',str_validation + null_validation),
+                        Column('Salutation*',str_validation + null_validation),
+                        Column('First Name*',str_validation + null_validation),
+                        Column('Gender*',str_validation + null_validation),
+                        Column('Marital Status*',str_validation + null_validation),
+                        Column('Caste*',str_validation + null_validation),
+                        Column('Disability Status*',str_validation + null_validation),
+                        Column('Religion*',str_validation + null_validation),
+                        Column('Mother Tongue*',str_validation + null_validation),
+                        Column('Occupation*',str_validation + null_validation),
+                        Column('Average annual income*',str_validation + null_validation),
+                        Column('Source of Information*',str_validation + null_validation),
+                        Column('Interested Course*',str_validation + null_validation),
+                        Column('Product*',str_validation + null_validation),
+                        Column('Present District*',str_validation + null_validation),
+                        Column('Present State*',state_validation + str_validation + null_validation),
+                        Column('Present Country*',str_validation + null_validation),
+                        Column('Permanent District*',str_validation + null_validation),
+                        Column('Permanent State*',state_validation + str_validation + null_validation),
+                        Column('Permanent Country*',str_validation + null_validation),                            
+                        Column('Employment Type*',str_validation + null_validation),
+                        Column('Preferred Job Role*',str_validation + null_validation),
+                        Column('Years Of Experience*',str_validation + null_validation),
+                        Column('Relevant Years of Experience*',str_validation + null_validation),
+                        Column('Current/Last CTC*',str_validation + null_validation),
+                        Column('Preferred Location*',str_validation + null_validation),
+                        Column('Willing to travel?*',str_validation + null_validation),
+                        Column('Willing to work in shifts?*',str_validation + null_validation),
+                        Column('Expected CTC*',str_validation + null_validation),
+                        Column('Aspirational District',str_validation + null_validation),
+                        Column('Educational Marksheet',str_validation + null_validation),
+                        Column('Income Certificate',str_validation + null_validation),
+                        #pincode check
+                        Column('Present Pincode*',pincode_validation + null_validation),
+                        Column('Permanent Pincode*',pincode_validation + null_validation),
+                        #mobile number check
+                        Column('Primary contact  No*',mob_validation + null_validation),
+                        #date of birth and age pass(null check)
+                        Column('Date of Birth*',null_validation),
+                        Column('Age*',null_validation),
+                        Column('date_age',dob_validation),
+                        #ID Validation pass(null check)
+                        Column('Aadhar No',null_validation),
+                        Column('Identifier Type',null_validation),
+                        Column('Identity number',null_validation),
+                        Column('ids',null_validation),
+                        #Email validation
+                        Column('Registered by*',email_validation+str_validation)
+                        ])
+                else:
+                    schema = Schema([
+                        #nan check column non mandate
+                        Column('Candidate_id',null_validation),
+                        Column('Candidate Photo',null_validation),
+                        Column('Middle Name',null_validation),
+                        Column('Last Name',null_validation),
+                        Column('Secondary Contact  No',null_validation),
+                        Column('Email id*',str_validation + null_validation),
+                        Column('Present Panchayat',null_validation),
+                        Column('Present Taluk/Block',null_validation),
+                        Column('Present Address line1',null_validation),
+                        Column('Present Address line2',null_validation),
+                        Column('Present Village',null_validation),
+                        Column('Permanent Address line1',null_validation),
+                        Column('Permanent Address line2',null_validation),
+                        Column('Permanent Village',null_validation),
+                        Column('Permanent Panchayat',null_validation),
+                        Column('Permanent Taluk/Block',null_validation),
+                        Column('Document copy',null_validation),
+                        Column('BOCW Registration Id',null_validation),
+                        Column('Whatsapp Number',null_validation),
                         #str+null check
                         Column('Fresher/Experienced?*',str_validation + null_validation),
                         Column('Salutation*',str_validation + null_validation),
@@ -5806,7 +5881,7 @@ class upload_bulk_upload(Resource):
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
                     return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
                 else:
-                    out = Database.registration_web_inser(df,user_id)
+                    out = Database.registration_web_inser(df,user_id,ProjectType)
                     return out
             
             elif cand_stage==str(3):
@@ -6009,7 +6084,7 @@ class DownloadRegTemplate(Resource):
                     'Permanent_Taluk_Block', 'Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country', 'Aadhar_No', 'Identifier_Type', 
                     'Identity_Number', 'Document_Copy_Image_Name', 'Employment_Type', 'Preferred_Job_Role', 'Years_Of_Experience', 'Relevant_Years_Of_Experience', 
                     'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc', 
-                    'Registered_By']
+                    'Registered_By', 'Whatsapp_Number']
 
                     Column = ['Candidate_id', 'Fresher/Experienced?*', 'Candidate Photo', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 
                     'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 'Gender*', 'Marital Status*', 'Caste*', 'Disability Status*', 'Religion*', 
@@ -6018,7 +6093,7 @@ class DownloadRegTemplate(Resource):
                     'Present Pincode*', 'Present Country*', 'Permanent Address line1', 'Permanent Address line2', 'Permanent Village', 'Permanent Panchayat', 
                     'Permanent Taluk/Block', 'Permanent District*', 'Permanent State*', 'Permanent Pincode*', 'Permanent Country*', 'Aadhar No', 'Identifier Type', 
                     'Identity number', 'Document copy', 'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 
-                    'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 'Expected CTC*']
+                    'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 'Expected CTC*','Registered by*','Whatsapp Number']
                 
                     if Project_Type==1:
                         col += ['Aspirational District', 'Educational Marksheet', 'Income Certificate']

@@ -50,6 +50,7 @@ function toggleCheckbox(e)
     //        UploadFileToProcess();
     //    }
     //}    
+            
             var fileExtension = ['xlsx']
             if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
                 alert("Formats allowed are : "+fileExtension.join(', '));
@@ -182,6 +183,7 @@ function Uploadfile(project_type){
     $("#imgSpinner1").hide();
     $('#myFile').val('');
 
+    $('#mdl_project_type').modal('hide');
     $('#mdl_bulkupload_candidate').modal('show');
 }
 function Loadcreatedbyddl(){
