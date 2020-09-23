@@ -446,7 +446,6 @@ function DownloadRegTemplate(Project_Type){
                     },
                     success: function(resp) 
                     {
-
                         if (resp.Status){
                             var varAnchor = document.getElementById('lnkDownload');
                             varAnchor.href = $('#hdn_web_url').val() + '/Bulk Upload/' + resp.filename;

@@ -86,6 +86,7 @@ null_validation = [CustomElementValidation(lambda d: d is not np.nan, 'this fiel
 dob_validation = [CustomElementValidation(lambda d: check_dob(d), 'either date or age is not valid')]
 status_validation = [CustomElementValidation(lambda d: d.lower() in ['certified','notcertified'], 'invalid status (certified, notcertified allowed)')]
 flt_validation = [CustomElementValidation(lambda d: str(d).replace('.', '', 1).isdigit(), 'invalid score (number allowed)')]
+yea_no_validation = [CustomElementValidation(lambda d: str(d).lower() in ['yes','no'], 'invalid option (yes/no allwed)')]
 
 
 #from lib.log import Log
@@ -5653,6 +5654,7 @@ class upload_bulk_upload(Resource):
             state_validation = [CustomElementValidation(lambda d: d.lower() in all_state, 'Invalid State')]
             cand_email_validation = [CustomElementValidation(lambda d: ((Database.app_email_validation(d))and(d==parseaddr(d)[1])), 'Email already exists')]
             cand_mobile_validation = [CustomElementValidation(lambda d: Database.app_mobile_validation(d), 'mobile number already exists')]
+            
             #dob_validation = [CustomElementValidation(lambda d: , 'invalid format. please provide in "MM-DD-YYYY')]
             if cand_stage==str(1):
                 df= pd.read_excel(file_name,sheet_name='Mobilizer')
@@ -5718,7 +5720,7 @@ class upload_bulk_upload(Resource):
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
                     return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
                 else:
-                    out = Database.mobilization_web_inser(df,user_id)
+                    out = Database.mobilization_web_inser(df,user_id,ProjectType)
                     return out
 
             elif cand_stage==str(2):
@@ -5885,11 +5887,44 @@ class upload_bulk_upload(Resource):
                     return out
             
             elif cand_stage==str(3):
-                df= pd.read_excel(file_name,sheet_name='Enrollment')
-                df = df.fillna('')
-                df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
-                df['ids']=df['Aadhar No'].astype(str)+df['Identity number'].astype(str)
-                schema = Schema([
+                
+                if ProjectType==2:
+                    df= pd.read_excel(file_name,sheet_name='Enrollment',header=1)
+                    df = df.fillna('')
+                    df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
+                    df['ids']=df['Aadhar No'].astype(str)+df['Identity number'].astype(str)
+
+                    df_MCL= pd.read_excel(file_name,sheet_name='MCL')
+                    df_MCL = df_MCL.fillna('')
+                    schema_MCL = Schema([
+                        #nan check column non mandate
+                        Column('Candidate_id',null_validation),
+                        Column('First Name*',str_validation + null_validation),
+                        Column('Primary contact  No*',mob_validation + null_validation),
+                        Column('Email id*',str_validation + null_validation),
+
+                        Column('Date of birth (age between 18 to 40)[ view Only]',yea_no_validation + null_validation),
+                        Column('Are you 8th Pass?',yea_no_validation + null_validation),
+                        Column('Are you able to read and write local language?',yea_no_validation + null_validation),
+                        Column('Do you have a smart phone?',yea_no_validation + null_validation),
+                        Column('Are you willing to buy a smartphone?',yea_no_validation + null_validation),
+                        Column('Do you own two wheeler?',yea_no_validation + null_validation),
+                        Column('Do you have any work experience',yea_no_validation + null_validation),
+                        Column('Will you able to work full time or at least 6 hours a day?',yea_no_validation + null_validation),
+                        Column('Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?',yea_no_validation + null_validation),
+                        Column('Willing to travel for work',yea_no_validation + null_validation),
+                        Column('Are you willing to work and sign the work contract with LN?',yea_no_validation + null_validation),
+                        Column('Are you willing to adopt digital transactions in your business?',yea_no_validation + null_validation),
+                        Column('Do you have a bank account?',yea_no_validation + null_validation),
+                        Column('Have you availed any loan in the past?',yea_no_validation + null_validation),
+                        Column('Do you have any active loan?',yea_no_validation + null_validation),
+                        Column('Are you willing to take up a loan to purchase tools and consumables?',yea_no_validation + null_validation),
+                        Column('Are you covered under any health insurance?',yea_no_validation + null_validation),
+                        Column('Are you allergic to any chemicals and dust?',yea_no_validation + null_validation),
+                        Column('Are you willing to follow  Environment, Health and Safety Norms in your business?',yea_no_validation + null_validation),
+                        Column('Have you ever been subjected to any legal enquiry for Non ethical work/business?',yea_no_validation + null_validation)
+                        ])
+                    schema = Schema([
                         #nan check column non mandate
                         Column('Candidate_id',null_validation),
                         Column('Middle Name',null_validation),
@@ -5922,6 +5957,127 @@ class upload_bulk_upload(Resource):
                         Column('Bank Name'),
                         Column('Account Number'),
                         Column('BOCW Registration Id'),
+                        Column('Whatsapp Number'),
+                        #str+null check
+                        Column('Fresher/Experienced?*',str_validation + null_validation),
+                        #Column('Candidate Photo*',str_validation + null_validation),
+                        Column('Salutation*',str_validation + null_validation),
+                        Column('First Name*',str_validation + null_validation),
+                        Column('Gender*',str_validation + null_validation),
+                        Column('Marital Status*',str_validation + null_validation),
+                        Column('Caste*',str_validation + null_validation),
+                        Column('Disability Status*',str_validation + null_validation),
+                        Column('Religion*',str_validation + null_validation),
+                        Column('Mother Tongue*',str_validation + null_validation),
+                        Column('Occupation*',str_validation + null_validation),
+                        Column('Average annual income*',str_validation + null_validation),
+                        Column('Source of Information*',str_validation + null_validation),
+                        Column('Interested Course*',str_validation + null_validation),
+                        Column('Product*',str_validation + null_validation),
+                        Column('Present Address line1*',str_validation + null_validation),
+                        Column('Present District*',str_validation + null_validation),
+                        Column('Present State*',state_validation + str_validation + null_validation),
+                        Column('Present Country*',str_validation + null_validation),
+                        Column('Permanent Address line1*',str_validation + null_validation),
+                        Column('Permanent District*',str_validation + null_validation),
+                        Column('Permanent State*',state_validation + str_validation + null_validation),
+                        Column('Permanent Country*',str_validation + null_validation),
+                        #Column('Document copy*',str_validation + null_validation),
+                        Column('Employment Type*',str_validation + null_validation),
+                        Column('Preferred Job Role*',str_validation + null_validation),
+                        Column('Years Of Experience*',str_validation + null_validation),
+                        Column('Relevant Years of Experience*',str_validation + null_validation),
+                        Column('Current/Last CTC*',str_validation + null_validation),
+                        Column('Preferred Location*',str_validation + null_validation),
+                        Column('Willing to travel?*',str_validation + null_validation),
+                        Column('Willing to work in shifts?*',str_validation + null_validation),
+                        Column('Expected CTC*',str_validation + null_validation),
+                        Column('Highest Qualification*',str_validation + null_validation),
+                        Column('Stream/Specialization*',str_validation + null_validation),
+                        Column('Computer Knowledge*',str_validation + null_validation),
+                        Column('Technical Knowledge*',str_validation + null_validation),
+                        Column('family_Salutation*',str_validation + null_validation),
+                        Column('Member Name*',str_validation + null_validation),
+                        Column('family_Gender*',str_validation + null_validation),
+                        Column('Education Qualification*',str_validation + null_validation),
+                        Column('Relationship*',str_validation + null_validation),
+                        Column('Average Household Income*',str_validation + null_validation),
+                        Column('batch_id*',str_validation + null_validation),
+                        #pincode check
+                        Column('Present Pincode*',pincode_validation + null_validation),
+                        Column('Permanent Pincode*',pincode_validation + null_validation),
+                        #mobile number check
+                        Column('Primary contact  No*',mob_validation + null_validation),
+                        #date of birth and age pass(null check)
+                        Column('Date of Birth*',null_validation),
+                        Column('Age*',null_validation),
+                        Column('date_age',dob_validation),
+                        #ID Validation pass(null check)
+                        Column('Aadhar No',null_validation),
+                        Column('Identifier Type',null_validation),
+                        Column('Identity number',null_validation),
+                        Column('ids',null_validation),
+                        #Email validation
+                        Column('Enrolled_By*',email_validation + str_validation),
+                        #SHE PRORJECT
+                        Column('Rented Or Own House?',null_validation),
+                        Column('Size Of The House',null_validation),
+                        Column('Ration Card (Apl Or Bpl)',null_validation),
+                        Column('Tv',null_validation),
+                        Column('Refrigerator',null_validation),
+                        Column('Washing Machine',null_validation),
+                        Column('Ac /Cooler',null_validation),
+                        Column('Car',null_validation),
+                        Column('Medical Insurance',null_validation),
+                        Column('Life Insurance',null_validation),
+                        Column('Farm Land',null_validation),
+                        Column('Others',null_validation),
+                        Column('Address As Per Aadhar Card (Incl Pin Code)*',null_validation),
+                        Column('Educational Qualification',null_validation),
+                        Column('Age Proof',null_validation),
+                        Column('Signed Mou*',null_validation),
+                        Column('Mou Signed Date',null_validation)
+                        ])
+                else:
+                    df= pd.read_excel(file_name,sheet_name='Enrollment')
+                    df = df.fillna('')
+                    df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
+                    df['ids']=df['Aadhar No'].astype(str)+df['Identity number'].astype(str)
+
+                    schema = Schema([
+                        #nan check column non mandate
+                        Column('Candidate_id',null_validation),
+                        Column('Middle Name',null_validation),
+                        Column('Last Name',null_validation),
+                        Column('Secondary Contact  No',null_validation),
+                        Column('Email id*',str_validation + null_validation),
+                        Column('Present Panchayat',null_validation),
+                        Column('Present Taluk/Block',null_validation),
+                        Column('Present Address line2',null_validation),
+                        Column('Present Village',null_validation),
+                        Column('Permanent Address line2',null_validation),
+                        Column('Permanent Village',null_validation),
+                        Column('Permanent Panchayat',null_validation),
+                        Column('Permanent Taluk/Block',null_validation),
+                        Column('Name of Institute',null_validation),
+                        Column('University',null_validation),
+                        Column('Year Of Pass',null_validation),
+                        Column('Percentage',null_validation),
+                        Column('Date Of birth',null_validation),
+                        Column('Age',null_validation),
+                        Column('Primary contact',null_validation),
+                        Column('Email Address',null_validation),
+                        Column('Occupation',null_validation),
+                        Column('Branch Name',null_validation),
+                        Column('Branch Code',null_validation),
+                        Column('Account type',null_validation),
+                        Column('Attachment',null_validation),
+                        Column('Candidate Photo'),
+                        Column('Document copy'),
+                        Column('Bank Name'),
+                        Column('Account Number'),
+                        Column('BOCW Registration Id'),
+                        Column('Whatsapp Number'),                        
                         #str+null check
                         Column('Fresher/Experienced?*',str_validation + null_validation),
                         #Column('Candidate Photo*',str_validation + null_validation),
@@ -5994,7 +6150,17 @@ class upload_bulk_upload(Resource):
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
                     return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
                 else:
-                    out = Database.enrollment_web_inser(df,user_id)
+                    if ProjectType==2:
+                        errors = schema_MCL.validate(df_MCL)
+                        errors_index_rows = [e.row for e in errors]
+                        len_error = len(errors_index_rows)
+                        if len_error>0:
+                            file_name = str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv'
+                            pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                            return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name)}
+                        out = Database.enrollment_web_inser(df,user_id,ProjectType,df_MCL)
+                    else:
+                        out = Database.enrollment_web_inser(df,user_id,ProjectType)
                     return out
             else:
                 return {"Status":False, "message":"Wrong Candidate Stage"}
@@ -6220,19 +6386,70 @@ class DownloadEnrTemplate(Resource):
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
                 candidate_ids = request.form["candidate_ids"]
+                Project_Type = int(request.form["Project_Type"])
+
                 file_name='CandidateBulkUpload_Enrolment_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
-                data = Database.download_selected_enrolled_candidate(candidate_ids,file_name)
-                if len(data[0])==0:
-                    return {'Description':'candidates not available', 'Status':False}
+                resp = Database.download_selected_enrolled_candidate(candidate_ids)
+
+                if(len(resp['data']) < 1):
+                    return({'msg':'No Records Found For Selected Filters!', 'success':False})
                 else:
-                    df = pd.read_excel(config.bulk_upload_path +'Master_Enrollment.xlsx')
-                    col = df.columns.to_list()
-                    d={}
-                    for i in range(len(data)):
-                        for j in range(len(col)):
-                            d[col[j]]=data[i][j]
-                        df = df.append(d,ignore_index=True)
-                    df.to_excel(config.bulk_upload_path + file_name,sheet_name='Enrollment',index=False)
+                    df = pd.DataFrame(resp['data'], columns=resp['columns'])
+                    col = resp['columns'][:83]
+                    
+                    Column = ['Candidate_id', 'Fresher/Experienced?*', 'Candidate Photo', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 
+                    'Gender*', 'Marital Status*', 'Caste*', 'Disability Status*', 'Religion*', 'Mother Tongue*', 'Occupation*', 'Average annual income*', 'Source of Information*', 'Interested Course*', 'Product*', 'Present Address line1*', 
+                    'Present Address line2', 'Present Village', 'Present Panchayat', 'Present Taluk/Block', 'Present District*', 'Present State*', 'Present Pincode*', 'Present Country*', 'Permanent Address line1*', 'Permanent Address line2', 
+                    'Permanent Village', 'Permanent Panchayat', 'Permanent Taluk/Block', 'Permanent District*', 'Permanent State*', 'Permanent Pincode*', 'Permanent Country*', 'Aadhar No', 'Identifier Type', 'Identity number', 'Document copy', 
+                    'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 
+                    'Expected CTC*', 'Highest Qualification*', 'Stream/Specialization*', 'Name of Institute', 'University', 'Year Of Pass', 'Percentage', 'Computer Knowledge*', 'Technical Knowledge*', 'family_Salutation*', 'Member Name*', 
+                    'Date Of birth', 'Age', 'Primary contact', 'Email Address', 'family_Gender*', 'Education Qualification*', 'Relationship*', 'Occupation', 'Average Household Income*', 'Bank Name', 'Branch Name', 'Branch Code', 
+                    'Account type', 'Account Number', 'Attachment', 'batch_id*', 'Enrolled_By*', 'Whatsapp Number']
+                    
+                    excel_row=0
+                    if Project_Type==1:
+                        col += []
+                        Column += []
+                        #df = df.iloc[:,:83]
+                        filename = 'CandidateBulkUpload_Enrollment_DELL_'
+                    elif Project_Type==2:
+                        excel_row=1
+                        col += resp['columns'][83:]
+                        Column += ['Rented Or Own House?', 'Size Of The House', 'Ration Card (Apl Or Bpl)', 'Tv', 'Refrigerator', 'Washing Machine', 'Ac /Cooler', 'Car', 'Medical Insurance', 'Life Insurance', 
+                        'Farm Land', 'Others', 'Address As Per Aadhar Card (Incl Pin Code)*', 'Educational Qualification', 'Age Proof', 'Signed Mou*', 'Mou Signed Date']
+                        filename = 'CandidateBulkUpload_Enrollment_SHE_'
+                    else:
+                        #df = df.iloc[:,:83]
+                        filename = 'CandidateBulkUpload_Enrollment_'
+
+                    file_name= filename +str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                    writer = pd.ExcelWriter(config.bulk_upload_path + file_name, engine='xlsxwriter')
+                    workbook  = writer.book
+
+                    header_format = workbook.add_format({
+                        'bold': True,
+                        #'text_wrap': True,
+                        'valign': 'center',
+                        'fg_color': '#D7E4BC',
+                        'border': 1})
+                    df_1 = df[col]
+                    df_1.to_excel(writer, index=None, header=None ,startrow=excel_row+1 ,sheet_name='Enrollment') 
+                    worksheet = writer.sheets['Enrollment']
+                    for i in range(len(Column)):
+                        worksheet.write(excel_row,i ,Column[i], header_format)
+                    
+                    if Project_Type==2:
+                        worksheet.merge_range(0, 86, 0, 94, 'Asset List', header_format)
+                        she_col = ['Candidate_Id', 'First_Name', 'Primary_Contact_No', 'Email_Id']
+                        MCL = ['Candidate_id', 'First Name*', 'Primary contact  No*', 'Email id*'] 
+                        MCL += ['Date of birth (age between 18 to 40)[ view Only]', 'Are you 8th Pass?', 'Are you able to read and write local language?', 'Do you have a smart phone?', 'Are you\xa0willing to buy a smartphone?', 'Do you own two wheeler?', 'Do you have any work experience', 'Will you able to work full time or at least 6 hours a day?', 'Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?', 'Willing to travel for work', 'Are you willing to work and sign the work contract with LN?', 'Are you willing to adopt digital transactions in your business?', 'Do you have a bank account?', 'Have you availed any loan in the past?', 'Do you have any active loan?', 'Are you willing to take up a loan to purchase tools and consumables?', 'Are you covered under any health insurance?', 'Are you allergic to any chemicals and dust?', 'Are you willing to follow  Environment, Health and Safety Norms in your business?', 'Have you ever been subjected to any legal enquiry for Non ethical work/business?']
+                        df_2 = df[she_col]
+                        df_2.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='MCL')
+                        worksheet = writer.sheets['MCL']
+                        for i in range(len(MCL)):
+                            worksheet.write(0,i ,MCL[i], header_format)
+                    writer.save()
+                    
                     return {'Description':'Downloaded Template', 'Status':True, 'filename':file_name}
             except Exception as e:
                 return {'Description':'Error: '+str(e), 'Status':False}
