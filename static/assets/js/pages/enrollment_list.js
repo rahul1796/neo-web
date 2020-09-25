@@ -461,7 +461,7 @@ function DownloadEnrTemplate(ProjectType){
                     },
                     success: function(resp) 
                     {
-
+                        //console.log(resp)
                         if (resp.Status){
                             var varAnchor = document.getElementById('lnkDownload');
                             varAnchor.href = $('#hdn_web_url').val() + '/Bulk Upload/' + resp.filename;
@@ -498,7 +498,7 @@ function DownloadEnrTemplate(ProjectType){
                             
                         }
                         else{
-                            //alert(resp.Description)
+                            alert(resp.Description)
                             //alert('Not success')
                             $("#imgSpinner").hide();
                             

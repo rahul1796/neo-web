@@ -5160,7 +5160,7 @@ SELECT					cb.name as candidate_name,
         try:
             quer1 = '''
             insert into candidate_details.tbl_candidates
-            (isFresher, salutation, first_name, middle_name, last_name, date_of_birth, isDob, age,primary_contact_no, secondary_contact_no, email_id, gender,marital_status, caste, disability_status, religion, source_of_information, present_pincode,present_district, permanent_district,permanent_pincode,candidate_stage_id, candidate_status_id, created_on, created_by, is_active, insert_from,present_state, present_country,permanent_state,permanent_country)
+            (isFresher, salutation, first_name, middle_name, last_name, date_of_birth, isDob, age,primary_contact_no, secondary_contact_no, email_id, gender,marital_status, caste, disability_status, religion, source_of_information, present_pincode,present_district, permanent_district,permanent_pincode,candidate_stage_id, candidate_status_id, created_on, created_by, is_active, insert_from,present_state, present_country,permanent_state,permanent_country,project_type)
             OUTPUT inserted.candidate_id
             values
             '''
@@ -5188,10 +5188,18 @@ SELECT					cb.name as candidate_name,
 
             df['Date of Birth*'] = df['Date of Birth*'].astype(str)
             out = df.values.tolist()
+            p=0
+            if ProjectType==1:#sell
+                p=4
+            elif ProjectType==2:#she
+                p=2
+            else:#regular 3
+                p=1
+
             for row in out:
                 quer = "({},'{}','{}','{}','{}','{}',{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},1,'w',{},'{}',{},'{}'),".format(1 if row[0]=='Fresher' else 0,row[2],row[3],row[4],row[5],row[6],
                 1 if row[7]=='' else 0,row[7] if row[7]!='' else 0,row[8],row[10],row[11],row[12],row[13],row[14],row[15],row[16],row[17],row[25],row[23],row[32],row[34],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[36]),
-                "(select state_id from masters.tbl_states where state_name like trim('{}'))".format(row[24]),'1',"(select state_id from masters.tbl_states where state_name like trim('{}'))".format(row[33]),'1')
+                "(select state_id from masters.tbl_states where state_name like trim('{}'))".format(row[24]),'1',"(select state_id from masters.tbl_states where state_name like trim('{}'))".format(row[33]),'1',p)
                 quer1 += '\n'+quer
             quer1 = quer1[:-1]+';'
             #print(quer1)
@@ -5346,11 +5354,11 @@ SELECT					cb.name as candidate_name,
                 [Do you own two wheeler?]='{}',[Do you have any work experience in the past?]='{}',[Will you able to work full time or at least 6 hours a day?]='{}',[Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?]='{}',
                 [Are you willing to travel from one place to another within panchayat?]='{}',[Are you willing to work and sign the work contract with LN?]='{}',[Are you willing to adopt digital transactions in your business?]='{}',[Do you have a bank account?]='{}',
                 [Have you availed any loan in the past?]='{}',[Do you have any active loan?]='{}',[Are you willing to take up a loan to purchase tools and consumables?]='{}',[Are you covered under any health insurance?]='{}',[Are you allergic to any chemicals and dust?]='{}',
-                [Are you willing to follow  Environment, Health and Safety Norms in your business?]='{}',[Have you ever been subjected to any legal enquiry for Non ethical work/business?]='{}'
+                [Are you willing to follow  Environment, Health and Safety Norms in your business?]='{}',[Have you ever been subjected to any legal enquiry for Non ethical work/business?]='{}',result='{}'
                 where candidate_id={}
                 '''
                 for row_she in out_she:
-                    quer7_res += '\n' + quer7.format(row_she[4],row_she[5],row_she[6],row_she[7],row_she[8],row_she[9],row_she[10],row_she[11],row_she[12],row_she[13],row_she[14],row_she[15],row_she[16],row_she[17],row_she[18],row_she[19],row_she[20],row_she[21],row_she[22],row_she[23],row_she[0])
+                    quer7_res += '\n' + quer7.format(row_she[4],row_she[5],row_she[6],row_she[7],row_she[8],row_she[9],row_she[10],row_she[11],row_she[12],row_she[13],row_she[14],row_she[15],row_she[16],row_she[17],row_she[18],row_she[19],row_she[20],row_she[21],row_she[22],row_she[23],row_she[24],row_she[0])
             query = ""
             b=[]
             temp=""
@@ -5425,6 +5433,8 @@ SELECT					cb.name as candidate_name,
         cur = con.cursor()
         sql = 'exec	[candidate_details].[sp_get_candidate_download_new_E] ?'
         values = (candidate_ids,)
+        print (sql, values)
+
         cur.execute(sql,(values))
 
         columns = [column[0].title() for column in cur.description]  

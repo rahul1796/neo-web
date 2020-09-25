@@ -5654,10 +5654,18 @@ class upload_bulk_upload(Resource):
             state_validation = [CustomElementValidation(lambda d: d.lower() in all_state, 'Invalid State')]
             cand_email_validation = [CustomElementValidation(lambda d: ((Database.app_email_validation(d))and(d==parseaddr(d)[1])), 'Email already exists')]
             cand_mobile_validation = [CustomElementValidation(lambda d: Database.app_mobile_validation(d), 'mobile number already exists')]
+            pass_fail_validation = [CustomElementValidation(lambda d: str(d).lower() in ['pass','fail'], 'invalid option (Pass/Fail allwed)')]
             
             #dob_validation = [CustomElementValidation(lambda d: , 'invalid format. please provide in "MM-DD-YYYY')]
             if cand_stage==str(1):
                 df= pd.read_excel(file_name,sheet_name='Mobilizer')
+                if len(df['Primary contact  No*'])!=len(df['Primary contact  No*'].unique()):
+                    return {"Status":False, "message":"Duplicate Primary contact No Not Allowed"}
+                elif len(df['Email id*'])==len(df['Email id*'].unique()):
+                    return {"Status":False, "message":"Duplicate Email Id Not Allowed"}
+
+                len(df['Email id*'])==len(df['Email id*'].unique())
+                return {"Status":False, "message":"Please fill all the mandatory fileds to uplaod the file" }
                 if df.values.tolist() == []:
                     return {"Status":False, "message":"Please fill all the mandatory fileds to uplaod the file" }
                 df = df.fillna('')
@@ -5782,9 +5790,6 @@ class upload_bulk_upload(Resource):
                         Column('Willing to travel?*',str_validation + null_validation),
                         Column('Willing to work in shifts?*',str_validation + null_validation),
                         Column('Expected CTC*',str_validation + null_validation),
-                        Column('Aspirational District',str_validation + null_validation),
-                        Column('Educational Marksheet',str_validation + null_validation),
-                        Column('Income Certificate',str_validation + null_validation),
                         #pincode check
                         Column('Present Pincode*',pincode_validation + null_validation),
                         Column('Permanent Pincode*',pincode_validation + null_validation),
@@ -5800,7 +5805,11 @@ class upload_bulk_upload(Resource):
                         Column('Identity number',null_validation),
                         Column('ids',null_validation),
                         #Email validation
-                        Column('Registered by*',email_validation+str_validation)
+                        Column('Registered by*',email_validation+str_validation),
+                        #DELL
+                        Column('Aspirational District',str_validation + null_validation),
+                        Column('Educational Marksheet', null_validation),
+                        Column('Income Certificate', null_validation)
                         ])
                 else:
                     schema = Schema([
@@ -5894,7 +5903,7 @@ class upload_bulk_upload(Resource):
                     df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
                     df['ids']=df['Aadhar No'].astype(str)+df['Identity number'].astype(str)
 
-                    df_MCL= pd.read_excel(file_name,sheet_name='MCL')
+                    df_MCL= pd.read_excel(file_name,sheet_name='SHE MCL')
                     df_MCL = df_MCL.fillna('')
                     schema_MCL = Schema([
                         #nan check column non mandate
@@ -5903,7 +5912,7 @@ class upload_bulk_upload(Resource):
                         Column('Primary contact  No*',mob_validation + null_validation),
                         Column('Email id*',str_validation + null_validation),
 
-                        Column('Date of birth (age between 18 to 40)[ view Only]',yea_no_validation + null_validation),
+                        Column('Date of birth -Is age between 18 to 40?',yea_no_validation + null_validation),
                         Column('Are you 8th Pass?',yea_no_validation + null_validation),
                         Column('Are you able to read and write local language?',yea_no_validation + null_validation),
                         Column('Do you have a smart phone?',yea_no_validation + null_validation),
@@ -5922,7 +5931,8 @@ class upload_bulk_upload(Resource):
                         Column('Are you covered under any health insurance?',yea_no_validation + null_validation),
                         Column('Are you allergic to any chemicals and dust?',yea_no_validation + null_validation),
                         Column('Are you willing to follow  Environment, Health and Safety Norms in your business?',yea_no_validation + null_validation),
-                        Column('Have you ever been subjected to any legal enquiry for Non ethical work/business?',yea_no_validation + null_validation)
+                        Column('Have you ever been subjected to any legal enquiry for Non ethical work/business?',yea_no_validation + null_validation),
+                        Column('Result',pass_fail_validation + null_validation)
                         ])
                     schema = Schema([
                         #nan check column non mandate
@@ -5954,8 +5964,6 @@ class upload_bulk_upload(Resource):
                         Column('Attachment',null_validation),
                         Column('Candidate Photo'),
                         Column('Document copy'),
-                        Column('Bank Name'),
-                        Column('Account Number'),
                         Column('BOCW Registration Id'),
                         Column('Whatsapp Number'),
                         #str+null check
@@ -6020,6 +6028,9 @@ class upload_bulk_upload(Resource):
                         #Email validation
                         Column('Enrolled_By*',email_validation + str_validation),
                         #SHE PRORJECT
+                        Column('Bank Name',str_validation + null_validation),
+                        Column('Account Number',str_validation + null_validation),
+
                         Column('Rented Or Own House?',null_validation),
                         Column('Size Of The House',null_validation),
                         Column('Ration Card (Apl Or Bpl)',null_validation),
@@ -6442,10 +6453,10 @@ class DownloadEnrTemplate(Resource):
                         worksheet.merge_range(0, 86, 0, 94, 'Asset List', header_format)
                         she_col = ['Candidate_Id', 'First_Name', 'Primary_Contact_No', 'Email_Id']
                         MCL = ['Candidate_id', 'First Name*', 'Primary contact  No*', 'Email id*'] 
-                        MCL += ['Date of birth (age between 18 to 40)[ view Only]', 'Are you 8th Pass?', 'Are you able to read and write local language?', 'Do you have a smart phone?', 'Are you\xa0willing to buy a smartphone?', 'Do you own two wheeler?', 'Do you have any work experience', 'Will you able to work full time or at least 6 hours a day?', 'Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?', 'Willing to travel for work', 'Are you willing to work and sign the work contract with LN?', 'Are you willing to adopt digital transactions in your business?', 'Do you have a bank account?', 'Have you availed any loan in the past?', 'Do you have any active loan?', 'Are you willing to take up a loan to purchase tools and consumables?', 'Are you covered under any health insurance?', 'Are you allergic to any chemicals and dust?', 'Are you willing to follow  Environment, Health and Safety Norms in your business?', 'Have you ever been subjected to any legal enquiry for Non ethical work/business?']
+                        MCL += ['Date of birth -Is age between 18 to 40?', 'Are you 8th Pass?', 'Are you able to read and write local language?', 'Do you have a smart phone?', 'Are you\xa0willing to buy a smartphone?', 'Do you own two wheeler?', 'Do you have any work experience', 'Will you able to work full time or at least 6 hours a day?', 'Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?', 'Willing to travel for work', 'Are you willing to work and sign the work contract with LN?', 'Are you willing to adopt digital transactions in your business?', 'Do you have a bank account?', 'Have you availed any loan in the past?', 'Do you have any active loan?', 'Are you willing to take up a loan to purchase tools and consumables?', 'Are you covered under any health insurance?', 'Are you allergic to any chemicals and dust?', 'Are you willing to follow  Environment, Health and Safety Norms in your business?', 'Have you ever been subjected to any legal enquiry for Non ethical work/business?','Result']
                         df_2 = df[she_col]
-                        df_2.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='MCL')
-                        worksheet = writer.sheets['MCL']
+                        df_2.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='SHE MCL')
+                        worksheet = writer.sheets['SHE MCL']
                         for i in range(len(MCL)):
                             worksheet.write(0,i ,MCL[i], header_format)
                     writer.save()
