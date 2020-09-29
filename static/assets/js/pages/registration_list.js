@@ -389,6 +389,8 @@ function LoadTable()
                     var varButtons = "";
                     if(row.Is_Check)
                         varButtons += '<input id="addedchk_' + row.S_No + '" name="checkcase" type="checkbox" value="'+row.Candidate_Id+'" onclick="toggleCheckbox(event)">';
+                    //else
+                    //    varButtons += '<a onclick="ReuploadImages(\'' + row.Candidate_Id + '\')" class="btn" style="cursor:pointer" ><i title="Reupload Images" class="fas fa-edit" ></i></a>';
                     return varButtons;
                 }
             },
@@ -566,3 +568,8 @@ function LoadProjectPage(){
                 //UploadFileData($('#ddlProjectType').val())
             }
         }
+function ReuploadImages(Candidate_Id)
+    {
+        $('#hdn_candidate_id').val(Candidate_Id);
+        $('#form1').submit();
+    }

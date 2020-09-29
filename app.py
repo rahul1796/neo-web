@@ -218,6 +218,8 @@ def before_request():
         g.subproject_id=session['subproject_id']
     if 'partner_id' in session.keys():
         g.partner_id = session['partner_id']
+    if 'candidate_id' in session.keys():
+        g.candidate_id = session['candidate_id']
     
 
 #home_API's
@@ -876,7 +878,6 @@ def batch_add_edit():
 
 @app.route("/assign_batch_add_edit_to_home", methods=['GET','POST'])
 def assign_batch_add_edit_to_home():
-    
     session['batch_id']=request.form['hdn_batch_id']
     if g.user:
         return render_template("home.html",values=g.User_detail_with_ids,html="batch_add_edit")
@@ -5917,8 +5918,11 @@ class upload_bulk_upload(Resource):
                     return out
             
             elif cand_stage==str(3):
-                
+                img_column = 'Attachment'
+                if ProjectType!=1:
+                    img_column += ',Candidate Photo'
                 if ProjectType==2:
+                    img_column += ',Educational Qualification,Age Proof,Signed Mou*'
                     df= pd.read_excel(file_name,sheet_name='Enrollment',header=1)
                     df = df.fillna('')
                     df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
@@ -6184,18 +6188,34 @@ class upload_bulk_upload(Resource):
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
                     return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
                 else:
-                    if ProjectType==2:
-                        errors = schema_MCL.validate(df_MCL)
-                        errors_index_rows = [e.row for e in errors]
-                        len_error = len(errors_index_rows)
-                        if len_error>0:
-                            file_name = str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv'
-                            pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
-                            return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name)}
-                        out = Database.enrollment_web_inser(df,user_id,ProjectType,df_MCL)
+                    df_all_image=[]
+                    for i in img_column.split(','):
+                        df_all_image += df[i].tolist()
+                    df_all_image = list(filter(lambda x: ((x!='') and (not(pd.isna(x)))), df_all_image))
+                    df_all_image = ','.join(df_all_image).split(',')
+
+                    for i in img_column.split(','):
+                        df[i]=df[i].map(lambda x: x if (x=='' or pd.isna(x)) else ','.join([filename_prefix+j for j in x.split(',')]))
+
+                    if set(all_image_files)==set(df_all_image):
+                        if ProjectType==2:
+                            errors = schema_MCL.validate(df_MCL)
+                            errors_index_rows = [e.row for e in errors]
+                            len_error = len(errors_index_rows)
+                            if len_error>0:
+                                file_name = str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_' + 'errors.csv'
+                                pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                                out = {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name)}
+                            else:
+                                out = Database.enrollment_web_inser(df,user_id,ProjectType,df_MCL)
+                        else:
+                            out = Database.enrollment_web_inser(df,user_id,ProjectType)
+                    elif set(all_image_files)>set(df_all_image):
+                        out = {"Status":False, "message":"images name not used in excel" }
                     else:
-                        out = Database.enrollment_web_inser(df,user_id,ProjectType)
+                        out = {"Status":False, "message":"images not available" }
                     return out
+
             else:
                 return {"Status":False, "message":"Wrong Candidate Stage"}
             #except Exception as e:
@@ -8006,6 +8026,23 @@ class GetAllParentCourse(Resource):
         if request.method=='GET':
             return Content.GetAllParentCourse()
 api.add_resource(GetAllParentCourse,'/GetAllParentCourse')
+
+@app.route("/reupload_candidate_image")
+def reupload_candidate_image():
+    if g.user:
+        return render_template("Candidate/reupload_images.html",candidate_id=g.candidate_id)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+## Reupload candidate images
+@app.route("/Reupload_Candidate_Images_Web", methods=['GET','POST'])
+def Reupload_Candidate_Images_Web():
+    session['candidate_id']=request.form['hdn_candidate_id']
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="reupload_candidate_image")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
