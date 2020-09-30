@@ -976,7 +976,8 @@ function add_map_message(){
         $('#DivAssessorName').hide();
         $('#DivAssessorMob').hide();
         $('#DivAssessorEmail').hide();
-        $('#DivCandidates').hide();
+        $('#DivCandidates').show();
+        AbsentCandidateBatch(BatchId,0,0);  
         $('#TxtScheduledDate').val('');
         $('#TxtAssessmnetDate').val('');
         $('#hdnMobilizationType').val(Mobilization_Type);
@@ -998,7 +999,8 @@ function add_map_message(){
         $('#DivAssessorName').hide();
         $('#DivAssessorMob').hide();
         $('#DivAssessorEmail').hide();
-        $('#DivCandidates').hide();
+        $('#DivCandidates').show();
+        AbsentCandidateBatch($('#hdn_batch_assessment_id').val(),AssessmentId,3); 
         $('#TxtScheduledDate').val('');
         $('#TxtAssessmnetDate').val('');
         $('#hdn_batch_assessment_id').val(BatchId);
@@ -1062,8 +1064,8 @@ function add_map_message(){
             $('#DivAssessorName').show();
             $('#DivAssessorMob').show();
             $('#DivAssessorEmail').show();
-            $('#DivCandidates').show();
-            AbsentCandidateBatch($('#hdn_batch_assessment_id').val(),$('#hdn_assessment_id').val());         
+            //$('#DivCandidates').show();
+            //AbsentCandidateBatch($('#hdn_batch_assessment_id').val(),$('#hdn_assessment_id').val(),StageId);         
         }
         else
         {
@@ -1392,7 +1394,7 @@ function add_map_message(){
             }
         });
     }
-    function AbsentCandidateBatch(BatchId,AssessmentId){
+    function AbsentCandidateBatch(BatchId,AssessmentId,StageId){
         flag='absent'
         $('#tbl_mark_absent_candidate').show();
         $('#tbl_mark_absent_candidate').dataTable().fnDestroy();    
@@ -1414,9 +1416,16 @@ function add_map_message(){
                     if (data.Candidates != null){
                         var count=data.Candidates.length;
                         if( count> 0)
-                        {
-                            $("#lblCandidateTable").text("Select Absent Candidates:");
-                            $("#thSelect").text("Select Absentees");
+                        {   if(StageId==0)
+                            {
+                                $("#lblCandidateTable").text("Select Not-Eligible Candidates for Assessment:");
+                                $("#thSelect").text("Select");
+                            }
+                            else{
+                                $("#lblCandidateTable").text("Select Candidates For Re-Assessment:");
+                                $("#thSelect").text("Select");
+                            }
+                            
                             for(var i=0;i<count;i++)
                             {   
                                 
@@ -1435,6 +1444,7 @@ function add_map_message(){
                                 varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Candidate_Name +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Mobile_Number +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Enrollment_Id +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Attempt +'</td>';
                                 varHtml+='</tr>';
 
                             }                        

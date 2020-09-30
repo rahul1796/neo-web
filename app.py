@@ -4745,7 +4745,30 @@ class ScheduleAssessment(Resource):
             assessor_mobile=request.form['Assessor_Mobile']
             reassessment_flag=request.form['reassessment_flag']
             return Assessments.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag)
+class ConfirmedAssessedAssessmentFromUAP(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            batch_id=Database.get_batchid_from_batch_code(request.form['batch_id'])
+            #user_id=request.form['user_id']
+            #requested_date=request.form['requested_date']
+            scheduled_date=request.form['planned_assessment_date']
+            assessment_date=request.form['actual_assessment_date']
+            #assessment_type_id=request.form['assessment_type_id']
+            #assessment_agency_id=request.form['assessment_agency_id']
+            #assessment_id=request.form['assessment_id']
+            #partner_id=request.form['partner_id']
+            current_stage_id=request.form['stage_id']
+            present_candidate=request.form['present_candidate']
+            absent_candidate=request.form['absent_candidate']
+            assessor_name=request.form['assessor_name']
+            assessor_email=request.form['assessor_email']
+            assessor_mobile=request.form['assessor_mobile']
+            #reassessment_flag=request.form['reassessment_flag']
+            return Assessments.ScheduleAssessment(batch_id,1,'',scheduled_date,assessment_date,0,0,-1,0,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,0)
+
 api.add_resource(ScheduleAssessment,'/ScheduleAssessment')
+api.add_resource(ConfirmedAssessedAssessmentFromUAP,'/ConfirmedAssessedAssessmentFromUAP')
 
 api.add_resource(DownloadAssessmentResult,'/DownloadAssessmentResult')
 api.add_resource(DownloadAssessmentResultUploadTemplate,'/DownloadAssessmentResultUploadTemplate')
@@ -6304,6 +6327,20 @@ class upload_assessment_result(Resource):
             except Exception as e:
                  return {"Status":False, "message":"Unable to upload " + str(e)}         
 api.add_resource(upload_assessment_result,'/upload_assessment_result')
+
+class UAP_upload_assessment_result(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                batch_id = request.form["batch_id"]
+                stage_id = request.form["stage_id"]             
+                result_json = request.form["result_json"]
+                out = Database.UAP_upload_assessment_result(batch_id,stage_id,result_json)
+                return out
+            except Exception as e:
+                 return {"Status":False, "message":"Unable to upload " + str(e)}         
+api.add_resource(UAP_upload_assessment_result,'/UAP_upload_assessment_result')
 
 class batch_download_report(Resource):
     report_name = "Trainerwise_TMA_Registration_Compliance"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
