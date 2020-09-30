@@ -5657,8 +5657,11 @@ class upload_bulk_upload(Resource):
             email_validation = [CustomElementValidation(lambda d: d.lower() in all_email, 'Invalid mobilizer')]
             all_state=Database.all_state_validation()
             #print(data)
+
+            regex = '^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[.]\w+$'
+            regex2 = '[\.]{2,}'
             state_validation = [CustomElementValidation(lambda d: d.lower() in all_state, 'Invalid State')]
-            cand_email_validation = [CustomElementValidation(lambda d: ((Database.app_email_validation(d))and(d==parseaddr(d)[1])), 'Email already exists')]
+            cand_email_validation = [CustomElementValidation(lambda d: ((Database.app_email_validation(d.lower()))and((re.search(regex2,d)==None)and(re.search(regex,d)!=None))), 'Email already exists')]
             cand_mobile_validation = [CustomElementValidation(lambda d: Database.app_mobile_validation(d), 'mobile number already exists')]
             pass_fail_validation = [CustomElementValidation(lambda d: str(d).lower() in ['pass','fail'], 'invalid option (Pass/Fail allwed)')]
             images_validation = [CustomElementValidation(lambda d: d in all_image_files, 'Image not available with this name.')]
