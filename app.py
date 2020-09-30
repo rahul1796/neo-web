@@ -3298,7 +3298,7 @@ class GetSessionTrainerActivity(Resource):
         if request.method=='GET':
             batch_id=request.args.get('batch_id',0,type=int)
             session_id=request.args.get('session_id',0,type=int)
-            response={"TrainerActivity":Report.GetSessionTrainerActivity(batch_id,session_id),"TMAStageLogImagePath":config.tma_stage_log_image_path}
+            response={"TrainerActivity":Report.GetSessionTrainerActivity(batch_id,session_id),"TMAStageLogImagePath":config.Base_URL + '/GetDocumentForExcel?image_path=trainer_stage_images&image_name='}
             return response
 api.add_resource(GetSessionTrainerActivity,'/GetSessionTrainerActivity')
 
@@ -3312,7 +3312,7 @@ class GetCandidateSessionAttendance(Resource):
             GrpAttendance=[]
             if attendance_type==1:
                 GrpAttendance=Report.GetCandidateGrpAttendance(batch_id,session_id)
-            response={"CandidateAttendance":Report.GetCandidateSessionAttendance(batch_id,session_id),"GroupAttendance":GrpAttendance,"TMACandidateImagePath":config.tma_candidate_image_path}
+            response={"CandidateAttendance":Report.GetCandidateSessionAttendance(batch_id,session_id),"GroupAttendance":GrpAttendance,"TMACandidateImagePath":config.Base_URL + '/GetDocumentForExcel?image_path=attendance_images&image_name='}
             return response
 api.add_resource(GetCandidateSessionAttendance,'/GetCandidateSessionAttendance')
 
@@ -5657,8 +5657,7 @@ class upload_bulk_upload(Resource):
             email_validation = [CustomElementValidation(lambda d: d.lower() in all_email, 'Invalid mobilizer')]
             all_state=Database.all_state_validation()
             #print(data)
-
-            regex = '^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[.]\w+$'
+            regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[.]\w+$'
             regex2 = '[\.]{2,}'
             state_validation = [CustomElementValidation(lambda d: d.lower() in all_state, 'Invalid State')]
             cand_email_validation = [CustomElementValidation(lambda d: ((Database.app_email_validation(d.lower()))and((re.search(regex2,d)==None)and(re.search(regex,d)!=None))), 'Email already exists')]
@@ -5910,14 +5909,12 @@ class upload_bulk_upload(Resource):
 
                     for i in img_column.split(','):
                         df[i]=df[i].map(lambda x: x if (x=='' or pd.isna(x)) else ','.join([filename_prefix+j for j in x.split(',')]))
-
                     if set(all_image_files)==set(df_all_image):
                         out = Database.registration_web_inser(df,user_id,ProjectType)
                     elif set(all_image_files)>set(df_all_image):
                         out = {"Status":False, "message":"images name not used in excel" }
                     else:
                         out = {"Status":False, "message":"images not available" }
-                    
                     return out
             
             elif cand_stage==str(3):
@@ -6218,7 +6215,6 @@ class upload_bulk_upload(Resource):
                     else:
                         out = {"Status":False, "message":"images not available" }
                     return out
-
             else:
                 return {"Status":False, "message":"Wrong Candidate Stage"}
             #except Exception as e:
@@ -7958,27 +7954,23 @@ api.add_resource(download_sub_project_list,'/download_sub_project_list')
 class GetDocumentForExcel(Resource):
     @staticmethod
     def get():
+        # data/TMA/attendance_images/IMG_652_5156_1598957384498.jpg
         if request.method=='GET':
             image_name=request.args.get('image_name','',type=str)
             image_path=request.args.get('image_path','',type=str)
-            #response={"POC":Master.GetPOCForCustomer(customer_id)}
-            #url = hyperlink.parse(u'www.google.co.in')
-            #image_name =  '2_Class room_Untitled.png'
-            path = 'C:/Users/Jagdish P K/Desktop/APP/code/neo-web_qa/data/TMA/'
-            filename = '{}{}'.format(path,image_name)
+            path = config.neo_report_file_path + 'data/TMA/' + image_path
+            filename = '{}/{}'.format(path,image_name)
             if os.path.exists(filename):
-                filename = 'http://127.0.0.1:5000/data/tma/{}'.format(image_name)
+                filename = 'http://127.0.0.1:5000/data/TMA/' + image_path +'/{}'.format(image_name)
             else:
-                path = 'neo_skills/qa/bulk_upload/room_image/1_Class room_Untitled.png'
-
+                path = config.aws_location + 'tms/' + image_path +'/' + image_name
                 URL = config.COL_URL + 's3_signed_url_for_file_updated'
                 PARAMS = {'file_path':path} 
                 r = requests.get(url = URL, params = PARAMS) 
                 if r.text !='':
                     filename = r.text
                 else:
-                    filename = 'http://127.0.0.1:5000/data/tma/{}'.format(image_name) # no image found
-            
+                    filename = config.Base_URL + '/data/No-image-found.jpg' # no image found
             return redirect(filename)
 api.add_resource(GetDocumentForExcel,'/GetDocumentForExcel')
 
@@ -7988,30 +7980,24 @@ class GetDocumentForExcel_S3_certiplate(Resource):
         if request.method=='GET':
             image_name=request.args.get('image_name','',type=str)
             image_path=request.args.get('image_path','',type=str)
-            
             URL=config.neo_certiplate+image_name
             r = requests.get(url = URL) 
             if r.status_code==200:
                 filename =  URL
             elif r.status_code==404:
-                print(image_name)
-                path = config.aws_location +'bulk_upload/room_image/'+image_name
+                #print(image_name)/
+                path = config.aws_location +'neo_app/images/'+image_name
                 URL = config.COL_URL + 's3_signed_url_for_file_updated'
                 PARAMS = {'file_path':path} 
-                r = requests.get(url = URL, params = PARAMS) 
-                
-                #print('hi'+r.text)
-
+                r = requests.get(url = URL, params = PARAMS)
                 if r.text !='':
                     filename = r.text
                 else:
                     filename = ''
             else:
                 filename=''
-            
             if filename =='':
                 filename= config.Base_URL + '/data/No-image-found.jpg'
-            print(filename)
             return redirect(filename)
 api.add_resource(GetDocumentForExcel_S3_certiplate,'/GetDocumentForExcel_S3_certiplate')
 
