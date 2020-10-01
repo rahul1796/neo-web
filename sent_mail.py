@@ -2,7 +2,7 @@ import smtplib
 import json 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from Database import config
+from Database import *
 
 def forget_password(email, password, name):
     try:
@@ -25,6 +25,34 @@ def forget_password(email, password, name):
 
         msg.attach(MIMEText(html_msg, 'html'))
 
+        res = server.sendmail(msg['From'], msg['To'], msg.as_string())
+        server.quit()
+
+        return {'status':True,'description':'Email sent'}
+    except:
+        return {'status':False,'description':'Unable to sent email'}
+
+def UAP_Batch_Creation_MAIL(RequestId):
+    try:
+        print('hello')
+        server = smtplib.SMTP('smtp.office365.com','587')
+        #server = smtplib.SMTP(host='smtp.office365.com')
+        #server.connect('smtp.office365.com','587')
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login("do-not-reply@labournet.in","Donotreply@123")
+
+        msg = MIMEMultipart()
+
+        msg['From'] = "do-not-reply@labournet.in"
+        msg['To'] = config.NAVRITI_SPOC_EMAIL
+        msg['Subject'] = "[NEO] Reg: Assessment Batch Creation in UAP"
+
+        html_msg= config.html_email_msg_uap_batch_creation
+        html_msg = html_msg.format('Navriti Assessment Team',RequestId)
+
+        msg.attach(MIMEText(html_msg, 'html'))
         res = server.sendmail(msg['From'], msg['To'], msg.as_string())
         server.quit()
 
