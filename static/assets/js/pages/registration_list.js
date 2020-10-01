@@ -351,6 +351,7 @@ function LoadState(){
 function LoadTable()
 {   //console.log($("#ddlRegion").val().toString(),$("#ddlState").val().toString(),$("#MinAge").val().toString(),$("#MaxAge").val().toString())
     //alert($('#Pincode').val())
+    var user_role_id = $('#hdn_home_user_role_id').val();
     $('#divCandidateList').show();
     vartable = $("#tbl_candidate").DataTable({
         "serverSide": true,
@@ -369,7 +370,7 @@ function LoadTable()
             "data": function (d) {
                 d.candidate_id = 0;
                 d.user_id = $('#hdn_home_user_id').val();
-                d.user_role_id  = $('#hdn_home_user_role_id').val();
+                d.user_role_id  = user_role_id;
                 d.region_ids = $('#ddlRegion').val().toString();
                 d.state_ids = $('#ddlState').val().toString();
                 d.Pincode = $('#Pincode').val().toString();
@@ -389,8 +390,9 @@ function LoadTable()
                     var varButtons = "";
                     if(row.Is_Check)
                         varButtons += '<input id="addedchk_' + row.S_No + '" name="checkcase" type="checkbox" value="'+row.Candidate_Id+'" onclick="toggleCheckbox(event)">';
-                    //else
-                    //    varButtons += '<a onclick="ReuploadImages(\'' + row.Candidate_Id + '\')" class="btn" style="cursor:pointer" ><i title="Reupload Images" class="fas fa-edit" ></i></a>';
+                    // else if((user_role_id==1)||(user_role_id==1)||(user_role_id==1)||(user_role_id==1)){
+                    //     varButtons += '<a onclick="ReuploadImages(\'' + row.Candidate_Id + '\')" class="btn" style="cursor:pointer" ><i title="View/Reupload Images" class="fas fa-edit" ></i></a>';
+                    // }
                     return varButtons;
                 }
             },
@@ -571,5 +573,6 @@ function LoadProjectPage(){
 function ReuploadImages(Candidate_Id)
     {
         $('#hdn_candidate_id').val(Candidate_Id);
+        $('#hdn_candidate_stage_id').val(2);
         $('#form1').submit();
     }

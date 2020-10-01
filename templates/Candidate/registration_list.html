@@ -59,22 +59,14 @@
                 $('#btnUpload').show();
             else
                 $('#btnUpload').hide();
-            //LoadTable(); 
-            // role_id=parseInt($('#hdn_home_user_role_id').val());
-            // if(role_id == 1 || role_id ==5 || role_id ==15)
-            //     $('#btn_create').show();
-            // else 
-            //     $('#btn_create').hide();
-            // if(role_id == 7 || role_id==5 || role_id == 4)
-            // 	$('#btn_create').hide();
             });
         </script>
         <!-- ============================================================== -->
         <!-- Start Page Content here -->
         <!-- ============================================================== -->
         <form id='form1' method="POST" action="/Reupload_Candidate_Images_Web">
-            
                 <input type="hidden" id="hdn_candidate_id" name="hdn_candidate_id" value="0">
+                <input type="hidden" id="hdn_candidate_stage_id" name="hdn_candidate_stage_id" value="0">
                 <div class="container-fluid">
     
                     <!-- start page title -->
