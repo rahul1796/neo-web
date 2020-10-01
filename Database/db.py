@@ -9,6 +9,8 @@ import requests
 import xml.etree.ElementTree as ET
 import io
 import csv
+import json
+import sent_mail
 
 
 def to_xml(df, filename=None, mode='w'):
@@ -1163,6 +1165,7 @@ class Database:
         sql = 'exec [candidate_details].[sp_get_candidate_enrolled_in_batch] ?,?'
        
         values = (batch_id,assessment_id)
+        print(values)
         cur.execute(sql,(values))
         #print(values)
         #print(cur2.description)
@@ -4087,23 +4090,60 @@ SELECT					cb.name as candidate_name,
             cur = con.cursor()
             sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
             values = (batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag)
-            #print(values)
-            #print("kjjkj")
+            print(values)
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]
             for row in cur:
                 pop=row[0]
                 msg=row[1]
             cur.commit()
-            cur.close()
-            con.close() 
+            
             if pop>0:
                 out={"message":msg,"success":1,"assessment_id":pop}
+                if((str(partner_id)=="1") & (str(assessment_type_id)=="2") & ((msg=='Assessment Proposed') | (msg=='Re-Assessment Proposed'))):
+                    SDMSBatchId=''
+                    Stage=''
+                    AssessmentDate=''
+                    BatchAttemptNumber=''
+                    sql = '''select TOP(1) b.batch_code,ba.assessment_stage_id as assessment_stage,CONVERT(varchar,FORMAT(ba.requested_date,'dd-MMM-yyyy'),106) as requested_date,ba.attempt  
+                             from batches.tbl_batches as b 
+                             left join assessments.tbl_batch_assessments as ba on ba.batch_id=b.batch_id
+                            where b.is_active=1
+                            AND ba.assessment_type_id=2
+                            AND b.batch_id='''+batch_id
+                    cur.execute(sql)
+                    columns = [column[0].title() for column in cur.description]
+                    for row in cur:
+                        SDMSBatchId=str(row[0])
+                        Stage=str(row[1])
+                        AssessmentDate=str(row[2])
+                        BatchAttemptNumber=str(row[3])
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_assessment_UAP] ?,?,?'
+                    values = (batch_id,pop,present_candidate)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]
+                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    uap_url=''
+                    params={"SDMSBatchId":SDMSBatchId,"NeoBatchStage":Stage,"AssessmentDate":AssessmentDate,"BatchAttemptNumber":BatchAttemptNumber,"CandidateList":response}
+                    json_data = json.dumps(params)   
+                    uap_api=UAP_API_BASE_URL + 'CreateNeoSkillsBatchJSONRequest?JSONRequest='+json_data
+                    x = requests.get(uap_api)
+                    data = x.json()
+                    if  str(data['CreateNeoSkillsBatch']['Succsess']) == "True":
+                        sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']))                 
+                    
+            
             else:
                 out={"message":"Error scheduling assessment","success":0,"assessment_id":pop}
+            cur.close()
+            con.close()
             return out
         except Exception as e:
-            return {"message":"Error changing assessment stage","success":0,"assessment_id":0}
+            return {"message":"Error changing assessment stage"+e.message,"success":0,"assessment_id":0}
     def GetAssessmentCandidateResults(AssessmentId):
         try:
             col=[]
@@ -5647,7 +5687,37 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             # print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
+    def UAP_upload_assessment_result(batch_id,stage_id,batch_attempt_number,result_json):
+        try: 
+            # print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            sql = 'exec	[assessments].[sp_upload_assessment_result_from_UAP]  ?,?, ?, ?'
+            values = (result_json,batch_id,3,batch_attempt_number)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
 
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop >0 :
+                Status=True
+                msg="Uploaded Successfully"
+            elif pop==-1:
+                msg="Only one batch data allowed at a time"
+                Status=False
+            elif pop==-2:
+                msg="Wrong batch to upoload assesment"
+                Status=False
+            else:
+                msg="Wrong Batch code/Enrollment Id"
+                Status=False
+            return {"Status":Status,'message':msg}
+        except Exception as e:
+            # print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+    
     def GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
         response = []
         h={}
@@ -6491,3 +6561,15 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
+    def get_batchid_from_batch_code(batch_code):
+        
+        response=''
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = "SELECT   distinct [batch_id] FROM  [batches].[tbl_batches]  WHERE batch_code = '{}'".format(str(batch_code))
+        cur.execute(sql)
+        for row in cur:
+            response=row[0]
+        cur.close()
+        con.close()  
+        return str(response)
