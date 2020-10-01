@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ET
 import io
 import csv
 import json
+import sent_mail
 
 
 def to_xml(df, filename=None, mode='w'):
@@ -4130,8 +4131,10 @@ SELECT					cb.name as candidate_name,
                     params={"SDMSBatchId":SDMSBatchId,"NeoBatchStage":Stage,"AssessmentDate":AssessmentDate,"BatchAttemptNumber":BatchAttemptNumber,"CandidateList":response}
                     json_data = json.dumps(params)   
                     uap_api=UAP_API_BASE_URL + 'CreateNeoSkillsBatchJSONRequest?JSONRequest='+json_data
-                    #x = requests.get(uap_api)
-                    
+                    x = requests.get(uap_api)
+                    data = x.json()
+                    if  str(data['CreateNeoSkillsBatch']['Succsess']) == "True":
+                        sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']))                 
                     
             
             else:
@@ -5621,13 +5624,13 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             # print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
-    def UAP_upload_assessment_result(batch_id,stage_id,result_json):
+    def UAP_upload_assessment_result(batch_id,stage_id,batch_attempt_number,result_json):
         try: 
             # print(str(df.to_json(orient='records')))
             con = pyodbc.connect(conn_str)
             cur = con.cursor()            
-            sql = 'exec	[assessments].[sp_upload_assessment_result]  ?,?, ?, ?,?'
-            values = (result_json,batch_id,stage_id)
+            sql = 'exec	[assessments].[sp_upload_assessment_result_from_UAP]  ?,?, ?, ?'
+            values = (result_json,batch_id,3,batch_attempt_number)
             cur.execute(sql,(values))
             for row in cur:
                 pop=row[0]

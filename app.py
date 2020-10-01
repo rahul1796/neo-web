@@ -6333,10 +6333,11 @@ class UAP_upload_assessment_result(Resource):
     def post():
         if request.method=='POST':
             try:
-                batch_id = request.form["batch_id"]
-                stage_id = request.form["stage_id"]             
+                batch_id=Database.get_batchid_from_batch_code(request.form['batch_id'])
+                stage_id = request.form["stage_id"] 
+                batch_attempt_number = request.form["batch_attempt_number"]            
                 result_json = request.form["result_json"]
-                out = Database.UAP_upload_assessment_result(batch_id,stage_id,result_json)
+                out = Database.UAP_upload_assessment_result(batch_id,stage_id,batch_attempt_number,result_json)
                 return out
             except Exception as e:
                  return {"Status":False, "message":"Unable to upload " + str(e)}         
