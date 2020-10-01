@@ -56,7 +56,7 @@ def check_mob_number(mob):
         mob = str(mob)
         mob = mob.replace(' ','')
         mob = mob.replace('-','')
-        return (len(mob)==10)and(mob.isnumeric())
+        return (len(mob)==10)and(mob.isnumeric())or(mob=='')
         if mob[0:3]=='+91':
             return (len(mob)==13)and(mob.isnumeric())
         else:
@@ -220,7 +220,8 @@ def before_request():
         g.partner_id = session['partner_id']
     if 'candidate_id' in session.keys():
         g.candidate_id = session['candidate_id']
-    
+    if 'candidate_stage_id' in session.keys():
+        g.candidate_stage_id = session['candidate_stage_id']
 
 #home_API's
 #home_batch -> for batchlist in home page
@@ -5660,7 +5661,8 @@ class upload_bulk_upload(Resource):
             regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[.]\w+$'
             regex2 = '[\.]{2,}'
             state_validation = [CustomElementValidation(lambda d: d.lower() in all_state, 'Invalid State')]
-            cand_email_validation = [CustomElementValidation(lambda d: ((Database.app_email_validation(d.lower()))and((re.search(regex2,d)==None)and(re.search(regex,d)!=None))), 'Email already exists')]
+            cand_email_format_validation = [CustomElementValidation(lambda d: ((re.search(regex2,d)==None)and(re.search(regex,d)!=None)), 'Inavalid email format. Please provide correct email')]
+            cand_email_validation = [CustomElementValidation(lambda d: Database.app_email_validation(d.lower()), 'Email already exists')]
             cand_mobile_validation = [CustomElementValidation(lambda d: Database.app_mobile_validation(d), 'mobile number already exists')]
             pass_fail_validation = [CustomElementValidation(lambda d: str(d).lower() in ['pass','fail'], 'invalid option (Pass/Fail allwed)')]
             images_validation = [CustomElementValidation(lambda d: d in all_image_files, 'Image not available with this name.')]
@@ -5682,7 +5684,7 @@ class upload_bulk_upload(Resource):
                         Column('Middle Name',null_validation),
                         Column('Last Name',null_validation),
                         Column('Secondary Contact  No',null_validation),
-                        Column('Email id*',cand_email_validation + str_validation + null_validation),
+                        Column('Email id*',cand_email_validation + cand_email_format_validation + str_validation + null_validation),
                         Column('Present Panchayat',null_validation),
                         Column('Present Taluk/Block',null_validation),
                         Column('Present Address line1',null_validation),
@@ -5693,7 +5695,7 @@ class upload_bulk_upload(Resource):
                         Column('Permanent Village',null_validation),
                         Column('Permanent Panchayat',null_validation),
                         Column('Permanent Taluk/Block',null_validation),
-                        Column('Whatsapp Number',null_validation),
+                        Column('Whatsapp Number',mob_validation + null_validation),
                         #str+null check
                         Column('Fresher/Experienced?*',str_validation + null_validation),
                         Column('Salutation*',str_validation + null_validation),
@@ -5765,7 +5767,7 @@ class upload_bulk_upload(Resource):
                         Column('Permanent Taluk/Block',null_validation),
                         Column('Document copy',null_validation),
                         Column('BOCW Registration Id',null_validation),
-                        Column('Whatsapp Number',null_validation),
+                        Column('Whatsapp Number',mob_validation + null_validation),
                         Column('Aadhar Image',null_validation),
                         #str+null check
                         Column('Candidate Photo',str_validation + null_validation),
@@ -5840,7 +5842,7 @@ class upload_bulk_upload(Resource):
                         Column('Permanent Taluk/Block',null_validation),
                         Column('Document copy',null_validation),
                         Column('BOCW Registration Id',null_validation),
-                        Column('Whatsapp Number',null_validation),
+                        Column('Whatsapp Number',mob_validation + null_validation),
                         Column('Aadhar Image',null_validation),
                         #str+null check
                         Column('Fresher/Experienced?*',str_validation + null_validation),
@@ -5922,7 +5924,7 @@ class upload_bulk_upload(Resource):
                 if ProjectType!=1:
                     img_column += ',Candidate Photo'
                 if ProjectType==2:
-                    img_column += ',Educational Qualification,Age Proof,Signed Mou*'
+                    img_column += ',Education qualification Proof,Age Proof,Signed Mou*'
                     df= pd.read_excel(file_name,sheet_name='Enrollment',header=1)
                     df = df.fillna('')
                     df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
@@ -5959,6 +5961,7 @@ class upload_bulk_upload(Resource):
                         Column('Have you ever been subjected to any legal enquiry for Non ethical work/business?',yea_no_validation + null_validation),
                         Column('Result',pass_fail_validation + null_validation)
                         ])
+
                     schema = Schema([
                         #nan check column non mandate
                         Column('Candidate_id',null_validation),
@@ -5990,7 +5993,7 @@ class upload_bulk_upload(Resource):
                         Column('Candidate Photo'),
                         Column('Document copy'),
                         Column('BOCW Registration Id'),
-                        Column('Whatsapp Number'),
+                        Column('Whatsapp Number',mob_validation),
                         Column('Aadhar Image',null_validation),
                         #str+null check
                         Column('Fresher/Experienced?*',str_validation + null_validation),
@@ -6054,8 +6057,8 @@ class upload_bulk_upload(Resource):
                         #Email validation
                         Column('Enrolled_By*',email_validation + str_validation),
                         #SHE PRORJECT
-                        Column('Bank Name',str_validation + null_validation),
-                        Column('Account Number',str_validation + null_validation),
+                        Column('Bank Name*',str_validation + null_validation),
+                        Column('Account Number*',str_validation + null_validation),
 
                         Column('Rented Or Own House?',null_validation),
                         Column('Size Of The House',null_validation),
@@ -6070,7 +6073,7 @@ class upload_bulk_upload(Resource):
                         Column('Farm Land',null_validation),
                         Column('Others',null_validation),
                         Column('Address As Per Aadhar Card (Incl Pin Code)*',null_validation),
-                        Column('Educational Qualification',null_validation),
+                        Column('Education qualification Proof',null_validation),
                         Column('Age Proof',null_validation),
                         Column('Signed Mou*',null_validation),
                         Column('Mou Signed Date',null_validation)
@@ -6114,7 +6117,7 @@ class upload_bulk_upload(Resource):
                         Column('Bank Name'),
                         Column('Account Number'),
                         Column('BOCW Registration Id'),
-                        Column('Whatsapp Number'),             
+                        Column('Whatsapp Number',mob_validation),             
                         Column('Aadhar Image',null_validation),           
                         #str+null check
                         Column('Fresher/Experienced?*',str_validation + null_validation),
@@ -6211,9 +6214,9 @@ class upload_bulk_upload(Resource):
                         else:
                             out = Database.enrollment_web_inser(df,user_id,ProjectType)
                     elif set(all_image_files)>set(df_all_image):
-                        out = {"Status":False, "message":"images name not used in excel" }
+                        out = {"Status":False, "message":"Unable to upload {} ,image name missing in the excel template.".format(','.join(set(all_image_files)-set(df_all_image)))}
                     else:
-                        out = {"Status":False, "message":"images not available" }
+                        out = {"Status":False, "message":"No such image found : {}".format(','.join(set(df_all_image)-set(all_image_files)))}
                     return out
             else:
                 return {"Status":False, "message":"Wrong Candidate Stage"}
@@ -6468,9 +6471,18 @@ class DownloadEnrTemplate(Resource):
                         filename = 'CandidateBulkUpload_Enrollment_DELL_'
                     elif Project_Type==2:
                         excel_row=1
+                        Column = ['Candidate_id', 'Fresher/Experienced?*', 'Candidate Photo', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 
+                        'Gender*', 'Marital Status*', 'Caste*', 'Disability Status*', 'Religion*', 'Mother Tongue*', 'Occupation*', 'Average annual income*', 'Source of Information*', 'Interested Course*', 'Product*', 'Present Address line1*', 
+                        'Present Address line2', 'Present Village', 'Present Panchayat', 'Present Taluk/Block', 'Present District*', 'Present State*', 'Present Pincode*', 'Present Country*', 'Permanent Address line1*', 'Permanent Address line2', 
+                        'Permanent Village', 'Permanent Panchayat', 'Permanent Taluk/Block', 'Permanent District*', 'Permanent State*', 'Permanent Pincode*', 'Permanent Country*', 'Aadhar No', 'Identifier Type', 'Identity number', 'Document copy', 
+                        'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 
+                        'Expected CTC*', 'Highest Qualification*', 'Stream/Specialization*', 'Name of Institute', 'University', 'Year Of Pass', 'Percentage', 'Computer Knowledge*', 'Technical Knowledge*', 'family_Salutation*', 'Member Name*', 
+                        'Date Of birth', 'Age', 'Primary contact', 'Email Address', 'family_Gender*', 'Education Qualification*', 'Relationship*', 'Occupation', 'Average Household Income*', 'Bank Name*', 'Branch Name', 'Branch Code', 
+                        'Account type', 'Account Number*', 'Attachment', 'batch_id*', 'Aadhar Image', 'Enrolled_By*', 'Whatsapp Number']
+
                         col += resp['columns'][84:]
                         Column += ['Rented Or Own House?', 'Size Of The House', 'Ration Card (Apl Or Bpl)', 'Tv', 'Refrigerator', 'Washing Machine', 'Ac /Cooler', 'Car', 'Medical Insurance', 'Life Insurance', 
-                        'Farm Land', 'Others', 'Address As Per Aadhar Card (Incl Pin Code)*', 'Educational Qualification', 'Age Proof', 'Signed Mou*', 'Mou Signed Date']
+                        'Farm Land', 'Others', 'Address As Per Aadhar Card (Incl Pin Code)*', 'Education qualification Proof', 'Age Proof', 'Signed Mou*', 'Mou Signed Date']
                         filename = 'CandidateBulkUpload_Enrollment_SHE_'
                     else:
                         #df = df.iloc[:,:83]
@@ -8019,7 +8031,7 @@ api.add_resource(GetAllParentCourse,'/GetAllParentCourse')
 @app.route("/reupload_candidate_image")
 def reupload_candidate_image():
     if g.user:
-        return render_template("Candidate/reupload_images.html",candidate_id=g.candidate_id)
+        return render_template("Candidate/reupload_images.html",candidate_id=g.candidate_id,candidate_stage_id=g.candidate_stage_id)
     else:
         return render_template("login.html",error="Session Time Out!!")
 
@@ -8027,11 +8039,37 @@ def reupload_candidate_image():
 @app.route("/Reupload_Candidate_Images_Web", methods=['GET','POST'])
 def Reupload_Candidate_Images_Web():
     session['candidate_id']=request.form['hdn_candidate_id']
+    session['candidate_stage_id']=request.form['hdn_candidate_stage_id']
     if g.user:
         return render_template("home.html",values=g.User_detail_with_ids,html="reupload_candidate_image")
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+class AllCandidateImages(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                UserId=request.args.get('user_id',0,type=int)
+                UserRoleId=request.args.get('user_role_id',0,type=int)
+                candidate_id=request.args.get('candidate_id',0,type=int)
+                return Candidate.get_allcandidate_images(UserId,UserRoleId,candidate_id)
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(AllCandidateImages,'/AllCandidateImages')
+
+class ReuploadCandidateImageById(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                UserId=request.args.get('user_id',0,type=int)
+                UserRoleId=request.args.get('user_role_id',0,type=int)
+                id=request.args.get('id',0,type=int)
+                return Candidate.get_allcandidate_images(UserId,UserRoleId,candidate_id)
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(ReuploadCandidateImageById,'/ReuploadCandidateImageById')
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)

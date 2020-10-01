@@ -6491,3 +6491,17 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
+    def get_allcandidate_images(user_id,user_role_id,candidate_id):
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        values=(user_id,user_role_id,candidate_id)
+        sql = 'exec candidate_details.sp_get_allcandidate_images ?,?,?'
+        cur2.execute(sql,values)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+        cur2.close()
+        con.close()
+        return h.copy()

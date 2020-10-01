@@ -34,3 +34,6 @@ class Candidate:
     def get_project_basedon_client_multiple(user_id,user_role_id,client_id):
         projects ={"Projects": Database.get_project_basedon_client_multiple(user_id,user_role_id,client_id)}
         return projects
+    def get_allcandidate_images(user_id,user_role_id,candidate_id):
+        Candidate ={"Candidate": Database.get_allcandidate_images(user_id,user_role_id,candidate_id)}
+        return Candidate
