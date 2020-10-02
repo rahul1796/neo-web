@@ -41,6 +41,7 @@
 
         <script type="text/javascript">
             $(document).ready(function () {
+                $('#btnUpload').hide();
                 $("#imgSpinner").hide();
                 $("#imgSpinner1").hide();
                 
@@ -58,22 +59,14 @@
                 $('#btnUpload').show();
             else
                 $('#btnUpload').hide();
-            //LoadTable(); 
-            // role_id=parseInt($('#hdn_home_user_role_id').val());
-            // if(role_id == 1 || role_id ==5 || role_id ==15)
-            //     $('#btn_create').show();
-            // else 
-            //     $('#btn_create').hide();
-            // if(role_id == 7 || role_id==5 || role_id == 4)
-            // 	$('#btn_create').hide();
             });
         </script>
         <!-- ============================================================== -->
         <!-- Start Page Content here -->
         <!-- ============================================================== -->
-        <form id='form1' method="POST" action="/assign_batch_add_edit_to_home">
-            
-                <input type="hidden" id="hdn_batch_id" name="hdn_batch_id" value="0">
+        <form id='form1' method="POST" action="/Reupload_Candidate_Images_Web">
+                <input type="hidden" id="hdn_candidate_id" name="hdn_candidate_id" value="0">
+                <input type="hidden" id="hdn_candidate_stage_id" name="hdn_candidate_stage_id" value="0">
                 <div class="container-fluid">
     
                     <!-- start page title -->
@@ -134,11 +127,11 @@
                                         <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
                                     </div>
                                     <div class="form-group col-lg-2">                                         
-                                        <a class="btn btn-success waves-effect waves-light" style="float: right; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadRegTemplate()">Download Template</a>
+                                        <a class="btn btn-success waves-effect waves-light" style="float: right; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="select_Project_Type(0)">Download Template</a>
                                         <a id="lnkDownload" style="display:none;"></a>
                                     </div>
                                     <div class="form-group col-lg-1">   
-                                        <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Uploadfile()" id="btnUpload">Upload</button>
+                                        <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="select_Project_Type(1)" id="btnUpload">Upload</button>
 <!--                                     <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
                                         <label for="MaxAge">Max Age</label>
                                         
@@ -541,12 +534,13 @@
                     <form id="formUpload" action="javascript:UploadFileData()">
                         <input type="hidden" id="hdn_home_user_id_modal" name="hdn_home_user_id_modal" value="0">
                         <input type="hidden" id="hdn_home_user_role_id_modal" name="hdn_home_user_role_id_modal" value="0">
+                        <input type="hidden" id="hdn_ProjectType_modal" name="hdn_ProjectType_modal" value="0">
                     <div class="modal-header">
                         <h4 class="modal-title">Candidate Bulk Upload</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                     </div>
                     <div class="modal-body">
-                        <input type="file" id="myFile" name="filename" required>
+                        <input type="file" id="myFile" name="filename" multiple required>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-primary waves-effect" type="submit" >Submit</button>
@@ -560,4 +554,38 @@
                 </div>
             </div>
         </div><!--/.modal-->
-        
+
+        <div id="mdl_project_type" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content ">
+                    <form id="tempformProjectType" action="javascript:UploadFileData()">
+                        <div class="modal-header">
+                            <h4 class="modal-title" ><span id="header">Select project type</span></h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        </div>    
+                        <input type="hidden" id="hdn_upload_download_report" name="hdn_upload_download_report" value="">                
+                        <div class="modal-body">
+                            <div>
+                                <label for="ddlProjectType" class="mr-2">Project Type</label>
+                                <select class="form-control" id="ddlProjectType">
+                                    <option value="1">DELL</option>	
+                                    <option value="2">SHE</option>
+                                    <option selected="3" value="3">REGULAR</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div >
+                                <div>
+                                    <button  type="button" class="btn btn-success waves-effect waves-light" 
+                                        onclick="LoadProjectPage()">Submit</button>
+                                </div> <!-- style="margin-top: 30px" -->
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <!-- <button type="submit" class="btn btn-primary waves-effect" > Save</button> -->
+                            <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+                        </div>
+                </form>
+                </div>
+            </div>
+        </div><!--/.modal-->

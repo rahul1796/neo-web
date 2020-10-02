@@ -48,7 +48,7 @@ class TMADatabase:
         curs = con.cursor()
         quer="call [masters].[sp_get_tma_session_plan_module]({},{})".format(course_id,qp_id)
         quer="{"+quer+"}"
-        curs.execute(quer)
+        curs.execute(quer) 
         data=curs.fetchall()
         out=[]
         if(data!=None):
