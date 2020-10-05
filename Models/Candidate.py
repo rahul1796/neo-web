@@ -37,3 +37,6 @@ class Candidate:
     def get_allcandidate_images(user_id,user_role_id,candidate_id):
         Candidate ={"Candidate": Database.get_allcandidate_images(user_id,user_role_id,candidate_id)}
         return Candidate
+    def reupload_candidate_image_web_ui(user_id,user_role_id,filename,c_id,candidate_id):
+        Candidate =Database.reupload_candidate_image_web_ui(user_id,user_role_id,filename,c_id,candidate_id)
+        return Candidate
