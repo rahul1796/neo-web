@@ -6590,3 +6590,26 @@ SELECT					cb.name as candidate_name,
         con.close()  
         return str(response)
 
+    def reupload_candidate_image_web_ui(user_id,user_role_id,filename,c_id,candidate_id):
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        quer = ""
+        quer1 = "update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}' where candidate_id={}"
+        quer2 = "update candidate_details.tbl_candidate_reg_enroll_details set aadhar_image_name='{}' where candidate_id = {}"
+        quer3 = "update candidate_details.tbl_candidate_reg_enroll_details set document_copy_image_name = '{}' where candidate_id = {}"
+        quer4 = "update candidate_details.tbl_candidate_dell_details set [Educational Marksheet]='{}' where candidate_id={}"
+        quer5 = "update candidate_details.tbl_candidate_dell_details set [Income Certificate]='{}' where candidate_id={}"
+        quer6 = "update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set attachment_image_name='{}' where candidate_id={}"
+        quer7 = "update candidate_details.tbl_candidate_she_details set [Educational qualification]='{}' where candidate_id={}"
+        quer8 = "update candidate_details.tbl_candidate_she_details set [Age proof]='{}' where candidate_id={}"
+        quer9 = "update candidate_details.tbl_candidate_she_details set [Signed MoU]='{}' where candidate_id={}"
+
+        query = eval('quer'+str(c_id))
+        query = query.format(filename,candidate_id)
+        print(query)
+        cur2.execute(query)
+        cur2.commit()
+        cur2.close()
+        con.close()
+        out = {'Status': True, 'message': "Submitted Successfully"}
+        return out

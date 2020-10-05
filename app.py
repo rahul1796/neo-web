@@ -7972,7 +7972,6 @@ class download_Project_list(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(download_Project_list,'/download_Project_list')
 
-
 class download_sub_project_list(Resource):
     @staticmethod
     def post():
@@ -8108,6 +8107,29 @@ class ReuploadCandidateImageById(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(ReuploadCandidateImageById,'/ReuploadCandidateImageById')
+
+class reupload_candidate_image_web_ui(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:  
+                user_id = request.form['user_id']
+                user_role_id = request.form['user_role_id'] 
+                filename = request.form['filename']
+                c_id = request.form['id']
+                candidate_id = request.form['candidate_id']
+                return Candidate.reupload_candidate_image_web_ui(user_id,user_role_id,filename,c_id,candidate_id)
+            except Exception as e:
+                out = {'Status': False, 'message': "Error : "+str(e)}
+                return out
+api.add_resource(reupload_candidate_image_web_ui,'/reupload_candidate_image_web_ui')
+
+@app.route("/after_popup_reload_image")
+def after_popup_reload_image():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="reupload_candidate_image")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
