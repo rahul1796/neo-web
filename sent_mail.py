@@ -32,9 +32,8 @@ def forget_password(email, password, name):
     except:
         return {'status':False,'description':'Unable to sent email'}
 
-def UAP_Batch_Creation_MAIL(RequestId):
+def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId):
     try:
-        print('hello')
         server = smtplib.SMTP('smtp.office365.com','587')
         #server = smtplib.SMTP(host='smtp.office365.com')
         #server.connect('smtp.office365.com','587')
@@ -50,7 +49,7 @@ def UAP_Batch_Creation_MAIL(RequestId):
         msg['Subject'] = "[NEO] Reg: Assessment Batch Creation in UAP"
 
         html_msg= config.html_email_msg_uap_batch_creation
-        html_msg = html_msg.format('Navriti Assessment Team',RequestId)
+        html_msg = html_msg.format('Navriti Assessment Team',RequestId,SDMSBatchId)
 
         msg.attach(MIMEText(html_msg, 'html'))
         res = server.sendmail(msg['From'], msg['To'], msg.as_string())

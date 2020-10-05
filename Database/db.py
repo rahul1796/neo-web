@@ -2692,7 +2692,6 @@ SELECT					cb.name as candidate_name,
         cur.commit()
         cur.close()
         con.close()
-        print(response)
         return response
      
     def AllRegionsBasedOnUser(UserId,UserRoleId,UserRegionId):
@@ -4090,7 +4089,6 @@ SELECT					cb.name as candidate_name,
             cur = con.cursor()
             sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
             values = (batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag)
-            print(values)
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]
             for row in cur:
@@ -4134,7 +4132,7 @@ SELECT					cb.name as candidate_name,
                     x = requests.get(uap_api)
                     data = x.json()
                     if  str(data['CreateNeoSkillsBatch']['Succsess']) == "True":
-                        sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']))                 
+                        sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId)                 
                     
             
             else:
