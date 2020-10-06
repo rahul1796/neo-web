@@ -34,8 +34,8 @@ var Candidates = {};
                 $('#div_Aadhar_Image').hide();
                 $('#div_candidate_photo').hide();
             }
-            download_images();
         }
+        download_images();
     });
     function UploadFileData_s3(file,file_name)
     {
@@ -99,11 +99,11 @@ var Candidates = {};
         },
         success: function (data){
             //console.log(data);
-            if (data.Candidate.Project_Type!=2){
+            if (data.Candidate.Project_Type!=4){
                 $('#div_Income_Certificate').hide();
                 $('#div_Education_Mark_Sheet').hide();
             }
-            if(data.Candidate.Project_Type!=4){
+            if(data.Candidate.Project_Type!=2){
                 $('#div_Signed_MoU').hide();
                 $('#div_Age_proof').hide();
                 $('#div_Educational_qualification_Proof').hide();

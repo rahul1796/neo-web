@@ -5934,12 +5934,13 @@ class upload_bulk_upload(Resource):
 
                     for i in img_column.split(','):
                         df[i]=df[i].map(lambda x: x if (x=='' or pd.isna(x)) else ','.join([filename_prefix+j for j in x.split(',')]))
+                    
                     if set(all_image_files)==set(df_all_image):
                         out = Database.registration_web_inser(df,user_id,ProjectType)
-                    elif set(all_image_files)>set(df_all_image):
-                        out = {"Status":False, "message":"images name not used in excel" }
+                    elif (set(all_image_files)-set(df_all_image))!={}:
+                        out = {"Status":False, "message":"Unable to upload {} ,image name missing in the excel template.".format(','.join(set(all_image_files)-set(df_all_image)))}
                     else:
-                        out = {"Status":False, "message":"images not available" }
+                        out = {"Status":False, "message":"No such image found : {}".format(','.join(set(df_all_image)-set(all_image_files)))}
                     return out
             
             elif cand_stage==str(3):
@@ -6218,11 +6219,10 @@ class upload_bulk_upload(Resource):
                     for i in img_column.split(','):
                         df_all_image += df[i].tolist()
                     df_all_image = list(filter(lambda x: ((x!='') and (not(pd.isna(x)))), df_all_image))
-                    df_all_image = ','.join(df_all_image).split(',')
-
+                    df_all_image = df_all_image if df_all_image==[] else ','.join(df_all_image).split(',')
                     for i in img_column.split(','):
                         df[i]=df[i].map(lambda x: x if (x=='' or pd.isna(x)) else ','.join([filename_prefix+j for j in x.split(',')]))
-
+                    #print(str(set(df_all_image)) + ',' + str(set(all_image_files)))
                     if set(all_image_files)==set(df_all_image):
                         if ProjectType==2:
                             errors = schema_MCL.validate(df_MCL)
@@ -6236,7 +6236,8 @@ class upload_bulk_upload(Resource):
                                 out = Database.enrollment_web_inser(df,user_id,ProjectType,df_MCL)
                         else:
                             out = Database.enrollment_web_inser(df,user_id,ProjectType)
-                    elif set(all_image_files)>set(df_all_image):
+                    
+                    elif (set(all_image_files)-set(df_all_image))!={}:
                         out = {"Status":False, "message":"Unable to upload {} ,image name missing in the excel template.".format(','.join(set(all_image_files)-set(df_all_image)))}
                     else:
                         out = {"Status":False, "message":"No such image found : {}".format(','.join(set(df_all_image)-set(all_image_files)))}
