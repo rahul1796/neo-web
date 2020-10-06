@@ -144,7 +144,6 @@ function toggleCheckbox(e)
         }   
     }
 }   
-    
     function UploadFileToProcess(xls_file,all_file_names)
     {
         UploadFileData_s3(xls_file,xls_file.name)
