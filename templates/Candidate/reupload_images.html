@@ -39,6 +39,7 @@ var Candidates = {};
     });
     function UploadFileData_s3(file,file_name)
     {
+        console.log(file_name)
         var fileExtension = ['xlsx'];
         var s3_path="neo_app/images/";
         if (fileExtension.includes(file_name.split('.').pop().toLowerCase())){
@@ -162,6 +163,7 @@ var Candidates = {};
     return false;
     }
     function Upload_image(id){
+        console.log(id)
         var validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
         var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_'
         var filename = ''
@@ -220,7 +222,9 @@ var Candidates = {};
                 success: function(data) 
                 {   
                     if (id!=2){
-                    UploadFileData_s3(file,file.names);
+                    //console.log(file)
+                    file = document.getElementById('myFile'+id).files[0]
+                    UploadFileData_s3(file,filename);
                     }
                     else{
                         for (var x = 0; x < ins; x++) {

@@ -5309,7 +5309,7 @@ SELECT					cb.name as candidate_name,
         con.close()
         return {'data':data,'columns':columns}
 
-    def registration_web_inser(df,user_id,ProjectType):
+    def registration_web_inser(df,user_id,ProjectType,df_she=[]):
         try:
             con = pyodbc.connect(conn_str)
             cur = con.cursor()
@@ -5330,6 +5330,19 @@ SELECT					cb.name as candidate_name,
             quer4 = '''
             update candidate_details.tbl_candidate_dell_details set	[Educational Marksheet]='{}', [Aspirational District]='{}', [Income Certificate]='{}', created_by={}, created_on=GETDATE(), is_active=1 where	candidate_id='{}' 
             '''
+            quer7_res=''
+            if (ProjectType==2):
+                out_she = df_she.values.tolist()
+                quer7 = '''
+                update candidate_details.tbl_candidate_she_details set [Date of birth (age between 18 to 40)]='{}',[Are you 8th Pass?]='{}',[Are you able to read and write local language?]='{}',[Do you have a smart phone?]='{}',[Are you willing to buy a smartphone?]='{}',
+                [Do you own two wheeler?]='{}',[Do you have any work experience in the past?]='{}',[Will you able to work full time or at least 6 hours a day?]='{}',[Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?]='{}',
+                [Are you willing to travel from one place to another within panchayat?]='{}',[Are you willing to work and sign the work contract with LN?]='{}',[Are you willing to adopt digital transactions in your business?]='{}',[Do you have a bank account?]='{}',
+                [Have you availed any loan in the past?]='{}',[Do you have any active loan?]='{}',[Are you willing to take up a loan to purchase tools and consumables?]='{}',[Are you covered under any health insurance?]='{}',[Are you allergic to any chemicals and dust?]='{}',
+                [Are you willing to follow  Environment, Health and Safety Norms in your business?]='{}',[Have you ever been subjected to any legal enquiry for Non ethical work/business?]='{}',result='{}'
+                where candidate_id={}
+                '''
+                for row_she in out_she:
+                    quer7_res += '\n' + quer7.format(row_she[4],row_she[5],row_she[6],row_she[7],row_she[8],row_she[9],row_she[10],row_she[11],row_she[12],row_she[13],row_she[14],row_she[15],row_she[16],row_she[17],row_she[18],row_she[19],row_she[20],row_she[21],row_she[22],row_she[23],row_she[24],row_she[0])
 
             query = ""
             for row in out:
@@ -5339,6 +5352,8 @@ SELECT					cb.name as candidate_name,
                 query += '\n' + quer3.format(row[24],row[25],row[26],row[27],row[33],row[34],row[35],row[36],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[0])
                 if ProjectType==1:
                     query += '\n' + quer4.format(row[58],row[59],row[60],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[0])
+                elif ProjectType==2:
+                    query += quer7_res
             #print(query)
             cur.execute(query)
             cur.commit()
@@ -5385,19 +5400,6 @@ SELECT					cb.name as candidate_name,
             [Farm land]='{}',Others='{}',[Address as per Aadhar Card (incl pin code)]='{}',[Educational qualification]='{}',[Age proof]='{}',[Signed MoU]='{}',[MoU signed date]='{}'
             where candidate_id={}
             '''
-            quer7_res=''
-            if (ProjectType==2):
-                out_she = df_she.values.tolist()
-                quer7 = '''
-                update candidate_details.tbl_candidate_she_details set [Date of birth (age between 18 to 40)]='{}',[Are you 8th Pass?]='{}',[Are you able to read and write local language?]='{}',[Do you have a smart phone?]='{}',[Are you willing to buy a smartphone?]='{}',
-                [Do you own two wheeler?]='{}',[Do you have any work experience in the past?]='{}',[Will you able to work full time or at least 6 hours a day?]='{}',[Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?]='{}',
-                [Are you willing to travel from one place to another within panchayat?]='{}',[Are you willing to work and sign the work contract with LN?]='{}',[Are you willing to adopt digital transactions in your business?]='{}',[Do you have a bank account?]='{}',
-                [Have you availed any loan in the past?]='{}',[Do you have any active loan?]='{}',[Are you willing to take up a loan to purchase tools and consumables?]='{}',[Are you covered under any health insurance?]='{}',[Are you allergic to any chemicals and dust?]='{}',
-                [Are you willing to follow  Environment, Health and Safety Norms in your business?]='{}',[Have you ever been subjected to any legal enquiry for Non ethical work/business?]='{}',result='{}'
-                where candidate_id={}
-                '''
-                for row_she in out_she:
-                    quer7_res += '\n' + quer7.format(row_she[4],row_she[5],row_she[6],row_she[7],row_she[8],row_she[9],row_she[10],row_she[11],row_she[12],row_she[13],row_she[14],row_she[15],row_she[16],row_she[17],row_she[18],row_she[19],row_she[20],row_she[21],row_she[22],row_she[23],row_she[24],row_she[0])
             query = ""
             b=[]
             temp=""
@@ -5423,7 +5425,7 @@ SELECT					cb.name as candidate_name,
                 query += '\n' + quer1.format(1 if str(row[1]).lower()=='Fresher' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[10],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[82]),row[0])
                 query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[23],row[32],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[55],row[56],row[61],row[62],row[63],row[64],row[69],row[70],row[71],row[72],row[73],row[74],row[78],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[82]),row[83],row[81],row[0])
                 query += '\n' + quer3.format(row[24],row[25],row[26],row[27],row[33],row[34],row[35],row[36],row[57],row[58],row[59],row[60],row[65],row[66],row[67],row[68],row[75],row[76],row[77],row[79],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[82]),row[0])
-            query += quer7_res
+            
             #print(query)
             curs.execute(query)
             curs.commit()
