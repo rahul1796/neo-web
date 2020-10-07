@@ -28,11 +28,12 @@ var Candidates = {};
             }
             else if (candidate_stage_id==3){
                 $('#form1').attr('action', '/enrollment');
-                $('#div_Income_Certificate').hide();
-                $('#div_Education_Mark_Sheet').hide();
-                $('#div_Identity_Image').hide();
-                $('#div_Aadhar_Image').hide();
-                $('#div_candidate_photo').hide();
+
+                // $('#div_Income_Certificate').hide();
+                // $('#div_Education_Mark_Sheet').hide();
+                // $('#div_Identity_Image').hide();
+                // $('#div_Aadhar_Image').hide();
+                // $('#div_candidate_photo').hide();
             }
         }
         download_images();
@@ -163,7 +164,6 @@ var Candidates = {};
     return false;
     }
     function Upload_image(id){
-        console.log(id)
         var validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
         var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_'
         var filename = ''
@@ -276,6 +276,19 @@ var Candidates = {};
             });
         }
     }
+function validate_upload(id){
+    if(document.getElementById('myFile'+id).files.length==0){
+        alert('please select a file');
+    }
+    else{
+        if (confirm("ADDING A NEW IMAGE WILL REPLACE THE EXISTING IMAGE. Click ok to Continue!")){
+            Upload_image(id);
+        }
+        else{
+            console.log('no upload')
+        }
+    }
+}
 </script>
 
 <div class="container-fluid">
@@ -309,7 +322,7 @@ var Candidates = {};
                             </div>
                             <div class="col-lg-6">
                                 <input style="float: left;cursor:pointer;margin-top:30px;" type="file" id="myFile1" name="filename">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(1)" id="btnUpload">Upload</button>
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(1)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div> 
@@ -324,7 +337,7 @@ var Candidates = {};
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile2" name="filename" style="float: left;cursor:pointer;margin-top:30px;" multiple>
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(2)" id="btnUpload">Upload</button>
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(2)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div>
@@ -338,7 +351,7 @@ var Candidates = {};
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile3" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(3)" id="btnUpload">Upload</button>
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(3)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div>
@@ -352,7 +365,7 @@ var Candidates = {};
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile4" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(4)" id="btnUpload">Upload</button>
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(4)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div> 
@@ -366,7 +379,7 @@ var Candidates = {};
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile5" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(5)" id="btnUpload">Upload</button>
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(5)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div>
@@ -380,7 +393,7 @@ var Candidates = {};
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile6" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(6)" id="btnUpload">Upload</button>
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(6)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div>
@@ -394,7 +407,7 @@ var Candidates = {};
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile7" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(7)" id="btnUpload">Upload</button>
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(7)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div> 
@@ -408,7 +421,7 @@ var Candidates = {};
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile8" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(8)" id="btnUpload">Upload</button>
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(8)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div>
@@ -422,7 +435,7 @@ var Candidates = {};
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile9" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(9)" id="btnUpload">Upload</button>
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(9)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div>
