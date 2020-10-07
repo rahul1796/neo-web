@@ -5978,6 +5978,7 @@ class upload_bulk_upload(Resource):
                                 pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
                                 out = {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name)}
                             else:
+                                df_MCL['Result']=df_MCL['Result'].map(lambda x:1 if x.lower()=='pass' else 0)
                                 out = Database.registration_web_inser(df,user_id,ProjectType,df_MCL)
                         else:
                             out = Database.registration_web_inser(df,user_id,ProjectType)

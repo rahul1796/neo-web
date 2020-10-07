@@ -25,9 +25,16 @@ var Candidates = {};
                 $('#div_Age_proof').hide();
                 $('#div_Educational_qualification_Proof').hide();
                 $('#div_Bank_Account_Copy').hide();
+
+                document.getElementById('headerurl').innerHTML ="Registration"
+                $("#headerurl").attr("href", "/registration");
             }
             else if (candidate_stage_id==3){
                 $('#form1').attr('action', '/enrollment');
+
+                document.getElementById('headerurl').innerHTML ="Enrollment"
+                $("#headerurl").attr("href", "/enrollment");
+                
 
                 // $('#div_Income_Certificate').hide();
                 // $('#div_Education_Mark_Sheet').hide();
@@ -298,7 +305,8 @@ function validate_upload(id){
             <div class="page-title-box">
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="javascript: void(0);">NEO</a></li>
+                        <li class="breadcrumb-item"><a href="/">NEO</a></li>
+                        <li class="breadcrumb-item"><a id="headerurl" href="/"></a></li>
                         <li class="breadcrumb-item active">Reupload Images</li>
                     </ol>
                 </div>
@@ -318,7 +326,7 @@ function validate_upload(id){
                                 <label for="ur_candidate_photo">Candidate Photo</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_candidate_photo" name="ur_candidate_photo" src="" alt="Candidate Photo" style="float:left;width:100%;">
+                                <img id="ur_candidate_photo" name="ur_candidate_photo" src="static\assets\images\noimage2.png" alt="Candidate Photo" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
                                 <input style="float: left;cursor:pointer;margin-top:30px;" type="file" id="myFile1" name="filename">
@@ -328,12 +336,12 @@ function validate_upload(id){
                     </div> 
                     <div class="form-group" id="div_Aadhar_Image">
                         <div class="row">
-                            <div class="col-lg-3">
+                            <div class="col-lg-2">
                                 <label for="ur_Aadhar_Image">Aadhar Image</label>
                             </div>
-                            <div class="col-lg-3">
-                                <img id="ur_Aadhar_Image1" name="ur_Aadhar_Image1" src="" alt="Aadhar Image" style="float:left;width:50%;padding: 5px;">
-                                <img id="ur_Aadhar_Image2" name="ur_Aadhar_Image2" src="" alt="Aadhar Image" style="float:left;width:50%;padding: 5px;"> <!-- width:128px;height:128px; -->
+                            <div class="col-lg-4">
+                                <img id="ur_Aadhar_Image1" name="ur_Aadhar_Image1" src="static\assets\images\noimage2.png" alt="Aadhar Image" style="float:left;width:50%;padding: 5px;">
+                                <img id="ur_Aadhar_Image2" name="ur_Aadhar_Image2" src="static\assets\images\noimage2.png" alt="Aadhar Image" style="float:left;width:50%;padding: 5px;"> <!-- width:128px;height:128px; -->
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile2" name="filename" style="float: left;cursor:pointer;margin-top:30px;" multiple>
@@ -347,7 +355,7 @@ function validate_upload(id){
                                 <label for="ur_Identity_Image">Identity Image</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_Identity_Image" name="ur_Identity_Image" src="" alt="Identity Image" style="float:left;width:100%;">
+                                <img id="ur_Identity_Image" name="ur_Identity_Image" src="static\assets\images\noimage2.png" alt="Identity Image" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile3" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
@@ -361,7 +369,7 @@ function validate_upload(id){
                                 <label for="ur_Education_Mark_Sheet">Education Mark Sheet</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_Education_Mark_Sheet" name="ur_Education_Mark_Sheet" src="" alt="Education Mark Sheet" style="float:left;width:100%;">
+                                <img id="ur_Education_Mark_Sheet" name="ur_Education_Mark_Sheet" src="static\assets\images\noimage2.png" alt="Education Mark Sheet" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile4" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
@@ -375,7 +383,7 @@ function validate_upload(id){
                                 <label for="ur_Income_Certificate">Income Certificate</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_Income_Certificate" name="ur_Income_Certificate" src="" alt="Income Certificate" style="float:left;width:100%;">
+                                <img id="ur_Income_Certificate" name="ur_Income_Certificate" src="static\assets\images\noimage2.png" alt="Income Certificate" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile5" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
@@ -389,7 +397,7 @@ function validate_upload(id){
                                 <label for="ur_Bank_Account_Copy">Bank Account Copy</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_Bank_Account_Copy" name="ur_Bank_Account_Copy" src="" alt="Bank Account Copy" style="float:left;width:100%;">
+                                <img id="ur_Bank_Account_Copy" name="ur_Bank_Account_Copy" src="static\assets\images\noimage2.png" alt="Bank Account Copy" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile6" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
@@ -403,7 +411,7 @@ function validate_upload(id){
                                 <label for="ur_Educational_qualification_Proof">Educational qualification Proof</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_Educational_qualification_Proof" name="ur_Educational_qualification_Proof" src="" alt="Educational qualification Proof" style="float:left;width:100%;">
+                                <img id="ur_Educational_qualification_Proof" name="ur_Educational_qualification_Proof" src="static\assets\images\noimage2.png" alt="Educational qualification Proof" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile7" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
@@ -417,7 +425,7 @@ function validate_upload(id){
                                 <label for="ur_Age_proof">Age proof</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_Age_proof" name="ur_Age_proof" src="" alt="Age proof" style="float:left;width:100%;">
+                                <img id="ur_Age_proof" name="ur_Age_proof" src="static\assets\images\noimage2.png" alt="Age proof" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile8" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
@@ -431,7 +439,7 @@ function validate_upload(id){
                                 <label for="ur_Signed_MoU">Signed MoU</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_Signed_MoU" name="ur_Signed_MoU" src="" alt="Signed MoU" style="float:left;width:100%;">
+                                <img id="ur_Signed_MoU" name="ur_Signed_MoU" src="static\assets\images\noimage2.png" alt="Signed MoU" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile9" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
