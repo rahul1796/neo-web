@@ -46,7 +46,7 @@ def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date):
 
         msg['From'] = "do-not-reply@labournet.in"
         msg['To'] = config.NAVRITI_SPOC_EMAIL
-        msg['Cc'] = 'prakashchaudhary.navriti@gmail.com;prakashchaudhary13@gmail.com'
+        msg['Cc'] = ','.join(config.NAVRITI_ASSESSMENT_EMAIL_CC)
         msg['Subject'] = "LN NEO - An Assessment Has Been Scheduled For Batch - "+str(SDMSBatchId)
 
         html_msg= config.html_email_msg_uap_batch_creation
