@@ -46,13 +46,14 @@ def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date):
 
         msg['From'] = "do-not-reply@labournet.in"
         msg['To'] = config.NAVRITI_SPOC_EMAIL
+        msg['Cc'] = 'prakashchaudhary.navriti@gmail.com;prakashchaudhary13@gmail.com'
         msg['Subject'] = "LN NEO - An Assessment Has Been Scheduled For Batch - "+str(SDMSBatchId)
 
         html_msg= config.html_email_msg_uap_batch_creation
         html_msg = html_msg.format('Navriti Assessment Team',RequestId,SDMSBatchId,requested_date)
 
         msg.attach(MIMEText(html_msg, 'html'))
-        res = server.sendmail(msg['From'], msg['To'], msg.as_string())
+        res = server.sendmail(msg['From'], [msg['To']] + config.NAVRITI_ASSESSMENT_EMAIL_CC , msg.as_string())
         server.quit()
 
         return {'status':True,'description':'Email sent'}

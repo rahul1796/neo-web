@@ -4131,8 +4131,9 @@ SELECT					cb.name as candidate_name,
                     uap_api=UAP_API_BASE_URL + 'CreateNeoSkillsBatchJSONRequest?JSONRequest='+json_data
                     x = requests.get(uap_api)
                     data = x.json()
-                    if  str(data['CreateNeoSkillsBatch']['Succsess']) == "True":
-                        sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId,requested_date)                 
+                    if 'CreateNeoSkillsBatch' in data:
+                        if  str(data['CreateNeoSkillsBatch']['Succsess']) == "True":
+                            sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId,requested_date)                 
                     
             
             else:
