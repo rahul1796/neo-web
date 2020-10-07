@@ -5995,7 +5995,7 @@ class upload_bulk_upload(Resource):
                 else:
                     candidate_photo = 'Candidate Photo'
                 if ProjectType==2:
-                    img_column = 'Attachment*,'+ candidate_photo +',Education qualification Proof,Age Proof,Signed Mou*'
+                    img_column = 'Bank Copy*,'+ candidate_photo +',Education qualification Proof,Age Proof,Signed Mou*'
                     df= pd.read_excel(file_name,sheet_name='Enrollment',header=1)
                     df = df.fillna('')
                     df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
@@ -6095,7 +6095,7 @@ class upload_bulk_upload(Resource):
                         Column('Enrolled_By*',email_validation + str_validation),
                         #SHE PRORJECT
                         Column('Candidate Photo*',str_validation + null_validation),
-                        Column('Attachment*',str_validation + null_validation),
+                        Column('Bank Copy*',str_validation + null_validation),
                         Column('Bank Name*',str_validation + null_validation),
                         Column('Account Number*',str_validation + null_validation),
 
@@ -6118,7 +6118,7 @@ class upload_bulk_upload(Resource):
                         Column('Mou Signed Date',null_validation)
                         ])
                 else:
-                    img_column = 'Attachment,'+ candidate_photo
+                    img_column = 'Bank Copy,'+ candidate_photo
                     df= pd.read_excel(file_name,sheet_name='Enrollment')
                     df = df.fillna('')
                     df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
@@ -6150,7 +6150,7 @@ class upload_bulk_upload(Resource):
                         Column('Branch Name',null_validation),
                         Column('Branch Code',null_validation),
                         Column('Account type',null_validation),
-                        Column('Attachment',null_validation),
+                        Column('Bank Copy',null_validation),
                         Column('Candidate Photo') if ProjectType==1 else Column('Candidate Photo*',str_validation+null_validation),
                         Column('Document copy'),
                         Column('Bank Name'),
@@ -6508,7 +6508,7 @@ class DownloadEnrTemplate(Resource):
                         'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 
                         'Expected CTC*', 'Highest Qualification*', 'Stream/Specialization*', 'Name of Institute', 'University', 'Year Of Pass', 'Percentage', 'Computer Knowledge*', 'Technical Knowledge*', 'family_Salutation*', 'Member Name*', 
                         'Date Of birth', 'Age', 'Primary contact', 'Email Address', 'family_Gender*', 'Education Qualification*', 'Relationship*', 'Occupation', 'Average Household Income*', 'Bank Name', 'Branch Name', 'Branch Code', 
-                        'Account type', 'Account Number', 'Attachment', 'batch_id*', 'Aadhar Image', 'Enrolled_By*', 'Whatsapp Number']
+                        'Account type', 'Account Number', 'Bank Copy', 'batch_id*', 'Aadhar Image', 'Enrolled_By*', 'Whatsapp Number']
                         col += []
                         Column += []
                         #df = df.iloc[:,:83]
@@ -6522,7 +6522,7 @@ class DownloadEnrTemplate(Resource):
                         'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 
                         'Expected CTC*', 'Highest Qualification*', 'Stream/Specialization*', 'Name of Institute', 'University', 'Year Of Pass', 'Percentage', 'Computer Knowledge*', 'Technical Knowledge*', 'family_Salutation*', 'Member Name*', 
                         'Date Of birth', 'Age', 'Primary contact', 'Email Address', 'family_Gender*', 'Education Qualification*', 'Relationship*', 'Occupation', 'Average Household Income*', 'Bank Name*', 'Branch Name', 'Branch Code', 
-                        'Account type', 'Account Number*', 'Attachment*', 'batch_id*', 'Aadhar Image', 'Enrolled_By*', 'Whatsapp Number']
+                        'Account type', 'Account Number*', 'Bank Copy*', 'batch_id*', 'Aadhar Image', 'Enrolled_By*', 'Whatsapp Number']
 
                         col += resp['columns'][84:]
                         Column += ['Rented Or Own House?', 'Size Of The House', 'Ration Card (Apl Or Bpl)', 'Tv', 'Refrigerator', 'Washing Machine', 'Ac /Cooler', 'Car', 'Medical Insurance', 'Life Insurance', 
@@ -6536,7 +6536,7 @@ class DownloadEnrTemplate(Resource):
                         'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 
                         'Expected CTC*', 'Highest Qualification*', 'Stream/Specialization*', 'Name of Institute', 'University', 'Year Of Pass', 'Percentage', 'Computer Knowledge*', 'Technical Knowledge*', 'family_Salutation*', 'Member Name*', 
                         'Date Of birth', 'Age', 'Primary contact', 'Email Address', 'family_Gender*', 'Education Qualification*', 'Relationship*', 'Occupation', 'Average Household Income*', 'Bank Name', 'Branch Name', 'Branch Code', 
-                        'Account type', 'Account Number', 'Attachment', 'batch_id*', 'Aadhar Image', 'Enrolled_By*', 'Whatsapp Number']
+                        'Account type', 'Account Number', 'Bank Copy', 'batch_id*', 'Aadhar Image', 'Enrolled_By*', 'Whatsapp Number']
                         #df = df.iloc[:,:83]
                         filename = 'CandidateBulkUpload_Enrollment_'
 
