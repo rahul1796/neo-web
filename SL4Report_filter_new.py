@@ -224,8 +224,8 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
             for col_num, value in enumerate(header):
                 worksheet.write(0, col_num, value, header_format)
         
-
-        if  set('305,339'.split(',')) >= set(Customers.split(',')):
+        
+        if  set(config.dell_type_customer.split(',')) >= set(Customers.split(',')):
             #print('dell')
             t4 = threading.Thread(target=trainee_dell_tracker_fxn)
             t5 = threading.Thread(target=trainee_dell_tracker2_fxn)

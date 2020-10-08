@@ -2,52 +2,7 @@ var varTable;
 var varTable1;
 var flag = "";
 var role_id;
-
-function UploadFileData()
-{   
-    if ($('#myFile').get(0).files.length === 0) {
-        console.log("No files selected.");
-    }
-    else
-    {
-        UploadFileToProcess();
-    }
-}
-/*
-        var fileExtension = ['xlsx']
-        if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
-            alert("Formats allowed are : "+fileExtension.join(', '));
-            return false;
-        }
-        else
-        {
-            $("#imgSpinner1").show();
-
-            var files=document.getElementById("myFile").files;
-            var file=files[0];
-
-            var file_path=$('#hdn_AWS_S3_path').val()+"bulk_upload/candidate/mobilization/" + $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + file.name; 
-            var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
-            
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET",api_url );
-                xhr.onreadystatechange = function(){
-                    if(xhr.readyState === 4){
-                    if(xhr.status === 200){
-                        var response = JSON.parse(xhr.responseText);
-                        //console.log(response);
-                        uploadFileToS3(file, response.data, response.url);
-                    }
-                    else{
-                        alert("Could not get signed URL.");
-                    }
-                    }
-                };
-                xhr.send();
-            
-        }
-    }
-}
+var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_'
 
 function uploadFileToS3(file, s3Data, url){
     var xhr = new XMLHttpRequest();
@@ -63,8 +18,8 @@ function uploadFileToS3(file, s3Data, url){
         if(xhr.readyState === 4){
         if(xhr.status === 200 || xhr.status === 204){
             var response = xhr;
-            //console.log(response);
-            UploadFileToProcess();
+            console.log(response);
+            //UploadFileToProcess();
         }
         else{
             alert("Could not upload file to s3.");
@@ -73,13 +28,62 @@ function uploadFileToS3(file, s3Data, url){
     };
     xhr.send(postData);
 }
-*/
-function UploadFileToProcess()
+
+function UploadFileData_s3(file,file_name)
 {
-var form_data = new FormData($('#formUpload')[0]);
+    var fileExtension = ['xlsx'];
+    var s3_path="neo_app/images/"
+    if (fileExtension.includes(file_name.split('.').pop().toLowerCase())){
+        s3_path ="bulk_upload/candidate/mobilization/" + filename_prefix
+    }
+    var file_path=$('#hdn_AWS_S3_path').val()+ s3_path + file_name;
+    var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET",api_url );
+        xhr.onreadystatechange = function(){
+            if(xhr.readyState === 4){
+            if(xhr.status === 200){
+                var response = JSON.parse(xhr.responseText);
+                console.log(response);
+                uploadFileToS3(file, response.data, response.url);
+            }
+            else{
+                alert("Could not get signed URL.");
+            }
+            }
+        };
+        xhr.send();
+}
+function UploadFileData()
+{   
+    var fileExtension = ['xlsx']
+    if ($('#myFile').get(0).files.length === 0) {
+        console.log("No files selected.");
+    }
+    else if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+        alert("Formats allowed are : "+fileExtension.join(', '));
+        return false;
+    }
+    else
+    {
+        $("#imgSpinner1").show();
+        var file=document.getElementById("myFile").files[0];
+        UploadFileToProcess(file,'');
+    }
+}
+
+function UploadFileToProcess(xls_file,all_file_names)
+{
+UploadFileData_s3(xls_file,xls_file.name)
+var form_data = new FormData(); //$('#formUpload')[0]
+form_data.append('filename',xls_file);
 form_data.append('cand_stage',1);
 form_data.append('user_id',$('#hdn_home_user_id_modal').val());
 form_data.append('user_role_id',$('#hdn_home_user_role_id_modal').val());
+form_data.append('ProjectType',$('#hdn_ProjectType_modal').val());
+form_data.append('All_Filenames',all_file_names.toString());
+form_data.append('filename_prefix',filename_prefix.toString());
 $.ajax({
     type: 'POST',
     url: $('#hdn_web_url').val()+ "/upload_bulk_upload",
@@ -135,10 +139,13 @@ $.ajax({
     }
 });
 }
-   
-function Uploadfile(){
+
+function Uploadfile(project_type){
     $('#hdn_home_user_id_modal').val($('#hdn_home_user_id').val());
     $('#hdn_home_user_role_id_modal').val($('#hdn_home_user_role_id').val());
+    $('#hdn_ProjectType_modal').val(project_type);
+
+    $('#mdl_project_type').modal('hide');
     $('#mdl_bulkupload_candidate').modal('show');
 }
 function Loadcreatedbyddl(){
@@ -288,6 +295,8 @@ function LoadTable()
                 d.MinAge  = $('#MinAge').val();
                 d.MaxAge  = $('#MaxAge').val();
                 d.created_by  = $('#ddlcreated_by').val().toString();
+                d.FromDate  = $('#FromDate').val();
+                d.ToDate  = $('#ToDate').val();
             },
             error: function (e) {
                 $("#tbl_candidate tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -368,9 +377,10 @@ function CandidateContactDetails(primary_contact,SecondaryContact,Email,PresnetA
     $('#mdl_cand_contact').modal('show');
 }
 
-function DownloadMobTemplate(){
+function DownloadMobTemplate(Project_Tpye){
+    $('#mdl_project_type').modal('hide');
+    console.log(Project_Tpye)
     $("#imgSpinner").show();
-    
     if (0==9){
     console.log(false)
     }
@@ -385,7 +395,8 @@ function DownloadMobTemplate(){
                             //candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
                             
                             'user_id':$('#hdn_home_user_id').val(),
-                            'user_role_id':$('#hdn_home_user_role_id').val()
+                            'user_role_id':$('#hdn_home_user_role_id').val(),
+                            'Project_Tpye':Project_Tpye
                     },
                     success: function(resp) 
                     {
@@ -453,3 +464,18 @@ function ForceDownload(varUrl, varFileName)
             link.click();
             document.body.removeChild(link);
         }
+
+function select_Project_Type(a){
+    //DownloadMobTemplate, Uploadfile
+    $('#hdn_upload_download_report').val(a)
+    $('#mdl_project_type').modal('show');
+}
+function LoadProjectPage(){
+    if ($('#hdn_upload_download_report').val()==0){
+        DownloadMobTemplate($('#ddlProjectType').val())
+    }
+    else{
+        Uploadfile($('#ddlProjectType').val())
+        //UploadFileData($('#ddlProjectType').val())
+    }
+}

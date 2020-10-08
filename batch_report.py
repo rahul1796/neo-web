@@ -33,9 +33,9 @@ def create_report(batch_id, user_id, user_role_id, status, customer, project, su
         data = list(map(lambda x:list(x), data))
         #print(len(data))
         df = pd.DataFrame(data, columns=columns)
-        df = df[['Batch_Id','Batch_Name','Batch_Code','Candidate_Count','Product_Name','Center_Name','Course_Name','Customer_Name',
+        df = df[['Batch_Id','Batch_Name','Batch_Code','Planned_Batch_Code','Candidate_Count','Product_Name','Center_Name','Course_Name','Customer_Name',
         'Contract_Name','Project_Name','Sub_Project_Name','Trainer_Email', 'Center_Manager_Email', 'Start_Date', 'End_Date','Status']]
-        columns = ['Batch_Id','Batch_External_Code','Batch_Code','Candidate_Count','Product_Name','Center_Name','Course_Name','Customer_Name',
+        columns = ['Batch_Id','Batch_External_Code','Batch_Code','Planned_Batch_Code','Candidate_Count','Product_Name','Center_Name','Course_Name','Customer_Name',
         'Contract_Name','Project_Name','Sub_Project_Name','Trainer_Email', 'Center_Manager_Email', 'Start_Date', 'End_Date','Status']
         df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Batch_Report') 
 

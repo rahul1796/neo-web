@@ -21,10 +21,10 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
     try:
         base_url = config.Base_URL
         
-        log_image = '/data/TMA/trainer_stage_images/'
-        attendance_image = '/data/TMA/attendance_images/'
-        attendance_url = base_url + attendance_image
-        log_url = base_url + log_image
+        # log_image = '/data/TMA/trainer_stage_images/'
+        # attendance_image = '/data/TMA/attendance_images/'
+        # attendance_url = base_url + attendance_image
+        # log_url = base_url + log_image
         conn_str = config.conn_str
 
         name_withpath = config.neo_report_file_path + 'report file/'+ name
@@ -57,13 +57,13 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
             data = curs.fetchall()
             data = list(map(lambda x:list(x), data))
             df = pd.DataFrame(data)
-            df.iloc[:,17] = df.iloc[:,17].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + log_url + x + '","View Image")')
+            df.iloc[:,17] = df.iloc[:,17].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + base_url + '/GetDocumentForExcel?image_name=' + x +'&image_path=trainer_stage_images' + '","View Image")')
             df.iloc[:,18] = df.iloc[:,18].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
-            df.iloc[:,20] = df.iloc[:,20].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + log_url + x + '","View Image")')
+            df.iloc[:,20] = df.iloc[:,20].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + base_url + '/GetDocumentForExcel?image_name=' + x +'&image_path=trainer_stage_images' + '","View Image")')
             df.iloc[:,21] = df.iloc[:,21].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
-            df.iloc[:,23] = df.iloc[:,23].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + log_url + x + '","View Image")')
+            df.iloc[:,23] = df.iloc[:,23].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + base_url + '/GetDocumentForExcel?image_name=' + x +'&image_path=trainer_stage_images' + '","View Image")')
             df.iloc[:,24] = df.iloc[:,24].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
-            df.iloc[:,26] = df.iloc[:,26].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + log_url + x + '","View Image")')
+            df.iloc[:,26] = df.iloc[:,26].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + base_url + '/GetDocumentForExcel?image_name=' + x +'&image_path=trainer_stage_images' + '","View Image")')
             df.iloc[:,27] = df.iloc[:,27].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
             
             df.to_excel(writer, index=None, header=None, startrow=2 ,sheet_name='Stage-Log')
@@ -119,8 +119,7 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
             data = list(map(lambda x:list(x), data))
             df = pd.DataFrame(data)
             df.columns = attendance_default_column
-            df['ATTENDANCE IMAGE'] = df.loc[:,'ATTENDANCE IMAGE'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + attendance_url + x + '","View Image")')
-
+            df['ATTENDANCE IMAGE'] = df.loc[:,'ATTENDANCE IMAGE'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + base_url + '/GetDocumentForExcel?image_name=' + x +'&image_path=attendance_images' + '","View Image")')
             df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Candidate-Attendance')
 
             worksheet = writer.sheets['Candidate-Attendance']

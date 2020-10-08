@@ -284,7 +284,7 @@ function LoadTable()
             { "orderable":false,
                 "data": function(row, type, val, meta) {
                     var varButtons='';
-                    if($('#hdn_home_user_role_id').val()!='25'  & row.Summative_Count==0)
+                    if($('#hdn_home_user_role_id').val()!='25' & $('#hdn_home_user_role_id').val()!='28'  & row.Summative_Count==0)
                     {
                         if($('#hdn_home_user_role_id').val()!='37')
                             varButtons+='<a onclick="ScheduleAssessmentModal(\'' + row.Batch_Id + '\',\'' + row.Batch_Code + '\',\'' + row.Mobilization_Type + '\')" class="btn" style="cursor:pointer" ><i title="Schedule Assessment" class="fe-edit" ></i></a>';
@@ -902,7 +902,7 @@ function add_map_message(){
                             for(var i=0;i<count;i++)
                             {   var txt=''
                                 var attempt=''
-                                if(!($("#hdn_home_user_role_id ").val() == "25" & data.Assessments[i].Assessment_Agency_Id==1))
+                                if(!($("#hdn_home_user_role_id ").val() == "25"  & data.Assessments[i].Assessment_Agency_Id==1))
                                 {
                                     varHtml+='<tr>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].S_No +'</td>';
@@ -920,7 +920,7 @@ function add_map_message(){
                                     }                                     
                                     if ((data.Assessments[i].Assessment_Stage_Id>=3 & $('#hdn_home_user_role_id').val()!='25')  )
                                         txt+='<a onclick="Reassessment(\'' + data.Assessments[i].Assessment_Id + '\',\''+ data.Assessments[i].Batch_Id +'\',\''+ data.Assessments[i].Partner_Category_Id +'\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Schedule Reassessment" class="fe-edit" ></i></a>';
-                                    if($('#hdn_home_user_role_id').val()!='37')
+                                    if($('#hdn_home_user_role_id').val()!='37' & $('#hdn_home_user_role_id').val()!='28')
                                         varHtml+='  <td style="text-align:center;">'+ txt +'</td>';
                                     else
                                         varHtml+='  <td style="text-align:center;">'+ ''+'</td>';
@@ -976,7 +976,8 @@ function add_map_message(){
         $('#DivAssessorName').hide();
         $('#DivAssessorMob').hide();
         $('#DivAssessorEmail').hide();
-        $('#DivCandidates').hide();
+        $('#DivCandidates').show();
+        AbsentCandidateBatch(BatchId,0,0);  
         $('#TxtScheduledDate').val('');
         $('#TxtAssessmnetDate').val('');
         $('#hdnMobilizationType').val(Mobilization_Type);
@@ -998,7 +999,8 @@ function add_map_message(){
         $('#DivAssessorName').hide();
         $('#DivAssessorMob').hide();
         $('#DivAssessorEmail').hide();
-        $('#DivCandidates').hide();
+        $('#DivCandidates').show();
+        AbsentCandidateBatch($('#hdn_batch_assessment_id').val(),AssessmentId,3); 
         $('#TxtScheduledDate').val('');
         $('#TxtAssessmnetDate').val('');
         $('#hdn_batch_assessment_id').val(BatchId);
@@ -1062,8 +1064,8 @@ function add_map_message(){
             $('#DivAssessorName').show();
             $('#DivAssessorMob').show();
             $('#DivAssessorEmail').show();
-            $('#DivCandidates').show();
-            AbsentCandidateBatch($('#hdn_batch_assessment_id').val(),$('#hdn_assessment_id').val());         
+            //$('#DivCandidates').show();
+            //AbsentCandidateBatch($('#hdn_batch_assessment_id').val(),$('#hdn_assessment_id').val(),StageId);         
         }
         else
         {
@@ -1392,7 +1394,7 @@ function add_map_message(){
             }
         });
     }
-    function AbsentCandidateBatch(BatchId,AssessmentId){
+    function AbsentCandidateBatch(BatchId,AssessmentId,StageId){
         flag='absent'
         $('#tbl_mark_absent_candidate').show();
         $('#tbl_mark_absent_candidate').dataTable().fnDestroy();    
@@ -1414,9 +1416,16 @@ function add_map_message(){
                     if (data.Candidates != null){
                         var count=data.Candidates.length;
                         if( count> 0)
-                        {
-                            $("#lblCandidateTable").text("Select Absent Candidates:");
-                            $("#thSelect").text("Select Absentees");
+                        {   if(StageId==0)
+                            {
+                                $("#lblCandidateTable").text("Select Not-Eligible Candidates for Assessment:");
+                                $("#thSelect").text("Select");
+                            }
+                            else{
+                                $("#lblCandidateTable").text("Select Candidates For Re-Assessment:");
+                                $("#thSelect").text("Select");
+                            }
+                            
                             for(var i=0;i<count;i++)
                             {   
                                 
@@ -1435,6 +1444,7 @@ function add_map_message(){
                                 varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Candidate_Name +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Mobile_Number +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Enrollment_Id +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Attempt +'</td>';
                                 varHtml+='</tr>';
 
                             }                        
@@ -1590,10 +1600,9 @@ function UploadFileData()
     }
     else
     {
-        UploadFileToProcess();
-    }
-}
-/*
+//        UploadFileToProcess();
+//    }
+//}
         var fileExtension = ['xlsx']
         if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
             alert("Formats allowed are : "+fileExtension.join(', '));
@@ -1652,7 +1661,7 @@ function uploadFileToS3(file, s3Data, url){
     };
     xhr.send(postData);
 }
-*/
+
 function UploadFileToProcess()
 {
     //console.log()
