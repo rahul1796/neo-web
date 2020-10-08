@@ -8031,7 +8031,7 @@ class GetDocumentForExcel(Resource):
             path = config.neo_report_file_path + 'data/TMA/' + image_path
             filename = '{}/{}'.format(path,image_name)
             if os.path.exists(filename):
-                filename = 'http://127.0.0.1:5000/data/TMA/' + image_path +'/{}'.format(image_name)
+                filename = config.Base_URL + '/data/TMA/' + image_path +'/{}'.format(image_name)
             else:
                 path = config.aws_location + 'tms/' + image_path +'/' + image_name
                 URL = config.COL_URL + 's3_signed_url_for_file_updated'
