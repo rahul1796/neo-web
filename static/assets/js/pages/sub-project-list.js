@@ -762,7 +762,8 @@ function GetUsers(SubProjectId,SubProjectName)
                             varHtml+='  <td style="text-align:center;">'+ data.Users[i].Mob +'</td>';  
                             varHtml+='  <td style="text-align:center;">'+ data.Users[i].Tr +'</td>';     
                             varHtml+='  <td style="text-align:center;">'+ data.Users[i].Mis +'</td>'; 
-                            varHtml+='  <td style="text-align:center;">'+ data.Users[i].Pco +'</td>'; 
+                            varHtml+='  <td style="text-align:center;">'+ data.Users[i].Pco +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Users[i].Po +'</td>'; 
                             varHtml+='</tr>';                            
                         }
                         $("#tbl_proj_Users tbody").append(varHtml);
@@ -1081,12 +1082,11 @@ function UploadFileData()
             return false;
         }
         else
-        {
-            UploadFileToProcess();
-        }
-    }
-}
-    /*
+        {          
+//            UploadFileToProcess();
+//        }
+//    }
+//}
             $("#imgSpinner1").show();
             var files=document.getElementById("myFile").files;
             var file=files[0];
@@ -1138,7 +1138,7 @@ function uploadFileToS3(file, s3Data, url){
     };
     xhr.send(postData);
 }
-*/
+
 function UploadFileToProcess()
 {
     //console.log()
