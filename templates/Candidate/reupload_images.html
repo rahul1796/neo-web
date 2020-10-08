@@ -137,8 +137,8 @@ var Candidates = {};
                     s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Identity_Image_Name;
                 }
                 if (data.Candidate.Educational_Marksheet!=''){
-                    console.log(data.Candidate.Educational_Marksheet)
-                    var s = document.getElementById('ur_Education_Mark_Sheet')
+                    alert(data.Candidate.Educational_Marksheet);
+                    var s = document.getElementById('ur_Education_Mark_Sheet');
                     s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Educational_Marksheet;
                 }
                 if (data.Candidate.Income_Certificate!=''){
