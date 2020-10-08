@@ -4098,6 +4098,7 @@ SELECT					cb.name as candidate_name,
             
             if pop>0:
                 out={"message":msg,"success":1,"assessment_id":pop}
+                print(str(partner_id),str(assessment_type_id),msg)
                 if((str(partner_id)=="1") & (str(assessment_type_id)=="2") & ((msg=='Assessment Proposed') | (msg=='Re-Assessment Proposed'))):
                     SDMSBatchId=''
                     Stage=''
@@ -4116,6 +4117,8 @@ SELECT					cb.name as candidate_name,
                         Stage=str(row[1])
                         AssessmentDate=str(row[2])
                         BatchAttemptNumber=str(row[3])
+                    if BatchAttemptNumber != '1':
+                        present_candidate = absent_candidate
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_assessment_UAP] ?,?,?'
                     values = (batch_id,pop,present_candidate)
                     cur.execute(sql,(values))
