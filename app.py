@@ -5877,11 +5877,11 @@ class upload_bulk_upload(Resource):
                             Column('Result',pass_fail_validation + null_validation)
                             ])
 
-                    img_column ='Candidate Photo,Aadhar Image,Document copy'
+                    img_column ='Aadhar Image,Document copy'
                     schema = Schema([
                         #nan check column non mandate
                         Column('Candidate_id',null_validation),
-                        Column('Candidate Photo',null_validation),
+                        #Column('Candidate Photo',null_validation),
                         Column('Middle Name',null_validation),
                         Column('Last Name',null_validation),
                         Column('Secondary Contact  No',null_validation),
@@ -6326,7 +6326,7 @@ class DownloadRegTemplate(Resource):
                     return({'msg':'No Records Found For Selected Filters!', 'success':False})
                 else:
                     df = pd.DataFrame(resp['data'], columns=resp['columns'])
-                    col = ['Candidate_Id', 'Isfresher', 'Candidate_Photo', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 
+                    col = ['Candidate_Id', 'Isfresher', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 
                     'Age', 'Primary_Contact_No', 'Secondary_Contact_No', 'Email_Id', 'Gender', 'Marital_Status', 'Caste', 'Disability_Status', 'Religion', 
                     'Mother_Tongue', 'Occupation', 'Average_Annual_Income', 'Source_Of_Information', 'Interested_Course', 'Product', 'Present_Address_Line1', 
                     'Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block', 'Present_District', 'Present_State', 
@@ -6336,8 +6336,7 @@ class DownloadRegTemplate(Resource):
                     'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc', 
                     'Aadhar_Image_Name','Registered_By', 'Whatsapp_Number']
 
-
-                    Column = ['Candidate_id', 'Fresher/Experienced?*', 'Candidate Photo', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 
+                    Column = ['Candidate_id', 'Fresher/Experienced?*', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 
                     'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 'Gender*', 'Marital Status*', 'Caste*', 'Disability Status*', 'Religion*', 
                     'Mother Tongue*', 'Occupation*', 'Average annual income*', 'Source of Information*', 'Interested Course*', 'Product*', 'Present Address line1', 
                     'Present Address line2', 'Present Village', 'Present Panchayat', 'Present Taluk/Block', 'Present District*', 'Present State*', 
@@ -6348,7 +6347,17 @@ class DownloadRegTemplate(Resource):
                     'Aadhar Image','Registered by*','Whatsapp Number']
                 
                     if Project_Type==1:
+                        col = ['Candidate_Id', 'Isfresher', 'Candidate_Photo', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 
+                        'Age', 'Primary_Contact_No', 'Secondary_Contact_No', 'Email_Id', 'Gender', 'Marital_Status', 'Caste', 'Disability_Status', 'Religion', 
+                        'Mother_Tongue', 'Occupation', 'Average_Annual_Income', 'Source_Of_Information', 'Interested_Course', 'Product', 'Present_Address_Line1', 
+                        'Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block', 'Present_District', 'Present_State', 
+                        'Present_Pincode', 'Present_Country', 'Permanent_Address_Line1', 'Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 
+                        'Permanent_Taluk_Block', 'Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country', 'Aadhar_No', 'Identifier_Type', 
+                        'Identity_Number', 'Document_Copy_Image_Name', 'Employment_Type', 'Preferred_Job_Role', 'Years_Of_Experience', 'Relevant_Years_Of_Experience', 
+                        'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc', 
+                        'Aadhar_Image_Name','Registered_By', 'Whatsapp_Number']
                         col += ['Aspirational District', 'Educational Marksheet', 'Income Certificate']
+
                         Column = ['Candidate_id', 'Fresher/Experienced?*', 'Candidate Photo*', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 
                         'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 'Gender*', 'Marital Status*', 'Caste*', 'Disability Status*', 'Religion*', 
                         'Mother Tongue*', 'Occupation*', 'Average annual income*', 'Source of Information*', 'Interested Course*', 'Product*', 'Present Address line1', 

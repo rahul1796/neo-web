@@ -5345,15 +5345,25 @@ SELECT					cb.name as candidate_name,
                     quer7_res += '\n' + quer7.format(row_she[4],row_she[5],row_she[6],row_she[7],row_she[8],row_she[9],row_she[10],row_she[11],row_she[12],row_she[13],row_she[14],row_she[15],row_she[16],row_she[17],row_she[18],row_she[19],row_she[20],row_she[21],row_she[22],row_she[23],row_she[24],row_she[0])
 
             query = ""
-            for row in out:
-                #row[42]=1
-                query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[10],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[0])
-                query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[23],row[32],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[57],row[55],row[0])
-                query += '\n' + quer3.format(row[24],row[25],row[26],row[27],row[33],row[34],row[35],row[36],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[0])
-                if ProjectType==1:
+            if (ProjectType==1):
+                for row in out:
+                    query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[10],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[0])
+                    query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[23],row[32],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[57],row[55],row[0])
+                    query += '\n' + quer3.format(row[24],row[25],row[26],row[27],row[33],row[34],row[35],row[36],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[0])
+
                     query += '\n' + quer4.format(row[58],row[59],row[60],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[0])
-                elif ProjectType==2:
+            else:
+                quer2='''
+                update candidate_details.tbl_candidate_reg_enroll_details set mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where UPPER(identification_name)=UPPER('{}')),identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',present_address_line1='{}',permanaet_address_line1='{}',created_by={},created_on=GETDATE(),is_active=1 ,whatsapp_number='{}',aadhar_image_name='{}' where candidate_id='{}';
+                '''
+                for row in out:
+                    query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[7]=='' else 0,row[46],row[2],row[3],row[4],row[5],row[6],row[7],row[9],row[11],row[12],row[13],row[14],row[15],row[19],row[27],row[28],row[29],row[30],row[36],row[37],row[38],row[39],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[55]),row[0])
+                    query += '\n' + quer2.format(row[16],row[17],row[18],row[20],row[21],row[40],row[41],row[42],row[43],row[44],row[45],row[47],row[48],row[49],row[50],row[51],row[52],row[53],row[22],row[31],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[55]),row[56],row[54],row[0])
+                    query += '\n' + quer3.format(row[23],row[24],row[25],row[26],row[32],row[33],row[34],row[37],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[55]),row[0])
+                    
+                if ProjectType==2:
                     query += quer7_res
+                
             #print(query)
             cur.execute(query)
             cur.commit()
@@ -5894,7 +5904,8 @@ SELECT					cb.name as candidate_name,
                     from		users.tbl_users as u
                     left join	users.tbl_user_details as ud on ud.user_id=u.user_id
                     left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
-                    where		ur.user_role_id in (24,5)
+                    where		ur.user_role_id in (24,5,38)
+                    and         coalesce(ur.is_active,0)=0
                                 
                     """
         else:
@@ -5904,7 +5915,8 @@ SELECT					cb.name as candidate_name,
                     from		users.tbl_users as u
                     left join	users.tbl_user_details as ud on ud.user_id=u.user_id
                     left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
-                    where		ur.user_role_id in (2,24,5)
+                    where		ur.user_role_id in (2,24,5,38)
+                    and         coalesce(ur.is_active,0)=0
                     """
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
