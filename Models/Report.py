@@ -313,9 +313,9 @@ class Report:
             return False
     def GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         return Database.GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw) 
-    def DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id):
+    def DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id):
         try:
-            data=Database.DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id)
+            data=Database.DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.OpsProductivityFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.OpsProductivityFileName + ".*")
@@ -661,9 +661,9 @@ class Report:
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
-    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids):
+    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
         try:
-            data=Database.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids)
+            data=Database.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.RegionProductivityFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.RegionProductivityFileName + ".*")
@@ -798,9 +798,9 @@ class Report:
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
     
-    def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids):
+    def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
         try:
-            data=Database.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids)
+            data=Database.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.CustomerTargetFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.CustomerTargetFileName + ".*")

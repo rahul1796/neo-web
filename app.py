@@ -7389,8 +7389,9 @@ class DownloadOpsProductivityReport(Resource):
             role_id = request.form["role_id"]
             customer_ids = request.form["customer_ids"]
             contract_ids = request.form["contract_ids"]
-            print(month,role_id,customer_ids,contract_ids)
-            resp = Report.DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id)
+            user_id =  session['user_id']
+            user_role_id =  session['user_role_id']
+            resp = Report.DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id)
             return resp
 
 api.add_resource(DownloadOpsProductivityReport,'/DownloadOpsProductivityReport')
@@ -7403,7 +7404,9 @@ class DownloadRegionProductivityReport(Resource):
             region_ids = request.form["region_ids"]
             customer_ids = request.form["customer_ids"]
             contract_ids = request.form["contract_ids"]
-            resp = Report.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids)
+            user_id =  session['user_id']
+            user_role_id =  session['user_role_id']
+            resp = Report.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id)
             return resp
 
 api.add_resource(DownloadRegionProductivityReport,'/DownloadRegionProductivityReport')
@@ -7416,7 +7419,9 @@ class DownloadCustomerTargetReport(Resource):
             region_ids = request.form["region_ids"]
             customer_ids = request.form["customer_ids"]
             contract_ids = request.form["contract_ids"]
-            resp = Report.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids)
+            user_id =  session['user_id']
+            user_role_id =  session['user_role_id']
+            resp = Report.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id)
             return resp
 
 api.add_resource(DownloadCustomerTargetReport,'/DownloadCustomerTargetReport')
