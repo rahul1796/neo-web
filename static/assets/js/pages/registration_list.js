@@ -144,7 +144,6 @@ function toggleCheckbox(e)
         }   
     }
 }   
-    
     function UploadFileToProcess(xls_file,all_file_names)
     {
         UploadFileData_s3(xls_file,xls_file.name)
@@ -390,9 +389,9 @@ function LoadTable()
                     var varButtons = "";
                     if(row.Is_Check)
                         varButtons += '<input id="addedchk_' + row.S_No + '" name="checkcase" type="checkbox" value="'+row.Candidate_Id+'" onclick="toggleCheckbox(event)">';
-                    // else if((user_role_id==1)||(user_role_id==1)||(user_role_id==1)||(user_role_id==1)){
-                    //     varButtons += '<a onclick="ReuploadImages(\'' + row.Candidate_Id + '\')" class="btn" style="cursor:pointer" ><i title="View/Reupload Images" class="fas fa-edit" ></i></a>';
-                    // }
+                    else if((user_role_id==1)||(user_role_id==1)||(user_role_id==1)||(user_role_id==1)){
+                        varButtons += '<a onclick="ReuploadImages(\'' + row.Candidate_Id + '\')" class="btn" style="cursor:pointer" ><i title="View/Reupload Images" class="fas fa-edit" ></i></a>';
+                    }
                     return varButtons;
                 }
             },

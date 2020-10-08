@@ -5308,49 +5308,72 @@ SELECT					cb.name as candidate_name,
         con.close()
         return {'data':data,'columns':columns}
 
-    def registration_web_inser(df,user_id,ProjectType):
-        con = pyodbc.connect(conn_str)
-        cur = con.cursor()
-        #print(df.columns)
-        #try:
-        df['Date of Birth*'] = df['Date of Birth*'].astype(str)
-        out = df.values.tolist()
-                                                                                                                                                                                                                                                                                                                                                                                                
-        quer1 = '''
-        update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',secondary_contact_no='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=2,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1 where candidate_id='{}';
-        '''
-        quer2='''
-        update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where UPPER(identification_name)=UPPER('{}')),identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',present_address_line1='{}',permanaet_address_line1='{}',created_by={},created_on=GETDATE(),is_active=1 ,whatsapp_number='{}',aadhar_image_name='{}' where candidate_id='{}';
-        '''
-        quer3='''
-        update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set present_address_line2='{}',present_village='{}',present_panchayat='{}',present_taluk_block='{}',permanent_address_line2='{}',permanent_village='{}',permanent_panchayat='{}',permanent_taluk_block='{}',created_by={},created_on=GETDATE(),is_active=1 where candidate_id='{}';
-        '''
+    def registration_web_inser(df,user_id,ProjectType,df_she=[]):
+        try:
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            #print(df.columns)
+            #try:
+            df['Date of Birth*'] = df['Date of Birth*'].astype(str)
+            out = df.values.tolist()
+                                                                                                                                                                                                                                                                                                                                                                                                    
+            quer1 = '''
+            update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',secondary_contact_no='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=2,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1 where candidate_id='{}';
+            '''
+            quer2='''
+            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where UPPER(identification_name)=UPPER('{}')),identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',present_address_line1='{}',permanaet_address_line1='{}',created_by={},created_on=GETDATE(),is_active=1 ,whatsapp_number='{}',aadhar_image_name='{}' where candidate_id='{}';
+            '''
+            quer3='''
+            update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set present_address_line2='{}',present_village='{}',present_panchayat='{}',present_taluk_block='{}',permanent_address_line2='{}',permanent_village='{}',permanent_panchayat='{}',permanent_taluk_block='{}',created_by={},created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            '''
+            quer4 = '''
+            update candidate_details.tbl_candidate_dell_details set	[Educational Marksheet]='{}', [Aspirational District]='{}', [Income Certificate]='{}', created_by={}, created_on=GETDATE(), is_active=1 where	candidate_id='{}' 
+            '''
+            quer7_res=''
+            if (ProjectType==2):
+                out_she = df_she.values.tolist()
+                quer7 = '''
+                update candidate_details.tbl_candidate_she_details set [Date of birth (age between 18 to 40)]='{}',[Are you 8th Pass?]='{}',[Are you able to read and write local language?]='{}',[Do you have a smart phone?]='{}',[Are you willing to buy a smartphone?]='{}',
+                [Do you own two wheeler?]='{}',[Do you have any work experience in the past?]='{}',[Will you able to work full time or at least 6 hours a day?]='{}',[Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?]='{}',
+                [Are you willing to travel from one place to another within panchayat?]='{}',[Are you willing to work and sign the work contract with LN?]='{}',[Are you willing to adopt digital transactions in your business?]='{}',[Do you have a bank account?]='{}',
+                [Have you availed any loan in the past?]='{}',[Do you have any active loan?]='{}',[Are you willing to take up a loan to purchase tools and consumables?]='{}',[Are you covered under any health insurance?]='{}',[Are you allergic to any chemicals and dust?]='{}',
+                [Are you willing to follow  Environment, Health and Safety Norms in your business?]='{}',[Have you ever been subjected to any legal enquiry for Non ethical work/business?]='{}',result='{}'
+                where candidate_id={}
+                '''
+                for row_she in out_she:
+                    quer7_res += '\n' + quer7.format(row_she[4],row_she[5],row_she[6],row_she[7],row_she[8],row_she[9],row_she[10],row_she[11],row_she[12],row_she[13],row_she[14],row_she[15],row_she[16],row_she[17],row_she[18],row_she[19],row_she[20],row_she[21],row_she[22],row_she[23],row_she[24],row_she[0])
 
-        quer4 = '''
-        update candidate_details.tbl_candidate_dell_details set	[Educational Marksheet]='{}', [Aspirational District]='{}', [Income Certificate]='{}', created_by={}, created_on=GETDATE(), is_active=1 where	candidate_id='{}' 
-        '''
+            query = ""
+            if (ProjectType==1):
+                for row in out:
+                    query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[10],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[0])
+                    query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[23],row[32],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[57],row[55],row[0])
+                    query += '\n' + quer3.format(row[24],row[25],row[26],row[27],row[33],row[34],row[35],row[36],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[0])
 
-        query = ""
-        for row in out:
-            #row[42]=1
-            query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[10],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[0])
-            query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[23],row[32],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[57],row[55],row[0])
-            query += '\n' + quer3.format(row[24],row[25],row[26],row[27],row[33],row[34],row[35],row[36],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[0])
-            if ProjectType==1:
-                query += '\n' + quer4.format(row[58],row[59],row[60],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[0])
-        #print(query)
-        cur.execute(query)
-        cur.commit()
-
-        out = {'Status': True, 'message': "Submitted Successfully"}
-        #except Exception as e:
-        #    print(e)
-        #    out = {'Status': False, 'message': "error: "+str(e)}
-        #finally:
-        cur.close()
-        con.close()
-        return out
-    
+                    query += '\n' + quer4.format(row[58],row[59],row[60],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[56]),row[0])
+            else:
+                quer2='''
+                update candidate_details.tbl_candidate_reg_enroll_details set mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where UPPER(identification_name)=UPPER('{}')),identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',present_address_line1='{}',permanaet_address_line1='{}',created_by={},created_on=GETDATE(),is_active=1 ,whatsapp_number='{}',aadhar_image_name='{}' where candidate_id='{}';
+                '''
+                for row in out:
+                    query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[7]=='' else 0,row[46],row[2],row[3],row[4],row[5],row[6],row[7],row[9],row[11],row[12],row[13],row[14],row[15],row[19],row[27],row[28],row[29],row[30],row[36],row[37],row[38],row[39],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[55]),row[0])
+                    query += '\n' + quer2.format(row[16],row[17],row[18],row[20],row[21],row[40],row[41],row[42],row[43],row[44],row[45],row[47],row[48],row[49],row[50],row[51],row[52],row[53],row[22],row[31],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[55]),row[56],row[54],row[0])
+                    query += '\n' + quer3.format(row[23],row[24],row[25],row[26],row[32],row[33],row[34],row[37],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[55]),row[0])
+                    
+                if ProjectType==2:
+                    query += quer7_res
+                
+            #print(query)
+            cur.execute(query)
+            cur.commit()
+            out = {'Status': True, 'message': "Submitted Successfully"}
+        except Exception as e:
+            out = {'Status': False, 'message': "error: "+str(e)}
+        finally:
+            cur.close()
+            con.close()
+            return out
+            
     def enrollment_web_inser(df,user_id,ProjectType,df_she=[]):
         try:
             conn = pyodbc.connect(conn_str)
@@ -5386,19 +5409,6 @@ SELECT					cb.name as candidate_name,
             [Farm land]='{}',Others='{}',[Address as per Aadhar Card (incl pin code)]='{}',[Educational qualification]='{}',[Age proof]='{}',[Signed MoU]='{}',[MoU signed date]='{}'
             where candidate_id={}
             '''
-            quer7_res=''
-            if (ProjectType==2):
-                out_she = df_she.values.tolist()
-                quer7 = '''
-                update candidate_details.tbl_candidate_she_details set [Date of birth (age between 18 to 40)]='{}',[Are you 8th Pass?]='{}',[Are you able to read and write local language?]='{}',[Do you have a smart phone?]='{}',[Are you willing to buy a smartphone?]='{}',
-                [Do you own two wheeler?]='{}',[Do you have any work experience in the past?]='{}',[Will you able to work full time or at least 6 hours a day?]='{}',[Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?]='{}',
-                [Are you willing to travel from one place to another within panchayat?]='{}',[Are you willing to work and sign the work contract with LN?]='{}',[Are you willing to adopt digital transactions in your business?]='{}',[Do you have a bank account?]='{}',
-                [Have you availed any loan in the past?]='{}',[Do you have any active loan?]='{}',[Are you willing to take up a loan to purchase tools and consumables?]='{}',[Are you covered under any health insurance?]='{}',[Are you allergic to any chemicals and dust?]='{}',
-                [Are you willing to follow  Environment, Health and Safety Norms in your business?]='{}',[Have you ever been subjected to any legal enquiry for Non ethical work/business?]='{}',result='{}'
-                where candidate_id={}
-                '''
-                for row_she in out_she:
-                    quer7_res += '\n' + quer7.format(row_she[4],row_she[5],row_she[6],row_she[7],row_she[8],row_she[9],row_she[10],row_she[11],row_she[12],row_she[13],row_she[14],row_she[15],row_she[16],row_she[17],row_she[18],row_she[19],row_she[20],row_she[21],row_she[22],row_she[23],row_she[24],row_she[0])
             query = ""
             b=[]
             temp=""
@@ -5424,7 +5434,7 @@ SELECT					cb.name as candidate_name,
                 query += '\n' + quer1.format(1 if str(row[1]).lower()=='Fresher' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[10],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[82]),row[0])
                 query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[23],row[32],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[55],row[56],row[61],row[62],row[63],row[64],row[69],row[70],row[71],row[72],row[73],row[74],row[78],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[82]),row[83],row[81],row[0])
                 query += '\n' + quer3.format(row[24],row[25],row[26],row[27],row[33],row[34],row[35],row[36],row[57],row[58],row[59],row[60],row[65],row[66],row[67],row[68],row[75],row[76],row[77],row[79],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[82]),row[0])
-            query += quer7_res
+            
             #print(query)
             curs.execute(query)
             curs.commit()
@@ -5893,7 +5903,8 @@ SELECT					cb.name as candidate_name,
                     from		users.tbl_users as u
                     left join	users.tbl_user_details as ud on ud.user_id=u.user_id
                     left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
-                    where		ur.user_role_id in (24,5)
+                    where		ur.user_role_id in (24,5,38)
+                    and         coalesce(ur.is_active,0)=0
                                 
                     """
         else:
@@ -5903,7 +5914,8 @@ SELECT					cb.name as candidate_name,
                     from		users.tbl_users as u
                     left join	users.tbl_user_details as ud on ud.user_id=u.user_id
                     left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
-                    where		ur.user_role_id in (2,24,5)
+                    where		ur.user_role_id in (2,24,5,38)
+                    and         coalesce(ur.is_active,0)=0
                     """
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
@@ -6589,3 +6601,26 @@ SELECT					cb.name as candidate_name,
         con.close()  
         return str(response)
 
+    def reupload_candidate_image_web_ui(user_id,user_role_id,filename,c_id,candidate_id):
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        quer = ""
+        quer1 = "update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}' where candidate_id={}"
+        quer2 = "update candidate_details.tbl_candidate_reg_enroll_details set aadhar_image_name='{}' where candidate_id = {}"
+        quer3 = "update candidate_details.tbl_candidate_reg_enroll_details set document_copy_image_name = '{}' where candidate_id = {}"
+        quer4 = "update candidate_details.tbl_candidate_dell_details set [Educational Marksheet]='{}' where candidate_id={}"
+        quer5 = "update candidate_details.tbl_candidate_dell_details set [Income Certificate]='{}' where candidate_id={}"
+        quer6 = "update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set attachment_image_name='{}' where candidate_id={}"
+        quer7 = "update candidate_details.tbl_candidate_she_details set [Educational qualification]='{}' where candidate_id={}"
+        quer8 = "update candidate_details.tbl_candidate_she_details set [Age proof]='{}' where candidate_id={}"
+        quer9 = "update candidate_details.tbl_candidate_she_details set [Signed MoU]='{}' where candidate_id={}"
+
+        query = eval('quer'+str(c_id))
+        query = query.format(filename,candidate_id)
+        print(query)
+        cur2.execute(query)
+        cur2.commit()
+        cur2.close()
+        con.close()
+        out = {'Status': True, 'message': "Submitted Successfully"}
+        return out

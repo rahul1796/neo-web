@@ -25,35 +25,42 @@ var Candidates = {};
                 $('#div_Age_proof').hide();
                 $('#div_Educational_qualification_Proof').hide();
                 $('#div_Bank_Account_Copy').hide();
+
+                document.getElementById('headerurl').innerHTML ="Registration"
+                $("#headerurl").attr("href", "/registration");
             }
             else if (candidate_stage_id==3){
                 $('#form1').attr('action', '/enrollment');
-                $('#div_Income_Certificate').hide();
-                $('#div_Education_Mark_Sheet').hide();
-                $('#div_Identity_Image').hide();
-                $('#div_Aadhar_Image').hide();
-                $('#div_candidate_photo').hide();
+
+                document.getElementById('headerurl').innerHTML ="Enrollment"
+                $("#headerurl").attr("href", "/enrollment");
+                
+
+                // $('#div_Income_Certificate').hide();
+                // $('#div_Education_Mark_Sheet').hide();
+                // $('#div_Identity_Image').hide();
+                // $('#div_Aadhar_Image').hide();
+                // $('#div_candidate_photo').hide();
             }
-            download_images();
         }
+        download_images();
     });
     function UploadFileData_s3(file,file_name)
     {
+        console.log(file_name)
         var fileExtension = ['xlsx'];
-        var s3_path="neo_app/images/" + filename_prefix;
+        var s3_path="neo_app/images/";
         if (fileExtension.includes(file_name.split('.').pop().toLowerCase())){
-            s3_path ="bulk_upload/candidate/registration/" + filename_prefix;
+            s3_path ="bulk_upload/candidate/registration/";
         }
         var file_path=$('#hdn_AWS_S3_path').val()+ s3_path + file_name;
         var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
-        
         var xhr = new XMLHttpRequest();
         xhr.open("GET",api_url );
             xhr.onreadystatechange = function(){
                 if(xhr.readyState === 4){
                 if(xhr.status === 200){
                     var response = JSON.parse(xhr.responseText);
-                    console.log(response);
                     uploadFileToS3(file, response.data, response.url);
                 }
                 else{
@@ -77,8 +84,6 @@ var Candidates = {};
             if(xhr.readyState === 4){
             if(xhr.status === 200 || xhr.status === 204){
                 var response = xhr;
-                console.log(response);
-                //UploadFileToProcess();
             }
             else{
                 alert("Could not upload file to s3.");
@@ -101,9 +106,17 @@ var Candidates = {};
             "user_role_id" : $('#hdn_home_user_role_id').val(),
             "candidate_id" : '{{candidate_id}}'
         },
-
         success: function (data){
             //console.log(data);
+            if (data.Candidate.Project_Type!=4){
+                $('#div_Income_Certificate').hide();
+                $('#div_Education_Mark_Sheet').hide();
+            }
+            if(data.Candidate.Project_Type!=2){
+                $('#div_Signed_MoU').hide();
+                $('#div_Age_proof').hide();
+                $('#div_Educational_qualification_Proof').hide();
+            }
             if(data.Candidate != null)
             {  
                 if (data.Candidate.Candidate_Photo!=''){
@@ -111,15 +124,21 @@ var Candidates = {};
                     s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Candidate_Photo;
                 }
                 if (data.Candidate.Aadhar_Image_Name!=''){
-                    var s = document.getElementById('ur_Aadhar_Image')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Aadhar_Image_Name;
+                    data.Candidate.Aadhar_Image_Name.split(',')[0]
+                    var s = document.getElementById('ur_Aadhar_Image1')
+                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Aadhar_Image_Name.split(',')[0];
+                    if (data.Candidate.Aadhar_Image_Name.split(',').length ==2){
+                        var s = document.getElementById('ur_Aadhar_Image2')
+                        s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Aadhar_Image_Name.split(',')[1];
+                    }
                 }
                 if (data.Candidate.Identity_Image_Name!=''){
                     var s = document.getElementById('ur_Identity_Image')
                     s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Identity_Image_Name;
                 }
                 if (data.Candidate.Educational_Marksheet!=''){
-                    var s = document.getElementById('ur_Education_Mark_Sheet')
+                    alert(data.Candidate.Educational_Marksheet);
+                    var s = document.getElementById('ur_Education_Mark_Sheet');
                     s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Educational_Marksheet;
                 }
                 if (data.Candidate.Income_Certificate!=''){
@@ -152,98 +171,143 @@ var Candidates = {};
     });
     return false;
     }
-
     function Upload_image(id){
         var validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
         var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_'
-        var file = document.getElementById('myFile'+id).files[0]
-        if (!validImageTypes.includes(file['type'])){
-            console.log(1);
-        }
-        else if(1==1){
-            console.log(2);
+        var filename = ''
+        var ins=0
+        if (id!=2){
+            var file = document.getElementById('myFile'+id).files[0]
+            filename = filename_prefix + file.name
         }
         else{
-            console.log(3);
-        }
-
-
-        var URL=$('#hdn_web_url').val()+ "/AllCandidateImages"
-        $.ajax({
-        type:"GET",
-        url:URL,
-        async:false,        
-        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-        datatype:"json",
-        data:{
-            "user_id": $('#hdn_home_user_id').val(),
-            "user_role_id" : $('#hdn_home_user_role_id').val(),
-            "id" : id,
-
-
-        },
-        success: function (data){
-            if(data.Success != null)
-            {  
-                if (data.Candidate.Candidate_Photo!=''){
-                    var s = document.getElementById('ur_candidate_photo')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Candidate_Photo;
+            ins = document.getElementById('myFile'+id).files.length;
+            if (ins>2){
+                alert('max two images allowed to upload');
+                return
+            }
+            else{
+                for (var x = 0; x < ins; x++) {
+                    var file = document.getElementById('myFile'+id).files[x]
+                    if (!validImageTypes.includes(file['type'])){
+                        alert('allowed format are : '+validImageTypes.toString());
+                        return
+                    }
+                    else if(file.size > 1024*1024){
+                        alert('Image size is not valid');
+                        return
+                    }
                 }
-                if (data.Candidate.Aadhar_Image_Name!=''){
-                    var s = document.getElementById('ur_Aadhar_Image')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Aadhar_Image_Name;
+                if (document.getElementById('myFile'+id).files.length==2){
+                    filename = filename_prefix + document.getElementById('myFile'+id).files[0].name + ',' + filename_prefix + document.getElementById('myFile'+id).files[1].name
                 }
-                if (data.Candidate.Identity_Image_Name!=''){
-                    var s = document.getElementById('ur_Identity_Image')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Identity_Image_Name;
-                }
-                if (data.Candidate.Educational_Marksheet!=''){
-                    var s = document.getElementById('ur_Education_Mark_Sheet')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Educational_Marksheet;
-                }
-                if (data.Candidate.Income_Certificate!=''){
-                    var s = document.getElementById('ur_Income_Certificate')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Income_Certificate;
-                }
-                if (data.Candidate.Bank_Account_Image_Name!=''){
-                    var s = document.getElementById('ur_Bank_Account_Copy')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Bank_Account_Image_Name;
-                }
-                if (data.Candidate.Educational_Qualification!=''){
-                    var s = document.getElementById('ur_Educational_qualification_Proof')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Educational_Qualification;
-                }
-                if (data.Candidate.Age_Proof!=''){
-                    var s = document.getElementById('ur_Age_proof')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Age_Proof;
-                }
-                if (data.Candidate.Signed_Mou!=''){
-                    var s = document.getElementById('ur_Signed_MoU')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Signed_Mou;
+                else{
+                    filename = filename_prefix + document.getElementById('myFile'+id).files[0].name
                 }
             }
-        },
-        error:function(err)
-        {
-            alert('Error while loading BU! Please try again');
-            return false;
         }
-    });
-    return false;
-    
-    download_images();
+        if (!validImageTypes.includes(file['type'])){
+            alert('allowed format are : '+validImageTypes.toString());
+        }
+        else if(file.size > 1024*1024){
+            alert('Image size is not valid');
+        }
+        else{
+            var form_data = new FormData(); //$('#formUpload')[0]
+            form_data.append('user_id',$('#hdn_home_user_id_modal').val());
+            form_data.append('user_role_id',$('#hdn_home_user_role_id_modal').val());
+            form_data.append('filename',filename);
+            form_data.append('id',id); 
+            form_data.append('candidate_id','{{candidate_id}}'); 
+            $.ajax({
+                type: 'POST',
+                url: $('#hdn_web_url').val()+ "/reupload_candidate_image_web_ui",
+                enctype: 'multipart/form-data',
+                data: form_data,
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function(data) 
+                {   
+                    if (id!=2){
+                    //console.log(file)
+                    file = document.getElementById('myFile'+id).files[0]
+                    UploadFileData_s3(file,filename);
+                    }
+                    else{
+                        for (var x = 0; x < ins; x++) {
+                            var file = document.getElementById('myFile'+id).files[x]
+                            UploadFileData_s3(file,filename_prefix + file.name)
+                        }
+                    }
 
+                    var message="",title="",icon="";
+                    if(data.Status){
+                        message=data.message;
+                        title="Success";
+                        icon="success";
+                    }
+                    else{
+                        if (data.message=="Validation_Error"){
+                            message=data.error;
+                            title="Error";
+                            icon="error";
+                        }
+                        else {
+                            message=data.message;
+                            title="Error";
+                            icon="error";
+                        }
+                    }
+                    var span = document.createElement("span");
+                    span.innerHTML = message;
+                    swal({   
+                                title:title,
+                                content: span,
+                                icon:icon,
+                                confirmButtonClass:"btn btn-confirm mt-2"
+                                }).then(function(){
+                                    window.location.href = '/after_popup_reload_image';
+                                });        
+                },
+                error:function(err)
+                {
+                    swal({   
+                        title:"Error",
+                        text:'Error! Please try again',
+                        icon:"error",
+                        confirmButtonClass:"btn btn-confirm mt-2"
+                        }).then(function(){
+                            window.location.href = '/after_popup_reload_image';
+                    });
+                }
+            });
+        }
     }
+function validate_upload(id){
+    if(document.getElementById('myFile'+id).files.length==0){
+        alert('please select a file');
+    }
+    else{
+        if (confirm("ADDING A NEW IMAGE WILL REPLACE THE EXISTING IMAGE. Click ok to Continue!")){
+            Upload_image(id);
+        }
+        else{
+            console.log('no upload')
+        }
+    }
+}
 </script>
 
 <div class="container-fluid">
-    <form action="/" method="GET" id='form1'>
+    <!-- <form action="/" method="GET" id='form1'> -->
     <div class="row">
         <div class="col-12">
             <div class="page-title-box">
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="javascript: void(0);">LN</a></li>
+                        <li class="breadcrumb-item"><a href="/">NEO</a></li>
+                        <li class="breadcrumb-item"><a id="headerurl" href="/"></a></li>
                         <li class="breadcrumb-item active">Reupload Images</li>
                     </ol>
                 </div>
@@ -256,33 +320,33 @@ var Candidates = {};
     <div id="get" class="row">
         <div class="col-12">
             <div class="card-box">
-                <form id="demo-form" data-parsley-validate="">
-
+                <!-- <form id="demo-form" data-parsley-validate=""> -->
                     <div class="form-group" id="div_candidate_photo">
                         <div class="row">
                             <div class="col-lg-4">
                                 <label for="ur_candidate_photo">Candidate Photo</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_candidate_photo" name="ur_candidate_photo" src="" alt="Candidate Photo" style="width:128px;height:128px;">
+                                <img id="ur_candidate_photo" name="ur_candidate_photo" src="static\assets\images\noimage2.png" alt="Candidate Photo" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
-                                <input style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" type="file" id="myFile1" name="filename">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(1)" id="btnUpload">Upload</button>
+                                <input style="float: left;cursor:pointer;margin-top:30px;" type="file" id="myFile1" name="filename">
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(1)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div> 
                     <div class="form-group" id="div_Aadhar_Image">
                         <div class="row">
-                            <div class="col-lg-4">
+                            <div class="col-lg-2">
                                 <label for="ur_Aadhar_Image">Aadhar Image</label>
                             </div>
-                            <div class="col-lg-2">
-                                <img id="ur_Aadhar_Image" name="ur_Aadhar_Image" src="" alt="Aadhar Image" style="width:128px;height:128px;">
+                            <div class="col-lg-4">
+                                <img id="ur_Aadhar_Image1" name="ur_Aadhar_Image1" src="static\assets\images\noimage2.png" alt="Aadhar Image" style="float:left;width:50%;padding: 5px;">
+                                <img id="ur_Aadhar_Image2" name="ur_Aadhar_Image2" src="static\assets\images\noimage2.png" alt="Aadhar Image" style="float:left;width:50%;padding: 5px;"> <!-- width:128px;height:128px; -->
                             </div>
                             <div class="col-lg-6">
-                                <input type="file" id="myFile2" name="filename" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(2)" id="btnUpload">Upload</button>
+                                <input type="file" id="myFile2" name="filename" style="float: left;cursor:pointer;margin-top:30px;" multiple>
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(2)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div>
@@ -292,11 +356,11 @@ var Candidates = {};
                                 <label for="ur_Identity_Image">Identity Image</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_Identity_Image" name="ur_Identity_Image" src="" alt="Identity Image" style="width:128px;height:128px;">
+                                <img id="ur_Identity_Image" name="ur_Identity_Image" src="static\assets\images\noimage2.png" alt="Identity Image" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
-                                <input type="file" id="myFile3" name="filename" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(3)" id="btnUpload">Upload</button>
+                                <input type="file" id="myFile3" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(3)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div>
@@ -306,11 +370,11 @@ var Candidates = {};
                                 <label for="ur_Education_Mark_Sheet">Education Mark Sheet</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_Education_Mark_Sheet" name="ur_Education_Mark_Sheet" src="" alt="Education Mark Sheet" style="width:128px;height:128px;">
+                                <img id="ur_Education_Mark_Sheet" name="ur_Education_Mark_Sheet" src="static\assets\images\noimage2.png" alt="Education Mark Sheet" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
-                                <input type="file" id="myFile4" name="filename" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(4)" id="btnUpload">Upload</button>
+                                <input type="file" id="myFile4" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(4)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div> 
@@ -320,11 +384,11 @@ var Candidates = {};
                                 <label for="ur_Income_Certificate">Income Certificate</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_Income_Certificate" name="ur_Income_Certificate" src="" alt="Income Certificate" style="width:128px;height:128px;">
+                                <img id="ur_Income_Certificate" name="ur_Income_Certificate" src="static\assets\images\noimage2.png" alt="Income Certificate" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
-                                <input type="file" id="myFile5" name="filename" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(5)" id="btnUpload">Upload</button>
+                                <input type="file" id="myFile5" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(5)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div>
@@ -334,11 +398,11 @@ var Candidates = {};
                                 <label for="ur_Bank_Account_Copy">Bank Account Copy</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_Bank_Account_Copy" name="ur_Bank_Account_Copy" src="" alt="Bank Account Copy" style="width:128px;height:128px;">
+                                <img id="ur_Bank_Account_Copy" name="ur_Bank_Account_Copy" src="static\assets\images\noimage2.png" alt="Bank Account Copy" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
-                                <input type="file" id="myFile6" name="filename" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(6)" id="btnUpload">Upload</button>
+                                <input type="file" id="myFile6" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(6)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div>
@@ -348,11 +412,11 @@ var Candidates = {};
                                 <label for="ur_Educational_qualification_Proof">Educational qualification Proof</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_Educational_qualification_Proof" name="ur_Educational_qualification_Proof" src="" alt="Educational qualification Proof" style="width:128px;height:128px;">
+                                <img id="ur_Educational_qualification_Proof" name="ur_Educational_qualification_Proof" src="static\assets\images\noimage2.png" alt="Educational qualification Proof" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
-                                <input type="file" id="myFile7" name="filename" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(7)" id="btnUpload">Upload</button>
+                                <input type="file" id="myFile7" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(7)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div> 
@@ -362,11 +426,11 @@ var Candidates = {};
                                 <label for="ur_Age_proof">Age proof</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_Age_proof" name="ur_Age_proof" src="" alt="Age proof" style="width:128px;height:128px;">
+                                <img id="ur_Age_proof" name="ur_Age_proof" src="static\assets\images\noimage2.png" alt="Age proof" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
-                                <input type="file" id="myFile8" name="filename" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(8)" id="btnUpload">Upload</button>
+                                <input type="file" id="myFile8" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(8)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div>
@@ -376,26 +440,24 @@ var Candidates = {};
                                 <label for="ur_Signed_MoU">Signed MoU</label>
                             </div>
                             <div class="col-lg-2">
-                                <img id="ur_Signed_MoU" name="ur_Signed_MoU" src="" alt="Signed MoU" style="width:128px;height:128px;">
+                                <img id="ur_Signed_MoU" name="ur_Signed_MoU" src="static\assets\images\noimage2.png" alt="Signed MoU" style="float:left;width:100%;">
                             </div>
                             <div class="col-lg-6">
-                                <input type="file" id="myFile9" name="filename" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;">
-                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="Upload_image(9)" id="btnUpload">Upload</button>
+                                <input type="file" id="myFile9" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
+                                <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="validate_upload(9)" id="btnUpload">Upload</button>
                             </div>
                         </div>
                     </div>
-
+                    <form action="/" method="GET" id='form1'>
                     <div class="form-group mb-0">
-                        <button class="btn btn-primary" type="submit">Save</button>
+                        <button class="btn btn-primary" type="submit">BACK</button>
                     </div>
-
                 </form>
+                <!-- </form> -->
             </div> <!-- end card-box-->
         </div> <!-- end col-->
     </div>
     <!-- end row-->
-
-</form>
 </div> <!-- end container -->
     <!-- end wrapper -->
 
