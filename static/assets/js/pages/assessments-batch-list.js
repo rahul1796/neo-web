@@ -284,7 +284,7 @@ function LoadTable()
             { "orderable":false,
                 "data": function(row, type, val, meta) {
                     var varButtons='';
-                    if($('#hdn_home_user_role_id').val()!='25'  & row.Summative_Count==0)
+                    if($('#hdn_home_user_role_id').val()!='25' & $('#hdn_home_user_role_id').val()!='28'  & row.Summative_Count==0)
                     {
                         if($('#hdn_home_user_role_id').val()!='37')
                             varButtons+='<a onclick="ScheduleAssessmentModal(\'' + row.Batch_Id + '\',\'' + row.Batch_Code + '\',\'' + row.Mobilization_Type + '\')" class="btn" style="cursor:pointer" ><i title="Schedule Assessment" class="fe-edit" ></i></a>';
@@ -902,7 +902,7 @@ function add_map_message(){
                             for(var i=0;i<count;i++)
                             {   var txt=''
                                 var attempt=''
-                                if(!($("#hdn_home_user_role_id ").val() == "25" & data.Assessments[i].Assessment_Agency_Id==1))
+                                if(!($("#hdn_home_user_role_id ").val() == "25"  & data.Assessments[i].Assessment_Agency_Id==1))
                                 {
                                     varHtml+='<tr>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].S_No +'</td>';
@@ -920,7 +920,7 @@ function add_map_message(){
                                     }                                     
                                     if ((data.Assessments[i].Assessment_Stage_Id>=3 & $('#hdn_home_user_role_id').val()!='25')  )
                                         txt+='<a onclick="Reassessment(\'' + data.Assessments[i].Assessment_Id + '\',\''+ data.Assessments[i].Batch_Id +'\',\''+ data.Assessments[i].Partner_Category_Id +'\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Schedule Reassessment" class="fe-edit" ></i></a>';
-                                    if($('#hdn_home_user_role_id').val()!='37')
+                                    if($('#hdn_home_user_role_id').val()!='37' & $('#hdn_home_user_role_id').val()!='28')
                                         varHtml+='  <td style="text-align:center;">'+ txt +'</td>';
                                     else
                                         varHtml+='  <td style="text-align:center;">'+ ''+'</td>';

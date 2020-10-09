@@ -2692,7 +2692,6 @@ SELECT					cb.name as candidate_name,
         cur.commit()
         cur.close()
         con.close()
-        print(response)
         return response
      
     def AllRegionsBasedOnUser(UserId,UserRoleId,UserRegionId):
@@ -4090,7 +4089,6 @@ SELECT					cb.name as candidate_name,
             cur = con.cursor()
             sql = 'exec [assessments].[sp_add_edit_batch_assessment] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
             values = (batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag)
-            print(values)
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]
             for row in cur:
@@ -4100,6 +4098,7 @@ SELECT					cb.name as candidate_name,
             
             if pop>0:
                 out={"message":msg,"success":1,"assessment_id":pop}
+                print(str(partner_id),str(assessment_type_id),msg)
                 if((str(partner_id)=="1") & (str(assessment_type_id)=="2") & ((msg=='Assessment Proposed') | (msg=='Re-Assessment Proposed'))):
                     SDMSBatchId=''
                     Stage=''
@@ -4118,6 +4117,8 @@ SELECT					cb.name as candidate_name,
                         Stage=str(row[1])
                         AssessmentDate=str(row[2])
                         BatchAttemptNumber=str(row[3])
+                    if BatchAttemptNumber != '1':
+                        present_candidate = absent_candidate
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_assessment_UAP] ?,?,?'
                     values = (batch_id,pop,present_candidate)
                     cur.execute(sql,(values))
@@ -4133,8 +4134,9 @@ SELECT					cb.name as candidate_name,
                     uap_api=UAP_API_BASE_URL + 'CreateNeoSkillsBatchJSONRequest?JSONRequest='+json_data
                     x = requests.get(uap_api)
                     data = x.json()
-                    if  str(data['CreateNeoSkillsBatch']['Succsess']) == "True":
-                        sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']))                 
+                    if 'CreateNeoSkillsBatch' in data:
+                        if  str(data['CreateNeoSkillsBatch']['Succsess']) == "True":
+                            sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId,requested_date)                 
                     
             
             else:
@@ -6224,7 +6226,7 @@ SELECT					cb.name as candidate_name,
         con.close()
         return {"Data":response}
     
-    def DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id):
+    def DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
@@ -6237,18 +6239,18 @@ SELECT					cb.name as candidate_name,
         sql1=''
         sql2=''
         if int(role_id)==11:
-            sql = 'exec [reports].[sp_get_ops_productivity_report_data_coo] ?, ?, ?'
-            sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_sub_project] ?, ?, ?'
-            sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_course] ?, ?, ?'
+            sql = 'exec [reports].[sp_get_ops_productivity_report_data_coo] ?, ?, ?,?,?'
+            sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_sub_project] ?, ?, ?,?,?'
+            sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_course] ?, ?, ?,?,?'
         if int(role_id)==14:
-            sql = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager] ?, ?, ?'
-            sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_sub_project] ?, ?, ?'
-            sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_course] ?, ?, ?'
+            sql = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager] ?, ?, ?,?,?'
+            sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_sub_project] ?, ?, ?,?,?'
+            sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_course] ?, ?, ?,?,?'
         if int(role_id)==5:
-            sql = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager] ?, ?, ?'
-            sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_sub_project] ?, ?, ?'
-            sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_course] ?, ?, ?'
-        values = (customer_ids, contract_ids, month)
+            sql = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager] ?, ?, ?,?,?'
+            sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_sub_project] ?, ?, ?,?,?'
+            sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_course] ?, ?, ?,?,?'
+        values = (customer_ids, contract_ids, month,user_id,user_role_id)
         
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
@@ -6268,7 +6270,7 @@ SELECT					cb.name as candidate_name,
         return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
         cur2.close()
         con.close()    
-    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids):
+    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
@@ -6281,10 +6283,10 @@ SELECT					cb.name as candidate_name,
         sql1=''
         sql2=''
         
-        sql = 'exec [reports].[sp_get_region_productivity_report_data] ?, ?, ?,?'
-        sql1 = 'exec [reports].[sp_get_region_productivity_report_data_batch] ?, ?, ?,?'
-        sql2 = 'exec [reports].[sp_get_region_productivity_report_data_customer] ?, ?, ?,?'
-        values = (customer_ids, contract_ids, region_ids,month)
+        sql = 'exec [reports].[sp_get_region_productivity_report_data] ?, ?, ?,?,?,?'
+        sql1 = 'exec [reports].[sp_get_region_productivity_report_data_batch] ?, ?, ?,?,?,?'
+        sql2 = 'exec [reports].[sp_get_region_productivity_report_data_customer] ?, ?, ?,?,?,?'
+        values = (customer_ids, contract_ids, region_ids,month,user_id,user_role_id)
         #print(values)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
@@ -6306,7 +6308,7 @@ SELECT					cb.name as candidate_name,
         con.close()
         con.close()
 
-    def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids):
+    def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
@@ -6319,10 +6321,10 @@ SELECT					cb.name as candidate_name,
         sql1=''
         sql2=''
         
-        sql = 'exec [reports].[sp_get_monthly_target_report_data] ?, ?, ?,?'
-        sql1 = 'exec [reports].[sp_get_monthly_target_report_data_customerwise] ?, ?, ?,?'
-        sql2 = 'exec [reports].[sp_get_monthly_target_report_data_customerwise_batches] ?, ?, ?,?'
-        values = (customer_ids, contract_ids, region_ids,month)
+        sql = 'exec [reports].[sp_get_monthly_target_report_data] ?, ?, ?,?,?,?'
+        sql1 = 'exec [reports].[sp_get_monthly_target_report_data_customerwise] ?, ?, ?,?,?,?'
+        sql2 = 'exec [reports].[sp_get_monthly_target_report_data_customerwise_batches] ?, ?, ?,?,?,?'
+        values = (customer_ids, contract_ids, region_ids,month,user_id,user_role_id)
         #print(values)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
