@@ -417,11 +417,11 @@ class Database:
                         msg={"message":"Customer with the Customer code already exists","client_flag":2}
         return msg
     
-    def add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive):
+    def add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_subproject] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive)
+        sql = 'exec	[masters].[sp_add_edit_subproject] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req)
         #print(values)
         cur.execute(sql,(values))
         for row in cur:
@@ -456,18 +456,19 @@ class Database:
         return h
     
     def get_subproject_details(glob_project_id):
+        h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = "exec	[masters].[sp_GetsubprojectDetails] ?"
         values = (glob_project_id,)
-    
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9].split(','),""+columns[10]+"":row[10].split(','),""+columns[11]+"":row[11],""+columns[12]+"":row[12]}
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
         cur.close()
         con.close()
-        return h
+        return h.copy()
     
     def center_list(center_id,user_id,user_role_id,user_region_id,center_type_ids,bu_ids,status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,regions,clusters,courses):
         content = {}
@@ -1004,11 +1005,11 @@ class Database:
         con.close()
         return content
 
-    def add_batch_details(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id):
+    def add_batch_details(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id,OJTStartDate, OJTEndDate):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	batches.sp_add_edit_batches ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
-        values = (BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id)
+        sql = 'exec	batches.sp_add_edit_batches ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?'
+        values = (BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id,OJTStartDate, OJTEndDate)
         cur.execute(sql,(values))
         batch_code=""
         for row in cur:
@@ -1088,9 +1089,10 @@ class Database:
         for r in cur2:
             h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
             trainers.append(h)
+        trainers_f={"Trainers":trainers, "Is_Ojt":r[2]}
         cur2.close()
         con.close()
-        return trainers
+        return trainers_f
     def GetCenterManagerBasedOnCenter(center_id):
         centermanager = []
         con = pyodbc.connect(conn_str)
@@ -1768,7 +1770,7 @@ class Database:
         region = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'SELECT * FROM [masters].[tbl_region] where is_active=1;'
+        sql = 'SELECT region_id, region_name, region_code, created_by, ref_region_id, is_deleted FROM [masters].[tbl_region] where is_active=1;'
         cur.execute(sql)
         columns = [column[0].title() for column in cur.description]
         for row in cur:
