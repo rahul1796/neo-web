@@ -1034,6 +1034,8 @@ class add_batch_details(Resource):
             ActualEndDate=request.form['ActualEndDate']
             StartTime=request.form['StartTime']
             EndTime=request.form['EndTime']
+            OJTStartDate=request.form['OJTStartDate']
+            OJTEndDate=request.form['OJTEndDate']
             user_id=g.user_id
             isactive=request.form['isactive']
             Product=request.form['Product']
@@ -1044,7 +1046,7 @@ class add_batch_details(Resource):
             planned_batch_id=0
             if 'PlannedBatchId' in request.form:
                 planned_batch_id=request.form['PlannedBatchId']
-            return Batch.add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id)
+            return Batch.add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id,OJTStartDate, OJTEndDate)
 
 
 class get_batch_details(Resource):
@@ -5026,7 +5028,8 @@ class add_subproject_details(Resource):
             subproject_id=g.subproject_id
             project_code = request.form['project_id']      
             isactive=request.form['isactive']
-            return Master.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive)
+            is_ojt_req=request.form['is_ojt_req']
+            return Master.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req)
 api.add_resource(add_subproject_details,'/add_subproject_details')
 
 #############################################################################

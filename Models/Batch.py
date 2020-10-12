@@ -7,8 +7,8 @@ class Batch:
     def batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center,center_type,course_ids,assessment_stage_id, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
         return Database.batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids,assessment_stage_id, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
     
-    def add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id):
-        popupMessage = {"PopupMessage": Database.add_batch_details(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id)}
+    def add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id,OJTStartDate, OJTEndDate):
+        popupMessage = {"PopupMessage": Database.add_batch_details(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id,OJTStartDate, OJTEndDate)}
         return popupMessage
     def get_batch(batch_id):
         indi_batch={"BatchDetail":Database.get_batch_details(batch_id)}
@@ -50,7 +50,7 @@ class Batch:
         popupMessage = {"PopupMessage": Database.tag_sponser_candidate(skilling_ids,sponser_ids,user_id)}
         return popupMessage
     def AllTrainersOnSubProject(SubProject_Id):
-        trainers_f={"Trainers":Database.GetTrainersBasedOnSubProject(SubProject_Id)}
+        trainers_f=Database.GetTrainersBasedOnSubProject(SubProject_Id)
         return trainers_f
     def AllTrainersOnSubProjects(SubProject_Id):
         trainers_f={"Trainers":Database.AllTrainersOnSubProjects(SubProject_Id)}

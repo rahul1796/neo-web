@@ -52,6 +52,7 @@ var Candidates = {};
                             loadroomlist(data.BatchDetail.Center_Id);
                             //LoadCourseList(data.BatchDetail.Course_Id,data.BatchDetail.Center_Id);
                             LoadsubProject(data.BatchDetail.Sub_Project_Id,data.BatchDetail.Center_Id,data.BatchDetail.Course_Id);
+                            // dd_OJTEndDate, dd_OJTStartDate
                             LoadCoFunding(data.BatchDetail.Co_Funding_Project_Id);
                             TrainersBasedOnSubProject(data.BatchDetail.Trainer_Id,data.BatchDetail.Sub_Project_Id);
                             LoadPlannedBatches(data.BatchDetail.Sub_Project_Id,data.BatchDetail.Course_Id,data.BatchDetail.Planned_Batch_Id)
@@ -61,7 +62,9 @@ var Candidates = {};
                             $('#ActualEndDate').val(data.BatchDetail.Actual_End_Date);
                             $('#StartTime').val(data.BatchDetail.Training_Start_Time);
                             $("#EndTime").val(data.BatchDetail.Training_End_Time);
-                            
+                            $('#OJTStartDate').val(data.BatchDetail.Ojt_Startdate),
+                            $('#OJTEndDate').val(data.BatchDetail.Ojt_Enddate),
+
                             $('#ddlRoom').val(data.BatchDetail.Room_Ids.split(",")).trigger('change');
                             $('#ddlCourse').val(data.BatchDetail.Course_Id);//.trigger('change')
                             if(data.BatchDetail.Is_Active)
@@ -72,13 +75,6 @@ var Candidates = {};
                             {
                                 $('#isactive').prop('checked',false);
                             }
-                            // alert(data.BatchDetail.Sub_Project_Id);
-                            // alert(data.BatchDetail.Course_Id);
-                            //$('#ddlTrainer').val();
-                            //$('#BatchCode').val(data.BatchDetail.Batch_Code);
-                            //$('#ddlProduct').val(data.BatchDetail.Product_Id);
-                            //$('#ddlProduct').select2('val',data.BatchDetail.Product_Id);
-                            //$('#ddlCenter').val();
                         }
                     } 
                 },
@@ -381,7 +377,16 @@ var Candidates = {};
                 },
                 success: function (data){
                     if(data.Trainers != null)
-                    {
+                    {   
+                        if (data.Is_Ojt){
+                            $('#dd_OJTEndDate').show();
+                            $('#dd_OJTStartDate').show();
+                        }
+                        else{
+                            $('#dd_OJTEndDate').hide();
+                            $('#dd_OJTStartDate').hide();
+                        }
+
                         $('#ddlTrainer').empty();
                         var count=data.Trainers.length;
                         if( count> 0)
@@ -542,6 +547,21 @@ var Candidates = {};
             if(($('#StartTime').val() < $("#EndTime").val()) && ($('#ActualStartDate').val() <= $('#ActualEndDate').val()) && ($('#PlannedStartDate').val() <= $('#PlannedEndDate').val()))
             {
 				var centertype;
+                if ($('#OJTEndDate').val() >= $('#OJTStartDate').val()){
+                    if (($('#OJTEndDate').val()<$('#ActualStartDate').val())||($('#OJTEndDate').val()>$('#ActualEndDate').val())){
+                        alert('OJT End date must be less then actual end date and greater then actual start date.')
+                        return false;
+                    }
+                    if (($('#OJTStartDate').val()<$('#ActualStartDate').val())||($('#OJTStartDate').val()>$('#ActualEndDate').val())){
+                        alert('OJT start date must be less then actual end date and greater then actual start date.')
+                        return false;
+                    }
+                }
+                else{
+                    alert('OJT End Date should be greater than OJT start date')
+                    return false;
+                }
+
                 //alert($('#ActualStartDate').val());
 				// if($('#ddlSubCenter').val() != '')
                 // {
@@ -551,8 +571,6 @@ var Candidates = {};
                 // {
                 //     centertype = $('#ddlCenter').val()
                 // }
-                
-                
                 var PlannedTarget = parseInt($('#ddlPlannedBatchCode option:selected').attr('data-value'));
                 
                 var TotalCapacity=parseInt($('#TxtCapacity').val());
@@ -589,6 +607,8 @@ var Candidates = {};
                             "ActualEndDate":$('#ActualEndDate').val(),
                             "StartTime":$('#StartTime').val(),
                             "EndTime":$("#EndTime").val(),
+                            "OJTStartDate":$('#OJTStartDate').val(),
+                            "OJTEndDate":$('#OJTEndDate').val(),
                             "BatchId":'{{batch_id}}',
                             "PlannedBatchId":$('#ddlPlannedBatchCode').val()
                         },
@@ -611,9 +631,7 @@ var Candidates = {};
                                         confirmButtonClass:"btn btn-confirm mt-2"
                                         }).then(function(){
                                             window.location.href = '/after_popup_batch';
-                                        }); 
-                        
-                                
+                                        });         
                         },
                         error:function(err)
                         {
@@ -830,7 +848,24 @@ var Candidates = {};
                                 <div class="col-lg-6">
                             <input type="text" id="EndTime" name="EndTime" class="form-control time-picker" ClientIdMode="static" placeholder="End Time" required="">
                         </div>
-                    </div>                    
+                    </div>
+                    <div class="form-group row " id="dd_OJTStartDate" style="display: none;">
+                        <div class="col-lg-6">
+                            <label for="OJTStartDate">OJT Start Date:</label>
+                        </div>
+                        <div class="col-lg-6">
+                        <input type="text" id="OJTStartDate" name="OJTStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="OJT Start Date" required="">
+                        </div>
+                    </div>
+                    <div class="form-group row " id="dd_OJTEndDate" style="display: none;">
+                        <div class="col-lg-6">
+                            <label for="OJTEndDate">OJT End Date:</label>
+                        </div>
+                        <div class="col-lg-6">
+                        <input type="text" id="OJTEndDate" name="OJTEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="OJT End Date" required="">
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-6">

@@ -73,6 +73,15 @@ var Centers;
                             {
                                 $('#isactive').prop('checked',false);
                             }
+                    if(data.SubProjectDetail.Is_Ojt_Req)
+                            {
+                                $('#is_ojt_req').prop('checked',true);
+                            }
+                            else
+                            {
+                                $('#is_ojt_req').prop('checked',false);
+                            }
+                    
                         
                     } 
                     $('#hdn_sub_project_id').val(data.SubProjectDetail.Sub_Project_Id);
@@ -100,6 +109,7 @@ var Centers;
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
         success: function (data){
+            console.log(data);
             if(data.Region != null)
             {
                 $('#ddlRegion').empty();
@@ -119,7 +129,7 @@ var Centers;
         },
         error:function(err)
         {
-            alert('Error while loading BU! Please try again');
+            alert('Error while loading Region! Please try again');
             return false;
         }
     });
@@ -311,6 +321,7 @@ var Centers;
                     "ActualStartDate" : $('#ActualStartDate').val(),
                     "ActualEndDate" : $('#ActualEndDate').val(),
                     "isactive" : $('#isactive').prop('checked'),
+                    "is_ojt_req" : $('#is_ojt_req').prop('checked'),
                     "project_id" : $('#ddlProject').val()
                 },
                 success:function(data){
@@ -941,6 +952,20 @@ var Centers;
                                                 <div class="col-lg-6">
                                             <input type="text" id="ActualEndDate" name="ActualEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="End Date" required="">
                                         </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label>Is OJT required?*:</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="checkbox checkbox-pink mb-0">
+                                                    <input type="checkbox" name="is_ojt_req" id="is_ojt_req" ClientIdMode="static" 
+                                                                    value="0" data-parsley-mincheck="1" >
+                                                    <label for="is_ojt_req"> Is OJT required? </label>
+                                                </div>
+                                            </div>   
+                                        </div>                                     
                                     </div>
                                     <div class="form-group">
                                         <div class="row">
