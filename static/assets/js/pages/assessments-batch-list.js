@@ -626,6 +626,23 @@ function GetBatchDetails(BatchCode)
         });
         return false;
     }
+function toggleCheckbox(e)
+{
+    var temp=e.target.getAttribute('value');
+    if($('#'+e.target.getAttribute('id')).is(':checked'))
+    {
+        $('[name=checkcase]').each(function () {
+                $(this).prop("checked", true);
+        });
+    }
+    else
+    {
+        $('[name=checkcase]').each(function () {
+            $(this).prop("checked", false);
+        });
+    }
+    //console.log(check_list)
+}
 function add_map_message(){
     var cands='';
     //alert(flag)
@@ -1419,12 +1436,10 @@ function add_map_message(){
                         {   if(StageId==0)
                             {
                                 $("#lblCandidateTable").text("Select Not-Eligible Candidates for Assessment:");
-                                $("#thSelect").text("Select");
-                            }
+                                  }
                             else{
                                 $("#lblCandidateTable").text("Select Candidates For Re-Assessment:");
-                                $("#thSelect").text("Select");
-                            }
+                                  }
                             
                             for(var i=0;i<count;i++)
                             {   
@@ -1436,7 +1451,6 @@ function add_map_message(){
                                     txt+='<input id="addedchk" name="checkcase" type="checkbox" value="'+data.Candidates[i].Candidate_Id+'" >';
                                 else{
                                     $("#lblCandidateTable").text("Select Candidates For Re-Assessment");
-                                    $("#thSelect").text("Select");
                                     txt+='<input id="addedchk" name="checkcase" type="checkbox" value="'+data.Candidates[i].Candidate_Id+'" checked>';
                                     }
                                 varHtml+='  <td style="text-align:center;">'+ txt +'</td>';

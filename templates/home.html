@@ -60,6 +60,7 @@
 						$('#Mobilization_Menu').show();
                         $('#Registration_Menu').show();
                         $('#Enrollment_Menu').show();
+                        $('#Certification_Menu').show();
                         $('#Candidate_Menu').show();
                         //$('#Batch_Menu').show();
                         $('#Assessment_Menu').show();
@@ -156,6 +157,7 @@
 						$('#Mobilization_Menu').show();
                         $('#Registration_Menu').show();
                         $('#Enrollment_Menu').show();
+                        $('#Certification_Menu').show();
                         $('#Candidate_Menu').show();
                         //$('#Batch_Menu').show();
                         $('#Assessment_Menu').show();
@@ -240,6 +242,7 @@
                         $('#Enrollment_Menu').hide();
                         $('#Candidate_Menu').show();
                         $('#Assessment_Menu').show();
+                        $('#Certification_Menu').show();
                         $('#Content_Menu').show();
                             $('#AnchorSectors').show();
                             $('#AnchorQP').show();
@@ -277,6 +280,7 @@
                         $('#Enrollment_Menu').hide();
                         $('#Candidate_Menu').show();
                         $('#Assessment_Menu').show();
+                        $('#Certification_Menu').show();
                         $('#Content_Menu').show();
                             $('#AnchorSectors').hide();
                             $('#AnchorQP').hide();
@@ -356,6 +360,7 @@
                         $('#Enrollment_Menu').hide();
                         $('#Candidate_Menu').show();
                         $('#Assessment_Menu').show();
+                        $('#Certification_Menu').show();   
                         $('#Content_Menu').show();
                             $('#AnchorSectors').show();
                             $('#AnchorQP').show();
@@ -390,6 +395,7 @@
 						$('#Mobilization_Menu').show();
                         $('#Registration_Menu').show();
                         $('#Enrollment_Menu').show();
+                        $('#Certification_Menu').show();   
                         $('#Candidate_Menu').show();
                         $('#Assessment_Menu').show();
                         $('#Content_Menu').show();
@@ -713,6 +719,13 @@
                         if(goto !="")
                             $("#box").load(goto);
                         break;
+                    case 40:             //Logistics
+                    $('#Home').show();
+                    $('#Certification_Menu').show();                   
+                    if(goto !="")
+                        $("#box").load(goto);
+                    break;
+            
                 }
             }
         });      
@@ -882,7 +895,7 @@
             <!-- end Topbar -->
 
             <div class="topbar-menu">
-                <div class="container-fluid">
+                <div class="container-fluid" style="max-width: none;">
                     <div  id="navigation" class="active" style="display: none;">
                         <!-- Navigation Menu-->
                     <!-- <ul class="navbar-toggle nav-link"> -->
@@ -899,6 +912,9 @@
                             </li>
                             <li class="has-submenu active" id="Enrollment_Menu">
                                 <a id="AnchorRegistration" href="/enrollment"  class="active"> <i class="fe-edit-2"></i>Enrollment<div class="button"></div></a>
+                            </li>
+                            <li class="has-submenu active" id="Certification_Menu" style="display:none">
+                                <a id="AnchorCertification" href="/certification"  class="active"> <i class="fe-edit-2"></i>Certification<div class="button"></div></a>
                             </li>
                             <li class="has-submenu active" id="TMA_attendance_Menu" style="display:none">
                                 <a id="Anchorattendance" href="/AttendanceReport"  class="active"> <i class="fe-airplay"></i>Training<div class="button"></div></a>
