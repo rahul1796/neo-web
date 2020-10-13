@@ -7886,7 +7886,6 @@ class GetBatchList(Resource):
                 return response
 api.add_resource(GetBatchList,'/GetBatchList')
 
-
 class GetBatchSessionList(Resource):
     @staticmethod
     def get():
@@ -7941,7 +7940,6 @@ class LogTrainerStageDetails(Resource):
                 res = TMA.LogTrainerStageDetails(session_id,user_id,batch_id,stage_id,latitude,longitude,image_file_name,mark_candidate_attendance,attendance_data,group_attendance_image_data,app_version)
                 response=jsonify(res)
                 return response
-
         except Exception as e:
             res={'status':-1,'message':'Error : '+ str(e),'app_status':True}
             response=jsonify(res)
@@ -8407,6 +8405,80 @@ def certification():
         return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
     else:
         return render_template("login.html",error="Session Time Out!!")
+
+class GetOJTBatchCurrentStageDetails(Resource):
+    @staticmethod
+    def get():
+        try:
+            if request.method=='GET':
+                user_id=request.args.get('user_id',0,type=int)
+                batch_id=request.args.get('batch_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                client_id=request.args.get('client_id','',type=str)
+                client_key=request.args.get('client_key','',type=str)
+                
+                if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                    if batch_id<1:
+                        res = {'status':0,'message':'Missing or invalid batch_id'}
+                        return jsonify(res)
+                    
+                    current_stage = Database.GetOJTBatchCurrentStageDetails(batch_id,user_id,user_role_id)
+                    if current_stage ==None:
+                        res = {'status':0, 'message':'No stage found' }
+                    else:
+                        res = {'status':1,'message':'Success','user_id':user_id,'batch_id':batch_id,'stage_id':current_stage}
+                else:
+                    res = {'status':0, 'message':'Invalid client credentials'}
+                
+            else:
+                res = {'status':0, 'message':'Invalid Method'}
+            return jsonify(res)  
+
+        except Exception as e:
+            res={'status':-1,'message':'Error : '+ str(e)}
+            return jsonify(res)
+api.add_resource(GetOJTBatchCurrentStageDetails, '/GetOJTBatchCurrentStageDetails')
+
+class LogOJTStageDetails(Resource):
+    @staticmethod
+    def post():
+        try:
+            if request.method=='POST':
+                client_id = request.form['client_id']
+                client_key = request.form['client_key']
+                user_id = int(request.form['user_id'])
+                batch_id = int(request.form['batch_id'])
+                stage_id = int(request.form['stage_id'])
+                latitude = request.form['latitude']
+                longitude = request.form['longitude']
+                timestamp = request.form['timestamp']
+                filename = request.form['filename']
+
+                app_version = request.form['app_version']
+                device_model = request.form['device_model']
+                imei_num = request.form['imei_num']
+                android_version = request.form['android_version']
+                
+                if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                    if batch_id<1:
+                        res = {'status':0,'message':'Missing or invalid batch_id','app_status':True}
+                        return jsonify(res)
+                    if (stage_id<1 or stage_id>3):
+                        res = {'status':0,'message':'Missing or invalid stage_id','app_status':True}
+                        return jsonify(res)
+
+                    res = Database.LogOBJStageDetails(user_id, batch_id, stage_id, latitude, longitude, timestamp, filename, app_version, device_model, imei_num, android_version)
+                else:
+                    res = {'status':0, 'message':'Invalid client credentials'}               
+            else:
+                res = {'status':0, 'message':'Invalid Method'}
+            return jsonify(res)
+                    
+        except Exception as e:
+            res={'status':-1,'message':'Error : '+ str(e),'app_status':True}
+            response=jsonify(res)
+            return response
+api.add_resource(LogOJTStageDetails,'/LogOJTStageDetails')
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
