@@ -951,7 +951,7 @@ class Database:
         con.close()
         return content
         
-    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
+    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids,batch_codes, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
         #print(status, customer, project, course, region, center)
         content = {}
         d = []
@@ -959,9 +959,9 @@ class Database:
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
 
-        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?'
+        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?'
 
-        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids, batch_codes,Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
 
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
@@ -987,6 +987,32 @@ class Database:
         cur = con.cursor()
 
         sql = 'exec [batches].[sp_get_batch_list_assessment] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?,?, ?, ?, ?, ?, ?'
+
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids,assessment_stage_id, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
+        #print(values)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        record="0"
+        fil="0"
+        for row in cur:
+            record=row[len(columns)-1]
+            fil=row[len(columns)-2]
+            for i in range(len(columns)-2):
+                h[columns[i]]=row[i]
+            d.append(h.copy())
+        content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
+        cur.close()
+        con.close()
+        return content
+    def batch_list_certification(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids,assessment_stage_id, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
+        #print(status, customer, project, course, region, center)
+        content = {}
+        d = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+
+        sql = 'exec [batches].[sp_get_batch_list_certification] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?,?, ?, ?, ?, ?, ?'
 
         values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids,assessment_stage_id, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
         #print(values)
@@ -4358,6 +4384,28 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close() 
         return out
+    def ALLCandidatesBasedOnCertifiactionStage(batch_id,stage_id):
+        response = []
+        
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        h={}
+        sql = 'exec [assessments].[getcandidatesbasedoncertifiactionstage]  ?,?'
+        values = (batch_id,stage_id)
+        print(values)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6]}
+            response.append(h.copy())
+        out = {"Candidates":response}
+        cur.close()
+        con.close() 
+        print(response)
+        return out
+    
     def CandidateFamilyDetails(candidate_id):
         response = []
         
@@ -5537,8 +5585,20 @@ SELECT					cb.name as candidate_name,
         cur = con.cursor()
         sql = 'exec	[candidate_details].[sp_get_candidate_download_new_E] ?'
         values = (candidate_ids,)
-        print (sql, values)
+        
+        cur.execute(sql,(values))
 
+        columns = [column[0].title() for column in cur.description]  
+        data = list(map(lambda x:list(x),cur.fetchall()))
+        cur.close()
+        con.close()
+        return {'data':data,'columns':columns}
+
+    def download_selected_candidate_certification(batch_id,enrollment_ids):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[assessments].[sp_get_candidate_download_certification] ?,?'
+        values = (batch_id,enrollment_ids)
         cur.execute(sql,(values))
 
         columns = [column[0].title() for column in cur.description]  
@@ -5599,7 +5659,6 @@ SELECT					cb.name as candidate_name,
         cur = con.cursor()
         sql = 'exec [masters].[sp_get_partner_list] ?, ?, ?, ?, ?, ?'
         values = (partner_type_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
-        print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -5619,7 +5678,6 @@ SELECT					cb.name as candidate_name,
         cur = con.cursor()
         sql = 'exec	[masters].[sp_add_edit_partner] ?, ?, ?, ?,?, ?, ?'
         values = (partner_name,user_id,is_active,partner_type_id,assessment_partner_type_id,address,partner_id)
-        print(values)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -5936,7 +5994,7 @@ SELECT					cb.name as candidate_name,
         #quer = "{"+ quer + "}"
         curs.execute(quer)
         out = curs.fetchall()[0][0]<=0
-        print(out)
+        #print(out)
         return out
 
     def app_email_validation(email, candidate_id=0):
@@ -5990,7 +6048,7 @@ SELECT					cb.name as candidate_name,
         cur2 = con.cursor()
         sql = 'exec [reports].[sp_get_batch_status_report_data]    ?,?,?,?,?,?,?,?'
         values = (user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date)
-        print(values)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -6025,7 +6083,7 @@ SELECT					cb.name as candidate_name,
 
     def upload_batch_target_plan(df,user_id,user_role_id):
         try:            
-            print(str(df.to_json(orient='records')))
+            #print(str(df.to_json(orient='records')))
             con = pyodbc.connect(conn_str)
             cur = con.cursor()
             h=[]           
@@ -6064,7 +6122,7 @@ SELECT					cb.name as candidate_name,
             h=[]           
             d={} 
             json_str=df.to_json(orient='records')
-            print(json_str)
+            #print(json_str)
             sql = 'exec	[users].[sp_validate_upload_user]  ?,?,?'
             values = (json_str,user_id,user_role_id)
             cur.execute(sql,(values))
@@ -6671,7 +6729,7 @@ SELECT					cb.name as candidate_name,
 
         query = eval('quer'+str(c_id))
         query = query.format(filename,candidate_id)
-        #print(query)
+
         cur2.execute(query)
         cur2.commit()
         cur2.close()
