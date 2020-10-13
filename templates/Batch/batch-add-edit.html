@@ -378,6 +378,7 @@ var Candidates = {};
                 success: function (data){
                     if(data.Trainers != null)
                     {   
+                        $('#hdn_is_OBJ').val(data.Is_Ojt)
                         if (data.Is_Ojt){
                             $('#dd_OJTEndDate').show();
                             $('#dd_OJTStartDate').show();
@@ -547,35 +548,25 @@ var Candidates = {};
             if(($('#StartTime').val() < $("#EndTime").val()) && ($('#ActualStartDate').val() <= $('#ActualEndDate').val()) && ($('#PlannedStartDate').val() <= $('#PlannedEndDate').val()))
             {
 				var centertype;
-                if ($('#OJTEndDate').val() >= $('#OJTStartDate').val()){
-                    if (($('#OJTEndDate').val()<$('#ActualStartDate').val())||($('#OJTEndDate').val()>$('#ActualEndDate').val())){
-                        alert('OJT End date must be less then actual end date and greater then actual start date.')
+                if ($('#hdn_is_OBJ').val()=='1'){
+                    if ($('#OJTEndDate').val() >= $('#OJTStartDate').val()){
+                        if (($('#OJTEndDate').val()<$('#ActualStartDate').val())||($('#OJTEndDate').val()>$('#ActualEndDate').val())){
+                            alert('OJT End date must be less then actual end date and greater then actual start date.')
+                            return false;
+                        }
+                        if (($('#OJTStartDate').val()<$('#ActualStartDate').val())||($('#OJTStartDate').val()>$('#ActualEndDate').val())){
+                            alert('OJT start date must be less then actual end date and greater then actual start date.')
+                            return false;
+                        }
+                    }
+                    else{
+                        alert('OJT End Date should be greater than OJT start date')
                         return false;
                     }
-                    if (($('#OJTStartDate').val()<$('#ActualStartDate').val())||($('#OJTStartDate').val()>$('#ActualEndDate').val())){
-                        alert('OJT start date must be less then actual end date and greater then actual start date.')
-                        return false;
-                    }
-                }
-                else{
-                    alert('OJT End Date should be greater than OJT start date')
-                    return false;
                 }
 
-                //alert($('#ActualStartDate').val());
-				// if($('#ddlSubCenter').val() != '')
-                // {
-                //     centertype = $('#ddlSubCenter').val()
-                // }
-                // else
-                // {
-                //     centertype = $('#ddlCenter').val()
-                // }
                 var PlannedTarget = parseInt($('#ddlPlannedBatchCode option:selected').attr('data-value'));
-                
                 var TotalCapacity=parseInt($('#TxtCapacity').val());
-                
-                //console.log(PlannedTarget,TotalCapacity);
                 if(TotalCapacity< PlannedTarget)
                 {
                     alert('Batch capacity/target should be less than or equal to the room capacity');
@@ -585,7 +576,6 @@ var Candidates = {};
                 {
                     console.log('target is less than or equal to room capacity.');
                 }
-                
                 var URL=$('#hdn_web_url').val()+ "/add_batch_details";
                     $.ajax({
                         type:"POST",
@@ -652,6 +642,7 @@ var Candidates = {};
 
 <div class="container-fluid">
     <form action="javascript: add_popup_message();">
+        <input type="hidden" id="hdn_is_OBJ" name="hdn_is_OBJ" value="0">
     <!-- start page title -->
     <div class="row">
         <div class="col-12">
