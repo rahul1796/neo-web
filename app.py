@@ -3390,7 +3390,7 @@ api.add_resource(GetCandidateBasicDetails,'/GetCandidateBasicDetails')
 ############################################################################################################
 @app.route("/forget_password")
 def forget_password():
-    return render_template('recoverpw.html')
+    return render_template('recoverpw.html', html_path=config.Base_URL)
 
 class recover_pass(Resource):
     @staticmethod
