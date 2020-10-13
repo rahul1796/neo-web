@@ -4447,7 +4447,6 @@ SELECT					cb.name as candidate_name,
         con.close()
         return {"Contracts":response}
 
-
     def GetBillingMilestones():
         response = []
         h={}
@@ -5074,6 +5073,11 @@ SELECT					cb.name as candidate_name,
                 ,[is_active]=1
                 where candidate_id={};
             '''
+
+            que_test='''
+                select is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id where 1=1 and batch_code=trim('{}') and coalesce(sp.is_ojt_req,0)=1
+                '''
+
             url = candidate_xml_weburl + xml
             r = requests.get(url)
             data = r.text
@@ -5085,10 +5089,23 @@ SELECT					cb.name as candidate_name,
             for child in root:
                 data = child.attrib
                 out.append(data['assign_batch'])
+                
+                curs.execute(que_test.format(data['assign_batch']))
+                is_obj = curs.fetchall()
+                if is_obj!=[]:
+                    quer1 = '''
+                    update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1,Cand_Password='Password' where candidate_id='{}';
+                    '''
+                else:
+                    quer1 = '''
+                    update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1, Cand_Password=null where candidate_id='{}';
+                    '''
+
                 if 'mobilization_type' in data:
                     query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,data['mobilization_type'],1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
                 else:
                     query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1,1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
+
                 query += '\n' + quer2.format(data['whatsapp_number'],data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['presAddrOne'],data['permAddrOne'],data['highQuali'],data['candStream'],data['compKnow'],data['techKnow'],data['houseIncome'],data['bankName'],data['accNum'],user_id,data['cand_id'])
                 query += '\n' + quer3.format(data['presAddrTwo'],data['presVillage'],data['presPanchayat'],data['presTaluk'],data['permAddrTwo'],data['permVillage'],data['permPanchayat'],data['permTaluk'],data['instiName'],data['university'],data['yrPass'],data['percentage'],data['branchName'],data['ifscCode'],data['accType'],data['bankCopy'],user_id,data['cand_id'])
                 query += '\n' + quer7.format(data['cand_id'])
@@ -5390,6 +5407,10 @@ SELECT					cb.name as candidate_name,
             quer1 = '''
             update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',secondary_contact_no='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1 where candidate_id='{}';
             '''
+            quer1_OBJ = '''
+            update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',secondary_contact_no='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1,Cand_Password='Password' where candidate_id='{}';
+            '''
+
             quer2='''
             update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',present_address_line1='{}',permanaet_address_line1='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where UPPER(identification_name)=UPPER('{}')),identity_number='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',highest_qualification='{}',stream_specialization='{}',computer_knowledge='{}',technical_knowledge='{}',family_salutation='{}',member_name='{}',gender='{}',education_qualification='{}',relationship='{}',occupation='{}',average_household_income='{}',bank_name='{}',account_number='{}',created_by={},created_on=GETDATE(),is_active=1,whatsapp_number='{}' where candidate_id='{}';
             '''
@@ -5429,6 +5450,7 @@ SELECT					cb.name as candidate_name,
                         WHERE		i.candidate_id={}
                         AND			cs.intervention_id is NOT NULL
                     '''.format(row[0])
+                
                 curs.execute(que)
                 intervention_id = curs.fetchall()
                 if intervention_id!=[]:
@@ -5437,8 +5459,20 @@ SELECT					cb.name as candidate_name,
                     b.append(row[78] if ProjectType == 1 else row[79])
                     temp += '\n' + "({},'SAE',GETDATE(),{},1),".format(row[0],"(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id where u.is_active=1 and ud.email like trim('{}'))".format(row[79] if ProjectType == 1 else row[80]))
 
-
-
+                que='''
+                select is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id where 1=1 and batch_code=trim('{}') and coalesce(sp.is_ojt_req,0)=1
+                '''
+                curs.execute(que.format(row[78] if ProjectType == 1 else row[79]))
+                is_obj = curs.fetchall()
+                if is_obj!=[]:
+                    quer1 = '''
+                    update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',secondary_contact_no='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1,Cand_Password='Password' where candidate_id='{}';
+                    '''
+                else:
+                    quer1 = '''
+                    update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',secondary_contact_no='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1,Cand_Password=null where candidate_id='{}';
+                    '''
+                
                 if ProjectType==2:
                     query += '\n' + quer8.format(row[82],row[83],row[84],row[85],row[86],row[87],row[88],row[89],row[90],row[91],row[92],row[93],row[94],row[95],row[96],row[97],row[98],row[0])
 
@@ -6637,10 +6671,45 @@ SELECT					cb.name as candidate_name,
 
         query = eval('quer'+str(c_id))
         query = query.format(filename,candidate_id)
-        print(query)
+        #print(query)
         cur2.execute(query)
         cur2.commit()
         cur2.close()
         con.close()
         out = {'Status': True, 'message': "Submitted Successfully"}
         return out
+
+    def GetOJTBatchCurrentStageDetails(batch_id,user_id,user_role_id):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        quer = "call [masters].[sp_ojt_get_batch_current_stage_detail]({},{},{})".format(user_id, user_role_id,  batch_id)
+        quer = "{"+ quer + "}"
+        curs.execute(quer)
+        data = curs.fetchall()
+        
+        StageId=0
+        if data!=[]:
+            StageId=data[0][0]
+        curs.close()
+        con.close()
+        return StageId
+
+    def LogOBJStageDetails(user_id, batch_id, stage_id, latitude, longitude, timestamp, filename, app_version, device_model, imei_num, android_version):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        if TMADatabase.AppVersionCheck(curs, app_version):
+            quer = "call [masters].[sp_OBJ_log_stage_details]({},{},{},'{}','{}','{}','{}','{}','{}','{}')".format(user_id, batch_id, stage_id, latitude, longitude, timestamp, filename, device_model, imei_num, android_version)
+            quer = "{"+ quer + "}"
+            curs.execute(quer)
+            data = curs.fetchall()
+            if len(data)==0:
+                res = {'status':0, 'message':'Not able to log','app_status':True}
+            else:
+                res = {'status':1,'message':'Success','app_status':True}
+        else:
+            res={'status':1,'message':'Failed lower app version','app_status':False}
+
+        curs.commit()
+        curs.close()
+        con.close()
+        return res

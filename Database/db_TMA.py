@@ -82,14 +82,26 @@ class TMADatabase:
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         if TMADatabase.AppVersionCheck(curs, app_version):
-            quer="call [batches].[sp_tma_get_batch_list]({},{},{},{})".format(BatchStatusId, UserId,CenterId,role_id)
-            quer = "{"+ quer + "}"
-            curs.execute(quer)
+            if int(role_id) == 0:
+                quer="call [batches].[sp_ojt_get_batch_list]({})".format(UserId)
+                quer = "{"+ quer + "}"
+                curs.execute(quer)
+            else:
+                quer="call [batches].[sp_tma_get_batch_list]({},{},{},{})".format(BatchStatusId, UserId,CenterId,role_id)
+                quer = "{"+ quer + "}"
+                curs.execute(quer)
+            
             data=curs.fetchall()
             BatchList=[]
+            
             if ((data!=None)and(data!=[])):
-                for batch in data:
-                    BatchList.append({'batch_id':batch[0],'batch_code': batch[1],'batch_start_date': batch[2],'batch_end_date': batch[3],'batch_status': batch[4],'batch_active_status': batch[5],'batch_stage_id': batch[6],'batch_stage_name': batch[7],'business_unit': batch[8],'center_name': batch[9],'center_type': batch[10],'course_id': batch[11],'course_code': batch[12],'course_name': batch[13],'qp_id': batch[14],'qp_code': batch[15],'qp_name': batch[16],'image_required': batch[17],'center_id': batch[18]})
+                if int(role_id) == 0:
+                    for batch in data:
+                        BatchList.append({'batch_id':batch[0],'batch_code': batch[1],'batch_start_date': batch[2],'batch_end_date': batch[3],'batch_status': batch[4],'batch_active_status': batch[5],'business_unit': batch[6],'center_name': batch[7],'center_type': batch[8],'course_id': batch[9],'course_code': batch[10],'course_name': batch[11],'qp_id': batch[12],'qp_code': batch[13],'qp_name': batch[14],'image_required': batch[15],'center_id': batch[16],'OJT_Startdate': batch[17],'OJT_Enddate': batch[18]})
+                else:
+                    for batch in data:
+                        BatchList.append({'batch_id':batch[0],'batch_code': batch[1],'batch_start_date': batch[2],'batch_end_date': batch[3],'batch_status': batch[4],'batch_active_status': batch[5],'batch_stage_id': batch[6],'batch_stage_name': batch[7],'business_unit': batch[8],'center_name': batch[9],'center_type': batch[10],'course_id': batch[11],'course_code': batch[12],'course_name': batch[13],'qp_id': batch[14],'qp_code': batch[15],'qp_name': batch[16],'image_required': batch[17],'center_id': batch[18]})
+
             res={'status':1,'message':'Success','batch_list':BatchList,'app_status':True}
         else:
             res={'status':1,'message':'Failed lower app version','app_status':False}
