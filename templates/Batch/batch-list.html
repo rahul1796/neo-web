@@ -126,7 +126,7 @@
                                     </div>
                                     <div class="col-lg-3">
                                         <label for="ddlSubProject" class="mr-2">Sub Project</label>
-                                        <select class="form-control dropdown-search-filter" id="ddlSubProject" multiple>  <!-- onchange="LoadCenter();"-->>
+                                        <select class="form-control dropdown-search-filter" id="ddlSubProject" onchange="LoadBatches();" multiple>  <!-- onchange="LoadCenter();"-->>
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
@@ -181,6 +181,11 @@
                                     </div>
                                 </div> 
                                 <div class="row">
+                                    <div class="col-lg-3" id="batch_div" >
+                                        <label for="ddlBatches" class="mr-2">Batch Code:</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlBatches" multiple>
+                                        </select>
+                                    </div>
                                     <div class="col-lg-3">
 										<label for="Planned_actual" class="mr-2">Planned / Actual</label>
 										<select class="form-control dropdown-search-filter" id="Planned_actual" onchange="showdates();">
@@ -194,15 +199,16 @@
                                         <a class="btn btn-primary" style="float: right; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
                                         <a id="lnkDownload" style="display:none;"></a>
                                     </div>
+                                    <div class="col-lg-3" >                                        
+                                        <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-primary">Create Batch</a>
+                                    </div>
                                     <div class="form-group col-lg-3">
                                         <div id="imgSpinner">
                                             <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-block;"/>
                                             <label style="display:inline-block;">Please wait while downloading report...</label>
                                         </div> 
                                     </div>
-                                    <div class="col-lg-3" >                                        
-                                        <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-primary">Create Batch</a>
-                                    </div>
+                                   
                                 </div>
                                  <!-- end row -->
                             </div> <!-- end card-box -->
