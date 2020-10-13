@@ -3,8 +3,7 @@
 
 <script>
 function add_popup_message(){
-	
-	var URL='http://neo.labournet.in/recover_pass';
+	var URL= '{{html_path}}' + '/recover_pass';
 	   $.ajax({
 		   type:"GET",
 		   url:URL,
