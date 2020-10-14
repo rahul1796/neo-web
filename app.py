@@ -8448,6 +8448,7 @@ class LogOJTStageDetails(Resource):
                 client_id = request.form['client_id']
                 client_key = request.form['client_key']
                 user_id = int(request.form['user_id'])
+                user_role_id = int(request.form['user_role_id'])
                 batch_id = int(request.form['batch_id'])
                 stage_id = int(request.form['stage_id'])
                 latitude = request.form['latitude']
@@ -8462,17 +8463,17 @@ class LogOJTStageDetails(Resource):
                 
                 if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
                     if batch_id<1:
-                        res = {'status':0,'message':'Missing or invalid batch_id','app_status':True}
+                        res = {'success': False, 'description': "Missing or invalid batch_id", 'app_status':True}
                         return jsonify(res)
                     if (stage_id<1 or stage_id>3):
-                        res = {'status':0,'message':'Missing or invalid stage_id','app_status':True}
+                        res = {'success': False, 'description':'Missing or invalid stage_id','app_status':True}
                         return jsonify(res)
 
                     res = Database.LogOBJStageDetails(user_id, batch_id, stage_id, latitude, longitude, timestamp, filename, app_version, device_model, imei_num, android_version)
                 else:
-                    res = {'status':0, 'message':'Invalid client credentials'}               
+                    res = {'success': False, 'description':'Invalid client credentials','app_status':True}
             else:
-                res = {'status':0, 'message':'Invalid Method'}
+                res = {'success': False, 'description':'Invalid Method','app_status':True}
             return jsonify(res)
                     
         except Exception as e:
