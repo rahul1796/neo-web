@@ -55,16 +55,16 @@ var Candidates = {};
                             // dd_OJTEndDate, dd_OJTStartDate
                             LoadCoFunding(data.BatchDetail.Co_Funding_Project_Id);
                             TrainersBasedOnSubProject(data.BatchDetail.Trainer_Id,data.BatchDetail.Sub_Project_Id);
-                            LoadPlannedBatches(data.BatchDetail.Sub_Project_Id,data.BatchDetail.Course_Id,data.BatchDetail.Planned_Batch_Id)
+                            LoadPlannedBatches(data.BatchDetail.Sub_Project_Id,data.BatchDetail.Course_Id,data.BatchDetail.Planned_Batch_Id);
                             $('#PlannedStartDate').val(data.BatchDetail.Planned_Start_Date);
                             $('#PlannedEndDate').val(data.BatchDetail.Planned_End_Date);
                             $('#ActualStartDate').val(data.BatchDetail.Actual_Start_Date);
                             $('#ActualEndDate').val(data.BatchDetail.Actual_End_Date);
                             $('#StartTime').val(data.BatchDetail.Training_Start_Time);
                             $("#EndTime").val(data.BatchDetail.Training_End_Time);
-                            $('#OJTStartDate').val(data.BatchDetail.Ojt_Startdate),
-                            $('#OJTEndDate').val(data.BatchDetail.Ojt_Enddate),
-
+                            $('#OJTStartDate').val(data.BatchDetail.Ojt_Startdate);
+                            $('#OJTEndDate').val(data.BatchDetail.Ojt_Enddate);
+                            
                             $('#ddlRoom').val(data.BatchDetail.Room_Ids.split(",")).trigger('change');
                             $('#ddlCourse').val(data.BatchDetail.Course_Id);//.trigger('change')
                             if(data.BatchDetail.Is_Active)
