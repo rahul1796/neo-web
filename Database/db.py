@@ -6760,12 +6760,13 @@ SELECT					cb.name as candidate_name,
             quer = "{"+ quer + "}"
             curs.execute(quer)
             data = curs.fetchall()
+            
             if len(data)==0:
-                res = {'status':0, 'message':'Not able to log','app_status':True}
+                res = {'success': False, 'description':'Not able to log','app_status':True}
             else:
-                res = {'status':1,'message':'Success','app_status':True}
+                res = {'success': True, 'description':'Success','app_status':True}
         else:
-            res={'status':1,'message':'Failed lower app version','app_status':False}
+            res = {'success': True, 'description':'Failed lower app version','app_status':False}
 
         curs.commit()
         curs.close()
