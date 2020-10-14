@@ -6017,7 +6017,14 @@ SELECT					cb.name as candidate_name,
                     left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
                     where		ur.user_role_id in (24,5,38)
                     and         coalesce(ur.is_active,0)=1
-                                
+                    UNION
+                    select		distinct
+                                coalesce(ud.email,'') as email
+                    from		users.tbl_users as u
+                    left join	users.tbl_partner_users as ud on ud.user_id=u.user_id
+                    left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
+                    where		ur.user_role_id in (24,5,38)
+                    and         coalesce(ur.is_active,0)=1
                     """
         else:
             quer = """
@@ -6025,6 +6032,14 @@ SELECT					cb.name as candidate_name,
                                 coalesce(ud.email,'') as email
                     from		users.tbl_users as u
                     left join	users.tbl_user_details as ud on ud.user_id=u.user_id
+                    left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
+                    where		ur.user_role_id in (2,24,5,38)
+                    and         coalesce(ur.is_active,0)=1
+                    UNION
+                    select		distinct
+                                coalesce(ud.email,'') as email
+                    from		users.tbl_users as u
+                    left join	users.tbl_partner_users as ud on ud.user_id=u.user_id
                     left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
                     where		ur.user_role_id in (2,24,5,38)
                     and         coalesce(ur.is_active,0)=1
