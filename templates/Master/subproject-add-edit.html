@@ -9,6 +9,9 @@
 <script type="text/javascript">
 var Centers;
     $(document).ready(function(){
+        var $radio = $('input:radio[name="is_ojt_req"]');
+        $radio.addClass("validate[required]");
+
         $(".date-picker").flatpickr();
         $('.dropdown-search-filter').select2();
         //alert('{{subproject_id}}')
@@ -51,7 +54,7 @@ var Centers;
                 url:URL,
                 success:function(data){
                     if(data!=null)
-                    {    
+                    {   
                     $('#ProjectName').val(data.SubProjectDetail.Sub_Project_Name);
                     $('#ProjectCode').val(data.SubProjectDetail.Sub_Project_Code);
                     $('#ddlRegion').val(data.SubProjectDetail.Region_Id);
@@ -73,14 +76,16 @@ var Centers;
                             {
                                 $('#isactive').prop('checked',false);
                             }
-                    if(data.SubProjectDetail.Is_Ojt_Req)
-                            {
-                                $('#is_ojt_req').prop('checked',true);
-                            }
-                            else
-                            {
-                                $('#is_ojt_req').prop('checked',false);
-                            }
+                    $('input:radio[name=is_ojt_req][value="'+data.SubProjectDetail.Is_Ojt_Req+'"]').click();
+                    // if(data.SubProjectDetail.Is_Ojt_Req)
+                    //         {
+                                
+                    //             $('#is_ojt_req').prop('checked',true);
+                    //         }
+                    //         else
+                    //         {
+                    //             $('#is_ojt_req').prop('checked',false);
+                    //         }
                     
                         
                     } 
@@ -109,7 +114,7 @@ var Centers;
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
         success: function (data){
-            console.log(data);
+            //console.log(data);
             if(data.Region != null)
             {
                 $('#ddlRegion').empty();
@@ -305,6 +310,10 @@ var Centers;
         return false;
     }
     function add_popup_message(){
+        if ($('input:radio[name=is_ojt_req]:checked').val() == null){
+            alert('Please select is_ojt_req');
+            return
+        }
         var URL=$('#hdn_web_url').val()+ "/add_subproject_details";
             $.ajax({
                 type:"POST",
@@ -321,7 +330,7 @@ var Centers;
                     "ActualStartDate" : $('#ActualStartDate').val(),
                     "ActualEndDate" : $('#ActualEndDate').val(),
                     "isactive" : $('#isactive').prop('checked'),
-                    "is_ojt_req" : $('#is_ojt_req').prop('checked'),
+                    "is_ojt_req" : $('input:radio[name=is_ojt_req]:checked').val(), //$('#is_ojt_req').prop('checked'),
                     "project_id" : $('#ddlProject').val()
                 },
                 success:function(data){
@@ -959,11 +968,23 @@ var Centers;
                                                 <label>Is OJT required?*:</label>
                                             </div>
                                             <div class="col-lg-6">
+                                                <label class="radio-inline" for="OJT_yes">
+                                                    <input type="radio" id="OJT_yes" name="is_ojt_req" value="1" required>  Yes        
+                                                </label>
+                                                <label class="radio-inline;" for="OJT_no" style="margin-left: 20px;">
+                                                    <input type="radio" id="OJT_no" name="is_ojt_req" value="0">  No 
+                                                </label>
+                                                <!-- <input type="radio" id="OJT_yes" name="is_ojt_req" value="1" required>
+                                                <label for="OJT_yes">Yes     </label>
+                                                <input type="radio" id="OJT_no" name="is_ojt_req" value="0">
+                                                <label for="OJT_no">No</label> -->
+                                                <!-- 
                                                 <div class="checkbox checkbox-pink mb-0">
                                                     <input type="checkbox" name="is_ojt_req" id="is_ojt_req" ClientIdMode="static" 
                                                                     value="0" data-parsley-mincheck="1" >
                                                     <label for="is_ojt_req"> Is OJT required? </label>
-                                                </div>
+                                                </div> 
+                                                -->
                                             </div>   
                                         </div>                                     
                                     </div>
