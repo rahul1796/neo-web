@@ -8430,7 +8430,6 @@ class GetOJTBatchCurrentStageDetails(Resource):
                         res = {'status':1,'message':'Success','user_id':user_id,'batch_id':batch_id,'stage_id':current_stage}
                 else:
                     res = {'status':0, 'message':'Invalid client credentials'}
-                
             else:
                 res = {'status':0, 'message':'Invalid Method'}
             return jsonify(res)  
