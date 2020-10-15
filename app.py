@@ -8476,7 +8476,8 @@ class LogOJTStageDetails(Resource):
             return jsonify(res)
                     
         except Exception as e:
-            res={'status':-1,'message':'Error : '+ str(e),'app_status':True}
+            res = {'success': False, 'description':'Error : '+ str(e),'app_status':True}
+            #res={'status':-1,'message':'Error : '+ str(e),'app_status':True}
             response=jsonify(res)
             return response
 api.add_resource(LogOJTStageDetails,'/LogOJTStageDetails')

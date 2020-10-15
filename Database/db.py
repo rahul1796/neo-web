@@ -73,6 +73,13 @@ def to_xml(df, filename=None, mode='w'):
 pd.DataFrame.to_xml = to_xml
 
 class Database:
+    def AppVersionCheck(curs, app_version):
+        quer = "SELECT TOP (1) version_code FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        curs.execute(quer)
+        data=curs.fetchall()
+        data = 0 if data==[] else data[0][0]
+        return (int(app_version) >= int(data))
+
     def Login(email,passw):
         tr =[]
         h={}
@@ -6777,7 +6784,7 @@ SELECT					cb.name as candidate_name,
     def LogOBJStageDetails(user_id, batch_id, stage_id, latitude, longitude, timestamp, filename, app_version, device_model, imei_num, android_version):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
-        if TMADatabase.AppVersionCheck(curs, app_version):
+        if Database.AppVersionCheck(curs, app_version):
             quer = "call [masters].[sp_OBJ_log_stage_details]({},{},{},'{}','{}','{}','{}','{}','{}','{}')".format(user_id, batch_id, stage_id, latitude, longitude, timestamp, filename, device_model, imei_num, android_version)
             quer = "{"+ quer + "}"
             curs.execute(quer)
