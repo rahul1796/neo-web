@@ -8481,6 +8481,54 @@ class LogOJTStageDetails(Resource):
             return response
 api.add_resource(LogOJTStageDetails,'/LogOJTStageDetails')
 
+class Upload_OJT_file(Resource):
+    #upload_path = config.tmapath + 'trainer_stage_images/'
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            client_id = request.form['client_id']
+            client_key = request.form['client_key']
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                try:
+                    file = request.files['file']
+                    name = file.filename
+                    file_format = name.split('.')[-1]
+                except Exception as e:
+                    res = {'success': False, 'description': "Unable to read file "}
+                    #res = {'status':0,'message':"unable to read image " + str(e)}
+                    return jsonify(res)
+                if file:
+                    try:
+                        upload_path = ''
+                        if file_format.lower()=='mp3':
+                            upload_path = config.neo_report_file_path + 'data/OJT/audio/'
+                        elif (file_format.lower() in ['gif', 'jpeg', 'png', 'jpg']):
+                            upload_path = config.neo_report_file_path + 'data/OJT/images/'
+                        else:
+                            #res = {'status':0,'message':"Invalid file Format"}
+                            res = {'success': False, 'description': "Invalid file Format "}
+                            return jsonify(res)
+                        file.save(upload_path + name)
+                        
+                        #res = {'status':1,'message':"uploaded succesfully"}
+                        res = {'success': True, 'description': "uploaded succesfully"}
+                        return jsonify(res)
+                    except Exception as e:
+                        #res = {'status':0,'message':"uploaded failed " + str(e)}
+                        res = {'success': False, 'description': "uploaded failed " + str(e)}
+                        return jsonify(res) 
+                else:
+                    res = {'success': False, 'description': "Please select a file "}
+                    return jsonify(res) 
+            else:
+                #res = {'status':0,'message':"client name and password not matching {}, {}".format(client_id, client_key)}
+                res = {'success':False,'description':"client name and password not matching {}, {}".format(client_id, client_key)}
+                return jsonify(res)
+        else:
+            res = {'success':False,'description':"wrong method"}
+            return jsonify(res)
+api.add_resource(Upload_OJT_file, '/Upload_OJT_file')
+
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
     #app.run(debug=True)
