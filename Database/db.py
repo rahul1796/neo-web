@@ -4193,7 +4193,7 @@ SELECT					cb.name as candidate_name,
                     user_mail_id_to=''
                     user_name_to=''
                     sql = '''
-                          select top(1) email from users.tbl_user_details where user_id=
+                          select top(1) first_name,email from users.tbl_user_details where user_id=
                                                     (select top(1) created_by as stage_changed_by 
                                                     from assessments.tbl_map_certification_candidates_stages 
                                                     where assessment_id = (select TOP(1) assessment_id 
@@ -4218,7 +4218,7 @@ SELECT					cb.name as candidate_name,
                     user_mail_id_to=''
                     user_name_to=''
                     sql = '''
-                            select top(1) email from users.tbl_user_details where user_id in 
+                            select top(1) first_name,email from users.tbl_user_details where user_id in 
                                         (select user_id from masters.tbl_map_sub_project_user as u
                                         inner join users.tbl_map_User_UserRole as urr on urr.user_id=u.user_id
                                         and urr.user_role_id =5
@@ -4241,7 +4241,7 @@ SELECT					cb.name as candidate_name,
                     user_mail_id_to=''
                     user_name_to=''
                     sql = '''
-                            select top(1) email from users.tbl_user_details where user_id=
+                            select top(1) first_name,email from users.tbl_user_details where user_id=
                                                     (select top(1) assigned_to as logistic_user 
                                                     from assessments.tbl_map_certification_candidates_stages 
                                                     where assessment_id = (select TOP(1) assessment_id 
@@ -4267,7 +4267,7 @@ SELECT					cb.name as candidate_name,
                     user_mail_id_to=''
                     user_name_to=''
                     sql = '''
-                            select top(1) email from users.tbl_user_details where user_id=
+                            select top(1) first_name,email from users.tbl_user_details where user_id=
                                                     (select top(1) cereted_by as amt_user 
                                                     from assessments.tbl_map_certification_candidates_stages 
                                                     where assessment_id = (select TOP(1) assessment_id 
@@ -4293,7 +4293,7 @@ SELECT					cb.name as candidate_name,
                     user_mail_id_to=''
                     user_name_to=''
                     sql = '''
-                            select top(1) email from users.tbl_user_details where user_id=
+                            select top(1) first_name,email from users.tbl_user_details where user_id=
                                                     (select top(1) cereted_by as amt_user 
                                                     from assessments.tbl_map_certification_candidates_stages 
                                                     where assessment_id = (select TOP(1) assessment_id 
