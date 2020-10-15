@@ -549,18 +549,22 @@ var Candidates = {};
             {
 				var centertype;
                 if ($('#hdn_is_OBJ').val()=='1'){
+                    if ($('#OJTEndDate').val()==''|| $('#OJTStartDate').val()==''){
+                        alert('OJT dates are mandatory')
+                        return false;
+                    }
                     if ($('#OJTEndDate').val() >= $('#OJTStartDate').val()){
                         if (($('#OJTEndDate').val()<$('#ActualStartDate').val())||($('#OJTEndDate').val()>$('#ActualEndDate').val())){
-                            alert('OJT End date must be less then actual end date and greater then actual start date.')
+                            alert('OJT dates must be within the batch start date & end date.')
                             return false;
                         }
                         if (($('#OJTStartDate').val()<$('#ActualStartDate').val())||($('#OJTStartDate').val()>$('#ActualEndDate').val())){
-                            alert('OJT start date must be less then actual end date and greater then actual start date.')
+                            alert('OJT dates must be within the batch start date & end date.')
                             return false;
                         }
                     }
                     else{
-                        alert('OJT End Date should be greater than OJT start date')
+                        alert('OJT end date should be greater than OJT start date')
                         return false;
                     }
                 }
@@ -842,7 +846,7 @@ var Candidates = {};
                     </div>
                     <div class="form-group row " id="dd_OJTStartDate" style="display: none;">
                         <div class="col-lg-6">
-                            <label for="OJTStartDate">OJT Start Date:</label>
+                            <label for="OJTStartDate">OJT Start Date*:</label>
                         </div>
                         <div class="col-lg-6">
                         <input type="text" id="OJTStartDate" name="OJTStartDate" class="form-control date-picker" ClientIdMode="static" placeholder="OJT Start Date" required="">
@@ -850,7 +854,7 @@ var Candidates = {};
                     </div>
                     <div class="form-group row " id="dd_OJTEndDate" style="display: none;">
                         <div class="col-lg-6">
-                            <label for="OJTEndDate">OJT End Date:</label>
+                            <label for="OJTEndDate">OJT End Date*:</label>
                         </div>
                         <div class="col-lg-6">
                         <input type="text" id="OJTEndDate" name="OJTEndDate" class="form-control date-picker" ClientIdMode="static" placeholder="OJT End Date" required="">
