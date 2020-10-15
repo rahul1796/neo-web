@@ -58,21 +58,7 @@ function uploadFileToS3(file, s3Data, url){
 
 function toggleCheckbox(e)
     {
-        //let id = e.target.getAttribute('value');
-        
-        //console.log(e.target.getAttribute('name'));
         var temp=e.target.getAttribute('value');
-        //check_list.push(e.target.getAttribute('value'));
-
-        //console.log(e.target.getAttribute('name').checked)
-        //console.log(e.target.getAttribute('name').checked())
-        //console.log($('#'+e.target.getAttribute('id')).is(':checked')) 
-
-
-
-        //console.log($('#'+e.target.getAttribute('name')).is(':checked'))
-
-        //console.log(e.currentTarget.getAttribute('id'));
         if($('#'+e.target.getAttribute('id')).is(':checked'))
         {
             if(jQuery.inArray( temp, check_list )==-1){

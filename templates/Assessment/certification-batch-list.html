@@ -37,6 +37,9 @@
             .hidedialog {
                 display: none;
             }
+            .modal {
+                overflow-y:auto;
+            }
             .user-btn{    
                     /* display:inline-block; */
                     font-weight:400;
@@ -306,11 +309,12 @@
             <div class="modal-content " style="width: 1200px;">
                 <div class="modal-header">
                     <h4 class="modal-title">Candidate List:</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="Back()">×</button>
                 </div>             
                 <div class="modal-body">
-                    <input type="hidden" id="hdn_mdl_batch_code" name="hdn_mdl_batch_code" value="">
+                    <input type="hidden" id="hdn_batch_code" name="hdn_batch_code" value="">
                     <input type="hidden" id="hdn_batch_id" name="hdn_batch_id" value="0">
+                    <input type="hidden" id="hdn_cert_stage_id" name="hdn_cert_stage_id" value=0>
                     <input type="hidden" id="hdn_mdl_skilling_id" name="hdn_mdl_skilling_id" value="0">
                     
                     <table id="tbl_candidate" class="table table-bordered dt-responsive wrap w-100" style="border-color: lightgray;width:100% !important;font-size: 10px;">
@@ -324,7 +328,8 @@
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Email</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Enrolment No</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Certificate Number</th>
-
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Certificate Copy</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -333,18 +338,165 @@
                     </table>	
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="btnUploadCertificate" class="btn btn-primary waves-effect" onclick="UploadCertificate()" style="display: none;">Upload Certificate</button>
-                    <button type="button" class="btn btn-primary waves-effect" onclick="ChangeStage()" style="display: none;">Change Stage</button>
-                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                    <button type="button" id="btnUploadCertificate" class="btn btn-primary waves-effect" onclick="UploadCertificate()" style="display: none;">Upload Certificate Number</button>
+                    <button type="button" id="btnStatusChange" class="btn btn-primary waves-effect" onclick="ChangeStage()" style="display: none;">Change Stage</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="Back()">Close</button>
                     <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
                 </div>
+            </div>
+        </div>
+    </div><!--/.modal-->
+    <div id="mdl_certification_status_change" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content " >
+                <form id="frChangeStage" data-parsley-validate="" action="javascript:ChangeCertificationStage()">
+                <div class="modal-header">
+                    <h4 class="modal-title" ><span id="hdHeadingName">Certification Details</span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>                    
+                <div class="modal-body" style="overflow: auto;width: 100%;height:400px;">  
+                    <input type="hidden" id="hdn_batch_assessment_id" name="hdn_batch_assessment_id" value="0"> 
+                    <input type="hidden" id="hdn_assessment_id" name="hdn_assessment_id" value="0"> 
+                    <input type="hidden" id="hdn_current_stage_id" name="hdn_current_stage_id" value="0">
+                    <div >
+                        <div class="form-group" id="DivCertStages" >
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="ddlCertStages">Certification Stage * :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtCertStages" name="TxtCertStages" class="form-control " ClientIdMode="static" placeholder="Certification Satge" disabled >
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
+                        </div> 
+                        <div class="form-group" id="DivSentPrintingDate" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtSentPrintingDate">Sent For Printing On*:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtSentPrintingDate" name="TxtSentPrintingDate" class="form-control date-picker" required placeholder="Select Date">
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
+                        </div>
+                        <div class="form-group" id="DivSentCenterDate" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtSentCenterDate">Sent To Center On*:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtSentCenterDate" name="TxtSentCenterDate" class="form-control date-picker" required placeholder="Select Date">
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
+                        </div>
+                        <div class="form-group" id="DivCenterExpArrivalDate" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtSentCenterDate">Expected Arrival Date*:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtCenterExpArrivalDate" name="TxtCenterExpArrivalDate" class="form-control date-picker" required placeholder="Select Date">
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
+                        </div>
+                        <div class="form-group" id="DivReceivedDate" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtReceivedDate">Received Date*:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtReceivedDate" name="TxtReceivedDate" class="form-control date-picker" required placeholder="Select Date">
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
+                        </div>
+                        <div class="form-group" id="DivPlannedDistributionDate" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtPlannedDistributionDate">Planned Distribution Date*:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtPlannedDistributionDate" name="TxtPlannedDistributionDate" class="form-control date-picker" required placeholder="Select Date">
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
+                        </div>
+                        <div class="form-group" id="DivActualDistributionDate" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtActualDistributionDate">Actual Distribution Date*:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtActualDistributionDate" name="TxtActualDistributionDate" class="form-control date-picker" required placeholder="Select Date">
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" id="DivCGName" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtCGName">Chief Guest Name:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtCGName" name="TxtCGName" class="form-control " ClientIdMode="static" placeholder="Chief Guest Name" >
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
+                        </div>  
+                        <div class="form-group" id="DivCGDesig" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtCGDesig">Chief Guest Designation:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtCGDesig" name="TxtCGDesig" class="form-control " ClientIdMode="static" placeholder="Chief Guest Designation" >
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
+                        </div> 
+                        <div class="form-group" id="DivCGOrg" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtCGOrg">Chief Guest Organization:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtCGOrg" name="TxtCGOrg" class="form-control " ClientIdMode="static" placeholder="Chief Guest Oraganization" >
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
+                        </div>  
+                        <div class="form-group" id="DivCGOrgLoc" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtCGOrgLoc">Chief Guest Organization Location:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtCGOrgLoc" name="TxtCGOrgLoc" class="form-control " ClientIdMode="static" placeholder="Chief Guest Oraganization Location" >
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
+                        </div>  
+                       
+                           
+                    </div>             
+                </div>
+                <div class="modal-footer">   
+                    <button class="btn btn-success" type="submit"> Submit </button>                
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Back</button>                    
+                </div>
+                </form>
             </div>
         </div>
     </div><!--/.modal-->
     <div id="mdl_certificate_upload" class="modal fade" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content ">
-                <form id="formUpload" action="javascript:UploadFileData()">
+                <form id="formUpload" action="javascript:UploadcertificateFileData()">
                     <input type="hidden" id="hdn_home_user_id_modal" name="hdn_home_user_id_modal" value="0">
                     <input type="hidden" id="hdn_home_user_role_id_modal" name="hdn_home_user_role_id_modal" value="0">
                     <input type="hidden" id="hdn_upl_assessment_id" name="hdn_assessment_id" value="0">
@@ -352,12 +504,23 @@
                     <input type="hidden" id="hdn_upl_batch_code" name="hdn_upl_batch_code" value="">
                     <input type="hidden" id="hdn_upl_stage_id" name="hdn_stage_id" value="0">
                 <div class="modal-header">
-                    <h4 class="modal-title"><span id="HduploadFile"></span></h4>
+                    <h4 class="modal-title"><span id="HduploadFile"></span>Upload Certificate Number</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 </div>
                 <div class="modal-body">
-                    
+                   
                     <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-2">
+                                <label for="ddlLogisticUsers">Assign to*:</label>
+                            </div>
+                            <div class="col-lg-8" >
+                                <select id="ddlLogisticUsers" class="form-control"  name="ddlLogisticUsers" ClientIdMode="static" required=""> <!-- myfunction(this.value) -->>
+                                
+                                </select>
+                            </div> 
+                        </div>
+                        <br><br>
                         <div class="row">
                             <div class="col-lg-4">
                                 <label for="myFile">Upload File* :</label>
@@ -380,7 +543,7 @@
                     </div>
                 <div class="modal-footer">
                     <button class="btn btn-primary waves-effect" type="submit" >Submit</button>
-                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="LoadTable()">Back</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="Back()">Back</button>
                 </div>
                
             </form>
@@ -388,6 +551,6 @@
         </div>
     </div><!--/.modal-->
    
-   
+    
 
     <script src="static/assets/js/pages/certification-batch-list.js"></script>

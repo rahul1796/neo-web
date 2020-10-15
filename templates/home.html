@@ -652,6 +652,7 @@
                         $('#Candidate_Menu').hide();
                         //$('#Batch_Menu').show();
                         $('#Assessment_Menu').show();
+                        $('#Certification_Menu').show();  
                         $('#Content_Menu').hide();
                             $('#AnchorSectors').hide();
                             $('#AnchorQP').hide();
@@ -720,8 +721,37 @@
                             $("#box").load(goto);
                         break;
                     case 40:             //Logistics
-                    $('#Home').show();
-                    $('#Certification_Menu').show();                   
+                        $('#Home').hide();
+						$('#Mobilization_Menu').hide();
+                        $('#Registration_Menu').hide();
+                        $('#Enrollment_Menu').hide();
+                        $('#Candidate_Menu').hide();
+                         $('#Certification_Menu').show();   
+                         $('#Content_Menu').hide();
+                            $('#AnchorSectors').hide();
+                            $('#AnchorQP').hide();
+                            $('#AnchorCourses').hide();
+                        $('#Master_Menu').hide();
+                            $('#AnchorClients').hide();
+                            $('#AnchorContracts').hide();
+                            $('#Project_Menu').hide();    
+                                $('#AnchorProjects').hide();  
+                                $('#AnchorSubProjects').hide();   
+                                $('#AnchorBatch').hide();
+                            $('#AnchorCenters').hide();
+                            $('#AnchorUsers').hide();
+                            $('#AnchorTrainers').hide();
+                            $('#AnchorPartnerss').hide();
+                        $('#Insight_Menu').hide();
+                            $('#AnchorSalesDashboard').hide();
+                            $('#AnchorOperationDashboard').hide();
+                        $('#My_Projects_Menu').hide();
+                        $('#Report_Menu').hide();
+                            $('#ECP_report').hide();
+                            $('#Qp_wise_report').hide();
+                            $('#Batch_Status_report').hide();
+                            $('#ops_productivity_report').hide();
+                            $('#TrainerProductivityReport').hide();                
                     if(goto !="")
                         $("#box").load(goto);
                     break;
@@ -913,9 +943,7 @@
                             <li class="has-submenu active" id="Enrollment_Menu">
                                 <a id="AnchorRegistration" href="/enrollment"  class="active"> <i class="fe-edit-2"></i>Enrollment<div class="button"></div></a>
                             </li>
-                            <li class="has-submenu active" id="Certification_Menu" style="display:none">
-                                <a id="AnchorCertification" href="/certification"  class="active"> <i class="fe-edit-2"></i>Certification<div class="button"></div></a>
-                            </li>
+                           
                             <li class="has-submenu active" id="TMA_attendance_Menu" style="display:none">
                                 <a id="Anchorattendance" href="/AttendanceReport"  class="active"> <i class="fe-airplay"></i>Training<div class="button"></div></a>
                             </li>
@@ -937,7 +965,9 @@
                             <li class="has-submenu active" id="Assessment_Menu">
                                 <a id="AnchorAssessment" href="/assessment"  class="active"> <i class="fe-edit-2"></i>Assessment<div class="button"></div></a>
                             </li>
-
+                            <li class="has-submenu active" id="Certification_Menu" style="display:none">
+                                <a id="AnchorCertification" href="/certification"  class="active"> <i class="fe-edit-2"></i>Certification<div class="button"></div></a>
+                            </li>
 							<li class="has-submenu active"  id="Report_Menu"  >
                                 <a href="#" class="active">
                                     <i class="fe-airplay"></i>Report <div class="arrow-down"></div></a>
