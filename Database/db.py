@@ -1311,6 +1311,71 @@ class Database:
         con.close()
         msg={"message":"Batch Cancelled"}
         return msg
+    def upload_assessment_certificate_copy(certi_name,user_id,enrolment_id,batch_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = '''update assessments.tbl_map_certification_candidates_stages 
+                set certificate_copy=? ,
+                created_by=?
+                where intervention_value=? and assessment_id=(select TOP(1) assessment_id 
+                                                            from assessments.tbl_batch_assessments
+                                                            where batch_id=? and assessment_type_id=2
+                                                            and assessment_stage_id=4
+                                                            and is_active=1
+                                                            order by assessment_id desc
+                                                            )
+                AND is_active=1;'''
+        values = (certi_name,user_id,enrolment_id,batch_id)
+        cur.execute(sql,(values))
+        cur.commit()
+        cur.close()
+        con.close()
+        msg={"Status":True,"message":"Certificate Uploaded"}
+        return msg
+    def upload_cerification_cand_image(certi_name,user_id,enrolment_id,batch_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = '''update assessments.tbl_map_certification_candidates_stages 
+                set uploaded_cand_image=? ,
+                created_by=?
+                where intervention_value=? and assessment_id=(select TOP(1) assessment_id 
+                                                            from assessments.tbl_batch_assessments
+                                                            where batch_id=? and assessment_type_id=2
+                                                            and assessment_stage_id=4
+                                                            and is_active=1
+                                                            order by assessment_id desc
+                                                            )
+                AND is_active=1;'''
+        values = (certi_name,user_id,enrolment_id,batch_id)
+        cur.execute(sql,(values))
+        cur.commit()
+        cur.close()
+        con.close()
+        msg={"Status":True,"message":"Image Uploaded"}
+        return msg
+    
+    def upload_cerification_batch_image(file_name,user_id,batch_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = '''update assessments.tbl_batch_assessments 
+                set batch_image=? ,
+                created_by=?
+                where assessment_id=(select TOP(1) assessment_id 
+                                                            from assessments.tbl_batch_assessments
+                                                            where batch_id=? and assessment_type_id=2
+                                                            and assessment_stage_id=4
+                                                            and is_active=1
+                                                            order by assessment_id desc
+                                                            )
+                AND is_active=1;'''
+        values = (file_name,user_id,batch_id)
+        cur.execute(sql,(values))
+        cur.commit()
+        cur.close()
+        con.close()
+        msg={"Status":True,"message":"Image Uploaded"}
+        return msg
+    
     def tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()

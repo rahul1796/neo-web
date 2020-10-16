@@ -34,9 +34,9 @@
                 box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
             }
             
-            .hidedialog {
+           /* .hidedialog {
                 display: none;
-            }
+            }*/
             .modal {
                 overflow-y:auto;
             }
@@ -225,51 +225,7 @@
         <!-- End Page content -->
         <!-- ============================================================== -->
         
-    <div id="map_cand" class="center hidedialog col-lg-12">
-        <button id="close" class="btn btn-primary " style="float: right;"onclick="javascript:$('#get').show(); $('.center').hide();">X</button>
-        <table id="tbl_candidate"  class="table dt-responsive nowrap">
-            <thead>
-                <tr>
-                    <th>S No</th>
-                    <th>ADD</th>
-                    <th>Candidate Id</th>
-                    <th>Candidate Name</th>
-                    <th>Course Name</th>
-                    <th>Center Name</th>
-                    <th>Mobile Number</th>
-                    <th>Registration Id</th>
-                    <th>Enrollment Id</th>
-                    <th>Salutation</th>
-                </tr>
-            </thead>
-        
-        <tbody></tbody>
-        </table>
-
-        <table id="tbl_drop_candidate"  class="table dt-responsive nowrap">
-            <thead>
-                <tr>
-                    <th>S No</th>
-                    <th>DROP</th>
-                    <th>Candidate Id</th>
-                    <th>Candidate Name</th>
-                    <th>Course Name</th>
-                    <th>Center Name</th>
-                    <th>Mobile Number</th>
-                    <th>Registration Id</th>
-                    <th>Enrollment Id</th>
-                    <th>Salutation</th>
-                </tr>
-            </thead>
-        
-        <tbody></tbody>
-        </table>
-
-        <div class="form-group mb-0">
-            <button class="btn btn-primary" onclick="javascript:save();">Save</button>
-        </div>
-        
-    </div>
+    
     <div id="divBatchDetails" class="modal fade" role="dialog">
         <div class="modal-dialog modal-xl">
             <div class="modal-content ">
@@ -330,6 +286,7 @@
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Enrolment No</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Certificate Number</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Certificate Copy</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Candidate Image</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Actions</th>
                             </tr>
                         </thead>
@@ -500,16 +457,16 @@
                 <form id="CertUpload" action="javascript:UploadCandidatecertificateFileData()">
                    
                 <div class="modal-header">
-                    <h4 class="modal-title"><span id="HduploadFile"></span>Upload Certificate</h4>
+                    <h4 class="modal-title">Upload Certificate</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="hdn_ceri_file_name" name="hdn_ceri_file_name" value="">
+                    <input type="hidden" id="hdn_certi_file_name" name="hdn_certi_file_name" value="">
                     <div class="form-group">
                       
                         <div class="row">
                             <div class="col-lg-4">
-                                <label for="myFile">Upload File* :</label>
+                                <label for="fileCertificate">Upload File* :</label>
                             </div>
                             <div class="col-lg-4">
                                 <input type="file" id="fileCertificate" name="filename">
@@ -521,42 +478,7 @@
                            
                         </div>
                     </div>
-                <div class="modal-footer">
-                    <button class="btn btn-primary waves-effect" type="submit" >Submit</button>
-                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Back</button>
                 </div>
-               
-            </form>
-            </div>
-        </div>
-    </div><!--/.modal-->
-    <div id="mdl_candidate_cand_image_upload" class="modal fade" role="dialog">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content ">
-                <form id="CandImageUpload" action="javascript:UploadCandidateImageFileData()">
-                   
-                <div class="modal-header">
-                    <h4 class="modal-title"><span id="HduploadFile"></span>Upload Image:</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="hdn_cand_image_file_name" name="hdn_cand_image_file_name" value="">
-                    <div class="form-group">
-                      
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <label for="myFile">Upload File* :</label>
-                            </div>
-                            <div class="col-lg-4">
-                                <input type="file" id="fileCandImage" name="filename">
-                            </div>
-                            <div id="imgSpinnerCandImage" style="height:10px;display:none;">
-                                <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
-                                <label style="display:inline-block;">Please wait while uploading file...</label>
-                            </div> 
-                           
-                        </div>
-                    </div>
                 <div class="modal-footer">
                     <button class="btn btn-primary waves-effect" type="submit" >Submit</button>
                     <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Back</button>
@@ -582,10 +504,47 @@
                       
                         <div class="row">
                             <div class="col-lg-4">
-                                <label for="myFile">Upload File* :</label>
+                                <label for="fileBatchImage">Upload File* :</label>
                             </div>
                             <div class="col-lg-4">
-                                <input type="file" id="fileBatchImage" name="filename">
+                                <input type="file" id="fileBatchImage" name="fileBatchImage">
+                            </div>
+                            <div id="imgSpinnerBatchImage" style="height:10px;display:none;">
+                                <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                                <label style="display:inline-block;">Please wait while uploading file...</label>
+                            </div> 
+                           
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary waves-effect" type="submit" >Submit</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="Back()" >Back</button>
+                </div>
+               
+            </form>
+            </div>
+        </div>
+    </div><!--/.modal-->
+    <div id="mdl_candidate_cand_image_upload" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content ">
+                <form id="CandImageUpload" action="javascript:UploadCandidateImageFileData()">
+                   
+                <div class="modal-header">
+                    <h4 class="modal-title"><span id="HduploadFile"></span>Upload Image:</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="hdn_cand_image_file_name" name="hdn_cand_image_file_name" value="">
+                    <div class="form-group">
+                      
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label for="fileCandImage">Upload File* :</label>
+                            </div>
+                            <div class="col-lg-4">
+                                <input type="file" id="fileCandImage" name="filename">
                             </div>
                             <div id="imgSpinnerCandImage" style="height:10px;display:none;">
                                 <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
@@ -594,6 +553,7 @@
                            
                         </div>
                     </div>
+                </div>
                 <div class="modal-footer">
                     <button class="btn btn-primary waves-effect" type="submit" >Submit</button>
                     <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Back</button>
@@ -603,6 +563,9 @@
             </div>
         </div>
     </div><!--/.modal-->
+   
+    
+   
     
     <div id="mdl_certificate_upload" class="modal fade" role="dialog">
         <div class="modal-dialog modal-lg">
@@ -661,7 +624,51 @@
             </div>
         </div>
     </div><!--/.modal-->
-    <div></div>
+    <div id="map_cand" class="center hidedialog col-lg-12">
+        <button id="close" class="btn btn-primary " style="float: right;"onclick="javascript:$('#get').show(); $('.center').hide();">X</button>
+        <table id="tbl_candidate"  class="table dt-responsive nowrap">
+            <thead>
+                <tr>
+                    <th>S No</th>
+                    <th>ADD</th>
+                    <th>Candidate Id</th>
+                    <th>Candidate Name</th>
+                    <th>Course Name</th>
+                    <th>Center Name</th>
+                    <th>Mobile Number</th>
+                    <th>Registration Id</th>
+                    <th>Enrollment Id</th>
+                    <th>Salutation</th>
+                </tr>
+            </thead>
+        
+        <tbody></tbody>
+        </table>
+
+        <table id="tbl_drop_candidate"  class="table dt-responsive nowrap">
+            <thead>
+                <tr>
+                    <th>S No</th>
+                    <th>DROP</th>
+                    <th>Candidate Id</th>
+                    <th>Candidate Name</th>
+                    <th>Course Name</th>
+                    <th>Center Name</th>
+                    <th>Mobile Number</th>
+                    <th>Registration Id</th>
+                    <th>Enrollment Id</th>
+                    <th>Salutation</th>
+                </tr>
+            </thead>
+        
+        <tbody></tbody>
+        </table>
+
+        <div class="form-group mb-0">
+            <button class="btn btn-primary" onclick="javascript:save();">Save</button>
+        </div>
+        
+    </div>
    
     
 
