@@ -575,6 +575,7 @@ function GetPassedCandidates(BatchId,Stage,Batch_Code){
                             varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Intervention_Value +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Certificate_Number +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Certificate_Copy +'</td>';
+                            var action='';
                             varHtml+='  <td style="text-align:center;">'+ '' +'</td>';
                             varHtml+='</tr>';
 
@@ -691,7 +692,7 @@ function UploadCertificate()
 {
     
     
-   // $('#tr_candidate_detail').modal('hide');
+   $('#tr_candidate_detail').modal('hide');
     LoadLogisticUsers();
     $('#mdl_certificate_upload').modal('show');
     
@@ -1280,298 +1281,133 @@ function GetCourseDetail(course_id)
     return false;
 }
 
-
-function ScheduleAssessmentModal(BatchId,BatchCode,Mobilization_Type){
-    LoadAssessmentTypes();
-    LoadAssessmentAgency();
-    $('#TxtRequestedDate').val('');
-    $('#DivScheduleDate').hide();
-    $('#DivAssessmentDate').hide();
-    $('#DivAssessorName').hide();
-    $('#DivAssessorMob').hide();
-    $('#DivAssessorEmail').hide();
-    $('#DivCandidates').show();
-    AbsentCandidateBatch(BatchId,0,0);  
-    $('#TxtScheduledDate').val('');
-    $('#TxtAssessmnetDate').val('');
-    $('#hdnMobilizationType').val(Mobilization_Type);
-    $('#hdn_batch_assessment_id').val(BatchId);
-    $('#ddlAssessmentType').attr('disabled', false);
-    $('#ddlAssessmentAgency').attr('disabled', false);
-    $('#ddlPartner').attr('disabled', false);
-    $('#TxtRequestedDate').attr('disabled', false);
-    $('#mdl_create_batch_assessments').modal('show');
-}
-function ScheduleReAssessmentModal(AssessmentId,BatchId,Partner_Category_Id,ReqDate,SchDate,AssessmentTypeId,AssessmentAgencyId,StageId,PartnerId,AssessmentDate){
-    LoadAssessmentTypes();
-    LoadAssessmentAgency();
-    LoadAssessmentPartnerTypes();
-    LoadPartner(Partner_Category_Id)
-    $('#TxtRequestedDate').val('');
-    $('#DivScheduleDate').hide();
-    $('#DivAssessmentDate').hide();
-    $('#DivAssessorName').hide();
-    $('#DivAssessorMob').hide();
-    $('#DivAssessorEmail').hide();
-    $('#DivCandidates').show();
-    AbsentCandidateBatch($('#hdn_batch_assessment_id').val(),AssessmentId,3); 
-    $('#TxtScheduledDate').val('');
-    $('#TxtAssessmnetDate').val('');
-    $('#hdn_batch_assessment_id').val(BatchId);
-    $('#ddlAssessmentType').val(AssessmentTypeId);
-    $('#ddlAssessmentAgency').val(AssessmentAgencyId).trigger('change');
-    $('#hdn_assessment_id').val(AssessmentId);
-    $('#ddlPartnerType').val(Partner_Category_Id);
-    $('#hdn_current_stage_id').val(StageId);
-    $('#ddlPartner').val(PartnerId);
-    $('#hdn_reassessment_flag').val(1);
-    $('#ddlAssessmentType').attr('disabled', true);
-    $('#ddlAssessmentAgency').attr('disabled', true);
-    $('#ddlPartner').attr('disabled', true);
-    $('#ddlPartnerType').attr('disabled', true);
-    $('#TxtRequestedDate').attr('disabled', false);
-    $('#mdl_create_batch_assessments').modal('show');
-}
-function EditAssessmentDetails(AssessmentId,Partner_Category_Id,ReqDate,SchDate,AssessmentTypeId,AssessmentAgencyId,StageId,PartnerId,AssessmentDate)
-{
-    LoadAssessmentTypes();
-    LoadAssessmentAgency();
-    LoadAssessmentPartnerTypes();
-    LoadPartner(Partner_Category_Id)
-    //alert($('#hdn_batch_assessment_id').val());
-    //AbsentCandidateBatch($('#hdn_batch_assessment_id').val());
-
-    $('#TxtRequestedDate').val(ReqDate);
-    $('#TxtScheduledDate').val(SchDate!='NA'?SchDate:'');
-    $('#TxtAssessmnetDate').val(AssessmentDate!='NA'?AssessmentDate:'');
-    $('#ddlAssessmentType').val(AssessmentTypeId);
-    $('#ddlAssessmentAgency').val(AssessmentAgencyId).trigger('change');
-    $('#hdn_assessment_id').val(AssessmentId);
-    $('#ddlPartnerType').val(Partner_Category_Id);
-    $('#hdn_current_stage_id').val(StageId);
-    $('#ddlPartner').val(PartnerId);
-    $('#DivCandidates').hide();
-    //$('#DivPartnerType').hide();
+function UploadCandidatecertificateFileData()
+{  
+ 
     
-    $('#ddlAssessmentType').prop('disabled', 'disabled');
-    $('#ddlAssessmentAgency').prop('disabled', 'disabled');
-    $('#ddlPartner').prop('disabled', 'disabled');
-    $('#ddlPartnerType').prop('disabled', 'disabled');
-    $('#TxtRequestedDate').prop('disabled', 'disabled');
-
-    if (StageId==1)
-    {
-        $('#DivScheduleDate').show();
-        
-        $('#DivAssessmentDate').hide();
-        $('#DivAssessorName').hide();
-        $('#DivAssessorMob').hide();
-        $('#DivAssessorEmail').hide();
-        $('#DivCandidates').hide();
-    }
-    else if (StageId==2)
-    {
-        $('#TxtScheduledDate').prop('disabled', 'disabled'); 
-        $('#TxtAssessmentDate').attr('disabled', false);
-        $('#DivScheduleDate').show();
-        $('#DivAssessmentDate').show();  
-        $('#DivAssessorName').show();
-        $('#DivAssessorMob').show();
-        $('#DivAssessorEmail').show();
-        //$('#DivCandidates').show();
-        //AbsentCandidateBatch($('#hdn_batch_assessment_id').val(),$('#hdn_assessment_id').val(),StageId);         
+    
+    if ($('#fileCertificate').get(0).files.length === 0) {
+        alert("No files selected.");
+        return;
     }
     else
     {
-        $('#TxtScheduledDate').prop('disabled', 'disabled');   
-        $('#TxtAssessmnetDate').prop('disabled', 'disabled'); 
-        $('#DivAssessorName').hide();
-        $('#DivAssessorMob').hide();
-        $('#DivAssessorEmail').hide();  
-        $('#DivCandidates').hide();
-        
-    }
-
-        
-    
-    
-    $('#mdl_batch_assessments').modal('hide');
-    $('#mdl_create_batch_assessments').modal('show');
-}
-function LoadAssessmentTypes(){
-    var URL=$('#hdn_web_url').val()+ "/GetAssessmentTypes"
-    $.ajax({
-        type:"GET",
-        url:URL,
-        async:false,
-        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-        datatype:"json",
-        success: function (data){
-            if(data.AssessmentTypes != null)
-            {
-                $('#ddlAssessmentType').empty();
-                var count=data.AssessmentTypes.length;
-                $('#ddlAssessmentType').append(new Option('Select',''));
-                if( count> 0)
-                {
-                    for(var i=0;i<count;i++)                           
-                        $('#ddlAssessmentType').append(new Option(data.AssessmentTypes[i].Assessment_Types_Name,data.AssessmentTypes[i].Assessment_Types_Id));
-                        
-                }
-                else
-                {
-                    $('#ddlAssessmentType').append(new Option('ALL','-1'));
-                }
-            }
-        },
-        error:function(err)
-        {
-            alert('Error loading assessment types! Please try again');
+//        UploadFileToProcess();
+//    }
+//}
+        var fileExtension = ['xlsx','jpg','png','pdf','doc','docx','jpeg','csv']
+        if ($.inArray($('#fileCertificate').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            alert("Formats allowed are : "+fileExtension.join(', '));
             return false;
         }
-    });
-}
-function LoadAssessmentAgency(){
-    var URL=$('#hdn_web_url').val()+ "/GetAssessmentAgency"
-    $.ajax({
-        type:"GET",
-        url:URL,
-        async:false,
-        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-        datatype:"json",
-        success: function (data){
-            if(data.AssessmentAgency != null)
-            {
-                $('#ddlAssessmentAgency').empty();
-                var count=data.AssessmentAgency.length;
-                $('#ddlAssessmentAgency').append(new Option('Select',''));
-                if( count> 0)
-                {
-                    for(var i=0;i<count;i++)
-                        if(data.AssessmentAgency[i].Assessment_Agency_Id != 3)
-                        {
-                            $('#ddlAssessmentAgency').append(new Option(data.AssessmentAgency[i].Assessment_Agency_Name,data.AssessmentAgency[i].Assessment_Agency_Id));
-                        }
-                }
-
-                else
-                {
-                    $('#ddlAssessmentAgency').append(new Option('ALL','-1'));
-                }
-            }
-        },
-        error:function(err)
+        else
         {
-            alert('Error loading assessment types! Please try again');
-            return false;
-        }
-    });
-}
+            $("#imgSpinnerCerti").show();
 
-
-
-function LoadAssessmentPartnerTypes()
-{
-    var URL=$('#hdn_web_url').val()+ "/GetAssessmentPartnerTypes";
-        $.ajax({
-            type:"GET",
-            url:URL,
-            async:false,        
-            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-            datatype:"json",
-            success: function (data){
-                if(data.AssessmentPartnerTypes != null)
-                {
-                    $('#ddlPartnerType').empty();
-                    var count=data.AssessmentPartnerTypes.length;
-                    if( count> 0)
-                    {
-                        $('#ddlPartnerType').append(new Option('Choose Assessment Partner Type',''));
-                        for(var i=0;i<count;i++)
-                            $('#ddlPartnerType').append(new Option(data.AssessmentPartnerTypes[i].Assessment_Partner_Type_Name,data.AssessmentPartnerTypes[i].Assessment_Partner_Type_Id));
-                        
+            var files=document.getElementById("fileCertificate").files;
+            var file=files[0];
+            var file_name= $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + file.name;
+            var file_path=$('#hdn_AWS_S3_path').val()+"certification/certificate_copy/" + file_name;
+            var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET",api_url );
+                xhr.onreadystatechange = function(){
+                    if(xhr.readyState === 4){
+                    if(xhr.status === 200){
+                        var response = JSON.parse(xhr.responseText);
+                        //console.log(response);
+                        uploadCertificateFileToS3(file, response.data, response.url);
+                        $("#imgSpinnerCerti").hide();
                     }
-                    else
-                    {
-                        $('#ddlPartnerType').append(new Option('ALL',''));
+                    else{
+                        alert("Could not get signed URL.");
                     }
-                }
-            },
-            error:function(err)
-            {
-                alert('Error! Please try again');
-                return false;
-            }
-        });
-        return false;
+                    }
+                };
+                xhr.send();
+        }
+    }
 }
 
-function AgencyOnChange(AgencyId)
+function uploadCertificateFileToS3(file, s3Data, url){
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", s3Data.url);
+
+    var postData = new FormData();
+    for(key in s3Data.fields){
+        postData.append(key, s3Data.fields[key]);
+    }
+    postData.append('file', file);
+
+    xhr.onreadystatechange = function() {
+        if(xhr.readyState === 4){
+        if(xhr.status === 200 || xhr.status === 204){
+            var response = xhr;
+            //console.log(response);
+            UploadCertificateFileToProcess();
+        }
+        else{
+            alert("Could not upload file to s3.");
+        }
+    }
+    };
+    xhr.send(postData);
+}
+
+function UploadCertificateFileToProcess()
 {
-    //LoadPartner();
-    if (AgencyId==2)
-    {
-        LoadAssessmentPartnerTypes();
-        $('#DivPartnerType').show();
-        $('#ddlPartnerType').prop('Required');
-        $('#DivPartner').show();
-        $('#ddlPartner').prop('Required');
-    }
-    else
-    {
-        $('#DivPartner').hide();
-        $('#ddlPartner').removeProp('Required');
-        $('#DivPartnerType').hide();
-        $('#ddlPartnerType').removeProp('Required');
-    }
+    //console.log()
+    var form_data = new FormData('file_name',$('#hdn_ceri_file_name').val());
+    form_data.append('user_id', $('#hdn_home_user_id').val());
+    form_data.append('enrollment_id', $('#hdn_cand_enrol_id').val());
+    form_data.append('batch_code',$('#hdn_batch_code').val());
     
-}
-
-function PartnetTypeOnChange(PartnerTypeId)
-{
-    //alert(PartnerTypeId);
-    LoadPartner(PartnerTypeId)
-}
-function LoadPartner(PartnerTypeId)
-{
-    var URL=$('#hdn_web_url').val()+ "/GetPartners?PartnerTypeId="+PartnerTypeId;
-    //alert(URL);
+    
+    
     $.ajax({
-        type:"GET",
-        url:URL,
-        async:false,
-        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-        datatype:"json",
-        success: function (data){
-            if(data.Partners != null)
-            {
-                $('#ddlPartner').empty();
-                var count=data.Partners.length;
-                $('#ddlPartner').append(new Option('Select',''));
-                if( count> 0)
-                {
-                    for(var i=0;i<count;i++)
-                        if(data.Partners[i].Partner_Type_Id==2)
-                        $('#ddlPartner').append(new Option(data.Partners[i].Partner_Name,data.Partners[i].Partner_Id));
-                }
-                else
-                {
-                    $('#ddlPartner').append(new Option('ALL','-1'));
-                }
+        type: 'POST',
+        url: $('#hdn_web_url').val()+ "/upload_assessment_certificate_copy",
+        enctype: 'multipart/form-data',
+        data: form_data,
+        contentType: false,
+        cache: false,
+        processData: false,
+        success: function(data) 
+        {
+            var message="",title="",icon="";
+            if(data.Status){
+                message=data.message;
+                title="Success";
+                icon="success";
             }
+            else{
+                message=data.message;
+                title="Error";
+                icon="error";
+            }
+            swal({   
+                        title:title,
+                        text:message,
+                        icon:icon,
+                        confirmButtonClass:"btn btn-confirm mt-2"
+                        }).then(function(){
+                            return;
+                        }); 
         },
         error:function(err)
         {
-            alert('Error loading partners! Please try again');
-            return false;
+            swal({   
+                title:"Error",
+                text:'Error! Please try again',
+                icon:"error",
+                confirmButtonClass:"btn btn-confirm mt-2"
+                }).then(function(){
+                    window.location.href = '/assessment';
+                }); 
+           
         }
     });
 }
-
-function OpenAssessmentList()
-{
-    $('#mdl_batch_assessments').modal('show');
-}
-
 
 

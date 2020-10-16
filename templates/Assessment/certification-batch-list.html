@@ -316,6 +316,7 @@
                     <input type="hidden" id="hdn_batch_id" name="hdn_batch_id" value="0">
                     <input type="hidden" id="hdn_cert_stage_id" name="hdn_cert_stage_id" value=0>
                     <input type="hidden" id="hdn_mdl_skilling_id" name="hdn_mdl_skilling_id" value="0">
+                    <input type="hidden" id="hdn_cand_enrol_id" name="hdn_cand_enrol_id" value="0">
                     
                     <table id="tbl_candidate" class="table table-bordered dt-responsive wrap w-100" style="border-color: lightgray;width:100% !important;font-size: 10px;">
                         <thead>
@@ -493,6 +494,116 @@
             </div>
         </div>
     </div><!--/.modal-->
+    <div id="mdl_candidate_certificate_upload" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content ">
+                <form id="CertUpload" action="javascript:UploadCandidatecertificateFileData()">
+                   
+                <div class="modal-header">
+                    <h4 class="modal-title"><span id="HduploadFile"></span>Upload Certificate</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="hdn_ceri_file_name" name="hdn_ceri_file_name" value="">
+                    <div class="form-group">
+                      
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label for="myFile">Upload File* :</label>
+                            </div>
+                            <div class="col-lg-4">
+                                <input type="file" id="fileCertificate" name="filename">
+                            </div>
+                            <div id="imgSpinnerCerti" style="height:10px;display:none;">
+                                <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                                <label style="display:inline-block;">Please wait while uploading certificate...</label>
+                            </div> 
+                           
+                        </div>
+                    </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary waves-effect" type="submit" >Submit</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Back</button>
+                </div>
+               
+            </form>
+            </div>
+        </div>
+    </div><!--/.modal-->
+    <div id="mdl_candidate_cand_image_upload" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content ">
+                <form id="CandImageUpload" action="javascript:UploadCandidateImageFileData()">
+                   
+                <div class="modal-header">
+                    <h4 class="modal-title"><span id="HduploadFile"></span>Upload Image:</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="hdn_cand_image_file_name" name="hdn_cand_image_file_name" value="">
+                    <div class="form-group">
+                      
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label for="myFile">Upload File* :</label>
+                            </div>
+                            <div class="col-lg-4">
+                                <input type="file" id="fileCandImage" name="filename">
+                            </div>
+                            <div id="imgSpinnerCandImage" style="height:10px;display:none;">
+                                <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                                <label style="display:inline-block;">Please wait while uploading file...</label>
+                            </div> 
+                           
+                        </div>
+                    </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary waves-effect" type="submit" >Submit</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Back</button>
+                </div>
+               
+            </form>
+            </div>
+        </div>
+    </div><!--/.modal-->
+    <div id="mdl_candidate_batch_image_upload" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content ">
+                <form id="BatchImageUpload" action="javascript:UploadBatchImageFileData()">
+                   
+                <div class="modal-header">
+                    <h4 class="modal-title">Upload Image:</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="hdn_batch_image_file_name" name="hdn_batch_image_file_name" value="">
+                    
+                    <div class="form-group">
+                      
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label for="myFile">Upload File* :</label>
+                            </div>
+                            <div class="col-lg-4">
+                                <input type="file" id="fileBatchImage" name="filename">
+                            </div>
+                            <div id="imgSpinnerCandImage" style="height:10px;display:none;">
+                                <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                                <label style="display:inline-block;">Please wait while uploading file...</label>
+                            </div> 
+                           
+                        </div>
+                    </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary waves-effect" type="submit" >Submit</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Back</button>
+                </div>
+               
+            </form>
+            </div>
+        </div>
+    </div><!--/.modal-->
+    
     <div id="mdl_certificate_upload" class="modal fade" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content ">
@@ -550,6 +661,7 @@
             </div>
         </div>
     </div><!--/.modal-->
+    <div></div>
    
     
 
