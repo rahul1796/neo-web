@@ -6911,6 +6911,37 @@ class add_partner_details(Resource):
             return Master.add_partner_details(partner_name,user_id,is_active,partner_type_id,assessment_partner_type_id,address,partner_id)
 api.add_resource(add_partner_details,'/add_partner_details')
 
+class upload_assessment_certificate_copy(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            certi_name=request.form['file_name']
+            user_id=request.form['user_id']
+            enrolment_id=request.form['enrollment_id']
+            batch_id=request.form['batch_id']    
+            return Database.upload_assessment_certificate_copy(certi_name,user_id,enrolment_id,batch_id)
+api.add_resource(upload_assessment_certificate_copy,'/upload_assessment_certificate_copy')
+class upload_cerification_cand_image(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            certi_name=request.form['file_name']
+            user_id=request.form['user_id']
+            enrolment_id=request.form['enrollment_id']
+            batch_id=request.form['batch_id']    
+            return Database.upload_cerification_cand_image(certi_name,user_id,enrolment_id,batch_id)
+api.add_resource(upload_cerification_cand_image,'/upload_cerification_cand_image')
+
+class upload_cerification_batch_image(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            certi_name=request.form['file_name']
+            user_id=request.form['user_id']
+            batch_id=request.form['batch_id']    
+            return Database.upload_cerification_batch_image(certi_name,user_id,batch_id)
+api.add_resource(upload_cerification_batch_image,'/upload_cerification_batch_image')
+
 @app.route("/after_popup_partner")
 def after_popup_partner():
     if g.user:

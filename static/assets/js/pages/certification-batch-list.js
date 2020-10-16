@@ -283,12 +283,14 @@ function LoadTable()
             								
             { "data": "S_No"},
             { "orderable":false,
-               "visible" :false,
+              "visible": true,
                 "data": function(row, type, val, meta) {
                     var varButtons='';
-                    if($('#hdn_home_user_role_id').val()!='37'  )
-                        varButtons+='<a onclick="ScheduleAssessmentModal(\'' + row.Batch_Id + '\',\'' + row.Batch_Code + '\',\'' + row.Mobilization_Type + '\')" class="btn" style="cursor:pointer" ><i title="Schedule Assessment" class="fe-edit" ></i></a>';
-                     //varButtons+='<a onclick="GetAssessments(\'' + row.Batch_Id + '\',\'' + row.Batch_Code + '\')" class="btn" style="cursor:pointer" ><i title="Assessment List" class="fas fa-list" ></i></a>';
+                    if((row.Planned_Distribution>0)&($('#hdn_home_user_role_id').val()=='1'||$('#hdn_home_user_role_id').val()=='5'))
+                        varButtons+='<a onclick="UploadBatchImage(\'' + row.Batch_Id + '\',\'' + row.Batch_Code + '\')" class="btn" style="cursor:pointer" ><i title="Upload Batch Image" class="fe-upload" ></i></a>';
+                    if(row.Batch_Image!= '')
+                        varButtons+='<a onclick="DownloadCertificationImage(\'' + row.Batch_Image + '\',)" class="btn" style="cursor:pointer" ><i title="Download Batch Image" class="fe-download" ></i></a>';
+                    
                     return varButtons;
                 }
             },            
@@ -498,6 +500,7 @@ function LoadLogisticUsers(){
     return false;
 }
 function GetPassedCandidates(BatchId,Stage,Batch_Code){   
+    $("#tbl_candidate tbody").empty();
     $('#tr_candidate_detail').modal('show');      
     $('#tbl_candidate').show();
     $('#tbl_candidate').dataTable().fnDestroy();  
@@ -574,9 +577,22 @@ function GetPassedCandidates(BatchId,Stage,Batch_Code){
                             varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Email_Id +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Intervention_Value +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Certificate_Number +'</td>';
-                            varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Certificate_Copy +'</td>';
+                            varCerti='';
+                            varCerti += '<a onclick="DownloadCertificate(\'' + data.Candidates[i].Certificate_Copy +  '\' )"  style="color:blue;cursor:pointer" >' + data.Candidates[i].Certificate_Copy + '</a>';
+                            varHtml+='  <td style="text-align:center;">'+ varCerti +'</td>';
+                            varCandImage='';
+                            varCandImage += '<a onclick="DownloadCertificationImage(\'' +  data.Candidates[i].Uploaded_Cand_Image +  '\' )"  style="color:blue;cursor:pointer" >' +  data.Candidates[i].Uploaded_Cand_Image + '</a>';
+                            varHtml+='  <td style="text-align:center;">'+ varCandImage +'</td>';
                             var action='';
-                            varHtml+='  <td style="text-align:center;">'+ '' +'</td>';
+                            if((Stage==5) & (($('#hdn_home_user_role_id').val()=='5')||($('#hdn_home_user_role_id').val()=='1')))
+                            {
+                                action+='<a onclick="UploadCandImage(\'' + data.Candidates[i].Intervention_Value + '\')" class="user-btn" style="cursor:pointer" ><i title="Upload Candidate Image" class="fe-upload" ></i></a>';
+                            }
+                            if((Stage==2) & (($('#hdn_home_user_role_id').val()=='40')||($('#hdn_home_user_role_id').val()=='1')))
+                            {
+                                action+='<a onclick="UploadCandCertificate(\'' + data.Candidates[i].Intervention_Value + '\')" class="user-btn" style="cursor:pointer" ><i title="Upload Candidate Certificate" class="fe-upload" ></i></a>';
+                            }
+                            varHtml+='  <td style="text-align:center;">'+ action +'</td>';
                             varHtml+='</tr>';
 
                         }                        
@@ -1005,14 +1021,15 @@ function ChangeStage(){
         case "4":
             $('#TxtCertStages').val('Plaaned For Distribution');
             $('#DivPlannedDistributionDate').show();
-            break;
-        case "5":
-            $('#TxtCertStages').val('Distributed');
-            $('#DivActualDistributionDate').show();
             $('#DivCGName').show();
             $('#DivCGDesig').show();
             $('#DivCGOrg').show();
             $('#DivCGOrgLoc').show();
+            break;
+        case "5":
+            $('#TxtCertStages').val('Distributed');
+            $('#DivActualDistributionDate').show();
+           
             break;
     }   
     $('#tr_candidate_detail').modal('hide');
@@ -1280,7 +1297,29 @@ function GetCourseDetail(course_id)
     });
     return false;
 }
+function UploadCandCertificate(Enrollment_Id)
+{
+    $('#hdn_cand_enrol_id').val(Enrollment_Id);
+    $('#tr_candidate_detail').modal('hide');
+    $('#mdl_candidate_certificate_upload').modal('show');
 
+
+}
+function UploadCandImage(Enrollment_Id)
+{
+    $('#hdn_cand_enrol_id').val(Enrollment_Id);
+    $('#tr_candidate_detail').modal('hide');
+    $('#mdl_candidate_cand_image_upload').modal('show');
+
+
+}
+
+function UploadBatchImage(batch_id,batch_code)
+{
+    $('#hdn_batch_id').val(batch_id);
+    $('#hdn_batch_code').val(batch_code);
+    $('#mdl_candidate_batch_image_upload').modal('show');
+}
 function UploadCandidatecertificateFileData()
 {  
  
@@ -1307,6 +1346,7 @@ function UploadCandidatecertificateFileData()
             var files=document.getElementById("fileCertificate").files;
             var file=files[0];
             var file_name= $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + file.name;
+            $('#hdn_certi_file_name').val(file_name);
             var file_path=$('#hdn_AWS_S3_path').val()+"certification/certificate_copy/" + file_name;
             var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
             
@@ -1357,22 +1397,17 @@ function uploadCertificateFileToS3(file, s3Data, url){
 
 function UploadCertificateFileToProcess()
 {
-    //console.log()
-    var form_data = new FormData('file_name',$('#hdn_ceri_file_name').val());
-    form_data.append('user_id', $('#hdn_home_user_id').val());
-    form_data.append('enrollment_id', $('#hdn_cand_enrol_id').val());
-    form_data.append('batch_code',$('#hdn_batch_code').val());
-    
-    
-    
+       
     $.ajax({
         type: 'POST',
         url: $('#hdn_web_url').val()+ "/upload_assessment_certificate_copy",
-        enctype: 'multipart/form-data',
-        data: form_data,
-        contentType: false,
-        cache: false,
-        processData: false,
+        data:{
+            "file_name":$('#hdn_certi_file_name').val(),
+            "user_id" : $('#hdn_home_user_id').val(),
+            "enrollment_id" : $('#hdn_cand_enrol_id').val(),
+            "batch_id" : $('#hdn_batch_id').val()
+           
+        },
         success: function(data) 
         {
             var message="",title="",icon="";
@@ -1392,7 +1427,8 @@ function UploadCertificateFileToProcess()
                         icon:icon,
                         confirmButtonClass:"btn btn-confirm mt-2"
                         }).then(function(){
-                            return;
+                            $('#mdl_candidate_certificate_upload').modal('hide');
+                            GetPassedCandidates($('#hdn_batch_id').val(),2,$('#hdn_batch_code').val());
                         }); 
         },
         error:function(err)
@@ -1403,11 +1439,331 @@ function UploadCertificateFileToProcess()
                 icon:"error",
                 confirmButtonClass:"btn btn-confirm mt-2"
                 }).then(function(){
-                    window.location.href = '/assessment';
+                    window.location.href = '/certification';
                 }); 
            
         }
     });
+}
+function UploadCandidateImageFileData()
+{  
+ 
+    
+    
+    if ($('#fileCandImage').get(0).files.length === 0) {
+        alert("No files selected.");
+        return;
+    }
+    else
+    {
+//        UploadFileToProcess();
+//    }
+//}
+        var fileExtension = ['xlsx','jpg','png','pdf','doc','docx','jpeg','csv']
+        if ($.inArray($('#fileCandImage').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            alert("Formats allowed are : "+fileExtension.join(', '));
+            return false;
+        }
+        else
+        {
+            $("#imgSpinnerCandImage").show();
+
+            var files=document.getElementById("fileCandImage").files;
+            var file=files[0];
+            var file_name= $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + file.name;
+            $('#hdn_cand_image_file_name').val(file_name);
+            var file_path=$('#hdn_AWS_S3_path').val()+"certification/batch_candidate_images/" + file_name;
+            var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET",api_url );
+                xhr.onreadystatechange = function(){
+                    if(xhr.readyState === 4){
+                    if(xhr.status === 200){
+                        var response = JSON.parse(xhr.responseText);
+                        //console.log(response);
+                        uploadCandImageFileToS3(file, response.data, response.url);
+                        $("#imgSpinnerCandImage").hide();
+                    }
+                    else{
+                        alert("Could not get signed URL.");
+                    }
+                    }
+                };
+                xhr.send();
+        }
+    }
+}
+
+function uploadCandImageFileToS3(file, s3Data, url){
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", s3Data.url);
+
+    var postData = new FormData();
+    for(key in s3Data.fields){
+        postData.append(key, s3Data.fields[key]);
+    }
+    postData.append('file', file);
+
+    xhr.onreadystatechange = function() {
+        if(xhr.readyState === 4){
+        if(xhr.status === 200 || xhr.status === 204){
+            var response = xhr;
+            //console.log(response);
+            UploadCandImageFileToProcess();
+        }
+        else{
+            alert("Could not upload file to s3.");
+        }
+    }
+    };
+    xhr.send(postData);
+}
+
+function UploadCandImageFileToProcess()
+{
+       
+    $.ajax({
+        type: 'POST',
+        url: $('#hdn_web_url').val()+ "/upload_cerification_cand_image",
+        data:{
+            "file_name":$('#hdn_cand_image_file_name').val(),
+            "user_id" : $('#hdn_home_user_id').val(),
+            "enrollment_id" : $('#hdn_cand_enrol_id').val(),
+            "batch_id" : $('#hdn_batch_id').val()
+           
+        },
+        success: function(data) 
+        {
+            var message="",title="",icon="";
+            if(data.Status){
+                message=data.message;
+                title="Success";
+                icon="success";
+            }
+            else{
+                message=data.message;
+                title="Error";
+                icon="error";
+            }
+            swal({   
+                        title:title,
+                        text:message,
+                        icon:icon,
+                        confirmButtonClass:"btn btn-confirm mt-2"
+                        }).then(function(){
+                            $('#mdl_candidate_cand_image_upload').modal('hide');
+                            GetPassedCandidates($('#hdn_batch_id').val(),5,$('#hdn_batch_code').val());
+                        }); 
+        },
+        error:function(err)
+        {
+            swal({   
+                title:"Error",
+                text:'Error! Please try again',
+                icon:"error",
+                confirmButtonClass:"btn btn-confirm mt-2"
+                }).then(function(){
+                    window.location.href = '/certification';
+                }); 
+           
+        }
+    });
+}
+function UploadBatchImageFileData()
+{  
+ 
+    
+    
+    if ($('#fileBatchImage').get(0).files.length === 0) {
+        alert("No files selected.");
+        return;
+    }
+    else
+    {
+//        UploadFileToProcess();
+//    }
+//}
+        var fileExtension = ['xlsx','jpg','png','pdf','doc','docx','jpeg','csv']
+        if ($.inArray($('#fileBatchImage').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            alert("Formats allowed are : "+fileExtension.join(', '));
+            return false;
+        }
+        else
+        {
+            $("#imgSpinnerBatchImage").show();
+
+            var files=document.getElementById("fileBatchImage").files;
+            var file=files[0];
+            var file_name= $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + file.name;
+            $('#hdn_batch_image_file_name').val(file_name);
+            var file_path=$('#hdn_AWS_S3_path').val()+"certification/batch_candidate_images/" + file_name;
+            var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET",api_url );
+                xhr.onreadystatechange = function(){
+                    if(xhr.readyState === 4){
+                    if(xhr.status === 200){
+                        var response = JSON.parse(xhr.responseText);
+                        //console.log(response);
+                        uploadBatchImageFileToS3(file, response.data, response.url);
+                        $("#imgSpinnerBatchImage").hide();
+                    }
+                    else{
+                        alert("Could not get signed URL.");
+                    }
+                    }
+                };
+                xhr.send();
+        }
+    }
+}
+
+function uploadBatchImageFileToS3(file, s3Data, url){
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", s3Data.url);
+
+    var postData = new FormData();
+    for(key in s3Data.fields){
+        postData.append(key, s3Data.fields[key]);
+    }
+    postData.append('file', file);
+
+    xhr.onreadystatechange = function() {
+        if(xhr.readyState === 4){
+        if(xhr.status === 200 || xhr.status === 204){
+            var response = xhr;
+            //console.log(response);
+            UploadBatchImageFileToProcess();
+        }
+        else{
+            alert("Could not upload file to s3.");
+        }
+    }
+    };
+    xhr.send(postData);
+}
+
+function UploadBatchImageFileToProcess()
+{
+       
+    $.ajax({
+        type: 'POST',
+        url: $('#hdn_web_url').val()+ "/upload_cerification_batch_image",
+        data:{
+            "file_name":$('#hdn_batch_image_file_name').val(),
+            "user_id" : $('#hdn_home_user_id').val(),
+            "batch_id" : $('#hdn_batch_id').val()
+           
+        },
+        success: function(data) 
+        {
+            var message="",title="",icon="";
+            if(data.Status){
+                message=data.message;
+                title="Success";
+                icon="success";
+            }
+            else{
+                message=data.message;
+                title="Error";
+                icon="error";
+            }
+            swal({   
+                        title:title,
+                        text:message,
+                        icon:icon,
+                        confirmButtonClass:"btn btn-confirm mt-2"
+                        }).then(function(){
+                           Back();
+                        }); 
+        },
+        error:function(err)
+        {
+            swal({   
+                title:"Error",
+                text:'Error! Please try again',
+                icon:"error",
+                confirmButtonClass:"btn btn-confirm mt-2"
+                }).then(function(){
+                    window.location.href = '/certification';
+                }); 
+           
+        }
+    });
+}
+
+function DownloadCertificate(image_name)
+{   
+    var file_path=$('#hdn_AWS_S3_path').val()+"certification/certificate_copy/" + image_name;    
+    var api_url=$('#hdn_COL_url').val() + "s3_signed_url_for_file?file_path="+file_path+"&file_name="+image_name;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", api_url);
+    xhr.onreadystatechange = function(){
+        if(xhr.readyState === 4){
+        if(xhr.status === 200){
+            //var response = JSON.parse(xhr.responseText);
+            var url=xhr.responseText;
+            console.log(url);
+            var xhr_down = new XMLHttpRequest();
+            xhr_down.open("GET",url );
+            xhr_down.responseType = "blob";
+
+            xhr_down.onload = function () {
+                saveData(this.response,image_name ); // saveAs is now your function
+            };
+            xhr_down.send();
+        }
+        else{
+            alert("Could not get signed URL.");
+        }
+        }
+    };
+    xhr.send();
+    
+}
+function DownloadCertificationImage(image_name)
+{
+    //alert(image_name);
+    var file_path=$('#hdn_AWS_S3_path').val()+"certification/batch_candidate_images/" + image_name;    
+    var api_url=$('#hdn_COL_url').val() + "s3_signed_url_for_file?file_path="+file_path+"&file_name="+image_name;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", api_url);
+    xhr.onreadystatechange = function(){
+        if(xhr.readyState === 4){
+        if(xhr.status === 200){
+            //var response = JSON.parse(xhr.responseText);
+            var url=xhr.responseText;
+            console.log(url);
+            var xhr_down = new XMLHttpRequest();
+            xhr_down.open("GET",url );
+            xhr_down.responseType = "blob";
+
+            xhr_down.onload = function () {
+                saveData(this.response,image_name ); // saveAs is now your function
+            };
+            xhr_down.send();
+        }
+        else{
+            alert("Could not get signed URL.");
+        }
+        }
+    };
+    xhr.send();
+}
+function saveData(blob, fileName) // does the same as FileSaver.js
+{
+
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style = "display: none";
+
+    var url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    window.URL.revokeObjectURL(url);
 }
 
 
