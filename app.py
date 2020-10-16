@@ -8530,6 +8530,64 @@ class Upload_OJT_file(Resource):
             return jsonify(res)
 api.add_resource(Upload_OJT_file, '/Upload_OJT_file')
 
+#ECP REPORT PAGE
+@app.route("/OJT_report_page")
+def OJT_report_page():
+    if g.user:
+        return render_template("Reports/OJT-report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/OJT_report")
+def OJT_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="OJT_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class GetsubprojectbyCustomer(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                customer_id=request.args.get('customer_id','',type=str)
+                response = Database.GetsubprojectbyCustomer(user_id, user_role_id, customer_id)
+                return {'sub_projects':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetsubprojectbyCustomer,'/GetsubprojectbyCustomer')
+
+class download_ojt_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
+                customer_ids = request.form["customer_ids"]
+                sub_project_ids = request.form["sub_project_ids"]
+                course_ids = request.form["course_ids"]
+                batch_code =request.form["batch_code"]
+                date_stage = request.form["date_stage"]
+                BatchStartFromDate = request.form["BatchStartFromDate"]
+                BatchStartToDate = request.form["BatchStartToDate"]
+                BatchEndFromDate = request.form["BatchEndFromDate"]
+                BatchEndToDate = request.form["BatchEndToDate"]
+                OJTStartFromDate = request.form["OJTStartFromDate"]
+                OJTStartToDate = request.form["OJTStartToDate"]
+                OJTEndFromDate = request.form["OJTEndFromDate"]
+                OJTEndToDate = request.form["OJTEndToDate"]
+            
+                file_name='OJT_Monitoring_Report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            
+                resp = Report.download_ojt_report(file_name, user_id, user_role_id, customer_ids, sub_project_ids, course_ids, batch_code, date_stage, BatchStartFromDate,BatchStartToDate,BatchEndFromDate,BatchEndToDate,OJTStartFromDate,OJTStartToDate,OJTEndFromDate,OJTEndToDate)
+                return resp
+                
+            except Exception as e:
+                print({"exceptione":str(e)})
+api.add_resource(download_ojt_report,'/download_ojt_report')
+
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
-    #app.run(debug=True)
