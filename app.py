@@ -3511,9 +3511,9 @@ api.add_resource(change_password_api,'/change_password_api')
 def get_file(path):
     """Download a file."""
     filename = r"{}data/{}".format(config.ReportDownloadPathLocal,path)
-    print(filename)
+    #print(filename)
     if not(os.path.exists(filename)):
-        filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathWeb)
+        filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathLocal + 'data/')
     return send_file(filename)
 
 @app.route("/tma_registration")

@@ -6826,12 +6826,12 @@ SELECT					cb.name as candidate_name,
         sql = 'exec [masters].[sp_OJT_report__stagelog] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
         values = (user_id, user_role_id, customer_ids, sub_project_ids, course_ids, batch_code, date_stage, BatchStartFromDate,BatchStartToDate,BatchEndFromDate,BatchEndToDate,OJTStartFromDate,OJTStartToDate,OJTEndFromDate,OJTEndToDate)
         curs.execute(sql,(values))
-        
+        columns = [column[0].title() for column in curs.description]
         data = curs.fetchall()
         data = list(map(lambda x:list(x), data))
         
         curs.close()
         cnxn.close()
-        return data
+        return (data,columns)
 
     
