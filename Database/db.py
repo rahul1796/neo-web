@@ -4306,11 +4306,12 @@ SELECT					cb.name as candidate_name,
                     user_name_to=''
                     sql = '''
                             select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id in 
-                                        (select user_id from masters.tbl_map_sub_project_user as u
+                                        (select u.user_id from masters.tbl_map_sub_project_user as u
                                         inner join users.tbl_map_User_UserRole as urr on urr.user_id=u.user_id
                                         and urr.user_role_id =5
                                         where sub_project_id=(select sub_project_id from batches.tbl_batches where batch_id='''+ batch_id +''')
                                         AND u.is_active=1
+                                        order by u.created_on desc
                                         )
                             ANd is_active=1;
                           '''
@@ -4381,7 +4382,7 @@ SELECT					cb.name as candidate_name,
                     user_name_to=''
                     sql = '''
                             select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id=
-                                                    (select top(1) cereted_by as amt_user 
+                                                    (select top(1) created_by as amt_user 
                                                     from assessments.tbl_map_certification_candidates_stages_revision_history 
                                                     where assessment_id = (select TOP(1) assessment_id 
                                                                             from assessments.tbl_batch_assessments

@@ -60,7 +60,7 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
         msg['From'] = "do-not-reply@labournet.in"
         msg['To'] = emailTo
         msg['Cc'] = EmailCC
-        msg['Subject'] = "LN NEO - "+str(Batch_Code)+" Certificates" + str(stage_name)
+        msg['Subject'] = "LN NEO - "+str(Batch_Code)+" Certificates " + str(stage_name)
         html_msg= config.html_email_msg_certification_stage_change
         html_msg = html_msg.format(emailToName,Batch_Code,stage_name,EmailCC)
         msg.attach(MIMEText(html_msg, 'html'))
