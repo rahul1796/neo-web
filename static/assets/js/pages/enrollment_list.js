@@ -390,7 +390,7 @@ function LoadTable()
                     var varButtons = "";
                     if(row.Is_Check)
                         varButtons += '<input id="addedchk_' + row.S_No + '" name="checkcase" type="checkbox" value="'+row.Candidate_Id+'" onclick="toggleCheckbox(event)">';      
-                    else if((user_role_id==1)||(user_role_id==1)||(user_role_id==1)||(user_role_id==1)){
+                    else if((user_role_id==1)||(user_role_id==5)||(user_role_id==24)||(user_role_id==38)){
                         varButtons += '<a onclick="ReuploadImages(\'' + row.Candidate_Id + '\')" class="btn" style="cursor:pointer" ><i title="View/Reupload Images" class="fas fa-edit" ></i></a>';
                     }
                     return varButtons;

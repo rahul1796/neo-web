@@ -1080,4 +1080,58 @@ class Report:
             
         except Exception as e:
             return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
+
+    def download_ojt_report(file_name, user_id, user_role_id, customer_ids, sub_project_ids, course_ids, batch_code, date_stage, BatchStartFromDate,BatchStartToDate,BatchEndFromDate,BatchEndToDate,OJTStartFromDate,OJTStartToDate,OJTEndFromDate,OJTEndToDate):
+        try:
+            name_withpath = config.neo_report_file_path + 'report file/'+ file_name
+            
+            writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
+            workbook  = writer.book
+            header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+            second_header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#e9f789',
+                'border': 1})
+            
+            image_path = config.Base_URL + '/data/OJT/' + 'images/'
+            audio_path = config.Base_URL + '/data/OJT/' + 'audio/'
+            resp = Database.download_ojt_report(user_id, user_role_id, customer_ids, sub_project_ids, course_ids, batch_code, date_stage, BatchStartFromDate,BatchStartToDate,BatchEndFromDate,BatchEndToDate,OJTStartFromDate,OJTStartToDate,OJTEndFromDate,OJTEndToDate)
+            df = pd.DataFrame(resp[0],columns=resp[1])
+            df=df.fillna('')
+            df['Stage1_Location'] = df.loc[:,'Stage1_Location'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("'+ x + '","View Location")')
+            df['Stage2_Location'] = df.loc[:,'Stage2_Location'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("'+ x + '","View Location")')
+            df['Stage3_Location'] = df.loc[:,'Stage3_Location'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("'+ x + '","View Location")')
+
+            df['Stage1_File_Name'] = df.loc[:,'Stage1_File_Name'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + image_path + x + '","View Image")')
+            df['Stage2_File_Name'] = df.loc[:,'Stage2_File_Name'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + audio_path + x + '","View Image")')
+            df['Stage3_File_Name'] = df.loc[:,'Stage3_File_Name'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + image_path + x + '","View Image")')
+            
+            m_header = ["s","CANDIDATE ENROLLMENT NUMBER","CANDIDATE NAME","CANDIDATE EMAIL ID","BATCH CODE","BATCH START DATE","BATCH END DATE",
+            "OJT START DATE","OJT END DATE","CUSTOMER NAME","SUBPROJECT NAME","SUBPROJECT CODE","CENTER NAME","CENTER TYPE","DISTRICT",
+            "STATE","REGION","BUISINESS UNIT","COURSE CODE","COURSE NAME"]
+            f_header = ["REACHED OFFICE","RECORDED TODAY'S WORK","LEFT OFFICE"]
+            s_header = ["LOG DATE TIME","LOG IMAGE","LOG LOCATION","LOG DATE TIME","RECORDING","LOG LOCATION","LOG DATE TIME","LOG IMAGE","LOG LOCATION"]
+            df.to_excel(writer, index=None, header=None, startrow=2 ,sheet_name='OJT Report')
+            worksheet = writer.sheets['OJT Report']
+            for col_num, value in enumerate(m_header):
+                worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
+
+            for col_num, value in enumerate(s_header):
+                worksheet.write(1, 20+col_num, value, header_format)
+
+            for col_num, value in enumerate(f_header):
+                worksheet.merge_range(0, 20+col_num*3, 0, 22+col_num*3, value, second_header_format)
+
+            writer.save()
+            return({'Description':'created excel', 'Status':True, 'filename':file_name})
+
+        except Exception as e:
+            return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
         

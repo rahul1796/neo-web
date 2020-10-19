@@ -1092,6 +1092,8 @@ class add_batch_details(Resource):
             ActualEndDate=request.form['ActualEndDate']
             StartTime=request.form['StartTime']
             EndTime=request.form['EndTime']
+            OJTStartDate=request.form['OJTStartDate']
+            OJTEndDate=request.form['OJTEndDate']
             user_id=g.user_id
             isactive=request.form['isactive']
             Product=request.form['Product']
@@ -1102,7 +1104,7 @@ class add_batch_details(Resource):
             planned_batch_id=0
             if 'PlannedBatchId' in request.form:
                 planned_batch_id=request.form['PlannedBatchId']
-            return Batch.add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id)
+            return Batch.add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id,OJTStartDate, OJTEndDate)
 
 
 class get_batch_details(Resource):
@@ -3447,7 +3449,7 @@ api.add_resource(GetCandidateBasicDetails,'/GetCandidateBasicDetails')
 ############################################################################################################
 @app.route("/forget_password")
 def forget_password():
-    return render_template('recoverpw.html')
+    return render_template('recoverpw.html', html_path=config.Base_URL)
 
 class recover_pass(Resource):
     @staticmethod
@@ -3509,9 +3511,9 @@ api.add_resource(change_password_api,'/change_password_api')
 def get_file(path):
     """Download a file."""
     filename = r"{}data/{}".format(config.ReportDownloadPathLocal,path)
-    print(filename)
+    #print(filename)
     if not(os.path.exists(filename)):
-        filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathWeb)
+        filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathLocal + 'data/')
     return send_file(filename)
 
 @app.route("/tma_registration")
@@ -5118,7 +5120,8 @@ class add_subproject_details(Resource):
             subproject_id=g.subproject_id
             project_code = request.form['project_id']      
             isactive=request.form['isactive']
-            return Master.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive)
+            is_ojt_req=request.form['is_ojt_req']
+            return Master.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req)
 api.add_resource(add_subproject_details,'/add_subproject_details')
 
 #############################################################################
@@ -5772,8 +5775,9 @@ class upload_bulk_upload(Resource):
             all_email=Database.all_email_validation(cand_stage)
             email_validation = [CustomElementValidation(lambda d: d.lower() in all_email, 'Invalid mobilizer')]
             all_state=Database.all_state_validation()
-            #print(data)
-            regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[.]\w+$'
+            
+            #regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[.]\w+$'
+            regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[\.A-Za-z]+\w+$'
             regex2 = '[\.]{2,}'
             state_validation = [CustomElementValidation(lambda d: d.lower() in all_state, 'Invalid State')]
             cand_email_format_validation = [CustomElementValidation(lambda d: ((re.search(regex2,d)==None)and(re.search(regex,d)!=None)), 'Inavalid email format. Please provide correct email')]
@@ -6082,12 +6086,8 @@ class upload_bulk_upload(Resource):
                     return out
                     
             elif cand_stage==str(3):
-                if ProjectType!=1:
-                    candidate_photo = 'Candidate Photo*'
-                else:
-                    candidate_photo = 'Candidate Photo'
                 if ProjectType==2:
-                    img_column = 'Bank Copy*,'+ candidate_photo +',Education qualification Proof,Age Proof,Signed Mou*'
+                    img_column = 'Bank Copy*,Candidate Photo*,Education qualification Proof,Age Proof,Signed Mou*'
                     df= pd.read_excel(file_name,sheet_name='Enrollment',header=1)
                     df = df.fillna('')
                     df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
@@ -6120,10 +6120,10 @@ class upload_bulk_upload(Resource):
                         Column('Branch Name',null_validation),
                         Column('Branch Code',null_validation),
                         Column('Account type',null_validation),
-                        Column('Document copy'),
+                        #Column('Document copy'),
                         Column('BOCW Registration Id'),
                         Column('Whatsapp Number',mob_validation),
-                        Column('Aadhar Image',null_validation),
+                        #Column('Aadhar Image',null_validation),
                         #str+null check
                         Column('Fresher/Experienced?*',str_validation + null_validation),
                         #Column('Candidate Photo*',str_validation + null_validation),
@@ -6209,8 +6209,8 @@ class upload_bulk_upload(Resource):
                         Column('Signed Mou*',str_validation + null_validation),
                         Column('Mou Signed Date',null_validation)
                         ])
-                else:
-                    img_column = 'Bank Copy,'+ candidate_photo
+                elif ProjectType==1:
+                    img_column = 'Bank Copy'
                     df= pd.read_excel(file_name,sheet_name='Enrollment')
                     df = df.fillna('')
                     df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
@@ -6243,13 +6243,13 @@ class upload_bulk_upload(Resource):
                         Column('Branch Code',null_validation),
                         Column('Account type',null_validation),
                         Column('Bank Copy',null_validation),
-                        Column('Candidate Photo') if ProjectType==1 else Column('Candidate Photo*',str_validation+null_validation),
-                        Column('Document copy'),
+                        #Column('Candidate Photo') if ProjectType==1 else Column('Candidate Photo*',str_validation+null_validation),
+                        #Column('Document copy'),
                         Column('Bank Name'),
                         Column('Account Number'),
                         Column('BOCW Registration Id'),
                         Column('Whatsapp Number',mob_validation),             
-                        Column('Aadhar Image',null_validation),           
+                        #Column('Aadhar Image',null_validation),           
                         #str+null check
                         Column('Fresher/Experienced?*',str_validation + null_validation),
                         #Column('Candidate Photo*',str_validation + null_validation),
@@ -6312,6 +6312,111 @@ class upload_bulk_upload(Resource):
                         #Email validation
                         Column('Enrolled_By*',email_validation + str_validation)
                         ])
+                else:
+                    img_column = 'Bank Copy,Candidate Photo*'
+                    df= pd.read_excel(file_name,sheet_name='Enrollment')
+                    df = df.fillna('')
+                    df['date_age']=df['Age*'].astype(str)+df['Date of Birth*'].astype(str)
+                    df['ids']=df['Aadhar No'].astype(str)+df['Identity number'].astype(str)
+
+                    schema = Schema([
+                        Column('Candidate_id',null_validation),
+                        Column('Middle Name',null_validation),
+                        Column('Last Name',null_validation),
+                        Column('Secondary Contact  No',null_validation),
+                        Column('Email id*',str_validation + null_validation),
+                        Column('Present Panchayat',null_validation),
+                        Column('Present Taluk/Block',null_validation),
+                        Column('Present Address line2',null_validation),
+                        Column('Present Village',null_validation),
+                        Column('Permanent Address line2',null_validation),
+                        Column('Permanent Village',null_validation),
+                        Column('Permanent Panchayat',null_validation),
+                        Column('Permanent Taluk/Block',null_validation),
+                        Column('Name of Institute',null_validation),
+                        Column('University',null_validation),
+                        Column('Year Of Pass',null_validation),
+                        Column('Percentage',null_validation),
+                        Column('Date Of birth',null_validation),
+                        Column('Age',null_validation),
+                        Column('Primary contact',null_validation),
+                        Column('Email Address',null_validation),
+                        Column('Occupation',null_validation),
+                        Column('Branch Name',null_validation),
+                        Column('Branch Code',null_validation),
+                        Column('Account type',null_validation),
+                        Column('Bank Copy',null_validation),
+                        Column('Candidate Photo*',str_validation+null_validation),
+                        #Column('Candidate Photo') if ProjectType==1 else Column('Candidate Photo*',str_validation+null_validation),
+                        #Column('Document copy'),
+                        Column('Bank Name'),
+                        Column('Account Number'),
+                        Column('BOCW Registration Id'),
+                        Column('Whatsapp Number',mob_validation),             
+                        #Column('Aadhar Image',null_validation),           
+                        #str+null check
+                        Column('Fresher/Experienced?*',str_validation + null_validation),
+                        #Column('Candidate Photo*',str_validation + null_validation),
+                        Column('Salutation*',str_validation + null_validation),
+                        Column('First Name*',str_validation + null_validation),
+                        Column('Gender*',str_validation + null_validation),
+                        Column('Marital Status*',str_validation + null_validation),
+                        Column('Caste*',str_validation + null_validation),
+                        Column('Disability Status*',str_validation + null_validation),
+                        Column('Religion*',str_validation + null_validation),
+                        Column('Mother Tongue*',str_validation + null_validation),
+                        Column('Occupation*',str_validation + null_validation),
+                        Column('Average annual income*',str_validation + null_validation),
+                        Column('Source of Information*',str_validation + null_validation),
+                        Column('Interested Course*',str_validation + null_validation),
+                        Column('Product*',str_validation + null_validation),
+                        Column('Present Address line1*',str_validation + null_validation),
+                        Column('Present District*',str_validation + null_validation),
+                        Column('Present State*',state_validation + str_validation + null_validation),
+                        Column('Present Country*',str_validation + null_validation),
+                        Column('Permanent Address line1*',str_validation + null_validation),
+                        Column('Permanent District*',str_validation + null_validation),
+                        Column('Permanent State*',state_validation + str_validation + null_validation),
+                        Column('Permanent Country*',str_validation + null_validation),
+                        #Column('Document copy*',str_validation + null_validation),
+                        Column('Employment Type*',str_validation + null_validation),
+                        Column('Preferred Job Role*',str_validation + null_validation),
+                        Column('Years Of Experience*',str_validation + null_validation),
+                        Column('Relevant Years of Experience*',str_validation + null_validation),
+                        Column('Current/Last CTC*',str_validation + null_validation),
+                        Column('Preferred Location*',str_validation + null_validation),
+                        Column('Willing to travel?*',str_validation + null_validation),
+                        Column('Willing to work in shifts?*',str_validation + null_validation),
+                        Column('Expected CTC*',str_validation + null_validation),
+                        Column('Highest Qualification*',str_validation + null_validation),
+                        Column('Stream/Specialization*',str_validation + null_validation),
+                        Column('Computer Knowledge*',str_validation + null_validation),
+                        Column('Technical Knowledge*',str_validation + null_validation),
+                        Column('family_Salutation*',str_validation + null_validation),
+                        Column('Member Name*',str_validation + null_validation),
+                        Column('family_Gender*',str_validation + null_validation),
+                        Column('Education Qualification*',str_validation + null_validation),
+                        Column('Relationship*',str_validation + null_validation),
+                        Column('Average Household Income*',str_validation + null_validation),
+                        Column('batch_id*',str_validation + null_validation),
+                        #pincode check
+                        Column('Present Pincode*',pincode_validation + null_validation),
+                        Column('Permanent Pincode*',pincode_validation + null_validation),
+                        #mobile number check
+                        Column('Primary contact  No*',mob_validation + null_validation),
+                        #date of birth and age pass(null check)
+                        Column('Date of Birth*',null_validation),
+                        Column('Age*',null_validation),
+                        Column('date_age',dob_validation),
+                        #ID Validation pass(null check)
+                        Column('Aadhar No',null_validation),
+                        Column('Identifier Type',null_validation),
+                        Column('Identity number',null_validation),
+                        Column('ids',null_validation),
+                        #Email validation
+                        Column('Enrolled_By*',email_validation + str_validation)
+                        ])
+
                 errors = schema.validate(df)
                 errors_index_rows = [e.row for e in errors]
 
@@ -6598,19 +6703,20 @@ class DownloadEnrTemplate(Resource):
                     return({'msg':'No Records Found For Selected Filters!', 'success':False})
                 else:
                     df = pd.DataFrame(resp['data'], columns=resp['columns'])
-                    col = resp['columns'][:84]
-                    
+                    df_column = resp['columns']
+
+                    col = df_column[:44]+df_column[45:81] + df_column[82:84]
                     excel_row=0
                     if Project_Type==1:
-                        Column = ['Candidate_id', 'Fresher/Experienced?*', 'Candidate Photo', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 
+                        col = df_column[:2]+df_column[3:44]+df_column[45:81] + df_column[82:84]
+                        Column = ['Candidate_id', 'Fresher/Experienced?*', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 
                         'Gender*', 'Marital Status*', 'Caste*', 'Disability Status*', 'Religion*', 'Mother Tongue*', 'Occupation*', 'Average annual income*', 'Source of Information*', 'Interested Course*', 'Product*', 'Present Address line1*', 
                         'Present Address line2', 'Present Village', 'Present Panchayat', 'Present Taluk/Block', 'Present District*', 'Present State*', 'Present Pincode*', 'Present Country*', 'Permanent Address line1*', 'Permanent Address line2', 
-                        'Permanent Village', 'Permanent Panchayat', 'Permanent Taluk/Block', 'Permanent District*', 'Permanent State*', 'Permanent Pincode*', 'Permanent Country*', 'Aadhar No', 'Identifier Type', 'Identity number', 'Document copy', 
+                        'Permanent Village', 'Permanent Panchayat', 'Permanent Taluk/Block', 'Permanent District*', 'Permanent State*', 'Permanent Pincode*', 'Permanent Country*', 'Aadhar No', 'Identifier Type', 'Identity number', 
                         'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 
                         'Expected CTC*', 'Highest Qualification*', 'Stream/Specialization*', 'Name of Institute', 'University', 'Year Of Pass', 'Percentage', 'Computer Knowledge*', 'Technical Knowledge*', 'family_Salutation*', 'Member Name*', 
                         'Date Of birth', 'Age', 'Primary contact', 'Email Address', 'family_Gender*', 'Education Qualification*', 'Relationship*', 'Occupation', 'Average Household Income*', 'Bank Name', 'Branch Name', 'Branch Code', 
-                        'Account type', 'Account Number', 'Bank Copy', 'batch_id*', 'Aadhar Image', 'Enrolled_By*', 'Whatsapp Number']
-                        col += []
+                        'Account type', 'Account Number', 'Bank Copy', 'batch_id*', 'Enrolled_By*', 'Whatsapp Number']
                         Column += []
                         #df = df.iloc[:,:83]
                         filename = 'CandidateBulkUpload_Enrollment_DELL_'
@@ -6619,11 +6725,11 @@ class DownloadEnrTemplate(Resource):
                         Column = ['Candidate_id', 'Fresher/Experienced?*', 'Candidate Photo*', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 
                         'Gender*', 'Marital Status*', 'Caste*', 'Disability Status*', 'Religion*', 'Mother Tongue*', 'Occupation*', 'Average annual income*', 'Source of Information*', 'Interested Course*', 'Product*', 'Present Address line1*', 
                         'Present Address line2', 'Present Village', 'Present Panchayat', 'Present Taluk/Block', 'Present District*', 'Present State*', 'Present Pincode*', 'Present Country*', 'Permanent Address line1*', 'Permanent Address line2', 
-                        'Permanent Village', 'Permanent Panchayat', 'Permanent Taluk/Block', 'Permanent District*', 'Permanent State*', 'Permanent Pincode*', 'Permanent Country*', 'Aadhar No', 'Identifier Type', 'Identity number', 'Document copy', 
+                        'Permanent Village', 'Permanent Panchayat', 'Permanent Taluk/Block', 'Permanent District*', 'Permanent State*', 'Permanent Pincode*', 'Permanent Country*', 'Aadhar No', 'Identifier Type', 'Identity number', 
                         'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 
                         'Expected CTC*', 'Highest Qualification*', 'Stream/Specialization*', 'Name of Institute', 'University', 'Year Of Pass', 'Percentage', 'Computer Knowledge*', 'Technical Knowledge*', 'family_Salutation*', 'Member Name*', 
                         'Date Of birth', 'Age', 'Primary contact', 'Email Address', 'family_Gender*', 'Education Qualification*', 'Relationship*', 'Occupation', 'Average Household Income*', 'Bank Name*', 'Branch Name', 'Branch Code', 
-                        'Account type', 'Account Number*', 'Bank Copy*', 'batch_id*', 'Aadhar Image', 'Enrolled_By*', 'Whatsapp Number']
+                        'Account type', 'Account Number*', 'Bank Copy*', 'batch_id*', 'Enrolled_By*', 'Whatsapp Number']
 
                         col += resp['columns'][84:]
                         Column += ['Rented Or Own House?', 'Size Of The House', 'Ration Card (Apl Or Bpl)', 'Tv', 'Refrigerator', 'Washing Machine', 'Ac /Cooler', 'Car', 'Medical Insurance', 'Life Insurance', 
@@ -6633,11 +6739,11 @@ class DownloadEnrTemplate(Resource):
                         Column = ['Candidate_id', 'Fresher/Experienced?*', 'Candidate Photo*', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 
                         'Gender*', 'Marital Status*', 'Caste*', 'Disability Status*', 'Religion*', 'Mother Tongue*', 'Occupation*', 'Average annual income*', 'Source of Information*', 'Interested Course*', 'Product*', 'Present Address line1*', 
                         'Present Address line2', 'Present Village', 'Present Panchayat', 'Present Taluk/Block', 'Present District*', 'Present State*', 'Present Pincode*', 'Present Country*', 'Permanent Address line1*', 'Permanent Address line2', 
-                        'Permanent Village', 'Permanent Panchayat', 'Permanent Taluk/Block', 'Permanent District*', 'Permanent State*', 'Permanent Pincode*', 'Permanent Country*', 'Aadhar No', 'Identifier Type', 'Identity number', 'Document copy', 
+                        'Permanent Village', 'Permanent Panchayat', 'Permanent Taluk/Block', 'Permanent District*', 'Permanent State*', 'Permanent Pincode*', 'Permanent Country*', 'Aadhar No', 'Identifier Type', 'Identity number', 
                         'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 
                         'Expected CTC*', 'Highest Qualification*', 'Stream/Specialization*', 'Name of Institute', 'University', 'Year Of Pass', 'Percentage', 'Computer Knowledge*', 'Technical Knowledge*', 'family_Salutation*', 'Member Name*', 
                         'Date Of birth', 'Age', 'Primary contact', 'Email Address', 'family_Gender*', 'Education Qualification*', 'Relationship*', 'Occupation', 'Average Household Income*', 'Bank Name', 'Branch Name', 'Branch Code', 
-                        'Account type', 'Account Number', 'Bank Copy', 'batch_id*', 'Aadhar Image', 'Enrolled_By*', 'Whatsapp Number']
+                        'Account type', 'Account Number', 'Bank Copy', 'batch_id*', 'Enrolled_By*', 'Whatsapp Number']
                         #df = df.iloc[:,:83]
                         filename = 'CandidateBulkUpload_Enrollment_'
 
@@ -7868,7 +7974,6 @@ class GetBatchList(Resource):
                 return response
 api.add_resource(GetBatchList,'/GetBatchList')
 
-
 class GetBatchSessionList(Resource):
     @staticmethod
     def get():
@@ -7923,7 +8028,6 @@ class LogTrainerStageDetails(Resource):
                 res = TMA.LogTrainerStageDetails(session_id,user_id,batch_id,stage_id,latitude,longitude,image_file_name,mark_candidate_attendance,attendance_data,group_attendance_image_data,app_version)
                 response=jsonify(res)
                 return response
-
         except Exception as e:
             res={'status':-1,'message':'Error : '+ str(e),'app_status':True}
             response=jsonify(res)
@@ -8390,6 +8494,187 @@ def certification():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+class GetOJTBatchCurrentStageDetails(Resource):
+    @staticmethod
+    def get():
+        try:
+            if request.method=='GET':
+                user_id=request.args.get('user_id',0,type=int)
+                batch_id=request.args.get('batch_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                client_id=request.args.get('client_id','',type=str)
+                client_key=request.args.get('client_key','',type=str)
+                
+                if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                    if batch_id<1:
+                        res = {'status':0,'message':'Missing or invalid batch_id'}
+                        return jsonify(res)
+                    
+                    current_stage = Database.GetOJTBatchCurrentStageDetails(batch_id,user_id,user_role_id)
+                    if current_stage ==None:
+                        res = {'status':0, 'message':'No stage found' }
+                    else:
+                        res = {'status':1,'message':'Success','user_id':user_id,'batch_id':batch_id,'stage_id':current_stage}
+                else:
+                    res = {'status':0, 'message':'Invalid client credentials'}
+            else:
+                res = {'status':0, 'message':'Invalid Method'}
+            return jsonify(res)  
+
+        except Exception as e:
+            res={'status':-1,'message':'Error : '+ str(e)}
+            return jsonify(res)
+api.add_resource(GetOJTBatchCurrentStageDetails, '/GetOJTBatchCurrentStageDetails')
+
+class LogOJTStageDetails(Resource):
+    @staticmethod
+    def post():
+        try:
+            if request.method=='POST':
+                client_id = request.form['client_id']
+                client_key = request.form['client_key']
+                user_id = int(request.form['user_id'])
+                user_role_id = int(request.form['user_role_id'])
+                batch_id = int(request.form['batch_id'])
+                stage_id = int(request.form['stage_id'])
+                latitude = request.form['latitude']
+                longitude = request.form['longitude']
+                timestamp = request.form['timestamp']
+                filename = request.form['filename']
+
+                app_version = request.form['app_version']
+                device_model = request.form['device_model']
+                imei_num = request.form['imei_num']
+                android_version = request.form['android_version']
+                
+                if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                    if batch_id<1:
+                        res = {'success': False, 'description': "Missing or invalid batch_id", 'app_status':True}
+                        return jsonify(res)
+                    if (stage_id<1 or stage_id>3):
+                        res = {'success': False, 'description':'Missing or invalid stage_id','app_status':True}
+                        return jsonify(res)
+
+                    res = Database.LogOBJStageDetails(user_id, batch_id, stage_id, latitude, longitude, timestamp, filename, app_version, device_model, imei_num, android_version)
+                else:
+                    res = {'success': False, 'description':'Invalid client credentials','app_status':True}
+            else:
+                res = {'success': False, 'description':'Invalid Method','app_status':True}
+            return jsonify(res)
+                    
+        except Exception as e:
+            res = {'success': False, 'description':'Error : '+ str(e),'app_status':True}
+            #res={'status':-1,'message':'Error : '+ str(e),'app_status':True}
+            response=jsonify(res)
+            return response
+api.add_resource(LogOJTStageDetails,'/LogOJTStageDetails')
+
+class Upload_OJT_file(Resource):
+    #upload_path = config.tmapath + 'trainer_stage_images/'
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            client_id = request.form['client_id']
+            client_key = request.form['client_key']
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                try:
+                    file = request.files['file']
+                    name = file.filename
+                    file_format = name.split('.')[-1]
+                except Exception as e:
+                    res = {'success': False, 'description': "Unable to read file "}
+                    #res = {'status':0,'message':"unable to read image " + str(e)}
+                    return jsonify(res)
+                if file:
+                    try:
+                        upload_path = ''
+                        if file_format.lower()=='mp3':
+                            upload_path = config.neo_report_file_path + 'data/OJT/audio/'
+                        elif (file_format.lower() in ['gif', 'jpeg', 'png', 'jpg']):
+                            upload_path = config.neo_report_file_path + 'data/OJT/images/'
+                        else:
+                            #res = {'status':0,'message':"Invalid file Format"}
+                            res = {'success': False, 'description': "Invalid file Format "}
+                            return jsonify(res)
+                        file.save(upload_path + name)
+                        
+                        #res = {'status':1,'message':"uploaded succesfully"}
+                        res = {'success': True, 'description': "uploaded succesfully"}
+                        return jsonify(res)
+                    except Exception as e:
+                        #res = {'status':0,'message':"uploaded failed " + str(e)}
+                        res = {'success': False, 'description': "uploaded failed " + str(e)}
+                        return jsonify(res) 
+                else:
+                    res = {'success': False, 'description': "Please select a file "}
+                    return jsonify(res) 
+            else:
+                #res = {'status':0,'message':"client name and password not matching {}, {}".format(client_id, client_key)}
+                res = {'success':False,'description':"client name and password not matching {}, {}".format(client_id, client_key)}
+                return jsonify(res)
+        else:
+            res = {'success':False,'description':"wrong method"}
+            return jsonify(res)
+api.add_resource(Upload_OJT_file, '/Upload_OJT_file')
+
+#ECP REPORT PAGE
+@app.route("/OJT_report_page")
+def OJT_report_page():
+    if g.user:
+        return render_template("Reports/OJT-report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/OJT_report")
+def OJT_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="OJT_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class GetsubprojectbyCustomer(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                customer_id=request.args.get('customer_id','',type=str)
+                response = Database.GetsubprojectbyCustomer(user_id, user_role_id, customer_id)
+                return {'sub_projects':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetsubprojectbyCustomer,'/GetsubprojectbyCustomer')
+
+class download_ojt_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
+                customer_ids = request.form["customer_ids"]
+                sub_project_ids = request.form["sub_project_ids"]
+                course_ids = request.form["course_ids"]
+                batch_code =request.form["batch_code"]
+                date_stage = request.form["date_stage"]
+                BatchStartFromDate = request.form["BatchStartFromDate"]
+                BatchStartToDate = request.form["BatchStartToDate"]
+                BatchEndFromDate = request.form["BatchEndFromDate"]
+                BatchEndToDate = request.form["BatchEndToDate"]
+                OJTStartFromDate = request.form["OJTStartFromDate"]
+                OJTStartToDate = request.form["OJTStartToDate"]
+                OJTEndFromDate = request.form["OJTEndFromDate"]
+                OJTEndToDate = request.form["OJTEndToDate"]
+            
+                file_name='OJT_Monitoring_Report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            
+                resp = Report.download_ojt_report(file_name, user_id, user_role_id, customer_ids, sub_project_ids, course_ids, batch_code, date_stage, BatchStartFromDate,BatchStartToDate,BatchEndFromDate,BatchEndToDate,OJTStartFromDate,OJTStartToDate,OJTEndFromDate,OJTEndToDate)
+                return resp
+                
+            except Exception as e:
+                print({"exceptione":str(e)})
+api.add_resource(download_ojt_report,'/download_ojt_report')
+
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
-    #app.run(debug=True)
