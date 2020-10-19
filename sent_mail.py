@@ -71,7 +71,7 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
     except:
         return {'status':False,'description':'Unable to sent email'}
 
-def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date):
+def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails):
     try:
         server = smtplib.SMTP('smtp.office365.com','587')
         #server = smtplib.SMTP(host='smtp.office365.com')
@@ -85,14 +85,16 @@ def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date):
 
         msg['From'] = "do-not-reply@labournet.in"
         msg['To'] = config.NAVRITI_SPOC_EMAIL
-        msg['Cc'] = ','.join(config.NAVRITI_ASSESSMENT_EMAIL_CC)
+        msg['Cc'] = ','.join(config.NAVRITI_ASSESSMENT_EMAIL_CC) +',' +str(cm_emails)
+        ccList= [msg['Cc']]
+        ccList = list(dict.fromkeys(ccList))
         msg['Subject'] = "LN NEO - An Assessment Has Been Scheduled For Batch - "+str(SDMSBatchId)
 
         html_msg= config.html_email_msg_uap_batch_creation
-        html_msg = html_msg.format('Navriti Assessment Team',RequestId,SDMSBatchId,requested_date)
+        html_msg = html_msg.format('Navriti Assessment Team',RequestId,SDMSBatchId,requested_date,center_name,course_name,customer_name)
 
         msg.attach(MIMEText(html_msg, 'html'))
-        res = server.sendmail(msg['From'], [msg['To']] + config.NAVRITI_ASSESSMENT_EMAIL_CC , msg.as_string())
+        res = server.sendmail(msg['From'], [msg['To']] + ccList , msg.as_string())
         server.quit()
 
         return {'status':True,'description':'Email sent'}

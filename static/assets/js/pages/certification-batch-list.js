@@ -1086,6 +1086,7 @@ function ChangeCertificationStage()
             url:URL,
             data:{
                 "batch_id" : $('#hdn_batch_id').val(),
+                "batch_code" : $('#hdn_batch_code').val(),
                 "user_id" : $('#hdn_home_user_id').val(),
                 "current_stage_id" : $('#hdn_cert_stage_id').val(),
                 "enrollment_ids" : cands,

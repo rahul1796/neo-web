@@ -4210,6 +4210,19 @@ SELECT					cb.name as candidate_name,
                         BatchAttemptNumber=str(row[3])
                     if BatchAttemptNumber != '1':
                         present_candidate = absent_candidate
+                    center_name=''
+                    course_name=row=''
+                    customer_name=row=''
+                    cm_emails=''
+                    sql2 = 'exec [batches].[sp_get_batch_detail_for_assessment_mail] ?'
+                    values = (batch_id,)
+                    cur.execute(sql2,(values))
+                    
+                    for row in cur:
+                        center_name=row[0]
+                        course_name=row[1]
+                        customer_name=row[2]
+                        cm_emails=row[3]
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_assessment_UAP] ?,?,?'
                     values = (batch_id,pop,present_candidate)
                     cur.execute(sql,(values))
@@ -4220,14 +4233,14 @@ SELECT					cb.name as candidate_name,
                             h[columns[i]]=row[i]
                         response.append(h.copy())
                     uap_url=''
-                    params={"SDMSBatchId":SDMSBatchId,"NeoBatchStage":Stage,"AssessmentDate":AssessmentDate,"BatchAttemptNumber":BatchAttemptNumber,"CandidateList":response}
+                    params={"SDMSBatchId":SDMSBatchId,"CenterName":center_name,"CourseName":course_name,"ClientName":customer_name,"CMEmails":cm_emails,"NeoBatchStage":Stage,"AssessmentDate":AssessmentDate,"BatchAttemptNumber":BatchAttemptNumber,"CandidateList":response}
                     json_data = json.dumps(params)   
                     uap_api=UAP_API_BASE_URL + 'CreateNeoSkillsBatchJSONRequest?JSONRequest='+json_data
                     x = requests.get(uap_api)
                     data = x.json()
                     if 'CreateNeoSkillsBatch' in data:
                         if  str(data['CreateNeoSkillsBatch']['Succsess']) == "True":
-                            sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId,requested_date)                 
+                            sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails)                 
                     
             
             else:
@@ -4237,7 +4250,7 @@ SELECT					cb.name as candidate_name,
             return out
         except Exception as e:
             return {"message":"Error changing assessment stage"+e.message,"success":0,"assessment_id":0}
-    def ChangeCertificationStage(batch_id,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc):
+    def ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc):
         try:
             response=[]
             h={}
@@ -4258,9 +4271,9 @@ SELECT					cb.name as candidate_name,
                     user_mail_id_to=''
                     user_name_to=''
                     sql = '''
-                          select top(1) first_name,email from users.tbl_user_details where user_id=
+                          select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id=
                                                     (select top(1) created_by as stage_changed_by 
-                                                    from assessments.tbl_map_certification_candidates_stages 
+                                                    from assessments.tbl_map_certification_candidates_stages_revision_history 
                                                     where assessment_id = (select TOP(1) assessment_id 
                                                                             from assessments.tbl_batch_assessments
                                                                             where batch_id='''+ str(batch_id)+''' and assessment_type_id=2
@@ -4283,7 +4296,7 @@ SELECT					cb.name as candidate_name,
                     user_mail_id_to=''
                     user_name_to=''
                     sql = '''
-                            select top(1) first_name,email from users.tbl_user_details where user_id in 
+                            select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id in 
                                         (select user_id from masters.tbl_map_sub_project_user as u
                                         inner join users.tbl_map_User_UserRole as urr on urr.user_id=u.user_id
                                         and urr.user_role_id =5
@@ -4306,9 +4319,9 @@ SELECT					cb.name as candidate_name,
                     user_mail_id_to=''
                     user_name_to=''
                     sql = '''
-                            select top(1) first_name,email from users.tbl_user_details where user_id=
+                            select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id=
                                                     (select top(1) assigned_to as logistic_user 
-                                                    from assessments.tbl_map_certification_candidates_stages 
+                                                    from assessments.tbl_map_certification_candidates_stages_revision_history 
                                                     where assessment_id = (select TOP(1) assessment_id 
                                                                             from assessments.tbl_batch_assessments
                                                                             where batch_id='''+ str(batch_id)+''' and assessment_type_id=2
@@ -4332,9 +4345,9 @@ SELECT					cb.name as candidate_name,
                     user_mail_id_to=''
                     user_name_to=''
                     sql = '''
-                            select top(1) first_name,email from users.tbl_user_details where user_id=
-                                                    (select top(1) cereted_by as amt_user 
-                                                    from assessments.tbl_map_certification_candidates_stages 
+                            select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id=
+                                                    (select top(1) created_by as amt_user 
+                                                    from assessments.tbl_map_certification_candidates_stages_revision_history 
                                                     where assessment_id = (select TOP(1) assessment_id 
                                                                             from assessments.tbl_batch_assessments
                                                                             where batch_id='''+ str(batch_id)+''' and assessment_type_id=2
@@ -4358,9 +4371,9 @@ SELECT					cb.name as candidate_name,
                     user_mail_id_to=''
                     user_name_to=''
                     sql = '''
-                            select top(1) first_name,email from users.tbl_user_details where user_id=
+                            select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id=
                                                     (select top(1) cereted_by as amt_user 
-                                                    from assessments.tbl_map_certification_candidates_stages 
+                                                    from assessments.tbl_map_certification_candidates_stages_revision_history 
                                                     where assessment_id = (select TOP(1) assessment_id 
                                                                             from assessments.tbl_batch_assessments
                                                                             where batch_id='''+ str(batch_id)+''' and assessment_type_id=2
