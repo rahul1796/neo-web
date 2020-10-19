@@ -6960,6 +6960,7 @@ class upload_assessment_certificate_number(Resource):
                 schema = Schema([
                         #str+null check
                         Column('Enrolment_Id',str_validation + null_validation),
+                        Column('Candidate_Name'),
                         Column('Batch_Code',null_validation),
                         Column('Certificate_Number',null_validation)
                         ])
