@@ -4835,6 +4835,7 @@ class ChangeCertificationStage(Resource):
     def post():
         if request.method == 'POST':
             batch_id = request.form['batch_id']
+            batch_code = request.form['batch_code']
             user_id = request.form['user_id']
             current_stage_id = request.form['current_stage_id']
             enrollment_ids = request.form['enrollment_ids']
@@ -4848,7 +4849,7 @@ class ChangeCertificationStage(Resource):
             cg_desig = request.form['cg_desig']
             cg_org = request.form['cg_org']
             cg_org_loc = request.form['cg_org_loc']
-            return Assessments.ChangeCertificationStage(batch_id,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc)
+            return Assessments.ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc)
 api.add_resource(ScheduleAssessment,'/ScheduleAssessment')
 api.add_resource(ChangeCertificationStage,'/ChangeCertificationStage')
 api.add_resource(ConfirmedAssessedAssessmentFromUAP,'/ConfirmedAssessedAssessmentFromUAP')
@@ -6787,10 +6788,10 @@ class DownloadCertificationTemplate(Resource):
                     return({'msg':'No Records Found For Selected Filters!', 'success':False})
                 else:
                     df = pd.DataFrame(resp['data'], columns=resp['columns'])
-                    col = resp['columns'][:3]
+                    col = resp['columns'][:4]
                     
                     excel_row=0
-                    Column = ['Enrolment_Id', 'Batch_Code','Certificate_Number']
+                    Column = ['Enrolment_Id','Candidate_Name', 'Batch_Code','Certificate_Number']
                     col += []
                     Column += []
                     writer = pd.ExcelWriter(config.bulk_upload_path + file_name, engine='xlsxwriter')
