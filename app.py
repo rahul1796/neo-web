@@ -3514,6 +3514,7 @@ def get_file(path):
     #print(filename)
     if not(os.path.exists(filename)):
         filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathLocal + 'data/')
+    return filename 
     return send_file(filename)
 
 @app.route("/tma_registration")
