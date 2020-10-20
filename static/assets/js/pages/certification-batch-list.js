@@ -566,7 +566,7 @@ function GetPassedCandidates(BatchId,Stage,Batch_Code){
                             var txt=''
                             varHtml+='<tr>';
                             varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].S_No +'</td>';
-                            if(data.Candidates[i].Certificate_Flag) 
+                            if((data.Candidates[i].Certificate_Flag) || (Stage==6)) 
                                  txt += ''
                                 else{
                                  txt+='<input id="candcheckcase" name="candcheckcase" type="checkbox" value="'+data.Candidates[i].Intervention_Value+'" >';
@@ -1428,6 +1428,7 @@ function UploadCertificateFileToProcess()
                         icon:icon,
                         confirmButtonClass:"btn btn-confirm mt-2"
                         }).then(function(){
+                            $('#fileCertificate').val("");
                             $('#mdl_candidate_certificate_upload').modal('hide');
                             GetPassedCandidates($('#hdn_batch_id').val(),2,$('#hdn_batch_code').val());
                         }); 
@@ -1553,6 +1554,7 @@ function UploadCandImageFileToProcess()
                         icon:icon,
                         confirmButtonClass:"btn btn-confirm mt-2"
                         }).then(function(){
+                            $('#fileCandImage').val("");
                             $('#mdl_candidate_cand_image_upload').modal('hide');
                             GetPassedCandidates($('#hdn_batch_id').val(),5,$('#hdn_batch_code').val());
                         }); 
