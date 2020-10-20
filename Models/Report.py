@@ -1110,7 +1110,7 @@ class Report:
             df['Stage3_Location'] = df.loc[:,'Stage3_Location'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("'+ x + '","View Location")')
 
             df['Stage1_File_Name'] = df.loc[:,'Stage1_File_Name'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + image_path + x + '","View Image")')
-            df['Stage2_File_Name'] = df.loc[:,'Stage2_File_Name'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + audio_path + x + '","View Image")')
+            df['Stage2_File_Name'] = df.loc[:,'Stage2_File_Name'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + audio_path + x + '","View Recording")')
             df['Stage3_File_Name'] = df.loc[:,'Stage3_File_Name'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + image_path + x + '","View Image")')
             
             m_header = ["s","CANDIDATE ENROLLMENT NUMBER","CANDIDATE NAME","CANDIDATE EMAIL ID","BATCH CODE","BATCH START DATE","BATCH END DATE",
