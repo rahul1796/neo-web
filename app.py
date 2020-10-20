@@ -953,6 +953,9 @@ class batch_list_updated(Resource):
             course_ids=''
             if 'course_ids' in request.form:
                 course_ids=request.form['course_ids']
+            batch_codes=''
+            if 'BatchCodes' in request.form:
+                batch_codes=request.form['BatchCodes']
 
             start_index = request.form['start']
             page_length = request.form['length']
@@ -963,7 +966,7 @@ class batch_list_updated(Resource):
 
             #print(order_by_column_position)
             
-            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
+            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, batch_codes,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
 class batch_list_assessment(Resource):
     @staticmethod
     def post():
@@ -1019,6 +1022,61 @@ class batch_list_assessment(Resource):
             
             return Batch.batch_list_assessment(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, assessment_stage_id,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
 
+class batch_list_certification(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            
+            batch_id = request.form['batch_id'] 
+            
+            user_role_id  = request.form['user_role_id']
+            user_id = request.form['user_id']
+            customer = request.form['customer']
+            project = request.form['project']
+            sub_project = request.form['sub_project']
+            region = request.form['region']
+            center = request.form['center']
+            center_type = request.form['center_type']
+            # Planned_actual = request.form['Planned_actual']
+            # StartFromDate = request.form['StartFromDate']
+            # StartToDate = request.form['StartToDate']
+            # EndFromDate = request.form['EndFromDate']
+            # EndToDate = request.form['EndToDate']
+            status = request.form['status']
+            Planned_actual=''
+            if 'Planned_actual' in request.form:
+                Planned_actual = request.form['Planned_actual']
+            StartFromDate=''
+            if 'StartFromDate' in request.form:
+                StartFromDate = request.form['StartFromDate']
+            StartToDate=''
+            if 'StartToDate' in request.form:
+                StartToDate = request.form['StartToDate']
+            EndFromDate=''
+            if 'EndFromDate' in request.form:
+                EndFromDate = request.form['EndFromDate']
+            EndToDate=''
+            if 'EndToDate' in request.form:
+                EndToDate = request.form['EndToDate']
+            BU=''
+            if 'BU' in request.form:
+                BU = request.form['BU']            
+            course_ids=''
+            if 'course_ids' in request.form:
+                course_ids=request.form['course_ids']
+            if 'assessment_stage_id' in request.form:
+                assessment_stage_id=request.form['assessment_stage_id']
+            start_index = request.form['start']
+            page_length = request.form['length']
+            search_value = request.form['search[value]']
+            order_by_column_position = request.form['order[0][column]']
+            order_by_column_direction = request.form['order[0][dir]']
+            draw=request.form['draw']
+
+            #print(order_by_column_position)
+            
+            return Batch.batch_list_certification(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, assessment_stage_id,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
+
 class add_batch_details(Resource):
     @staticmethod
     def post():
@@ -1034,6 +1092,8 @@ class add_batch_details(Resource):
             ActualEndDate=request.form['ActualEndDate']
             StartTime=request.form['StartTime']
             EndTime=request.form['EndTime']
+            OJTStartDate=request.form['OJTStartDate']
+            OJTEndDate=request.form['OJTEndDate']
             user_id=g.user_id
             isactive=request.form['isactive']
             Product=request.form['Product']
@@ -1044,7 +1104,7 @@ class add_batch_details(Resource):
             planned_batch_id=0
             if 'PlannedBatchId' in request.form:
                 planned_batch_id=request.form['PlannedBatchId']
-            return Batch.add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id)
+            return Batch.add_batch(BatchName, Product, Center, Course, SubProject, Cofunding, Trainer, isactive, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, StartTime, EndTime, BatchId, user_id, room_ids,planned_batch_id,OJTStartDate, OJTEndDate)
 
 
 class get_batch_details(Resource):
@@ -1202,6 +1262,7 @@ class cancel_actual_batch(Resource):
 api.add_resource(batch_list, '/batch_list')
 api.add_resource(batch_list_updated, '/batch_list_updated')
 api.add_resource(batch_list_assessment, '/batch_list_assessment')
+api.add_resource(batch_list_certification, '/batch_list_certification')
 api.add_resource(add_batch_details, '/add_batch_details')
 api.add_resource(get_batch_details, '/GetBatchDetails')
 api.add_resource(all_course_list, '/AllCourseList')
@@ -3388,7 +3449,7 @@ api.add_resource(GetCandidateBasicDetails,'/GetCandidateBasicDetails')
 ############################################################################################################
 @app.route("/forget_password")
 def forget_password():
-    return render_template('recoverpw.html')
+    return render_template('recoverpw.html', html_path=config.Base_URL)
 
 class recover_pass(Resource):
     @staticmethod
@@ -3450,9 +3511,10 @@ api.add_resource(change_password_api,'/change_password_api')
 def get_file(path):
     """Download a file."""
     filename = r"{}data/{}".format(config.ReportDownloadPathLocal,path)
-    print(filename)
+    #print(filename)
     if not(os.path.exists(filename)):
-        filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathWeb)
+        filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathLocal + 'data/')
+    #return filename 
     return send_file(filename)
 
 @app.route("/tma_registration")
@@ -4769,8 +4831,28 @@ class ConfirmedAssessedAssessmentFromUAP(Resource):
             assessor_mobile=request.form['assessor_mobile']
             #reassessment_flag=request.form['reassessment_flag']
             return Assessments.ScheduleAssessment(batch_id,1,'',scheduled_date,assessment_date,0,0,-1,0,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,0)
-
+class ChangeCertificationStage(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            batch_id = request.form['batch_id']
+            batch_code = request.form['batch_code']
+            user_id = request.form['user_id']
+            current_stage_id = request.form['current_stage_id']
+            enrollment_ids = request.form['enrollment_ids']
+            sent_printing_date = request.form['sent_printing_date']
+            sent_center_date = request.form['sent_center_date']
+            expected_arrival_date = request.form['expected_arrival_date']
+            received_date = request.form['received_date']
+            planned_distribution_date = request.form['planned_distribution_date']
+            actual_distribution_date = request.form['actual_distribution_date']
+            cg_name = request.form['cg_name']
+            cg_desig = request.form['cg_desig']
+            cg_org = request.form['cg_org']
+            cg_org_loc = request.form['cg_org_loc']
+            return Assessments.ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc)
 api.add_resource(ScheduleAssessment,'/ScheduleAssessment')
+api.add_resource(ChangeCertificationStage,'/ChangeCertificationStage')
 api.add_resource(ConfirmedAssessedAssessmentFromUAP,'/ConfirmedAssessedAssessmentFromUAP')
 
 api.add_resource(DownloadAssessmentResult,'/DownloadAssessmentResult')
@@ -4846,6 +4928,19 @@ class Getcandidatebybatch(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(Getcandidatebybatch,'/Getcandidatebybatch')
+
+class ALLCandidatesBasedOnCertifiactionStage(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                batch_id=request.args.get('batch_id',0,type=int)
+                stage_id=request.args.get('stage_id',0,type=int)
+                response = Database.ALLCandidatesBasedOnCertifiactionStage(batch_id,stage_id)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(ALLCandidatesBasedOnCertifiactionStage,'/ALLCandidatesBasedOnCertifiactionStage')
 
 class CandidateFamilyDetails(Resource):
     @staticmethod
@@ -5026,7 +5121,8 @@ class add_subproject_details(Resource):
             subproject_id=g.subproject_id
             project_code = request.form['project_id']      
             isactive=request.form['isactive']
-            return Master.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive)
+            is_ojt_req=request.form['is_ojt_req']
+            return Master.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req)
 api.add_resource(add_subproject_details,'/add_subproject_details')
 
 #############################################################################
@@ -5680,8 +5776,9 @@ class upload_bulk_upload(Resource):
             all_email=Database.all_email_validation(cand_stage)
             email_validation = [CustomElementValidation(lambda d: d.lower() in all_email, 'Invalid mobilizer')]
             all_state=Database.all_state_validation()
-            #print(data)
-            regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[.]\w+$'
+            
+            #regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[.]\w+$'
+            regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[\.A-Za-z]+\w+$'
             regex2 = '[\.]{2,}'
             state_validation = [CustomElementValidation(lambda d: d.lower() in all_state, 'Invalid State')]
             cand_email_format_validation = [CustomElementValidation(lambda d: ((re.search(regex2,d)==None)and(re.search(regex,d)!=None)), 'Inavalid email format. Please provide correct email')]
@@ -6674,7 +6771,54 @@ class DownloadEnrTemplate(Resource):
                     return {'Description':'Downloaded Template', 'Status':True, 'filename':file_name}
             except Exception as e:
                 return {'Description':'Error: '+str(e), 'Status':False}
+class DownloadCertificationTemplate(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                batch_id = request.form["batch_id"]
+                enrollment_ids = request.form["intervention_values"]
+
+                
+                file_name='CandidateCertificateUpload_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                resp = Database.download_selected_candidate_certification(batch_id,enrollment_ids)
+
+                if(len(resp['data']) < 1):
+                    return({'msg':'No Records Found For Selected Filters!', 'success':False})
+                else:
+                    df = pd.DataFrame(resp['data'], columns=resp['columns'])
+                    col = resp['columns'][:4]
+                    
+                    excel_row=0
+                    Column = ['Enrolment_Id','Candidate_Name', 'Batch_Code','Certificate_Number']
+                    col += []
+                    Column += []
+                    writer = pd.ExcelWriter(config.bulk_upload_path + file_name, engine='xlsxwriter')
+                    workbook  = writer.book
+
+                    header_format = workbook.add_format({
+                        'bold': True,
+                        #'text_wrap': False,
+                        'valign': 'center',
+                        'fg_color': '#D7E4BC',
+                        'border': 1})
+                    df_1 = df[col]
+                    df_1.to_excel(writer, index=None, header=None ,startrow=excel_row+1 ,sheet_name='Certificate') 
+                    worksheet = writer.sheets['Certificate']
+                    for i in range(len(Column)):
+                        worksheet.write(excel_row,i ,Column[i], header_format)
+                    
+                    
+                    writer.save()
+                    
+                    return {'Description':'Downloaded Template', 'Status':True, 'filename':file_name}
+            except Exception as e:
+                return {'Description':'Error: '+str(e), 'Status':False}
+
 api.add_resource(DownloadEnrTemplate,'/DownloadEnrTemplate')
+api.add_resource(DownloadCertificationTemplate,'/DownloadCertificationTemplate')
 
 ####################################################################################################
 #Partner_API's
@@ -6768,6 +6912,37 @@ class add_partner_details(Resource):
             partner_id=request.form['PartnerId']
             return Master.add_partner_details(partner_name,user_id,is_active,partner_type_id,assessment_partner_type_id,address,partner_id)
 api.add_resource(add_partner_details,'/add_partner_details')
+
+class upload_assessment_certificate_copy(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            certi_name=request.form['file_name']
+            user_id=request.form['user_id']
+            enrolment_id=request.form['enrollment_id']
+            batch_id=request.form['batch_id']    
+            return Database.upload_assessment_certificate_copy(certi_name,user_id,enrolment_id,batch_id)
+api.add_resource(upload_assessment_certificate_copy,'/upload_assessment_certificate_copy')
+class upload_cerification_cand_image(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            certi_name=request.form['file_name']
+            user_id=request.form['user_id']
+            enrolment_id=request.form['enrollment_id']
+            batch_id=request.form['batch_id']    
+            return Database.upload_cerification_cand_image(certi_name,user_id,enrolment_id,batch_id)
+api.add_resource(upload_cerification_cand_image,'/upload_cerification_cand_image')
+
+class upload_cerification_batch_image(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            certi_name=request.form['file_name']
+            user_id=request.form['user_id']
+            batch_id=request.form['batch_id']    
+            return Database.upload_cerification_batch_image(certi_name,user_id,batch_id)
+api.add_resource(upload_cerification_batch_image,'/upload_cerification_batch_image')
 
 @app.route("/after_popup_partner")
 def after_popup_partner():
@@ -6874,6 +7049,42 @@ class upload_assessment_result(Resource):
                  return {"Status":False, "message":"Unable to upload " + str(e)}         
 api.add_resource(upload_assessment_result,'/upload_assessment_result')
 
+class upload_assessment_certificate_number(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                f = request.files['filename']
+                user_id = int(session['user_id'])
+                assigned_user_id = int(request.form["assigned_user_id"])
+                batch_code = str(request.form["batch_code"])
+                file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
+                f.save(file_name)
+    
+                df= pd.read_excel(file_name,sheet_name='Certificate')
+                df = df.fillna('')
+                df = df.astype(str)
+                schema = Schema([
+                        #str+null check
+                        Column('Enrolment_Id',str_validation + null_validation),
+                        Column('Candidate_Name'),
+                        Column('Batch_Code',null_validation),
+                        Column('Certificate_Number',str_validation + null_validation)
+                        ])
+                errors = schema.validate(df)
+                errors_index_rows = [e.row for e in errors]
+                len_error = len(errors_index_rows)
+                os.remove(file_name)
+                if len_error>0:
+                    pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename+'_' + 'errors.csv')
+                    return {"Status":False, "message":"Upload Failed (fails to validate data)" }
+                else:
+                    out = Database.upload_assessment_certificate_number(df,user_id,assigned_user_id,batch_code)
+                    return out
+            except Exception as e:
+                 return {"Status":False, "message":"Unable to upload data " + str(e)}         
+api.add_resource(upload_assessment_certificate_number,'/upload_assessment_certificate_number')
+
 class UAP_upload_assessment_result(Resource):
     @staticmethod
     def post():
@@ -6907,6 +7118,7 @@ class batch_download_report(Resource):
                 center = request.form["center"]
                 center_type = request.form["center_type"]
                 BU = request.form["BU"]
+                BatchCodes = request.form["BatchCodes"]
                 Planned_actual = request.form["Planned_actual"]
                 StartFromDate = request.form["StartFromDate"]
                 StartToDate = request.form["StartToDate"]
@@ -6914,7 +7126,7 @@ class batch_download_report(Resource):
                 EndToDate = request.form["EndToDate"]
                 file_name='batch_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
                 #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
-                resp = batch_report.create_report(batch_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate, file_name)
+                resp = batch_report.create_report(batch_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type,BU,BatchCodes ,Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate, file_name)
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:
@@ -7763,7 +7975,6 @@ class GetBatchList(Resource):
                 return response
 api.add_resource(GetBatchList,'/GetBatchList')
 
-
 class GetBatchSessionList(Resource):
     @staticmethod
     def get():
@@ -7818,7 +8029,6 @@ class LogTrainerStageDetails(Resource):
                 res = TMA.LogTrainerStageDetails(session_id,user_id,batch_id,stage_id,latitude,longitude,image_file_name,mark_candidate_attendance,attendance_data,group_attendance_image_data,app_version)
                 response=jsonify(res)
                 return response
-
         except Exception as e:
             res={'status':-1,'message':'Error : '+ str(e),'app_status':True}
             response=jsonify(res)
@@ -8267,7 +8477,205 @@ def after_popup_reload_image():
         return render_template("home.html",values=g.User_detail_with_ids,html="reupload_candidate_image")
     else:
         return render_template("login.html",error="Session Time Out!!")
+@app.route("/certification_page")
+def certification_page():
+    if g.user:
+        status=request.args.get('status',-1,type=int)
+        return render_template("Assessment/certification-batch-list.html", status=status)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
+@app.route("/certification")
+def certification():
+    if g.user:
+        status=request.args.get('status',-1,type=int) 
+        html_str="certification_page?status=" + str(status)
+        return render_template("home.html",values=g.User_detail_with_ids,html=html_str)
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class GetOJTBatchCurrentStageDetails(Resource):
+    @staticmethod
+    def get():
+        try:
+            if request.method=='GET':
+                user_id=request.args.get('user_id',0,type=int)
+                batch_id=request.args.get('batch_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                client_id=request.args.get('client_id','',type=str)
+                client_key=request.args.get('client_key','',type=str)
+                
+                if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                    if batch_id<1:
+                        res = {'status':0,'message':'Missing or invalid batch_id'}
+                        return jsonify(res)
+                    
+                    current_stage = Database.GetOJTBatchCurrentStageDetails(batch_id,user_id,user_role_id)
+                    if current_stage ==None:
+                        res = {'status':0, 'message':'No stage found' }
+                    else:
+                        res = {'status':1,'message':'Success','user_id':user_id,'batch_id':batch_id,'stage_id':current_stage}
+                else:
+                    res = {'status':0, 'message':'Invalid client credentials'}
+            else:
+                res = {'status':0, 'message':'Invalid Method'}
+            return jsonify(res)  
+
+        except Exception as e:
+            res={'status':-1,'message':'Error : '+ str(e)}
+            return jsonify(res)
+api.add_resource(GetOJTBatchCurrentStageDetails, '/GetOJTBatchCurrentStageDetails')
+
+class LogOJTStageDetails(Resource):
+    @staticmethod
+    def post():
+        try:
+            if request.method=='POST':
+                client_id = request.form['client_id']
+                client_key = request.form['client_key']
+                user_id = int(request.form['user_id'])
+                user_role_id = int(request.form['user_role_id'])
+                batch_id = int(request.form['batch_id'])
+                stage_id = int(request.form['stage_id'])
+                latitude = request.form['latitude']
+                longitude = request.form['longitude']
+                timestamp = request.form['timestamp']
+                filename = request.form['filename']
+
+                app_version = request.form['app_version']
+                device_model = request.form['device_model']
+                imei_num = request.form['imei_num']
+                android_version = request.form['android_version']
+                
+                if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                    if batch_id<1:
+                        res = {'success': False, 'description': "Missing or invalid batch_id", 'app_status':True}
+                        return jsonify(res)
+                    if (stage_id<1 or stage_id>3):
+                        res = {'success': False, 'description':'Missing or invalid stage_id','app_status':True}
+                        return jsonify(res)
+
+                    res = Database.LogOBJStageDetails(user_id, batch_id, stage_id, latitude, longitude, timestamp, filename, app_version, device_model, imei_num, android_version)
+                else:
+                    res = {'success': False, 'description':'Invalid client credentials','app_status':True}
+            else:
+                res = {'success': False, 'description':'Invalid Method','app_status':True}
+            return jsonify(res)
+                    
+        except Exception as e:
+            res = {'success': False, 'description':'Error : '+ str(e),'app_status':True}
+            #res={'status':-1,'message':'Error : '+ str(e),'app_status':True}
+            response=jsonify(res)
+            return response
+api.add_resource(LogOJTStageDetails,'/LogOJTStageDetails')
+
+class Upload_OJT_file(Resource):
+    #upload_path = config.tmapath + 'trainer_stage_images/'
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            client_id = request.form['client_id']
+            client_key = request.form['client_key']
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                try:
+                    file = request.files['file']
+                    name = file.filename
+                    file_format = name.split('.')[-1]
+                except Exception as e:
+                    res = {'success': False, 'description': "Unable to read file "}
+                    #res = {'status':0,'message':"unable to read image " + str(e)}
+                    return jsonify(res)
+                if file:
+                    try:
+                        upload_path = ''
+                        if file_format.lower()=='mp3':
+                            upload_path = config.neo_report_file_path + 'data/OJT/audio/'
+                        elif (file_format.lower() in ['gif', 'jpeg', 'png', 'jpg']):
+                            upload_path = config.neo_report_file_path + 'data/OJT/images/'
+                        else:
+                            #res = {'status':0,'message':"Invalid file Format"}
+                            res = {'success': False, 'description': "Invalid file Format "}
+                            return jsonify(res)
+                        file.save(upload_path + name)
+                        
+                        #res = {'status':1,'message':"uploaded succesfully"}
+                        res = {'success': True, 'description': "uploaded succesfully"}
+                        return jsonify(res)
+                    except Exception as e:
+                        #res = {'status':0,'message':"uploaded failed " + str(e)}
+                        res = {'success': False, 'description': "uploaded failed " + str(e)}
+                        return jsonify(res) 
+                else:
+                    res = {'success': False, 'description': "Please select a file "}
+                    return jsonify(res) 
+            else:
+                #res = {'status':0,'message':"client name and password not matching {}, {}".format(client_id, client_key)}
+                res = {'success':False,'description':"client name and password not matching {}, {}".format(client_id, client_key)}
+                return jsonify(res)
+        else:
+            res = {'success':False,'description':"wrong method"}
+            return jsonify(res)
+api.add_resource(Upload_OJT_file, '/Upload_OJT_file')
+
+#ECP REPORT PAGE
+@app.route("/OJT_report_page")
+def OJT_report_page():
+    if g.user:
+        return render_template("Reports/OJT-report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/OJT_report")
+def OJT_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="OJT_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class GetsubprojectbyCustomer(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                customer_id=request.args.get('customer_id','',type=str)
+                response = Database.GetsubprojectbyCustomer(user_id, user_role_id, customer_id)
+                return {'sub_projects':response}
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetsubprojectbyCustomer,'/GetsubprojectbyCustomer')
+
+class download_ojt_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
+                customer_ids = request.form["customer_ids"]
+                sub_project_ids = request.form["sub_project_ids"]
+                course_ids = request.form["course_ids"]
+                batch_code =request.form["batch_code"]
+                date_stage = request.form["date_stage"]
+                BatchStartFromDate = request.form["BatchStartFromDate"]
+                BatchStartToDate = request.form["BatchStartToDate"]
+                BatchEndFromDate = request.form["BatchEndFromDate"]
+                BatchEndToDate = request.form["BatchEndToDate"]
+                OJTStartFromDate = request.form["OJTStartFromDate"]
+                OJTStartToDate = request.form["OJTStartToDate"]
+                OJTEndFromDate = request.form["OJTEndFromDate"]
+                OJTEndToDate = request.form["OJTEndToDate"]
+            
+                file_name='OJT_Monitoring_Report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            
+                resp = Report.download_ojt_report(file_name, user_id, user_role_id, customer_ids, sub_project_ids, course_ids, batch_code, date_stage, BatchStartFromDate,BatchStartToDate,BatchEndFromDate,BatchEndToDate,OJTStartFromDate,OJTStartToDate,OJTEndFromDate,OJTEndToDate)
+                return resp
+                
+            except Exception as e:
+                print({"exceptione":str(e)})
+api.add_resource(download_ojt_report,'/download_ojt_report')
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
-    #app.run(debug=True)

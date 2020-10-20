@@ -58,21 +58,7 @@ function uploadFileToS3(file, s3Data, url){
 
 function toggleCheckbox(e)
     {
-        //let id = e.target.getAttribute('value');
-        
-        //console.log(e.target.getAttribute('name'));
         var temp=e.target.getAttribute('value');
-        //check_list.push(e.target.getAttribute('value'));
-
-        //console.log(e.target.getAttribute('name').checked)
-        //console.log(e.target.getAttribute('name').checked())
-        //console.log($('#'+e.target.getAttribute('id')).is(':checked')) 
-
-
-
-        //console.log($('#'+e.target.getAttribute('name')).is(':checked'))
-
-        //console.log(e.currentTarget.getAttribute('id'));
         if($('#'+e.target.getAttribute('id')).is(':checked'))
         {
             if(jQuery.inArray( temp, check_list )==-1){
@@ -404,7 +390,7 @@ function LoadTable()
                     var varButtons = "";
                     if(row.Is_Check)
                         varButtons += '<input id="addedchk_' + row.S_No + '" name="checkcase" type="checkbox" value="'+row.Candidate_Id+'" onclick="toggleCheckbox(event)">';      
-                    else if((user_role_id==1)||(user_role_id==1)||(user_role_id==1)||(user_role_id==1)){
+                    else if((user_role_id==1)||(user_role_id==5)||(user_role_id==24)||(user_role_id==38)){
                         varButtons += '<a onclick="ReuploadImages(\'' + row.Candidate_Id + '\')" class="btn" style="cursor:pointer" ><i title="View/Reupload Images" class="fas fa-edit" ></i></a>';
                     }
                     return varButtons;
