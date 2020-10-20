@@ -1,4 +1,4 @@
-def create_report(batch_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate, file_name):
+def create_report(batch_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type,BU,BatchCodes, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate, file_name):
     # from candidate report 
     try:
         import pandas as pd
@@ -23,9 +23,9 @@ def create_report(batch_id, user_id, user_role_id, status, customer, project, su
 
         cnxn=pyodbc.connect(config.conn_str) #
         curs = cnxn.cursor()
-        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?'
+        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?'
 
-        values = (batch_id,0,1000000,'','','',user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,'', Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
+        values = (batch_id,0,1000000,'','','',user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,'',BatchCodes, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
         curs.execute(sql,(values))
         columns = [column[0].title() for column in curs.description]
         

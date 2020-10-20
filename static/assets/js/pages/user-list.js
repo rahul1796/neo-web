@@ -490,9 +490,9 @@ function UpdateRole()
             data:{
                 "login_user_id": $('#hdn_home_user_id').val() ,
                 "user_id": $('#hdn_neo_user_id').val(),
-                "neo_role":$('#ddlNeoRole').val().toString(),
-                "jobs_role":$('#ddlJobsRole').val().toString(),
-                "crm_role":$('#ddlCRMRole').val().toString(),
+                "neo_role":($('#ddlNeoRole').val()==null? '20':$('#ddlNeoRole').val().toString()),
+                "jobs_role":($('#ddlJobsRole').val()==null? '20':$('#ddlJobsRole').val().toString()),
+                "crm_role":($('#ddlCRMRole').val()==null? '20':$('#ddlCRMRole').val().toString()),
             },
             success:function(data){
                 if(data.PopupMessage.message =="Success")

@@ -238,6 +238,45 @@ function LoadCenter(){
     });
     return false;
 }
+function LoadBatches(){
+    //alert($('#ddlProject').val().toString())
+    var URL=$('#hdn_web_url').val()+ "/get_batches_basedon_sub_proj_multiple"
+    $.ajax({
+        type:"POST",
+        url:URL,
+        async:false,
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "SubProjectId":$('#ddlSubProject').val().toString(),
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
+        },
+        success: function (data){
+            if(data.Batches != null)
+            {
+                $('#ddlBatches').empty();
+                var count=data.Batches.length;
+                if( count> 0)
+                {
+                    //$('#ddlCourse').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlBatches').append(new Option(data.Batches[i].Batch_Code,data.Batches[i].Batch_Id));
+                }
+                else
+                {
+                    $('#ddlBatches').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
 function LoadTable()
 {
     vartable = $("#tbl_batchs").DataTable({
@@ -271,6 +310,7 @@ function LoadTable()
                 d.EndFromDate = $('#EndFromDate').val().toString();
                 d.EndToDate = $('#EndToDate').val().toString();
                 d.BU =  $('#ddlBU').val().toString();
+                d.BatchCodes =  $('#ddlBatches').val().toString();
             },
             error: function (e) {
                 $("#tbl_batchs tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -1176,6 +1216,7 @@ function add_drop_message(){
                                 'center':$('#ddlCenter').val().toString(),
                                 'center_type':$('#ddlCenterType').val().toString(),
                                 'BU':$('#ddlBU').val().toString(),
+                                'BatchCodes':$('#ddlBatches').val().toString(),
                                 'Planned_actual' :$('#Planned_actual').val().toString(),
                                 'StartFromDate' :$('#StartFromDate').val().toString(),
                                 'EndFromDate' :$('#EndFromDate').val().toString(),
