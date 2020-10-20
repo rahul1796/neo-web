@@ -7068,7 +7068,7 @@ class upload_assessment_certificate_number(Resource):
                         Column('Enrolment_Id',str_validation + null_validation),
                         Column('Candidate_Name'),
                         Column('Batch_Code',null_validation),
-                        Column('Certificate_Number',null_validation)
+                        Column('Certificate_Number',str_validation + null_validation)
                         ])
                 errors = schema.validate(df)
                 errors_index_rows = [e.row for e in errors]
