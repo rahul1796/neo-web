@@ -588,7 +588,7 @@ function GetPassedCandidates(BatchId,Stage,Batch_Code){
                             {
                                 action+='<a onclick="UploadCandImage(\'' + data.Candidates[i].Intervention_Value + '\')" class="user-btn" style="cursor:pointer" ><i title="Upload Candidate Image" class="fe-upload" ></i></a>';
                             }
-                            if((Stage==2) & (($('#hdn_home_user_role_id').val()=='40')||($('#hdn_home_user_role_id').val()=='1')))
+                            if(((Stage==2)||((Stage==0)&(parseInt(data.Candidates[i].Certification_Stage_Id)>2))) & (($('#hdn_home_user_role_id').val()=='40')||($('#hdn_home_user_role_id').val()=='1')))
                             {
                                 action+='<a onclick="UploadCandCertificate(\'' + data.Candidates[i].Intervention_Value + '\')" class="user-btn" style="cursor:pointer" ><i title="Upload Candidate Certificate" class="fe-upload" ></i></a>';
                             }
