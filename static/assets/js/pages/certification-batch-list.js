@@ -1430,7 +1430,7 @@ function UploadCertificateFileToProcess()
                         }).then(function(){
                             $('#fileCertificate').val("");
                             $('#mdl_candidate_certificate_upload').modal('hide');
-                            GetPassedCandidates($('#hdn_batch_id').val(),2,$('#hdn_batch_code').val());
+                            GetPassedCandidates($('#hdn_batch_id').val(),parseInt($('#hdn_cert_stage_id').val()),$('#hdn_batch_code').val());
                         }); 
         },
         error:function(err)
