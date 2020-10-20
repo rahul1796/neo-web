@@ -7076,7 +7076,7 @@ class upload_assessment_certificate_number(Resource):
                 os.remove(file_name)
                 if len_error>0:
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename+'_' + 'errors.csv')
-                    return {"Status":False, "message":"Uploaded Failed (fails to validate data)" }
+                    return {"Status":False, "message":"Upload Failed (fails to validate data)" }
                 else:
                     out = Database.upload_assessment_certificate_number(df,user_id,assigned_user_id,batch_code)
                     return out
