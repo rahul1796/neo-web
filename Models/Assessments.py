@@ -47,7 +47,7 @@ class DownloadAssessmentResultUploadTemplate(Resource):
                 return {"exception":str(e),"File":"HI"}
 
 class DownloadAssessmentResult(Resource):
-    DownloadPath=config.DownloadcandidateResultPathWeb
+    DownloadPath=config.DownloadcandidateResultPathLocal
     #print(DownloadPath)
     
     @staticmethod
