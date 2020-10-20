@@ -33,7 +33,7 @@ def forget_password(email, password, name):
         return {'status':False,'description':'Unable to sent email'}
 
 def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch_Code):
-    print(NewStageId,emailTo,emailToName,EmailCC,Batch_Code)
+    #print(NewStageId,emailTo,emailToName,EmailCC,Batch_Code)
     try:
         server = smtplib.SMTP('smtp.office365.com','587')
         #server = smtplib.SMTP(host='smtp.office365.com')
@@ -64,6 +64,7 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
         html_msg= config.html_email_msg_certification_stage_change
         html_msg = html_msg.format(emailToName,Batch_Code,stage_name,EmailCC)
         msg.attach(MIMEText(html_msg, 'html'))
+        #print(msg['From'], [msg['To']] + EmailCC.split(",") , msg.as_string())
         res = server.sendmail(msg['From'], [msg['To']] + EmailCC.split(",") , msg.as_string())
         server.quit()
 
@@ -91,9 +92,10 @@ def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date,center_name,cou
         msg['Subject'] = "LN NEO - An Assessment Has Been Scheduled For Batch - "+str(SDMSBatchId)
 
         html_msg= config.html_email_msg_uap_batch_creation
-        html_msg = html_msg.format('Navriti Assessment Team',RequestId,SDMSBatchId,requested_date,center_name,course_name,customer_name)
+        html_msg = html_msg.format('Navriti Assessment Team',RequestId,SDMSBatchId,center_name,course_name,customer_name,requested_date)
 
         msg.attach(MIMEText(html_msg, 'html'))
+        #print(msg['From'], [msg['To']] + ccList , msg.as_string())
         res = server.sendmail(msg['From'], [msg['To']] + ccList , msg.as_string())
         server.quit()
 

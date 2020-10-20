@@ -4311,7 +4311,6 @@ SELECT					cb.name as candidate_name,
                                         and urr.user_role_id =5
                                         where sub_project_id=(select sub_project_id from batches.tbl_batches where batch_id='''+ batch_id +''')
                                         AND u.is_active=1
-                                        order by u.created_on desc
                                         )
                             ANd is_active=1;
                           '''
