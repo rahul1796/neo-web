@@ -2,6 +2,8 @@ var varTable;
 
 
 function hideDateStageDiv(){
+    $("#alldates").hide();
+    
     $("#divBatchStartFromDate").hide();
     $("#divBatchStartToDate").hide();
     $("#divBatchEndFromDate").hide();
@@ -12,6 +14,7 @@ function hideDateStageDiv(){
     $("#divOJTEndToDate").hide();       
 }
 function ChangeDateStageDiv(){
+    $("#alldates").show();
     //console.log($('#ddlDateStages').val())
     // divBatchFromDate, divBatchToDate, divOJTFromDate, divOJTToDate
     if ($('#ddlDateStages').val()=='1'){
@@ -176,22 +179,23 @@ function DownloadTableBasedOnSearch(){
         return 
     }
     if($('#ddlDateStages').val()=='1'){
-        if ($('#BatchStartFromDate').val()=='' || $('#BatchStartToDate').val() == '' || ($('#BatchStartFromDate').val() > $('#BatchStartToDate').val())){
-            alert('please search batch start date properly');
+        // new Date($('#BatchStartToDate').val()).getTime() > new Date($('#BatchStartFromDate').val()).getTime()
+        if ($('#BatchStartFromDate').val()=='' || $('#BatchStartToDate').val() == '' || (new Date($('#BatchStartFromDate').val()).getTime() > new Date($('#BatchStartToDate').val()).getTime())){
+            alert('Start date should be less than or equal to End date');
             return
         }
-        if ($('#BatchEndFromDate').val()=='' || $('#BatchEndToDate').val() == '' || ($('#BatchEndFromDate').val() > $('#BatchEndToDate').val())){
-            alert('please search batch end date properly');
+        if ($('#BatchEndFromDate').val()=='' || $('#BatchEndToDate').val() == '' || (new Date($('#BatchEndFromDate').val()).getTime() > new Date($('#BatchEndToDate').val()).getTime())){
+            alert('End date should be gearter than or equals to the Start date');
             return
         }
     }
     else if ($('#ddlDateStages').val()=='2'){
-        if ($('#OJTStartFromDate').val()=='' || $('#OJTStartToDate').val() == '' || ($('#OJTStartFromDate').val() > $('#OJTStartToDate').val())){
-            alert('please search OJT start date properly');
+        if ($('#OJTStartFromDate').val()=='' || $('#OJTStartToDate').val() == '' || (new Date($('#OJTStartFromDate').val()).getTime() > new Date($('#OJTStartToDate').val()).getTime())){
+            alert('Start date should be less than or equal to End date');
             return
         }
-        if ($('#OJTEndFromDate').val()=='' || $('#OJTEndToDate').val() == '' || ($('#OJTEndFromDate').val() > $('#OJTEndToDate').val())){
-            alert('please search OJT end date properly');
+        if ($('#OJTEndFromDate').val()=='' || $('#OJTEndToDate').val() == '' || (new Date($('#OJTEndFromDate').val()).getTime() > new Date($('#OJTEndToDate').val()).getTime())){
+            alert('End date should be gearter than or equals to the Start date');
             return
         }
     }
@@ -257,10 +261,9 @@ function DownloadTableBasedOnSearch(){
                                     return;
                             }
                         } catch(ex) {}
-                    
                 }
                 else{
-                    //alert(resp.Description)
+                    alert(resp.Description)
                     $("#imgSpinner").hide();
                     
                 }
