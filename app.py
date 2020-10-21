@@ -4831,8 +4831,28 @@ class ConfirmedAssessedAssessmentFromUAP(Resource):
             assessor_mobile=request.form['assessor_mobile']
             #reassessment_flag=request.form['reassessment_flag']
             return Assessments.ScheduleAssessment(batch_id,1,'',scheduled_date,assessment_date,0,0,-1,0,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,0)
-
+class ChangeCertificationStage(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            batch_id = request.form['batch_id']
+            batch_code = request.form['batch_code']
+            user_id = request.form['user_id']
+            current_stage_id = request.form['current_stage_id']
+            enrollment_ids = request.form['enrollment_ids']
+            sent_printing_date = request.form['sent_printing_date']
+            sent_center_date = request.form['sent_center_date']
+            expected_arrival_date = request.form['expected_arrival_date']
+            received_date = request.form['received_date']
+            planned_distribution_date = request.form['planned_distribution_date']
+            actual_distribution_date = request.form['actual_distribution_date']
+            cg_name = request.form['cg_name']
+            cg_desig = request.form['cg_desig']
+            cg_org = request.form['cg_org']
+            cg_org_loc = request.form['cg_org_loc']
+            return Assessments.ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc)
 api.add_resource(ScheduleAssessment,'/ScheduleAssessment')
+api.add_resource(ChangeCertificationStage,'/ChangeCertificationStage')
 api.add_resource(ConfirmedAssessedAssessmentFromUAP,'/ConfirmedAssessedAssessmentFromUAP')
 
 api.add_resource(DownloadAssessmentResult,'/DownloadAssessmentResult')
@@ -6769,10 +6789,10 @@ class DownloadCertificationTemplate(Resource):
                     return({'msg':'No Records Found For Selected Filters!', 'success':False})
                 else:
                     df = pd.DataFrame(resp['data'], columns=resp['columns'])
-                    col = resp['columns'][:3]
+                    col = resp['columns'][:4]
                     
                     excel_row=0
-                    Column = ['Enrolled_Id*', 'Batch_Code*','Certificate_Number*']
+                    Column = ['Enrolment_Id','Candidate_Name', 'Batch_Code','Certificate_Number']
                     col += []
                     Column += []
                     writer = pd.ExcelWriter(config.bulk_upload_path + file_name, engine='xlsxwriter')
@@ -6893,6 +6913,37 @@ class add_partner_details(Resource):
             return Master.add_partner_details(partner_name,user_id,is_active,partner_type_id,assessment_partner_type_id,address,partner_id)
 api.add_resource(add_partner_details,'/add_partner_details')
 
+class upload_assessment_certificate_copy(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            certi_name=request.form['file_name']
+            user_id=request.form['user_id']
+            enrolment_id=request.form['enrollment_id']
+            batch_id=request.form['batch_id']    
+            return Database.upload_assessment_certificate_copy(certi_name,user_id,enrolment_id,batch_id)
+api.add_resource(upload_assessment_certificate_copy,'/upload_assessment_certificate_copy')
+class upload_cerification_cand_image(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            certi_name=request.form['file_name']
+            user_id=request.form['user_id']
+            enrolment_id=request.form['enrollment_id']
+            batch_id=request.form['batch_id']    
+            return Database.upload_cerification_cand_image(certi_name,user_id,enrolment_id,batch_id)
+api.add_resource(upload_cerification_cand_image,'/upload_cerification_cand_image')
+
+class upload_cerification_batch_image(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            certi_name=request.form['file_name']
+            user_id=request.form['user_id']
+            batch_id=request.form['batch_id']    
+            return Database.upload_cerification_batch_image(certi_name,user_id,batch_id)
+api.add_resource(upload_cerification_batch_image,'/upload_cerification_batch_image')
+
 @app.route("/after_popup_partner")
 def after_popup_partner():
     if g.user:
@@ -6997,6 +7048,42 @@ class upload_assessment_result(Resource):
             except Exception as e:
                  return {"Status":False, "message":"Unable to upload " + str(e)}         
 api.add_resource(upload_assessment_result,'/upload_assessment_result')
+
+class upload_assessment_certificate_number(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                f = request.files['filename']
+                user_id = int(session['user_id'])
+                assigned_user_id = int(request.form["assigned_user_id"])
+                batch_code = str(request.form["batch_code"])
+                file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
+                f.save(file_name)
+    
+                df= pd.read_excel(file_name,sheet_name='Certificate')
+                df = df.fillna('')
+                df = df.astype(str)
+                schema = Schema([
+                        #str+null check
+                        Column('Enrolment_Id',str_validation + null_validation),
+                        Column('Candidate_Name'),
+                        Column('Batch_Code',null_validation),
+                        Column('Certificate_Number',str_validation + null_validation)
+                        ])
+                errors = schema.validate(df)
+                errors_index_rows = [e.row for e in errors]
+                len_error = len(errors_index_rows)
+                os.remove(file_name)
+                if len_error>0:
+                    pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename+'_' + 'errors.csv')
+                    return {"Status":False, "message":"Upload Failed (fails to validate data)" }
+                else:
+                    out = Database.upload_assessment_certificate_number(df,user_id,assigned_user_id,batch_code)
+                    return out
+            except Exception as e:
+                 return {"Status":False, "message":"Unable to upload data " + str(e)}         
+api.add_resource(upload_assessment_certificate_number,'/upload_assessment_certificate_number')
 
 class UAP_upload_assessment_result(Resource):
     @staticmethod

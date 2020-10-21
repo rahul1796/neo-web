@@ -1320,6 +1320,71 @@ class Database:
         con.close()
         msg={"message":"Batch Cancelled"}
         return msg
+    def upload_assessment_certificate_copy(certi_name,user_id,enrolment_id,batch_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = '''update assessments.tbl_map_certification_candidates_stages 
+                set certificate_copy=? ,
+                created_by=?
+                where intervention_value=? and assessment_id=(select TOP(1) assessment_id 
+                                                            from assessments.tbl_batch_assessments
+                                                            where batch_id=? and assessment_type_id=2
+                                                            and assessment_stage_id=4
+                                                            and is_active=1
+                                                            order by assessment_id desc
+                                                            )
+                AND is_active=1;'''
+        values = (certi_name,user_id,enrolment_id,batch_id)
+        cur.execute(sql,(values))
+        cur.commit()
+        cur.close()
+        con.close()
+        msg={"Status":True,"message":"Certificate Uploaded"}
+        return msg
+    def upload_cerification_cand_image(certi_name,user_id,enrolment_id,batch_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = '''update assessments.tbl_map_certification_candidates_stages 
+                set uploaded_cand_image=? ,
+                created_by=?
+                where intervention_value=? and assessment_id=(select TOP(1) assessment_id 
+                                                            from assessments.tbl_batch_assessments
+                                                            where batch_id=? and assessment_type_id=2
+                                                            and assessment_stage_id=4
+                                                            and is_active=1
+                                                            order by assessment_id desc
+                                                            )
+                AND is_active=1;'''
+        values = (certi_name,user_id,enrolment_id,batch_id)
+        cur.execute(sql,(values))
+        cur.commit()
+        cur.close()
+        con.close()
+        msg={"Status":True,"message":"Image Uploaded"}
+        return msg
+    
+    def upload_cerification_batch_image(file_name,user_id,batch_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = '''update assessments.tbl_batch_assessments 
+                set batch_image=? ,
+                created_by=?
+                where assessment_id=(select TOP(1) assessment_id 
+                                                            from assessments.tbl_batch_assessments
+                                                            where batch_id=? and assessment_type_id=2
+                                                            and assessment_stage_id=4
+                                                            and is_active=1
+                                                            order by assessment_id desc
+                                                            )
+                AND is_active=1;'''
+        values = (file_name,user_id,batch_id)
+        cur.execute(sql,(values))
+        cur.commit()
+        cur.close()
+        con.close()
+        msg={"Status":True,"message":"Image Uploaded"}
+        return msg
+    
     def tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -4154,6 +4219,19 @@ SELECT					cb.name as candidate_name,
                         BatchAttemptNumber=str(row[3])
                     if BatchAttemptNumber != '1':
                         present_candidate = absent_candidate
+                    center_name=''
+                    course_name=row=''
+                    customer_name=row=''
+                    cm_emails=''
+                    sql2 = 'exec [batches].[sp_get_batch_detail_for_assessment_mail] ?'
+                    values = (batch_id,)
+                    cur.execute(sql2,(values))
+                    
+                    for row in cur:
+                        center_name=row[0]
+                        course_name=row[1]
+                        customer_name=row[2]
+                        cm_emails=row[3]
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_assessment_UAP] ?,?,?'
                     values = (batch_id,pop,present_candidate)
                     cur.execute(sql,(values))
@@ -4164,14 +4242,14 @@ SELECT					cb.name as candidate_name,
                             h[columns[i]]=row[i]
                         response.append(h.copy())
                     uap_url=''
-                    params={"SDMSBatchId":SDMSBatchId,"NeoBatchStage":Stage,"AssessmentDate":AssessmentDate,"BatchAttemptNumber":BatchAttemptNumber,"CandidateList":response}
+                    params={"SDMSBatchId":SDMSBatchId,"CenterName":center_name,"CourseName":course_name,"ClientName":customer_name,"CMEmails":cm_emails,"NeoBatchStage":Stage,"AssessmentDate":AssessmentDate,"BatchAttemptNumber":BatchAttemptNumber,"CandidateList":response}
                     json_data = json.dumps(params)   
                     uap_api=UAP_API_BASE_URL + 'CreateNeoSkillsBatchJSONRequest?JSONRequest='+json_data
                     x = requests.get(uap_api)
                     data = x.json()
                     if 'CreateNeoSkillsBatch' in data:
                         if  str(data['CreateNeoSkillsBatch']['Succsess']) == "True":
-                            sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId,requested_date)                 
+                            sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails)                 
                     
             
             else:
@@ -4181,6 +4259,159 @@ SELECT					cb.name as candidate_name,
             return out
         except Exception as e:
             return {"message":"Error changing assessment stage"+e.message,"success":0,"assessment_id":0}
+    def ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc):
+        try:
+            response=[]
+            h={}
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            sql = 'exec [assessments].[sp_change_certification_stage] ?,?,?,?,?,?,?,?,?,?,?,?,?,?'
+            values = (batch_id,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc)
+            cur.execute(sql,(values))
+            columns = [column[0].title() for column in cur.description]
+            for row in cur:
+                pop=row[0]
+                msg=row[1]
+            cur.commit()
+            
+            if pop>0:
+                if(pop==2):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    sql = '''
+                          select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id=
+                                                    (select top(1) created_by as stage_changed_by 
+                                                    from assessments.tbl_map_certification_candidates_stages_revision_history 
+                                                    where assessment_id = (select TOP(1) assessment_id 
+                                                                            from assessments.tbl_batch_assessments
+                                                                            where batch_id='''+ str(batch_id)+''' and assessment_type_id=2
+                                                                            and assessment_stage_id=4
+                                                                            order by assessment_id desc
+                                                                            )
+                                                    AND certification_stage_id=1)
+                            AND is_active=1;'''
+                    cur.execute(sql)
+                    for row in cur:
+                        user_name_to=row[0]
+                        user_mail_id_to=row[1]
+                    sql = 'select top(1) email from users.tbl_user_details where user_id='+ str(user_id) +' and is_active=1'
+                    cur.execute(sql)
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    sent_mail.certification_stage_change_mail(2,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code)
+                if(pop==3):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    sql = '''
+                            select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id in 
+                                        (select u.user_id from masters.tbl_map_sub_project_user as u
+                                        inner join users.tbl_map_User_UserRole as urr on urr.user_id=u.user_id
+                                        and urr.user_role_id =5
+                                        where sub_project_id=(select sub_project_id from batches.tbl_batches where batch_id='''+ batch_id +''')
+                                        AND u.is_active=1
+                                        )
+                            ANd is_active=1;
+                          '''
+                    cur.execute(sql)
+                    for row in cur:
+                        user_name_to=row[0]
+                        user_mail_id_to=row[1]
+                    sql = 'select top(1) email from users.tbl_user_details where user_id='+ str(user_id) +' and is_active=1'
+                    cur.execute(sql)
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    sent_mail.certification_stage_change_mail(3,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code)
+                if(pop==4):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    sql = '''
+                            select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id=
+                                                    (select top(1) assigned_to as logistic_user 
+                                                    from assessments.tbl_map_certification_candidates_stages_revision_history 
+                                                    where assessment_id = (select TOP(1) assessment_id 
+                                                                            from assessments.tbl_batch_assessments
+                                                                            where batch_id='''+ str(batch_id)+''' and assessment_type_id=2
+                                                                            and assessment_stage_id=4
+                                                                            order by assessment_id desc
+                                                                            )
+                                                    AND certification_stage_id=1)
+                            AND is_active=1;
+                          '''
+                    cur.execute(sql)
+                    for row in cur:
+                        user_name_to=row[0]
+                        user_mail_id_to=row[1]
+                    sql = 'select top(1) email from users.tbl_user_details where user_id='+ str(user_id) +' and is_active=1'
+                    cur.execute(sql)
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    sent_mail.certification_stage_change_mail(4,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code)
+                if(pop==5):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    sql = '''
+                            select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id=
+                                                    (select top(1) created_by as amt_user 
+                                                    from assessments.tbl_map_certification_candidates_stages_revision_history 
+                                                    where assessment_id = (select TOP(1) assessment_id 
+                                                                            from assessments.tbl_batch_assessments
+                                                                            where batch_id='''+ str(batch_id)+''' and assessment_type_id=2
+                                                                            and assessment_stage_id=4
+                                                                            order by assessment_id desc
+                                                                            )
+                                                    AND certification_stage_id=1)
+                            AND is_active=1;
+                          '''
+                    cur.execute(sql)
+                    for row in cur:
+                        user_name_to=row[0]
+                        user_mail_id_to=row[1]
+                    sql = 'select top(1) email from users.tbl_user_details where user_id='+ str(user_id) +' and is_active=1'
+                    cur.execute(sql)
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    sent_mail.certification_stage_change_mail(5,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code)
+                if(pop==6):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    sql = '''
+                            select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id=
+                                                    (select top(1) created_by as amt_user 
+                                                    from assessments.tbl_map_certification_candidates_stages_revision_history 
+                                                    where assessment_id = (select TOP(1) assessment_id 
+                                                                            from assessments.tbl_batch_assessments
+                                                                            where batch_id='''+ str(batch_id)+''' and assessment_type_id=2
+                                                                            and assessment_stage_id=4
+                                                                            order by assessment_id desc
+                                                                            )
+                                                    AND certification_stage_id=1)
+                            AND is_active=1;
+                          '''
+                    cur.execute(sql)
+                    for row in cur:
+                        user_name_to=row[0]
+                        user_mail_id_to=row[1]
+                    sql = 'select top(1) email from users.tbl_user_details where user_id='+ str(user_id) +' and is_active=1'
+                    cur.execute(sql)
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    sent_mail.certification_stage_change_mail(6,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code)
+                
+                
+                out={"message":msg,"success":1}
+            else:
+                out={"message":"Error changing in stage","success":0}
+            cur.close()
+            con.close()
+            return out
+        except Exception as e:
+            return {"message":"Error changing assessment stage"+e.message,"success":0,"assessment_id":0}
+    
     def GetAssessmentCandidateResults(AssessmentId):
         try:
             col=[]
@@ -4399,7 +4630,7 @@ SELECT					cb.name as candidate_name,
         h={}
         sql = 'exec [assessments].[getcandidatesbasedoncertifiactionstage]  ?,?'
         values = (batch_id,stage_id)
-        print(values)
+        #print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -4410,7 +4641,7 @@ SELECT					cb.name as candidate_name,
         out = {"Candidates":response}
         cur.close()
         con.close() 
-        print(response)
+        #print(response)
         return out
     
     def CandidateFamilyDetails(candidate_id):
@@ -4431,7 +4662,7 @@ SELECT					cb.name as candidate_name,
         out = {"Members":response}
         cur.close()
         con.close() 
-        print(out)      
+        #print(out)      
         return out
     def GetSubProjectsForuser(user_id):
         response = []
@@ -4474,7 +4705,7 @@ SELECT					cb.name as candidate_name,
         cur2 = con.cursor()
         sql = 'exec [reports].[sp_get_ecp_report_data ]  ?,?,?,?,?,?,?'
         values = (user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date)
-        print(values)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -4491,7 +4722,7 @@ SELECT					cb.name as candidate_name,
         cur2 = con.cursor()
         sql = 'exec [masters].[sp_get_contracts_based_on_customer]  ?,?,?'
         values = (user_id,user_role_id,customer_id)
-        print(values)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -4998,10 +5229,8 @@ SELECT					cb.name as candidate_name,
             VALUES
             '''
             url = candidate_xml_weburl + xml
-            print(url)
             r = requests.get(url)
             data = r.text
-            print(data)
             root = ET.fromstring(data)
             query = ""
             she_query=""
@@ -5822,6 +6051,47 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             # print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
+    def upload_assessment_certificate_number(df,user_id,assigned_user_id,batch_code):
+        try: 
+            # print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            json_str=df.to_json(orient='records')
+            sql = 'exec	[assessments].[sp_upload_assessment_certificate_number]  ?,?,?'
+            values = (json_str,user_id,assigned_user_id)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
+
+            cur.commit()
+            
+            if pop >0 :
+                assigned_by_email_id=''
+                assigned_to_email_id=''
+                assigned_to_name=''
+                Status=True
+                sql = 'select top(1) first_name, email from users.tbl_user_details where user_id='+ str(assigned_user_id) +' and is_active=1'
+                cur.execute(sql)
+                for row in cur:
+                    assigned_to_name=row[0]
+                    assigned_to_email_id=row[1]
+                sql = 'select top(1) email from users.tbl_user_details where user_id='+ str(user_id) +' and is_active=1'
+                cur.execute(sql)
+                for row in cur:
+                    assigned_by_email_id=row[0]
+                sent_mail.certification_stage_change_mail(1,assigned_to_email_id,assigned_to_name,assigned_by_email_id,batch_code)
+                msg="Uploaded Successfully"
+           
+            else:
+                msg="Unable To Upload"
+                Status=False
+            cur.close()
+            con.close()
+            return {"Status":Status,'message':msg}
+        except Exception as e:
+            # print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+    
     def UAP_upload_assessment_result(batch_id,stage_id,batch_attempt_number,result_json):
         try: 
             # print(str(df.to_json(orient='records')))
