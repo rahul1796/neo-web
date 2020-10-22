@@ -4248,7 +4248,7 @@ SELECT					cb.name as candidate_name,
                     data = x.json()
                     if 'CreateNeoSkillsBatch' in data:
                         if  str(data['CreateNeoSkillsBatch']['Succsess']) == "True":
-                            sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails)                 
+                            sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails,"")                 
                     
             
             else:
@@ -4298,7 +4298,7 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
-                    sent_mail.certification_stage_change_mail(2,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code)
+                    sent_mail.certification_stage_change_mail(2,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,"")
                 if(pop==3):
                     user_mail_id_cc=''
                     user_mail_id_to=''
@@ -4321,7 +4321,7 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
-                    sent_mail.certification_stage_change_mail(3,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code)
+                    sent_mail.certification_stage_change_mail(3,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,"")
                 if(pop==4):
                     user_mail_id_cc=''
                     user_mail_id_to=''
@@ -4347,7 +4347,7 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
-                    sent_mail.certification_stage_change_mail(4,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code)
+                    sent_mail.certification_stage_change_mail(4,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,"")
                 if(pop==5):
                     user_mail_id_cc=''
                     user_mail_id_to=''
@@ -4373,7 +4373,7 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
-                    sent_mail.certification_stage_change_mail(5,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code)
+                    sent_mail.certification_stage_change_mail(5,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,"")
                 if(pop==6):
                     user_mail_id_cc=''
                     user_mail_id_to=''
@@ -4399,7 +4399,7 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
-                    sent_mail.certification_stage_change_mail(6,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code)
+                    sent_mail.certification_stage_change_mail(6,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,"")
                 
                 
                 out={"message":msg,"success":1}
@@ -6078,7 +6078,7 @@ SELECT					cb.name as candidate_name,
                 cur.execute(sql)
                 for row in cur:
                     assigned_by_email_id=row[0]
-                sent_mail.certification_stage_change_mail(1,assigned_to_email_id,assigned_to_name,assigned_by_email_id,batch_code)
+                sent_mail.certification_stage_change_mail(1,assigned_to_email_id,assigned_to_name,assigned_by_email_id,batch_code,"")
                 msg="Uploaded Successfully"
            
             else:

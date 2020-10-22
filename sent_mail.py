@@ -32,7 +32,7 @@ def forget_password(email, password, name):
     except:
         return {'status':False,'description':'Unable to sent email'}
 
-def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch_Code):
+def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch_Code,files):
     #print(NewStageId,emailTo,emailToName,EmailCC,Batch_Code)
     try:
         server = smtplib.SMTP('smtp.office365.com','587')
