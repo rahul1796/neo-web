@@ -64,6 +64,15 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
         html_msg= config.html_email_msg_certification_stage_change
         html_msg = html_msg.format(emailToName,Batch_Code,stage_name,EmailCC)
         msg.attach(MIMEText(html_msg, 'html'))
+        for path in [files]:
+            part = MIMEBase('application', "octet-stream")
+            with open(path, 'rb') as file:
+                part.set_payload(file.read())
+            encoders.encode_base64(part)
+            part.add_header('Content-Disposition',
+                            'attachment; filename="{}"'.format(Path(path).name))
+        #msg.attach(part)
+        
         #print(msg['From'], [msg['To']] + EmailCC.split(",") , msg.as_string())
         res = server.sendmail(msg['From'], [msg['To']] + EmailCC.split(",") , msg.as_string())
         server.quit()
@@ -72,7 +81,7 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
     except:
         return {'status':False,'description':'Unable to sent email'}
 
-def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails):
+def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails,files):
     try:
         server = smtplib.SMTP('smtp.office365.com','587')
         #server = smtplib.SMTP(host='smtp.office365.com')
@@ -95,6 +104,15 @@ def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date,center_name,cou
         html_msg = html_msg.format('Navriti Assessment Team',RequestId,SDMSBatchId,center_name,course_name,customer_name,requested_date)
 
         msg.attach(MIMEText(html_msg, 'html'))
+
+        for path in [files]:
+            part = MIMEBase('application', "octet-stream")
+            with open(path, 'rb') as file:
+                part.set_payload(file.read())
+            encoders.encode_base64(part)
+            part.add_header('Content-Disposition',
+                            'attachment; filename="{}"'.format(Path(path).name))
+        #msg.attach(part)
         #print(msg['From'], [msg['To']] + ccList , msg.as_string())
         res = server.sendmail(msg['From'], [msg['To']] + ccList , msg.as_string())
         server.quit()
