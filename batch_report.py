@@ -33,10 +33,16 @@ def create_report(batch_id, user_id, user_role_id, status, customer, project, su
         data = list(map(lambda x:list(x), data))
         #print(len(data))
         df = pd.DataFrame(data, columns=columns)
-        df = df[['Batch_Id','Batch_Name','Batch_Code','Planned_Batch_Code','Candidate_Count','Product_Name','Center_Name','Course_Name','Customer_Name',
-        'Contract_Name','Project_Name','Sub_Project_Name','Trainer_Email', 'Center_Manager_Email', 'Start_Date', 'End_Date','Status']]
-        columns = ['Batch_Id','Batch_External_Code','Batch_Code','Planned_Batch_Code','Candidate_Count','Product_Name','Center_Name','Course_Name','Customer_Name',
-        'Contract_Name','Project_Name','Sub_Project_Name','Trainer_Email', 'Center_Manager_Email', 'Start_Date', 'End_Date','Status']
+        df = df.fillna('')
+        df.loc[:,'Center_Manager_Email'] = df.loc[:,'Center_Manager_Email'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else (','.join(set(x.split(',')))))
+        df = df[['Batch_Id','Batch_Name','Batch_Code','Planned_Batch_Code','Candidate_Count','Product_Name','Center_Name',
+        'Center_Location','Center_State','Ojt_Start_Date','Ojt_End_Date','Course_Name','Customer_Name',
+        'Contract_Name','Project_Name','Sub_Project_Name','Trainer_Email', 'Center_Manager_Email', 'Start_Date', 'End_Date','Status',
+        'Assessment_Date','Result_Uploaded_Date']]
+        columns = ['Batch_Id','Batch_External_Code','Batch_Code','Planned_Batch_Code','Candidate_Count','Product_Name','Center_Name',
+        'Center_Location','Center_State','OJT_Start_Date','OJT_End_Date','Course_Name','Customer_Name',
+        'Contract_Name','Project_Name','Sub_Project_Name','Trainer_Email', 'Center_Manager_Email', 'Start_Date', 'End_Date','Status',
+        'Assessment_Date','Result_Uploaded_Date']
         df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Batch_Report') 
 
         worksheet = writer.sheets['Batch_Report']

@@ -7339,6 +7339,20 @@ def batch_status_report():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+@app.route("/Planned_Actual_Batch_Report_page")
+def Planned_Actual_Batch_Report_page():
+    if g.user:
+        return render_template("Reports/planned_actual_batch_report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/Planned_Actual_Batch_Report")
+def Planned_Actual_Batch_Report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="Planned_Actual_Batch_Report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
 class GetBatchStatusReportDataList(Resource):
     @staticmethod
     def post():

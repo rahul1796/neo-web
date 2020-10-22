@@ -972,7 +972,6 @@ class Database:
 
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
-        print(columns)
         record="0"
         fil="0"
         for row in cur:
