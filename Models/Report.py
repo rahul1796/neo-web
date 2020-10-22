@@ -1103,6 +1103,8 @@ class Report:
             image_path = config.Base_URL + '/data/OJT/' + 'images/'
             audio_path = config.Base_URL + '/data/OJT/' + 'audio/'
             resp = Database.download_ojt_report(user_id, user_role_id, customer_ids, sub_project_ids, course_ids, batch_code, date_stage, BatchStartFromDate,BatchStartToDate,BatchEndFromDate,BatchEndToDate,OJTStartFromDate,OJTStartToDate,OJTEndFromDate,OJTEndToDate)
+            if len(resp[0])==0:
+                return({'Description':'No data available for the selected items', 'Status':False})
             df = pd.DataFrame(resp[0],columns=resp[1])
             df=df.fillna('')
             df['Stage1_Location'] = df.loc[:,'Stage1_Location'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("'+ x + '","View Location")')
@@ -1110,10 +1112,10 @@ class Report:
             df['Stage3_Location'] = df.loc[:,'Stage3_Location'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("'+ x + '","View Location")')
 
             df['Stage1_File_Name'] = df.loc[:,'Stage1_File_Name'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + image_path + x + '","View Image")')
-            df['Stage2_File_Name'] = df.loc[:,'Stage2_File_Name'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + audio_path + x + '","View Image")')
+            df['Stage2_File_Name'] = df.loc[:,'Stage2_File_Name'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + audio_path + x + '","View Recording")')
             df['Stage3_File_Name'] = df.loc[:,'Stage3_File_Name'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + image_path + x + '","View Image")')
             
-            m_header = ["s","CANDIDATE ENROLLMENT NUMBER","CANDIDATE NAME","CANDIDATE EMAIL ID","BATCH CODE","BATCH START DATE","BATCH END DATE",
+            m_header = ["Log date","CANDIDATE ENROLLMENT NUMBER","CANDIDATE NAME","CANDIDATE EMAIL ID","BATCH CODE","BATCH START DATE","BATCH END DATE",
             "OJT START DATE","OJT END DATE","CUSTOMER NAME","SUBPROJECT NAME","SUBPROJECT CODE","CENTER NAME","CENTER TYPE","DISTRICT",
             "STATE","REGION","BUISINESS UNIT","COURSE CODE","COURSE NAME"]
             f_header = ["REACHED OFFICE","RECORDED TODAY'S WORK","LEFT OFFICE"]
