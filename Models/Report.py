@@ -574,7 +574,7 @@ class Report:
             df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Course') 
 
             worksheet = writer.sheets['Userwise']
-            default_column = ['COO','TM','CM']
+            default_column = ['COO','TM','CM/PC']
             first_row = ['Enrolment', 'New Batch Start','Training Nos', 'Certification','Placement']
             second_row = ['Target', 'Actual','Target', 'Actual','Actual','Target', 'Actual','Target', 'Actual']
             third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%', 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
