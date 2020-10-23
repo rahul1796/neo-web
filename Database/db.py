@@ -4248,7 +4248,8 @@ SELECT					cb.name as candidate_name,
                     data = x.json()
                     if 'CreateNeoSkillsBatch' in data:
                         if  str(data['CreateNeoSkillsBatch']['Succsess']) == "True":
-                            sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails,"")                 
+                            attachment_file=Database.create_assessment_candidate_file(response,columns,SDMSBatchId)
+                            sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails,attachment_file)                 
                     
             
             else:
@@ -4258,6 +4259,48 @@ SELECT					cb.name as candidate_name,
             return out
         except Exception as e:
             return {"message":"Error changing assessment stage"+e.message,"success":0,"assessment_id":0}
+    def create_assessment_candidate_file(data,columns,batch_code):
+        try:
+            import pandas as pd
+            import pypyodbc as pyodbc
+            import xlsxwriter
+            import calendar
+            import time
+            from Database import config
+        except:
+            return({'Description':'Module Error', 'Status':False})
+
+        try:
+            gmt = time.gmtime() 
+            ts = calendar.timegm(gmt) 
+            name_withpath = config.neo_report_file_path + 'report file/'+ 'Candidate_Assessment_List_'+batch_code+str(ts)+'.xlsx'
+            writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
+            workbook  = writer.book
+
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+            #data = list(map(lambda x:list(x), data))
+            #print(len(data))
+            df = pd.DataFrame(data, columns=columns)
+            df = df[['Candidateid','Candidatename','Enrollmentnumber','Fathername','Emailid','Candidateattemptnumber']]
+            columns = ['CandidateId','CandidateName','EnrollmentNumber','FatherName','EmailId','CandidateAttemptNumber']
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Candidates') 
+            worksheet = writer.sheets['Candidates']
+
+            for col_num, value in enumerate(columns):
+                worksheet.write(0, col_num, value, header_format)
+
+                            
+            writer.save()
+            return(name_withpath)
+            
+        except Exception as e:
+            print("Exc")
+            return(str(e))
     def ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc):
         try:
             response=[]
