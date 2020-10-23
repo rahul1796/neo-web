@@ -1,7 +1,11 @@
 import smtplib
 import json 
+from pathlib import Path
 from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
+from email.utils import COMMASPACE, formatdate
+from email import encoders
 from Database import *
 
 def forget_password(email, password, name):
@@ -65,7 +69,7 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
         html_msg = html_msg.format(emailToName,Batch_Code,stage_name,EmailCC)
         msg.attach(MIMEText(html_msg, 'html'))
         for path in [files]:
-            part = MIMEBase('application', "octet-stream")
+            part = MIMEText('application', "octet-stream")
             with open(path, 'rb') as file:
                 part.set_payload(file.read())
             encoders.encode_base64(part)
@@ -104,19 +108,18 @@ def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date,center_name,cou
         html_msg = html_msg.format('Navriti Assessment Team',RequestId,SDMSBatchId,center_name,course_name,customer_name,requested_date)
 
         msg.attach(MIMEText(html_msg, 'html'))
-
         for path in [files]:
-            part = MIMEBase('application', "octet-stream")
+            part = MIMEText('application', "octet-stream")
             with open(path, 'rb') as file:
                 part.set_payload(file.read())
             encoders.encode_base64(part)
             part.add_header('Content-Disposition',
                             'attachment; filename="{}"'.format(Path(path).name))
-        #msg.attach(part)
-        #print(msg['From'], [msg['To']] + ccList , msg.as_string())
+            msg.attach(part)
         res = server.sendmail(msg['From'], [msg['To']] + ccList , msg.as_string())
         server.quit()
 
         return {'status':True,'description':'Email sent'}
-    except:
-        return {'status':False,'description':'Unable to sent email'}
+    except Exception as e:
+        print(e)
+        return {'status':False,'description':e}
