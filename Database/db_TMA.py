@@ -40,7 +40,7 @@ class TMADatabase:
         CandidateList=[]
         if len(data)>0:
             for candidate in data:
-                CandidateList.append({'candidate_name':candidate[0],'enrollment_id': candidate[1],'guardian_name': candidate[2],'phone': candidate[3],'gender': candidate[4],'date_of_birth': candidate[5],'attendance_date': candidate[6],'attendance': candidate[7],'image_file_name': candidate[8]})
+                CandidateList.append({'candidate_name':candidate[0],'enrollment_id': candidate[1],'guardian_name': candidate[2],'phone': candidate[3],'gender': candidate[4],'date_of_birth': candidate[5],'attendance_date': candidate[6],'attendance': candidate[7],'image_file_name': candidate[8],'active': candidate[9]})
         return CandidateList
     
     def GetSessionPlanModuleDetailsForCourse(course_id,qp_id):

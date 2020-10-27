@@ -7106,4 +7106,21 @@ SELECT					cb.name as candidate_name,
         cnxn.close()
         return (data,columns)
 
-    
+    def GetSessionsForCourse(CourseId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_session_for_course]  ?'
+        values = (CourseId,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = {'Sessions':response}
+        cur.commit()
+        cur.close()
+        con.close()       
+        return out

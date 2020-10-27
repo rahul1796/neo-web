@@ -8677,5 +8677,19 @@ class download_ojt_report(Resource):
                 print({"exceptione":str(e)})
 api.add_resource(download_ojt_report,'/download_ojt_report')
 
+
+class GetSessionsForCourse(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                CourseId=request.args.get('CourseId',0,type=int)
+                response = Master.GetSessionsForCourse(CourseId)
+                return response
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetSessionsForCourse,'/GetSessionsForCourse')
+
+
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
