@@ -40,7 +40,7 @@ class TMADatabase:
         CandidateList=[]
         if len(data)>0:
             for candidate in data:
-                CandidateList.append({'candidate_name':candidate[0],'enrollment_id': candidate[1],'guardian_name': candidate[2],'phone': candidate[3],'gender': candidate[4],'date_of_birth': candidate[5],'attendance_date': candidate[6],'attendance': candidate[7],'image_file_name': candidate[8]})
+                CandidateList.append({'candidate_name':candidate[0],'enrollment_id': candidate[1],'guardian_name': candidate[2],'phone': candidate[3],'gender': candidate[4],'date_of_birth': candidate[5],'attendance_date': candidate[6],'attendance': candidate[7],'image_file_name': candidate[8],'active': candidate[9]})
         return CandidateList
     
     def GetSessionPlanModuleDetailsForCourse(course_id,qp_id):
@@ -121,24 +121,25 @@ class TMADatabase:
             #return data
             if ((data!=None)and(data!=[])):
                 for i in range(len(data)):
-                    is_active=False
-                    if data[i][11]<4:
-                        if i==0:
-                            is_active=True
-                            stg_id=data[i][11]  #11 - session stage id
-                        elif stg_id==4:
-                            is_active=True
-                            stg_id=data[i][11]
-                        elif (stg_id<4)and(stg_id==data[i][11]):
-                            is_active=True
-                            #stg_id=data[i][11]
-                        else:
-                            is_active=False
-                            #stg_id=data[i][11]
-                        SessionList.append({'session_id':data[i][0],'session_name': data[i][1],'course_id': data[i][2],'course_code': data[i][3],'course_name': data[i][4],'qp_id': data[i][5],'qp_code': data[i][6],'qp_name': data[i][7],'status_id': data[i][8],'status_name': data[i][9],'session_duration': data[i][10],'session_stage_id':data[i][11],'session_stage_name':data[i][12],'session_order':data[i][13],'is_active':is_active})
-                    elif data[i][11]==4:
-                        stg_id=data[i][11]
-                        SessionList.append({'session_id':data[i][0],'session_name': data[i][1],'course_id': data[i][2],'course_code': data[i][3],'course_name': data[i][4],'qp_id': data[i][5],'qp_code': data[i][6],'qp_name': data[i][7],'status_id': data[i][8],'status_name': data[i][9],'session_duration': data[i][10],'session_stage_id':data[i][11],'session_stage_name':data[i][12],'session_order':data[i][13],'is_active':is_active})
+
+                    # is_active=False
+                    # if data[i][11]<4:
+                    #     if i==0:
+                    #         is_active=True
+                    #         stg_id=data[i][11]  #11 - session stage id
+                    #     elif stg_id==4:
+                    #         is_active=True
+                    #         stg_id=data[i][11]
+                    #     elif (stg_id<4)and(stg_id==data[i][11]):
+                    #         is_active=True
+                    #         #stg_id=data[i][11]
+                    #     else:
+                    #         is_active=False
+                    #         #stg_id=data[i][11]
+                    #     SessionList.append({'session_id':data[i][0],'session_name': data[i][1],'course_id': data[i][2],'course_code': data[i][3],'course_name': data[i][4],'qp_id': data[i][5],'qp_code': data[i][6],'qp_name': data[i][7],'status_id': data[i][8],'status_name': data[i][9],'session_duration': data[i][10],'session_stage_id':data[i][11],'session_stage_name':data[i][12],'session_order':data[i][13],'is_active':is_active})
+                    # elif data[i][11]==4:
+                    #     stg_id=data[i][11]
+                    SessionList.append({'session_id':data[i][0],'session_name': data[i][1],'course_id': data[i][2],'course_code': data[i][3],'course_name': data[i][4],'qp_id': data[i][5],'qp_code': data[i][6],'qp_name': data[i][7],'status_id': data[i][8],'status_name': data[i][9],'session_duration': data[i][10],'session_stage_id':data[i][11],'session_stage_name':data[i][12],'session_order':data[i][13]})
                 #for session in data:
                 #    SessionList.append({'session_id':session[0],'session_name': session[1],'course_id': session[2],'course_code': session[3],'course_name': session[4],'qp_id': session[5],'qp_code': session[6],'qp_name': session[7],'status_id': session[8],'status_name': session[9],'session_duration': session[10],'session_stage_id':session[11],'session_stage_name':session[12],'session_order':session[13]})
                 res={'status':1,'message':'Success','session_list':SessionList,'app_status':True}

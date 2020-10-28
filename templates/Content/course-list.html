@@ -121,6 +121,7 @@
                                                     <th>Actions</th>
                                                     <th>Course Code</th> 
                                                     <th>Course Name</th>
+                                                    <th>Session</th>
                                                     <th>Projects</th>  
                                                     <th>Sub Projects</th>  
                                                     <th>Centers</th>                                           
@@ -288,6 +289,38 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"onclick="OpenCourseVariantModal()"> Back</button>
+                        <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->
+        
+        <div id="mdl_Cou_Sessions" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title" ><span id="hdCourseNameSession"></span></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>                    
+                    <div class="modal-body">
+                        <table id="tbl_session" class="table table-bordered dt-responsive wrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                            <thead>
+                                <tr style="background-color: #f5f6f8;">
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Session plan</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Module</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Session name</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Session code</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Session order</th>
+                                    <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Duration(In minutes)</th>
+                                </tr>
+                            </thead>
+                            <tbody>    
+                            </tbody>
+                        </table>	
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="OpenCourseVariantModal()">Back</button>
                         <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
                     </div>
                 </div>
