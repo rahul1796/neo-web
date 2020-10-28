@@ -270,7 +270,8 @@ function LoadTable()
                 d.center = $('#ddlCenter').val().toString();
                 d.center_type = $('#ddlCenterType').val().toString();
                 d.course_ids= $('#ddlCourse').val().toString();
-                d.assessment_stage_id= "4";
+                d.assessment_stage_id= "4";                
+                d.certification_stage_id= $('#ddlCertificationStages').val().toString();
             },
             error: function (e) {
                 $("#tbl_batchs tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -438,6 +439,46 @@ function LoadTable()
         }
     });
 }
+function LoadCertificationStages(){
+    var URL=$('#hdn_web_url').val()+ "/AllCertificationStages"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id" : $('#hdn_home_user_role_id').val()
+        },
+
+        success: function (data){
+            if(data.CertificationStages != null)
+            {
+                $('#ddlCertificationStages').empty();
+                $('#ddlCertificationStages').append(new Option('ALL Stages','0'));
+                var count=data.CertificationStages.length;
+                if( count> 0)
+                {
+                  
+                   for(var i=0;i<count;i++)
+                        $('#ddlCertificationStages').append(new Option(data.CertificationStages[i].Certification_Stage_Name,data.CertificationStages[i].Certification_Stage_Id));
+                }
+                else
+                {
+                    $('#ddlCertificationStages').append(new Option('ALL',''));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while loading Assessment Stages! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
 function EditBatchDetail(BatchId)
 {
     $('#hdn_batch_id').val(BatchId);
@@ -522,21 +563,27 @@ function GetPassedCandidates(BatchId,Stage,Batch_Code){
         else if((Stage==2) &(($('#hdn_home_user_role_id').val()=='27')||($('#hdn_home_user_role_id').val()=='1')))
         {
             $('#btnStatusChange').show();
+            $('#btnBulkUploadCertificate').show();
+            $('#btnBulkDownloadCertificate').show();
         }
         else if((Stage==3) &(($('#hdn_home_user_role_id').val()=='5')||($('#hdn_home_user_role_id').val()=='1')))
         {
             $('#btnStatusChange').show();
+           $('#btnBulkDownloadCertificate').show();
         }
         else if((Stage==4) &(($('#hdn_home_user_role_id').val()=='5')||($('#hdn_home_user_role_id').val()=='1')))
         {
             $('#btnStatusChange').show();
+           $('#btnBulkDownloadCertificate').show();
         }
         else if((Stage==5) &(($('#hdn_home_user_role_id').val()=='5')||($('#hdn_home_user_role_id').val()=='1')))
         {
             $('#btnStatusChange').show();
+            $('#btnBulkDownloadCertificate').show();
         }
         else{
             $('#btnStatusChange').hide();
+            $('#btnBulkDownloadCertificate').show();
         }
         
     }
@@ -711,6 +758,14 @@ function UploadCertificate()
    $('#tr_candidate_detail').modal('hide');
     LoadLogisticUsers();
     $('#mdl_certificate_upload').modal('show');
+    
+}
+function BulkUploadCertificate()
+{
+    
+    
+   $('#tr_candidate_detail').modal('hide');
+    $('#mdl_bulk_certificate_upload').modal('show');
     
 }
 
@@ -976,6 +1031,7 @@ function UploadFileToProcess()
         }
     });
 }
+
 function ChangeStage(){
     var enrollments='';
     $('[name=candcheckcase]').each(function () {
@@ -1446,6 +1502,182 @@ function UploadCertificateFileToProcess()
            
         }
     });
+}
+function UploadBulkcertificateFileData()
+{  
+    var enrollments='';
+    $('[name=candcheckcase]').each(function () {
+        if($(this).prop('checked') == true)
+        {
+            enrollments+= $(this).val()+',';
+        }
+        
+    });
+    enrollments=enrollments.substring(0,enrollments.length-1)
+    var cands=enrollments.toString();
+    //alert(cands);
+    //cands=cands.substring(0,cands.length-1)
+    $("#hdn_enrol_ids").val(cands);
+    if ((cands.toString().length)==0)
+    {
+        alert('Please select candidates:')
+        $("#imgSpinnerBulkCerti").hide();
+    }
+    
+    else if ($('#BulkCertificateFile').get(0).files.length === 0) {
+        alert("No files selected.");
+        return;
+    }
+    else
+    {
+        var fileExtension = ['xlsx','jpg','png','pdf','doc','docx','jpeg','csv']
+        if ($.inArray($('#BulkCertificateFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            alert("Formats allowed are : "+fileExtension.join(', '));
+            return false;
+        }
+        else
+        {
+            $("#imgSpinnerBulkCerti").show();
+
+            var files=document.getElementById("BulkCertificateFile").files;
+            var file=files[0];
+            var file_name= $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + file.name;
+            $('#hdn_bulk_certi_file_name').val(file_name);
+            var file_path=$('#hdn_AWS_S3_path').val()+"certification/certificate_copy/" + file_name;
+            var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET",api_url );
+                xhr.onreadystatechange = function(){
+                    if(xhr.readyState === 4){
+                    if(xhr.status === 200){
+                        var response = JSON.parse(xhr.responseText);
+                        //console.log(response);
+                        uploadBulkCertificateFileToS3(file, response.data, response.url);
+                        $("#imgSpinnerBulkCerti").hide();
+                    }
+                    else{
+                        alert("Could not get signed URL.");
+                    }
+                    }
+                };
+                xhr.send();
+        }
+    }
+}
+
+function uploadBulkCertificateFileToS3(file, s3Data, url){
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", s3Data.url);
+
+    var postData = new FormData();
+    for(key in s3Data.fields){
+        postData.append(key, s3Data.fields[key]);
+    }
+    postData.append('file', file);
+
+    xhr.onreadystatechange = function() {
+        if(xhr.readyState === 4){
+        if(xhr.status === 200 || xhr.status === 204){
+            var response = xhr;
+            //console.log(response);
+            UploadBulkCertificateFileToProcess();
+        }
+        else{
+            alert("Could not upload file to s3.");
+        }
+    }
+    };
+    xhr.send(postData);
+}
+
+function UploadBulkCertificateFileToProcess()
+{
+       
+    $.ajax({
+        type: 'POST',
+        url: $('#hdn_web_url').val()+ "/upload_assessment_certificate_copy_bulk_upload",
+        data:{
+            "file_name":$('#hdn_bulk_certi_file_name').val(),
+            "user_id" : $('#hdn_home_user_id').val(),
+            "enrollment_id" : $('#hdn_enrol_ids').val(),
+            "batch_id" : $('#hdn_batch_id').val()
+           
+        },
+        success: function(data) 
+        {
+            var message="",title="",icon="";
+            if(data.Status){
+                message=data.message;
+                title="Success";
+                icon="success";
+            }
+            else{
+                message=data.message;
+                title="Error";
+                icon="error";
+            }
+            swal({   
+                        title:title,
+                        text:message,
+                        icon:icon,
+                        confirmButtonClass:"btn btn-confirm mt-2"
+                        }).then(function(){
+                            $('#mdl_bulk_certificate_upload').modal('hide');
+                            GetPassedCandidates($('#hdn_batch_id').val(),parseInt($('#hdn_cert_stage_id').val()),$('#hdn_batch_code').val());
+                        }); 
+        },
+        error:function(err)
+        {
+            swal({   
+                title:"Error",
+                text:'Error! Please try again',
+                icon:"error",
+                confirmButtonClass:"btn btn-confirm mt-2"
+                }).then(function(){
+                    window.location.href = '/certification';
+                }); 
+           
+        }
+    });
+}
+
+function BulkDowloadCertificate(){
+    var URL=$('#hdn_web_url').val()+ "/AllCertificateNames"
+        $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "batch_id": $('#hdn_batch_id').val()    ,
+            "stage": $('#hdn_cert_stage_id').val()        
+        },
+
+        success: function (data){
+            if(data.Certificates != null)
+            {
+                var count=data.Certificates.length;
+                if( count> 0)
+                {
+                  
+                   for(var i=0;i<count;i++)
+                   {
+                        DownloadCertificate(data.Certificates[i].Certificate_Name)
+                   }
+                       
+                }
+               
+            }
+        },
+        error:function(err)
+        {
+            alert('Error while downloading certificates! Please try again');
+            return false;
+        }
+    });
+    return false;
 }
 function UploadCandidateImageFileData()
 {  

@@ -33,7 +33,8 @@ def forget_password(email, password, name):
         server.quit()
 
         return {'status':True,'description':'Email sent'}
-    except:
+    except Exception as e:
+        print(e)
         return {'status':False,'description':'Unable to sent email'}
 
 def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch_Code,files):
@@ -63,7 +64,7 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
             stage_name='Distributed'
         msg['From'] = "do-not-reply@labournet.in"
         msg['To'] = emailTo
-        msg['Cc'] = EmailCC
+        msg['Cc'] = EmailCC + ',neo.helpdesk@labournet.in'
         msg['Subject'] = "LN NEO - "+str(Batch_Code)+" Certificates " + str(stage_name)
         html_msg= config.html_email_msg_certification_stage_change
         html_msg = html_msg.format(emailToName,Batch_Code,stage_name,EmailCC)
@@ -75,10 +76,9 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
             encoders.encode_base64(part)
             part.add_header('Content-Disposition',
                             'attachment; filename="{}"'.format(Path(path).name))
-        #msg.attach(part)
+            msg.attach(part)
         
-        #print(msg['From'], [msg['To']] + EmailCC.split(",") , msg.as_string())
-        res = server.sendmail(msg['From'], [msg['To']] + EmailCC.split(",") , msg.as_string())
+        res = server.sendmail(msg['From'], [msg['To']] + EmailCC.split(",") + ['neo.helpdesk@labournet.in'] , msg.as_string())
         server.quit()
 
         return {'status':True,'description':'Email sent'}

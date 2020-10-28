@@ -245,9 +245,9 @@ var Centers;
                         $('#ddlCenters').append(new Option('Choose Center',''));
                         for(var i=0;i<count;i++)
                             $('#ddlCenters').append(new Option(data.center[i].Center_Name,data.center[i].Center_Id));
-                        if (needed !=0)
+                        if(needed!=0)
                         {
-                            $('#ddlCenters').val(needed);
+                            $('#ddlCenters').val(needed.split(',')); 
                         }
                     }
                     else
@@ -287,9 +287,10 @@ var Centers;
                         $('#ddlCourse').append(new Option('Choose Course',''));
                         for(var i=0;i<count;i++)
                             $('#ddlCourse').append(new Option(data.course[i].Course_Name,data.course[i].Course_Id));
-                        if (needed !=0)
+                        if(needed!=0)
                         {
-                            $('#ddlCourse').val(needed);
+                            //console.log(needed);
+                            $('#ddlCourse').val(needed.split(',')); 
                         }
                     }
                     else
