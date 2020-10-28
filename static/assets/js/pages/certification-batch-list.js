@@ -1668,6 +1668,9 @@ function BulkDowloadCertificate(){
                    }
                        
                 }
+                else{
+                    alert("No Files to Download!");
+                }
                
             }
         },

@@ -609,7 +609,7 @@ class Report:
                 worksheet.write(2, 3+col_num, value, header_format)
 
             worksheet = writer.sheets['User-Sub Project']
-            default_column = ['COO','TM','CM','Sub Project']
+            default_column = ['COO','TM','CM/PC','Sub Project']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
             col=4
@@ -635,7 +635,7 @@ class Report:
                 worksheet.write(2, 4+col_num, value, header_format)
 
             worksheet = writer.sheets['User-Course']            
-            default_column = ['COO','TM','CM','Course']
+            default_column = ['COO','TM','CM/PC','Course']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
             col=4
