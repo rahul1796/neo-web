@@ -630,10 +630,11 @@ class add_course_details(Resource):
             Parent_Course=request.form['Parent_Course']
             Course_Duration_day=request.form['Course_Duration_day']
             Course_Duration_hour=request.form['Course_Duration_hour']
+            is_ojt_req = request.form['is_ojt_req']
+            OJT_Duration_hour = request.form['OJT_Duration_hour']
             isactive=request.form['isactive']
             user_id=g.user_id
-            
-            return Content.add_course(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, isactive, user_id)
+            return Content.add_course(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, is_ojt_req,OJT_Duration_hour,isactive, user_id)
             
 class GetCourseDetails(Resource):
     @staticmethod
