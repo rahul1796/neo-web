@@ -8437,13 +8437,18 @@ class GetDocumentForExcel_S3_certiplate(Resource):
         if request.method=='GET':
             image_name=request.args.get('image_name','',type=str)
             image_path=request.args.get('image_path','',type=str)
+
             URL=config.neo_certiplate+image_name
+            path = config.aws_location +'neo_app/images/'+image_name
+            if image_path!='':
+                URL = config.neo_certiplate_def + image_path + '/'+ image_name
+                path = config.aws_location +'neo_app/'+ image_path + '/'+image_name
+            
             r = requests.get(url = URL) 
             if r.status_code==200:
                 filename =  URL
             elif r.status_code==404:
-                #print(image_name)/
-                path = config.aws_location +'neo_app/images/'+image_name
+                #path = config.aws_location +'neo_app/images/'+image_name
                 URL = config.COL_URL + 's3_signed_url_for_file_updated'
                 PARAMS = {'file_path':path} 
                 r = requests.get(url = URL, params = PARAMS)
