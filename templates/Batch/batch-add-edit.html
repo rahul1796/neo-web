@@ -7,8 +7,7 @@ const months = ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep", "O
 const months_no = ["01", "02", "03","04", "05", "06", "07", "08", "09", "10", "11", "12"];
 var Candidates = {};
     $(document).ready(function(){
-        
-         $('.dropdown-search-filter').select2();
+        $('.dropdown-search-filter').select2();
         $(".date-picker").flatpickr();             
         $(".time-picker").flatpickr({
             enableTime: !0,
@@ -378,16 +377,6 @@ var Candidates = {};
                 success: function (data){
                     if(data.Trainers != null)
                     {   
-                        $('#hdn_is_OBJ').val(data.Is_Ojt)
-                        if (data.Is_Ojt){
-                            $('#dd_OJTEndDate').show();
-                            $('#dd_OJTStartDate').show();
-                        }
-                        else{
-                            $('#dd_OJTEndDate').hide();
-                            $('#dd_OJTStartDate').hide();
-                        }
-
                         $('#ddlTrainer').empty();
                         var count=data.Trainers.length;
                         if( count> 0)
@@ -413,7 +402,6 @@ var Candidates = {};
                     return false;
                 }
             });
-            
             return false;
         }
         function TrainersBasedOnUsers(needed)
@@ -478,10 +466,19 @@ var Candidates = {};
                         "course_id":CourseId,
                         "planned_batch_id":PlannedBatchId,
                         "is_assigned":1
-                        //"user_id": $('#hdn_home_user_id').val(),
-                       // "user_role_id": $('#hdn_home_user_role_id').val()
                     },
                 success: function (data){
+                    //console.log(data);
+                    $('#hdn_is_OBJ').val(data.is_ojt)
+                        if (data.is_ojt){
+                            $('#dd_OJTEndDate').show();
+                            $('#dd_OJTStartDate').show();
+                        }
+                        else{
+                            $('#dd_OJTEndDate').hide();
+                            $('#dd_OJTStartDate').hide();
+                        }
+
                     if(data.PlannedBatches != null)
                     {
                         $('#ddlPlannedBatchCode').empty();
@@ -506,8 +503,6 @@ var Candidates = {};
                         {
                             $('#ddlPlannedBatchCode').append(new Option('Choose Planned Batch Code',''));
                         }
-                        
-
                     }
                 },
                 error:function(err)
@@ -548,7 +543,7 @@ var Candidates = {};
             if(($('#StartTime').val() < $("#EndTime").val()) && ($('#ActualStartDate').val() <= $('#ActualEndDate').val()) && ($('#PlannedStartDate').val() <= $('#PlannedEndDate').val()))
             {
 				var centertype;
-                if ($('#hdn_is_OBJ').val()=='1'){
+                if ($('#hdn_is_OBJ').val()=='1' || $('#hdn_is_OBJ').val()=="true"){
                     if ($('#OJTEndDate').val()==''|| $('#OJTStartDate').val()==''){
                         alert('OJT dates are mandatory')
                         return false;

@@ -6641,13 +6641,15 @@ SELECT					cb.name as candidate_name,
         values = (sub_project_id,course_id,is_assigned,planned_batch_id)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
+        is_ojt=0
         for row in cur2:
-            for i in range(len(columns)):
+            for i in range(len(columns)-1):
                 h[columns[i]]=row[i]           
             response.append(h.copy())
+            is_ojt=row[-1]
         cur2.close()
         con.close()
-        return response
+        return {"PlannedBatches":response,"is_ojt":is_ojt}
     def Getcenterroom(center_id):
         response = []
         h={}
