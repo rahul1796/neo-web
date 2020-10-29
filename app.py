@@ -8443,7 +8443,6 @@ class GetDocumentForExcel_S3_certiplate(Resource):
             if image_path!='':
                 URL = config.neo_certiplate_def + image_path + '/'+ image_name
                 path = config.aws_location +'neo_app/'+ image_path + '/'+image_name
-            
             r = requests.get(url = URL) 
             if r.status_code==200:
                 filename =  URL
@@ -8460,6 +8459,7 @@ class GetDocumentForExcel_S3_certiplate(Resource):
                 filename=''
             if filename =='':
                 filename= config.Base_URL + '/data/No-image-found.jpg'
+            #return(filename)
             return redirect(filename)
 api.add_resource(GetDocumentForExcel_S3_certiplate,'/GetDocumentForExcel_S3_certiplate')
 
