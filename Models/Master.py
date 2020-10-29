@@ -264,7 +264,7 @@ class Master:
         return popupMessage
 
     def GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id):
-        return {"PlannedBatches":Database.GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id)}
+        return Database.GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id)
 
     def GetCenerRoom(center_id):
         return {"CenterRooms":Database.Getcenterroom(center_id)}
