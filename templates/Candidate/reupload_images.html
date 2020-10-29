@@ -107,7 +107,7 @@ var Candidates = {};
             "candidate_id" : '{{candidate_id}}'
         },
         success: function (data){
-            //console.log(data);
+            console.log(data.Candidate);
             if (data.Candidate.Project_Type!=4){
                 $('#div_Income_Certificate').hide();
                 $('#div_Education_Mark_Sheet').hide();
