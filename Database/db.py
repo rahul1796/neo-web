@@ -1120,10 +1120,12 @@ class Database:
         cur2 = con.cursor()
         cur2.execute("EXEC [masters].[sp_get_trainer_based_on_sub_project] @sub_project_id="+str(sub_project_id))
         columns = [column[0].title() for column in cur2.description]
+        j=0
         for r in cur2:
+            j+=1
             h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
             trainers.append(h)
-        trainers_f={"Trainers":trainers, "Is_Ojt":r[2]}
+        trainers_f={"Trainers":trainers, "Is_Ojt":r[2] if (j>0) else 0}
         cur2.close()
         con.close()
         return trainers_f
@@ -7287,4 +7289,21 @@ SELECT					cb.name as candidate_name,
         cnxn.close()
         return (data,columns)
 
-    
+    def GetSessionsForCourse(CourseId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_session_for_course]  ?'
+        values = (CourseId,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = {'Sessions':response}
+        cur.commit()
+        cur.close()
+        con.close()       
+        return out

@@ -8439,13 +8439,17 @@ class GetDocumentForExcel_S3_certiplate(Resource):
         if request.method=='GET':
             image_name=request.args.get('image_name','',type=str)
             image_path=request.args.get('image_path','',type=str)
+
             URL=config.neo_certiplate+image_name
+            path = config.aws_location +'neo_app/images/'+image_name
+            if image_path!='':
+                URL = config.neo_certiplate_def + image_path + '/'+ image_name
+                path = config.aws_location +'neo_app/'+ image_path + '/'+image_name
             r = requests.get(url = URL) 
             if r.status_code==200:
                 filename =  URL
             elif r.status_code==404:
-                #print(image_name)/
-                path = config.aws_location +'neo_app/images/'+image_name
+                #path = config.aws_location +'neo_app/images/'+image_name
                 URL = config.COL_URL + 's3_signed_url_for_file_updated'
                 PARAMS = {'file_path':path} 
                 r = requests.get(url = URL, params = PARAMS)
@@ -8457,6 +8461,7 @@ class GetDocumentForExcel_S3_certiplate(Resource):
                 filename=''
             if filename =='':
                 filename= config.Base_URL + '/data/No-image-found.jpg'
+            #return(filename)
             return redirect(filename)
 api.add_resource(GetDocumentForExcel_S3_certiplate,'/GetDocumentForExcel_S3_certiplate')
 
@@ -8739,6 +8744,20 @@ class download_ojt_report(Resource):
             except Exception as e:
                 print({"exceptione":str(e)})
 api.add_resource(download_ojt_report,'/download_ojt_report')
+
+
+class GetSessionsForCourse(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                CourseId=request.args.get('CourseId',0,type=int)
+                response = Master.GetSessionsForCourse(CourseId)
+                return response
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetSessionsForCourse,'/GetSessionsForCourse')
+
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)

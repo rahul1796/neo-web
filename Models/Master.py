@@ -301,3 +301,5 @@ class Master:
 
     def GetPOCForCustomer(customer_id):
         return Database.GetPOCForCustomer(customer_id)
+    def GetSessionsForCourse(CourseId):
+        return Database.GetSessionsForCourse(CourseId)
