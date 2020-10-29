@@ -69,22 +69,22 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
         html_msg= config.html_email_msg_certification_stage_change
         html_msg = html_msg.format(emailToName,Batch_Code,stage_name,EmailCC)
         msg.attach(MIMEText(html_msg, 'html'))
-        for path in [files]:
-            part = MIMEText('application', "octet-stream")
-            with open(path, 'rb') as file:
-                part.set_payload(file.read())
-            encoders.encode_base64(part)
-            part.add_header('Content-Disposition',
-                            'attachment; filename="{}"'.format(Path(path).name))
-            msg.attach(part)
-        
+        if files != '':
+            for path in [files]:
+                part = MIMEText('application', "octet-stream")
+                with open(path, 'rb') as file:
+                    part.set_payload(file.read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition',
+                                'attachment; filename="{}"'.format(Path(path).name))
+                msg.attach(part)
         res = server.sendmail(msg['From'], [msg['To']] + EmailCC.split(",") + ['neo.helpdesk@labournet.in'] , msg.as_string())
         server.quit()
 
         return {'status':True,'description':'Email sent'}
-    except:
+    except Exception as e:
+        print(e)
         return {'status':False,'description':'Unable to sent email'}
-
 def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails,files):
     try:
         server = smtplib.SMTP('smtp.office365.com','587')
