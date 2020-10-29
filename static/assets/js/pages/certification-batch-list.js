@@ -820,6 +820,7 @@ function DownloadCertificateTemplate(){
     });
     enrollments=enrollments.substring(0,enrollments.length-1)
     var cands=enrollments.toString();
+    $("#hdn_enrol_ids").val(cands);
     //alert(cands);
     //cands=cands.substring(0,cands.length-1)
     if ((cands.toString().length)==0)
@@ -984,6 +985,8 @@ function UploadFileToProcess()
     //form_data.append('user_id',$('#hdn_home_user_id_modal').val());
     form_data.append('assigned_user_id',$('#ddlLogisticUsers').val());
     form_data.append('batch_code',$('#hdn_batch_code').val());
+    form_data.append('batch_id',$('#hdn_batch_id').val());
+    form_data.append('enrollment_ids', $('#hdn_enrol_ids').val()); 
     
     
     
