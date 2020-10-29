@@ -7105,6 +7105,8 @@ class upload_assessment_certificate_number(Resource):
                 user_id = int(session['user_id'])
                 assigned_user_id = int(request.form["assigned_user_id"])
                 batch_code = str(request.form["batch_code"])
+                batch_id = int(request.form["batch_id"])
+                enrollment_ids = str(request.form["enrollment_ids"])
                 file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
                 f.save(file_name)
     
@@ -7126,7 +7128,7 @@ class upload_assessment_certificate_number(Resource):
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename+'_' + 'errors.csv')
                     return {"Status":False, "message":"Upload Failed (fails to validate data)" }
                 else:
-                    out = Database.upload_assessment_certificate_number(df,user_id,assigned_user_id,batch_code)
+                    out = Database.upload_assessment_certificate_number(df,user_id,assigned_user_id,batch_code,batch_id,enrollment_ids)
                     return out
             except Exception as e:
                  return {"Status":False, "message":"Unable to upload data " + str(e)}         

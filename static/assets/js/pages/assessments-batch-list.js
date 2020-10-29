@@ -937,7 +937,7 @@ function add_map_message(){
                                     }   
                                                                       
                                     if (((data.Assessments[i].Assessment_Stage_Id>=3 || (data.Assessments[i].Mobilization_Type==4)) & $('#hdn_home_user_role_id').val()!='25')  )
-                                        txt+='<a onclick="Reassessment(\'' + data.Assessments[i].Assessment_Id + '\',\''+ data.Assessments[i].Batch_Id +'\',\''+ data.Assessments[i].Partner_Category_Id +'\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Schedule Reassessment" class="fe-edit" ></i></a>';
+                                        txt+='<a onclick="Reassessment(\'' + data.Assessments[i].Assessment_Id + '\',\''+ data.Assessments[i].Batch_Id +'\',\''+ data.Assessments[i].Partner_Category_Id +'\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\',\'' + data.Assessments[i].Mobilization_Type + '\')" class="user-btn" style="cursor:pointer" ><i title="Schedule Reassessment" class="fe-edit" ></i></a>';
                                     if($('#hdn_home_user_role_id').val()!='37' & $('#hdn_home_user_role_id').val()!='28')
                                         varHtml+='  <td style="text-align:center;">'+ txt +'</td>';
                                     else
@@ -1006,7 +1006,7 @@ function add_map_message(){
         $('#TxtRequestedDate').attr('disabled', false);
         $('#mdl_create_batch_assessments').modal('show');
     }
-    function ScheduleReAssessmentModal(AssessmentId,BatchId,Partner_Category_Id,ReqDate,SchDate,AssessmentTypeId,AssessmentAgencyId,StageId,PartnerId,AssessmentDate){
+    function ScheduleReAssessmentModal(AssessmentId,BatchId,Partner_Category_Id,ReqDate,SchDate,AssessmentTypeId,AssessmentAgencyId,StageId,PartnerId,AssessmentDate,Mobilization_Type){
         LoadAssessmentTypes();
         LoadAssessmentAgency();
         LoadAssessmentPartnerTypes();
@@ -1029,6 +1029,7 @@ function add_map_message(){
         $('#hdn_current_stage_id').val(StageId);
         $('#ddlPartner').val(PartnerId);
         $('#hdn_reassessment_flag').val(1);
+        $('#hdn_mobilization_type').val(Mobilization_Type.toString());
         $('#ddlAssessmentType').attr('disabled', true);
         $('#ddlAssessmentAgency').attr('disabled', true);
         $('#ddlPartner').attr('disabled', true);
@@ -1194,22 +1195,26 @@ function add_map_message(){
             alert("Please enter proposed date.");
             return false;
         }
-        else if($('#hdn_current_stage_id').val()=="1" & $('#TxtScheduledDate').val()=='')
+        else if(($('#hdn_mobilization_type').val().toString())=="4")
+        {
+            
+        }      
+        else if(($('#hdn_current_stage_id').val()=="1" & $('#TxtScheduledDate').val()=='')|| ($('#hdn_mobilization_type').val())==4 )
         {
             alert("Please enter assesment confirmed date.");
             return false;
         }
-        else if($('#hdn_current_stage_id').val()=="1" & (DateScheduled < DateRequested))
+        else if(($('#hdn_current_stage_id').val()=="1" & (DateScheduled < DateRequested))|| ($('#hdn_mobilization_type').val().toString()=="4") )
         {
             alert("Assessment Confirmed date can not be less than proposed date.");
             return false;
         }
-        else if($('#hdn_current_stage_id').val()=="2" & (DateAssessed < DateScheduled))
+        else if(($('#hdn_current_stage_id').val()=="2" & (DateAssessed < DateScheduled))|| ($('#hdn_mobilization_type').val().toString()=="4") )
         {
             alert("Assesssment date can not be less than Assessment Confirmed date.");
             return false;
         }
-        else if($('#hdn_current_stage_id').val()=="2" & $('#TxtAssessmnetDate').val()=='')
+        else if(($('#hdn_current_stage_id').val()=="2" & $('#TxtAssessmnetDate').val()=='')|| ($('#hdn_mobilization_type').val().toString()=="4") )
         {
             alert("Please enter assessment date.");
             return false;
@@ -1737,8 +1742,8 @@ function UploadFileToProcess()
         window.location.href = '/assessment';
 
     }
-    function Reassessment(AssessmentId,BatchId,Partner_Category_Id,ReqDate,SchDate,AssessmentTypeId,AssessmentAgencyId,StageId,PartnerId,AssessmentDate)
+    function Reassessment(AssessmentId,BatchId,Partner_Category_Id,ReqDate,SchDate,AssessmentTypeId,AssessmentAgencyId,StageId,PartnerId,AssessmentDate,Mobilization_Type)
     {
-        ScheduleReAssessmentModal(AssessmentId,BatchId,Partner_Category_Id,ReqDate,SchDate,AssessmentTypeId,AssessmentAgencyId,StageId,PartnerId,AssessmentDate);
+        ScheduleReAssessmentModal(AssessmentId,BatchId,Partner_Category_Id,ReqDate,SchDate,AssessmentTypeId,AssessmentAgencyId,StageId,PartnerId,AssessmentDate,Mobilization_Type);
 
     }

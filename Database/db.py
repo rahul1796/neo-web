@@ -4299,7 +4299,9 @@ SELECT					cb.name as candidate_name,
                         course_name=row[1]
                         customer_name=row[2]
                         cm_emails=row[3]
-                        cm_emails=','.join(list(dict.fromkeys(cm_emails)))
+                        #print(cm_emails)
+                        cm_emails=','.join(set(cm_emails.split(',')))
+                        #print(cm_emails)
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_assessment_UAP] ?,?,?'
                     values = (batch_id,pop,present_candidate)
                     cur.execute(sql,(values))
@@ -4318,8 +4320,12 @@ SELECT					cb.name as candidate_name,
                     if 'CreateNeoSkillsBatch' in data:
                         if  str(data['CreateNeoSkillsBatch']['Succsess']) == "True":
                             attachment_file=Database.create_assessment_candidate_file(response,columns,SDMSBatchId,'assessment')
-                            sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails,attachment_file)                 
-                    
+                            #print(cm_emails)
+                            status_mail=sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails,attachment_file)                 
+                            if(status_mail['status']==False):
+                                out={"message":status_mail['description'],"success":0,"assessment_id":pop}
+                                return out
+                        
             
             else:
                 out={"message":"Error scheduling assessment","success":0,"assessment_id":pop}
@@ -6220,9 +6226,10 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             # print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
-    def upload_assessment_certificate_number(df,user_id,assigned_user_id,batch_code):
+    def upload_assessment_certificate_number(df,user_id,assigned_user_id,batch_code,batch_id,enrollment_ids):
         try: 
             # print(str(df.to_json(orient='records')))
+            response = []
             con = pyodbc.connect(conn_str)
             cur = con.cursor()            
             json_str=df.to_json(orient='records')
@@ -6248,16 +6255,16 @@ SELECT					cb.name as candidate_name,
                 cur.execute(sql)
                 for row in cur:
                     assigned_by_email_id=row[0]
-                sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
-                values = (batch_id,enrollment_ids)
-                cur.execute(sql,(values))
-                columns = [column[0].title() for column in cur.description]                   
-                for row in cur:
-                    for i in range(len(columns)):
-                        h[columns[i]]=row[i]
-                    response.append(h.copy())
-                attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
-                sent_mail.certification_stage_change_mail(1,assigned_to_email_id,assigned_to_name,assigned_by_email_id,batch_code,attachment_file)
+                #sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                #values = (batch_id,enrollment_ids)
+                #cur.execute(sql,(values))
+                #columns = [column[0].title() for column in cur.description]                   
+                #for row in cur:
+                    #for i in range(len(columns)):
+                        #h[columns[i]]=row[i]
+                    #response.append(h.copy())
+                #attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                sent_mail.certification_stage_change_mail(1,assigned_to_email_id,assigned_to_name,assigned_by_email_id,batch_code,'')
                 msg="Uploaded Successfully"
            
             else:
