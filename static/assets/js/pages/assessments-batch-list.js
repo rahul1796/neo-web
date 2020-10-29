@@ -1421,7 +1421,6 @@ function add_map_message(){
         flag='absent'
         $('#tbl_mark_absent_candidate').show();
         $('#tbl_mark_absent_candidate').dataTable().fnDestroy();    
-    
         var URL=$('#hdn_web_url').val()+ "/ALLCandidatesEnrolledInBatch?batch_id="+BatchId+"&assessmentId="+AssessmentId;
         $.ajax({
             type:"GET",
