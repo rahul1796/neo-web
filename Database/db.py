@@ -5361,7 +5361,7 @@ SELECT					cb.name as candidate_name,
             '''
 
             que_test='''
-                select is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id where 1=1 and batch_code=trim('{}') and coalesce(sp.is_ojt_req,0)=1
+                select sp.is_ojt_req & c.is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id left join masters.tbl_courses as c on c.course_id=b.course_id where 1=1 and coalesce(sp.is_ojt_req,0)=1  and coalesce(c.is_ojt_req,0)=1 and batch_code=trim('{}')
                 '''
 
             url = candidate_xml_weburl + xml
@@ -5386,7 +5386,6 @@ SELECT					cb.name as candidate_name,
                     quer1 = '''
                     update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1, Cand_Password=null where candidate_id='{}';
                     '''
-
                 if 'mobilization_type' in data:
                     query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,data['mobilization_type'],1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
                 else:
@@ -5753,7 +5752,7 @@ SELECT					cb.name as candidate_name,
                     temp += '\n' + "({},'SAE',GETDATE(),{},1),".format(row[0],quer_user.format(row[79] if ProjectType == 1 else row[80],row[79] if ProjectType == 1 else row[80]))
 
                 que='''
-                select is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id where 1=1 and batch_code=trim('{}') and coalesce(sp.is_ojt_req,0)=1
+                select sp.is_ojt_req & c.is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id left join masters.tbl_courses as c on c.course_id=b.course_id where 1=1 and coalesce(sp.is_ojt_req,0)=1  and coalesce(c.is_ojt_req,0)=1 and batch_code=trim('{}')
                 '''
                 curs.execute(que.format(row[78] if ProjectType == 1 else row[79]))
                 is_obj = curs.fetchall()
@@ -5765,7 +5764,7 @@ SELECT					cb.name as candidate_name,
                     quer1 = '''
                     update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',secondary_contact_no='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1,Cand_Password=null where candidate_id='{}';
                     '''
-                
+                    
                 if ProjectType==2:
                     query += '\n' + quer8.format(row[82],row[83],row[84],row[85],row[86],row[87],row[88],row[89],row[90],row[91],row[92],row[93],row[94],row[95],row[96],row[97],row[98],row[0])
 
