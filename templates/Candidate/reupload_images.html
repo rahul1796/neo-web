@@ -49,12 +49,17 @@ var Candidates = {};
     {
         console.log(file_name)
         var fileExtension = ['xlsx'];
+        var fileExtentionDoc = ['pdf','doc','docx']
         var s3_path="neo_app/images/";
         if (fileExtension.includes(file_name.split('.').pop().toLowerCase())){
             s3_path ="bulk_upload/candidate/registration/";
         }
+        else if (fileExtentionDoc.includes(file_name.split('.').pop().toLowerCase())){
+            s3_path ="neo_app/docs/";
+        }
         var file_path=$('#hdn_AWS_S3_path').val()+ s3_path + file_name;
         var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
+        //console.log(api_url);
         var xhr = new XMLHttpRequest();
         xhr.open("GET",api_url );
             xhr.onreadystatechange = function(){
@@ -119,50 +124,147 @@ var Candidates = {};
             }
             if(data.Candidate != null)
             {  
+                var fileExtentionDoc = ['pdf','doc','docx']
+                
                 if (data.Candidate.Candidate_Photo!=''){
-                    var s = document.getElementById('ur_candidate_photo')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Candidate_Photo;
+                    if (fileExtentionDoc.includes(data.Candidate.Candidate_Photo.split('.').pop().toLowerCase())){
+                        $('#candidate_photo_img').hide();
+                        $('#candidate_photo_doc').show();
+                        var s = document.getElementById('ur_candidate_doc')
+                        s.href = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_path=docs&image_name='+data.Candidate.Candidate_Photo;
+                    }
+                    else{
+                        $('#candidate_photo_img').show();
+                        $('#candidate_photo_doc').hide();
+                        var s = document.getElementById('ur_candidate_photo')
+                        s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Candidate_Photo;
+                    }
                 }
                 if (data.Candidate.Aadhar_Image_Name!=''){
-                    data.Candidate.Aadhar_Image_Name.split(',')[0]
-                    var s = document.getElementById('ur_Aadhar_Image1')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Aadhar_Image_Name.split(',')[0];
+                    if (fileExtentionDoc.includes(data.Candidate.Aadhar_Image_Name.split(',')[0].split('.').pop().toLowerCase())){
+                        $('#Aadhar_Image1_img').hide();
+                        $('#Aadhar_Image1_doc').show();
+                        var s = document.getElementById('ur_Aadhar_Image1_doc')
+                        s.href = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_path=docs&image_name='+data.Candidate.Aadhar_Image_Name.split(',')[0];
+                    }
+                    else{
+                        $('#Aadhar_Image1_img').show();
+                        $('#Aadhar_Image1_doc').hide();
+                        var s = document.getElementById('ur_Aadhar_Image1')
+                        s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Aadhar_Image_Name.split(',')[0];
+                    }
                     if (data.Candidate.Aadhar_Image_Name.split(',').length ==2){
-                        var s = document.getElementById('ur_Aadhar_Image2')
+                        if (fileExtentionDoc.includes(data.Candidate.Aadhar_Image_Name.split(',')[1].split('.').pop().toLowerCase())){
+                            $('#Aadhar_Image2_img').hide();
+                            $('#Aadhar_Image2_doc').show();
+                            var s = document.getElementById('ur_Aadhar_Image2_doc')
+                            s.href = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_path=docs&image_name='+data.Candidate.Aadhar_Image_Name.split(',')[1];
+                        }
+                        else{
+                            $('#Aadhar_Image2_img').show();
+                            $('#Aadhar_Image2_doc').hide();
+                            var s = document.getElementById('ur_Aadhar_Image2')
                         s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Aadhar_Image_Name.split(',')[1];
+                        }
                     }
                 }
                 if (data.Candidate.Identity_Image_Name!=''){
-                    var s = document.getElementById('ur_Identity_Image')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Identity_Image_Name;
+                    if (fileExtentionDoc.includes(data.Candidate.Identity_Image_Name.split('.').pop().toLowerCase())){
+                        $('#Identity_Image_img').hide();
+                        $('#Identity_Image_doc').show();
+                        var s = document.getElementById('ur_Identity_doc')
+                        s.href = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_path=docs&image_name='+data.Candidate.Identity_Image_Name;
+                    }
+                    else{
+                        $('#Identity_Image_img').show();
+                        $('#Identity_Image_doc').hide();
+                        var s = document.getElementById('ur_Identity_Image')
+                        s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Identity_Image_Name;
+                    }
                 }
                 if (data.Candidate.Educational_Marksheet!=''){
-                    //console.log(data.Candidate.Educational_Marksheet);
-                    var s = document.getElementById('ur_Education_Mark_Sheet');
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Educational_Marksheet;
-                }
-                else{
-
+                    if (fileExtentionDoc.includes(data.Candidate.Educational_Marksheet.split('.').pop().toLowerCase())){
+                        $('#Education_Mark_Sheet_img').hide();
+                        $('#Education_Mark_Sheet_doc').show();
+                        var s = document.getElementById('ur_Education_Mark_Sheet_doc')
+                        s.href = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_path=docs&image_name='+data.Candidate.Educational_Marksheet;
+                    }
+                    else{
+                        $('#Education_Mark_Sheet_img').show();
+                        $('#Education_Mark_Sheet_doc').hide();
+                        var s = document.getElementById('ur_Education_Mark_Sheet');
+                        s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Educational_Marksheet;
+                    }
                 }
                 if (data.Candidate.Income_Certificate!=''){
-                    var s = document.getElementById('ur_Income_Certificate')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Income_Certificate;
+                    if (fileExtentionDoc.includes(data.Candidate.Income_Certificate.split('.').pop().toLowerCase())){
+                        $('#Income_Certificate_img').hide();
+                        $('#Income_Certificate_doc').show();
+                        var s = document.getElementById('ur_Income_Certificate_doc')
+                        s.href = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_path=docs&image_name='+data.Candidate.Income_Certificate;
+                    }
+                    else{
+                        $('#Income_Certificate_img').show();
+                        $('#Income_Certificate_doc').hide();
+                        var s = document.getElementById('ur_Income_Certificate')
+                        s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Income_Certificate;
+                    }
                 }
                 if (data.Candidate.Bank_Account_Image_Name!=''){
-                    var s = document.getElementById('ur_Bank_Account_Copy')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Bank_Account_Image_Name;
+                    if (fileExtentionDoc.includes(data.Candidate.Bank_Account_Image_Name.split('.').pop().toLowerCase())){
+                        $('#Bank_Account_Copy_img').hide();
+                        $('#Bank_Account_Copy_doc').show();
+                        var s = document.getElementById('ur_Bank_Account_Copy_doc')
+                        s.href = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_path=docs&image_name='+data.Candidate.Bank_Account_Image_Name;
+                    }
+                    else{
+                        $('#Bank_Account_Copy_img').show();
+                        $('#Bank_Account_Copy_doc').hide();
+                        var s = document.getElementById('ur_Bank_Account_Copy')
+                        s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Bank_Account_Image_Name;
+                    }
                 }
                 if (data.Candidate.Educational_Qualification!=''){
-                    var s = document.getElementById('ur_Educational_qualification_Proof')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Educational_Qualification;
+                    if (fileExtentionDoc.includes(data.Candidate.Educational_Qualification.split('.').pop().toLowerCase())){
+                        $('#Educational_qualification_Proof_img').hide();
+                        $('#Educational_qualification_Proof_doc').show();
+                        var s = document.getElementById('ur_Educational_qualification_Proof_doc')
+                        s.href = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_path=docs&image_name='+data.Candidate.Educational_Qualification;
+                    }
+                    else{
+                        $('#Educational_qualification_Proof_img').show();
+                        $('#Educational_qualification_Proof_doc').hide();
+                        var s = document.getElementById('ur_Educational_qualification_Proof')
+                        s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Educational_Qualification;
+                    }
                 }
                 if (data.Candidate.Age_Proof!=''){
-                    var s = document.getElementById('ur_Age_proof')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Age_Proof;
+                    if (fileExtentionDoc.includes(data.Candidate.Age_Proof.split('.').pop().toLowerCase())){
+                        $('#Age_proof_img').hide();
+                        $('#Age_proof_doc').show();
+                        var s = document.getElementById('ur_Age_proof_doc')
+                        s.href = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_path=docs&image_name='+data.Candidate.Age_Proof;
+                    }
+                    else{
+                        $('#Age_proof_img').show();
+                        $('#Age_proof_doc').hide();
+                        var s = document.getElementById('ur_Age_proof')
+                        s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Age_Proof;
+                    }
                 }
                 if (data.Candidate.Signed_Mou!=''){
-                    var s = document.getElementById('ur_Signed_MoU')
-                    s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Signed_Mou;
+                    if (fileExtentionDoc.includes(data.Candidate.Signed_Mou.split('.').pop().toLowerCase())){
+                        $('#Signed_MoU_img').hide();
+                        $('#Signed_MoU_doc').show();
+                        var s = document.getElementById('ur_Signed_MoU_doc')
+                        s.href = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_path=docs&image_name='+data.Candidate.Signed_Mou;
+                    }
+                    else{
+                        $('#Signed_MoU_img').show();
+                        $('#Signed_MoU_doc').hide();
+                        var s = document.getElementById('ur_Signed_MoU')
+                        s.src = $('#hdn_web_url').val() + '/GetDocumentForExcel_S3_certiplate?image_name='+data.Candidate.Signed_Mou;
+                    }
                 }
             }
         },
@@ -175,9 +277,13 @@ var Candidates = {};
     return false;
     }
     function Upload_image(id){
-        var validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
+        var validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        
         var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_'
         var filename = ''
+
+        var file = document.getElementById('myFile'+id).files[0]
+
         var ins=0
         if (id!=2){
             var file = document.getElementById('myFile'+id).files[0]
@@ -329,8 +435,13 @@ function validate_upload(id){
                             <div class="col-lg-4">
                                 <label for="ur_candidate_photo">Candidate Photo</label>
                             </div>
-                            <div class="col-lg-2">
+                            <div class="col-lg-2" id="candidate_photo_img">
                                 <img id="ur_candidate_photo" name="ur_candidate_photo" src="static\assets\images\noimage2.png" alt="Candidate Photo" style="float:left;width:100%;">
+                            </div>
+                            <div class="col-lg-2" id="candidate_photo_doc" style="display: none;">
+                                <a href="" target="_blank" id="ur_candidate_doc" name="ur_candidate_doc" style="float:left; margin-top:30px;" download>
+                                    <p><b> Download File</b><p>
+                                </a>
                             </div>
                             <div class="col-lg-6">
                                 <input style="float: left;cursor:pointer;margin-top:30px;" type="file" id="myFile1" name="filename">
@@ -344,8 +455,22 @@ function validate_upload(id){
                                 <label for="ur_Aadhar_Image">Aadhar Image</label>
                             </div>
                             <div class="col-lg-4">
-                                <img id="ur_Aadhar_Image1" name="ur_Aadhar_Image1" src="static\assets\images\noimage2.png" alt="Aadhar Image" style="float:left;width:50%;padding: 5px;">
-                                <img id="ur_Aadhar_Image2" name="ur_Aadhar_Image2" src="static\assets\images\noimage2.png" alt="Aadhar Image" style="float:left;width:50%;padding: 5px;"> <!-- width:128px;height:128px; -->
+                                <div id="Aadhar_Image1_img"> <!-- class="col-lg-2"  -->>
+                                    <img id="ur_Aadhar_Image1" name="ur_Aadhar_Image1" src="static\assets\images\noimage2.png" alt="Aadhar Image" style="float:left;width:50%;padding: 5px;">
+                                </div>
+                                <div id="Aadhar_Image1_doc" style="display: none;">
+                                    <a href="" target="_blank" id="ur_Aadhar_Image1_doc" name="ur_Aadhar_Image1_doc" style="float:left; margin-top:30px;" download>
+                                        <p><b> Download File</b><p>
+                                    </a>
+                                </div>
+                                <div id="Aadhar_Image2_img">
+                                    <img id="ur_Aadhar_Image2" name="ur_Aadhar_Image2" src="static\assets\images\noimage2.png" alt="Aadhar Image" style="float:left;width:50%;padding: 5px;"> <!-- width:128px;height:128px; -->
+                                </div>
+                                <div id="Aadhar_Image2_doc" style="display: none;">
+                                    <a href="" target="_blank" id="ur_Aadhar_Image2_doc" name="ur_Aadhar_Image2_doc" style="float:left; margin-top:30px;" download>
+                                        <p><b> Download File</b><p>
+                                    </a>
+                                </div>
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile2" name="filename" style="float: left;cursor:pointer;margin-top:30px;" multiple>
@@ -358,8 +483,13 @@ function validate_upload(id){
                             <div class="col-lg-4">
                                 <label for="ur_Identity_Image">Identity Image</label>
                             </div>
-                            <div class="col-lg-2">
+                            <div class="col-lg-2" id="Identity_Image_img">
                                 <img id="ur_Identity_Image" name="ur_Identity_Image" src="static\assets\images\noimage2.png" alt="Identity Image" style="float:left;width:100%;">
+                            </div>
+                            <div class="col-lg-2" id="Identity_Image_doc" style="display: none;">
+                                <a href="" target="_blank" id="ur_Identity_doc" name="ur_Identity_doc" style="float:left; margin-top:30px;" download>
+                                    <p><b> Download File</b><p>
+                                </a>
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile3" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
@@ -372,8 +502,13 @@ function validate_upload(id){
                             <div class="col-lg-4">
                                 <label for="ur_Education_Mark_Sheet">Education Mark Sheet</label>
                             </div>
-                            <div class="col-lg-2">
+                            <div class="col-lg-2" id="Education_Mark_Sheet_img">
                                 <img id="ur_Education_Mark_Sheet" name="ur_Education_Mark_Sheet" src="static\assets\images\noimage2.png" alt="Education Mark Sheet" style="float:left;width:100%;">
+                            </div>
+                            <div class="col-lg-2" id="Education_Mark_Sheet_doc" style="display: none;">
+                                <a href="" target="_blank" id="ur_Education_Mark_Sheet_doc" name="ur_Education_Mark_Sheet_doc" style="float:left; margin-top:30px;" download>
+                                    <p><b> Download File</b><p>
+                                </a>
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile4" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
@@ -386,8 +521,13 @@ function validate_upload(id){
                             <div class="col-lg-4">
                                 <label for="ur_Income_Certificate">Income Certificate</label>
                             </div>
-                            <div class="col-lg-2">
+                            <div class="col-lg-2" id="Income_Certificate_img">
                                 <img id="ur_Income_Certificate" name="ur_Income_Certificate" src="static\assets\images\noimage2.png" alt="Income Certificate" style="float:left;width:100%;">
+                            </div>
+                            <div class="col-lg-2" id="Income_Certificate_doc" style="display: none;">
+                                <a href="" target="_blank" id="ur_Income_Certificate_doc" name="ur_Income_Certificate_doc" style="float:left; margin-top:30px;" download>
+                                    <p><b> Download File</b><p>
+                                </a>
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile5" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
@@ -400,8 +540,13 @@ function validate_upload(id){
                             <div class="col-lg-4">
                                 <label for="ur_Bank_Account_Copy">Bank Account Copy</label>
                             </div>
-                            <div class="col-lg-2">
+                            <div class="col-lg-2" id="Bank_Account_Copy_img">
                                 <img id="ur_Bank_Account_Copy" name="ur_Bank_Account_Copy" src="static\assets\images\noimage2.png" alt="Bank Account Copy" style="float:left;width:100%;">
+                            </div>
+                            <div class="col-lg-2" id="Bank_Account_Copy_doc" style="display: none;">
+                                <a href="" target="_blank" id="ur_Bank_Account_Copy_doc" name="ur_Bank_Account_Copy_doc" style="float:left; margin-top:30px;" download>
+                                    <p><b> Download File</b><p>
+                                </a>
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile6" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
@@ -414,8 +559,13 @@ function validate_upload(id){
                             <div class="col-lg-4">
                                 <label for="ur_Educational_qualification_Proof">Educational qualification Proof</label>
                             </div>
-                            <div class="col-lg-2">
+                            <div class="col-lg-2" id="Educational_qualification_Proof_img">
                                 <img id="ur_Educational_qualification_Proof" name="ur_Educational_qualification_Proof" src="static\assets\images\noimage2.png" alt="Educational qualification Proof" style="float:left;width:100%;">
+                            </div>
+                            <div class="col-lg-2" id="Educational_qualification_Proof_doc" style="display: none;">
+                                <a href="" target="_blank" id="ur_Educational_qualification_Proof_doc" name="ur_Educational_qualification_Proof_doc" style="float:left; margin-top:30px;" download>
+                                    <p><b> Download File</b><p>
+                                </a>
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile7" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
@@ -428,8 +578,13 @@ function validate_upload(id){
                             <div class="col-lg-4">
                                 <label for="ur_Age_proof">Age proof</label>
                             </div>
-                            <div class="col-lg-2">
+                            <div class="col-lg-2" id="Age_proof_img">
                                 <img id="ur_Age_proof" name="ur_Age_proof" src="static\assets\images\noimage2.png" alt="Age proof" style="float:left;width:100%;">
+                            </div>
+                            <div class="col-lg-2" id="Age_proof_doc" style="display: none;">
+                                <a href="" target="_blank" id="ur_Age_proof_doc" name="ur_Age_proof_doc" style="float:left; margin-top:30px;" download>
+                                    <p><b> Download File</b><p>
+                                </a>
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile8" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
@@ -442,8 +597,13 @@ function validate_upload(id){
                             <div class="col-lg-4">
                                 <label for="ur_Signed_MoU">Signed MoU</label>
                             </div>
-                            <div class="col-lg-2">
+                            <div class="col-lg-2" id="Signed_MoU_img">
                                 <img id="ur_Signed_MoU" name="ur_Signed_MoU" src="static\assets\images\noimage2.png" alt="Signed MoU" style="float:left;width:100%;">
+                            </div>
+                            <div class="col-lg-2" id="Signed_MoU_doc" style="display: none;">
+                                <a href="" target="_blank" id="ur_Signed_MoU_doc" name="ur_Signed_MoU_doc" style="float:left; margin-top:30px;" download>
+                                    <p><b> Download File</b><p>
+                                </a>
                             </div>
                             <div class="col-lg-6">
                                 <input type="file" id="myFile9" name="filename" style="float: left;cursor:pointer;margin-top:30px;">
