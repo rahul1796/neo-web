@@ -183,6 +183,8 @@
                                     varHtml+='<tr>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].S_No +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].Region_Name +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].User_Name_Coo +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].User_Name_Tm +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].Customer_Name +'</td>';
                                     let varLink='<a onclick="GetContractProjectTargets(\'' + data.Data[i].Region_Id + '\',\'' + data.Data[i].Contract_Id + '\',\'' + data.Data[i].Contract_Name + '\')"  style="color:blue;cursor:pointer" >' + data.Data[i].Contract_Name + '</a>';
                                     varHtml+='  <td style="text-align:center;">'+ varLink +'</td>';
@@ -270,6 +272,8 @@
                                 varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Project_Name +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Sub_Project_Code +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Sub_Project_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].User_Name_Coo +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].User_Name_Tm +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Course_Code +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Course_Name +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Target_Enrolment +'</td>';
@@ -480,6 +484,8 @@
                                 <tr >
                                     <th rowspan="2" style="text-align:center;">S.No</th>
                                     <th rowspan="2" style="text-align:center;">Region</th>
+                                    <th rowspan="2" style="text-align:center;">COO</th>
+                                    <th rowspan="2" style="text-align:center;">TM</th>
                                     <th rowspan="2" style="text-align:center;">Customer</th>
                                     <th rowspan="2" style="text-align:center;">Contract</th>
                                     <th colspan="3" style="text-align:center;">Targets</th>
@@ -521,10 +527,12 @@
                     <thead>
                         <tr style="background-color: #f5f6f8;">
                             <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
-                            <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Code</th>
+                            <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project_Code</th>
                             <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Name</th>
-                            <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Code</th>
+                            <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub_Project_Code</th>
                             <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Name</th>
+                            <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">COO</th>
+                            <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">TM</th>
                             <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Code</th>
                             <th  rowspan="2" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Name</th>
                             <th  colspan="3" style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Targets</th>
