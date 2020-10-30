@@ -50,7 +50,6 @@ def check_str(st):
     except:
         return False
 
-
 def check_mob_number(mob):
     try:
         mob = str(mob)
@@ -3981,9 +3980,9 @@ api.add_resource(GetAllBusBasedOn_User,'/GetAllBusBasedOn_User')
 @app.route("/Downloads/<path:path>")
 def get_download_file(path):
     """Download a file."""
-    print(path)
+    #print(path)
     filename = r"{}{}".format(config.DownloadPathLocal,path)
-    print(filename)
+    #print(filename)
     if not(os.path.exists(filename)):
         filename = r"{}No-image-found.jpg".format(config.DownloadPathWeb)
     return send_file(filename)
