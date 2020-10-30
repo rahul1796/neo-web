@@ -8443,7 +8443,7 @@ class GetDocumentForExcel_S3_certiplate(Resource):
             URL=config.neo_certiplate+image_name
             path = config.aws_location +'neo_app/images/'+image_name
             if image_path!='':
-                URL = config.neo_certiplate_def + image_path + '/'+ image_name
+                URL = config.neo_certiplate_def + 'doc' + '/'+ image_name
                 path = config.aws_location +'neo_app/'+ image_path + '/'+image_name
             r = requests.get(url = URL) 
             if r.status_code==200:
