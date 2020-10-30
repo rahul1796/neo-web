@@ -5534,7 +5534,7 @@ SELECT					cb.name as candidate_name,
             '''
 
             que_test='''
-                select sp.is_ojt_req & c.is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id left join masters.tbl_courses as c on c.course_id=b.course_id where 1=1 and coalesce(sp.is_ojt_req,0)=1  and coalesce(c.is_ojt_req,0)=1 and batch_code=trim('{}')
+                select sp.is_ojt_req & c.is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id left join masters.tbl_courses as c on c.course_id=b.course_id where 1=1 and coalesce(sp.is_ojt_req,0)=1  and coalesce(c.is_ojt_req,0)=1 and batch_code like trim('{}')
                 '''
 
             url = candidate_xml_weburl + xml
@@ -5925,7 +5925,7 @@ SELECT					cb.name as candidate_name,
                     temp += '\n' + "({},'SAE',GETDATE(),{},1),".format(row[0],quer_user.format(row[79] if ProjectType == 1 else row[80],row[79] if ProjectType == 1 else row[80]))
 
                 que='''
-                select sp.is_ojt_req & c.is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id left join masters.tbl_courses as c on c.course_id=b.course_id where 1=1 and coalesce(sp.is_ojt_req,0)=1  and coalesce(c.is_ojt_req,0)=1 and batch_code=trim('{}')
+                select sp.is_ojt_req & c.is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id left join masters.tbl_courses as c on c.course_id=b.course_id where 1=1 and coalesce(sp.is_ojt_req,0)=1  and coalesce(c.is_ojt_req,0)=1 and batch_code like trim('{}')
                 '''
                 curs.execute(que.format(row[78] if ProjectType == 1 else row[79]))
                 is_obj = curs.fetchall()
