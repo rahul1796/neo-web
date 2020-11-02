@@ -8,7 +8,7 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
         centername=''
         customername=''
     '''
-    print(start_date, end_date, customername, sub_project, coursename, name)
+    #print(start_date, end_date, customername, sub_project, coursename, name)
     try:
         import pandas as pd
         import pypyodbc as pyodbc
@@ -78,7 +78,6 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
             for col_num, value in enumerate(first_row):
                 worksheet.merge_range(0, 18+col_num*3, 0, 20+col_num*3, value, header_format)
 
-            
         def group_images_fxn():
             groupimage_default_column = ['LOG DATE', 'TRAINER NAME', 'TRAINER EMAIL', 'BATCH CODE', 'BATCH START DATE',
                                      'BATCH END DATE', 'CUSTOMER NAME', 'CENTER NAME', 'CENTER TYPE', 'DISTRICT', 'STATE' , 'REGION', 'BUSSINESS UNIT',
@@ -94,6 +93,10 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
             data = list(map(lambda x:list(x), data))
             df = pd.DataFrame(data)
             df.columns = groupimage_default_column
+
+            attendance_image = '/data/TMA/attendance_images/'
+            attendance_url = base_url + attendance_image
+
             df['SESSION GROUP IMAGE'] = df.loc[:,'SESSION GROUP IMAGE'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + attendance_url + x + '","View Image")')
             
             df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Session-Group-Images')
