@@ -33,20 +33,19 @@ def create_report(user_id, user_role_id, customer_ids, contract_ids, region_ids,
         data = list(map(lambda x:list(x), data))
 
         df = pd.DataFrame(data, columns=columns)
-        df= df[['Customer_Name', 'Contract_Name', 'Contract_Code', 'Project_Name', 'Sub_Project_Name', 'Region_Name','Target_Enrolment', 'Target_Certification', 'Target_Placement', 'Enrolled', 'Certified', 'Placement', 'Enrolled_Filtered', 'Certified_Filtered', 'Placed_Filtered']]
+        df= df[['Customer_Name', 'Contract_Name', 'Contract_Code', 'Project_Name', 'Sub_Project_Name', 'Region_Name', 'User_Name_Coo', 'User_Name_Tm', 'Target_Enrolment', 'Target_Certification', 'Target_Placement', 'Enrolled', 'Certified', 'Placement', 'Enrolled_Filtered', 'Certified_Filtered', 'Placed_Filtered']]
         
         df.to_excel(writer, index=None, header=None ,startrow=2 ,sheet_name='ECP-Report') 
         worksheet = writer.sheets['ECP-Report']
-        stagelog_default_column = ['Customer_Name', 'Contract_Name', 'Contract_Code', 'Project_Name', 'Sub_Project_Name', 'Region_Name']
+        stagelog_default_column = ['Customer_Name', 'Contract_Name', 'Contract_Code', 'Project_Name', 'Sub_Project_Name', 'Region_Name', 'COO', 'TM']
         first_row = ['Targets', 'Actuals (Contract Till Date)', 'Actuals']
         second_row = ['Enrolled','Certified','Placement','Enrolled','Certified','Placement','Enrolled','Certified','Placement']
         for col_num, value in enumerate(stagelog_default_column):
             worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
         for col_num, value in enumerate(first_row):
-            worksheet.merge_range(0, 6+col_num*3, 0, 8+col_num*3, value, header_format)
+            worksheet.merge_range(0, 8+col_num*3, 0, 10+col_num*3, value, header_format)
         for col_num, value in enumerate(second_row):
-            worksheet.write(1, 6+col_num, value, header_format)
-                        
+            worksheet.write(1, 8+col_num, value, header_format)
         writer.save()
         curs.close()
         cnxn.close()

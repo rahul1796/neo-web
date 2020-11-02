@@ -11,6 +11,8 @@ import io
 import csv
 import json
 import sent_mail
+import os
+import xlsxwriter,re,os,zipfile,zlib 
 
 
 def to_xml(df, filename=None, mode='w'):
@@ -729,11 +731,11 @@ class Database:
         cur2.close()
         con.close()
         return center
-    def add_course_details(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, isactive, user_id):
+    def add_course_details(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, is_ojt_req,OJT_Duration_hour, isactive, user_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[content].[sp_add_edit_course] ?, ?, ?, ?, ?, ?, ?, ?,?, ?'
-        values = (CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, isactive, user_id)
+        sql = 'exec	[content].[sp_add_edit_course] ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?'
+        values = (CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, is_ojt_req,OJT_Duration_hour, isactive, user_id)
         cur.execute(sql,(values))
 
         for row in cur:
@@ -972,7 +974,6 @@ class Database:
 
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
-        print(columns)
         record="0"
         fil="0"
         for row in cur:
@@ -1011,7 +1012,7 @@ class Database:
         cur.close()
         con.close()
         return content
-    def batch_list_certification(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids,assessment_stage_id, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
+    def batch_list_certification(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids,assessment_stage_id,certification_stage_id, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
         #print(status, customer, project, course, region, center)
         content = {}
         d = []
@@ -1019,9 +1020,9 @@ class Database:
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
 
-        sql = 'exec [batches].[sp_get_batch_list_certification] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?,?, ?, ?, ?, ?, ?'
+        sql = 'exec [batches].[sp_get_batch_list_certification] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?,?, ?, ?, ?, ?, ?'
 
-        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids,assessment_stage_id, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids,assessment_stage_id,certification_stage_id, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
         #print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
@@ -1119,10 +1120,12 @@ class Database:
         cur2 = con.cursor()
         cur2.execute("EXEC [masters].[sp_get_trainer_based_on_sub_project] @sub_project_id="+str(sub_project_id))
         columns = [column[0].title() for column in cur2.description]
+        j=0
         for r in cur2:
+            j+=1
             h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
             trainers.append(h)
-        trainers_f={"Trainers":trainers, "Is_Ojt":r[2]}
+        trainers_f={"Trainers":trainers, "Is_Ojt":r[2] if (j>0) else 0}
         cur2.close()
         con.close()
         return trainers_f
@@ -1341,6 +1344,34 @@ class Database:
         con.close()
         msg={"Status":True,"message":"Certificate Uploaded"}
         return msg
+    def upload_assessment_certificate_copy_bulk_upload(certi_name,user_id,enrolment_id,batch_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = '''update assessments.tbl_map_certification_candidates_stages 
+                set certificate_copy=? ,
+                created_by=?,
+                created_on=getdate()
+                where intervention_value in  (	
+								select	value 
+								from	string_split( ?,',')
+								where	trim(value)!=''
+								)
+                and assessment_id=(select TOP(1) assessment_id 
+                                                            from assessments.tbl_batch_assessments
+                                                            where batch_id=? and assessment_type_id=2
+                                                            and assessment_stage_id=4
+                                                            and is_active=1
+                                                            order by assessment_id desc
+                                                            )
+                AND is_active=1;'''
+        values = (certi_name,user_id,enrolment_id,batch_id)
+        cur.execute(sql,(values))
+        cur.commit()
+        cur.close()
+        con.close()
+        msg={"Status":True,"message":"Certificate Uploaded"}
+        return msg
+    
     def upload_cerification_cand_image(certi_name,user_id,enrolment_id,batch_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -2793,6 +2824,42 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return response
+    def AllCertificationStages(UserId,UserRoleId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[assessments].[sp_get_certification_stages] ?, ?'
+        values = (UserId,UserRoleId)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i] 
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h.copy())
+        cur.commit()
+        cur.close()
+        con.close()
+        return response
+    def AllCertificateNames(batch_id,stage):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[assessments].[sp_get_certificate_names] ?,?'
+        values = (batch_id,stage)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i] 
+            #h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1]}
+            response.append(h.copy())
+        cur.commit()
+        cur.close()
+        con.close()
+        return response
      
     def AllRegionsBasedOnUser(UserId,UserRoleId,UserRegionId):
         response=[]
@@ -4232,6 +4299,9 @@ SELECT					cb.name as candidate_name,
                         course_name=row[1]
                         customer_name=row[2]
                         cm_emails=row[3]
+                        #print(cm_emails)
+                        cm_emails=','.join(set(cm_emails.split(',')))
+                        #print(cm_emails)
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_assessment_UAP] ?,?,?'
                     values = (batch_id,pop,present_candidate)
                     cur.execute(sql,(values))
@@ -4249,8 +4319,13 @@ SELECT					cb.name as candidate_name,
                     data = x.json()
                     if 'CreateNeoSkillsBatch' in data:
                         if  str(data['CreateNeoSkillsBatch']['Succsess']) == "True":
-                            sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails)                 
-                    
+                            attachment_file=Database.create_assessment_candidate_file(response,columns,SDMSBatchId,'assessment')
+                            #print(cm_emails)
+                            status_mail=sent_mail.UAP_Batch_Creation_MAIL(str(data['CreateNeoSkillsBatch']['RequestId']),SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails,attachment_file)                 
+                            if(status_mail['status']==False):
+                                out={"message":status_mail['description'],"success":0,"assessment_id":pop}
+                                return out
+                        
             
             else:
                 out={"message":"Error scheduling assessment","success":0,"assessment_id":pop}
@@ -4259,6 +4334,61 @@ SELECT					cb.name as candidate_name,
             return out
         except Exception as e:
             return {"message":"Error changing assessment stage"+e.message,"success":0,"assessment_id":0}
+    def create_assessment_candidate_file(data,columns,batch_code,file_type):
+        try:
+            import pandas as pd
+            import pypyodbc as pyodbc
+            import xlsxwriter
+            import calendar
+            import time
+            from Database import config
+        except:
+            return({'Description':'Module Error', 'Status':False})
+
+        try:
+            gmt = time.gmtime() 
+            ts = calendar.timegm(gmt)
+            r=re.compile("Candidate_List_.*")
+            lst=os.listdir(config.neo_report_file_path + 'report file/')
+            newlist = list(filter(r.match, lst))
+            for i in newlist:
+                os.remove( config.neo_report_file_path + 'report file/' + i) 
+            if file_type=='assessment':
+                name_withpath = config.neo_report_file_path + 'report file/'+ 'Candidate_List_Assessment_'+batch_code+str(ts)+'.xlsx'
+            if file_type=='certification':
+                name_withpath = config.neo_report_file_path + 'report file/'+ 'Candidate_List_Certification_'+batch_code+str(ts)+'.xlsx'
+            writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
+            workbook  = writer.book
+
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+            #data = list(map(lambda x:list(x), data))
+            #print(len(data))
+            df = pd.DataFrame(data, columns=columns)
+            if file_type=='assessment':
+                df = df[['Candidateid','Candidatename','Enrollmentnumber','Fathername','Emailid','Candidateattemptnumber']]
+                columns = ['CandidateId','CandidateName','EnrollmentNumber','FatherName','EmailId','CandidateAttemptNumber']
+            if file_type=='certification':
+                df = df[['Candidateid','Candidatename','Enrollmentnumber','Fathername','Emailid']]
+                columns = ['CandidateId','CandidateName','EnrollmentNumber','FatherName','EmailId']
+            
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Candidates') 
+            worksheet = writer.sheets['Candidates']
+
+            for col_num, value in enumerate(columns):
+                worksheet.write(0, col_num, value, header_format)
+
+                            
+            writer.save()
+            return(name_withpath)
+            
+        except Exception as e:
+            print("Exc"+str(e))
+            return(str(e))
     def ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc):
         try:
             response=[]
@@ -4299,7 +4429,16 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
-                    sent_mail.certification_stage_change_mail(2,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code)
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail(2,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
                 if(pop==3):
                     user_mail_id_cc=''
                     user_mail_id_to=''
@@ -4322,7 +4461,16 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
-                    sent_mail.certification_stage_change_mail(3,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code)
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail(3,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
                 if(pop==4):
                     user_mail_id_cc=''
                     user_mail_id_to=''
@@ -4348,7 +4496,16 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
-                    sent_mail.certification_stage_change_mail(4,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code)
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail(4,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
                 if(pop==5):
                     user_mail_id_cc=''
                     user_mail_id_to=''
@@ -4374,7 +4531,16 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
-                    sent_mail.certification_stage_change_mail(5,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code)
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail(5,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
                 if(pop==6):
                     user_mail_id_cc=''
                     user_mail_id_to=''
@@ -4400,7 +4566,16 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
-                    sent_mail.certification_stage_change_mail(6,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code)
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail(6,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
                 
                 
                 out={"message":msg,"success":1}
@@ -5286,9 +5461,9 @@ SELECT					cb.name as candidate_name,
             return out
         
         try:
-            quer1 = '''
-            update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1 where candidate_id='{}';
-            '''
+            # quer1 = '''
+            # update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1 where candidate_id='{}';
+            # '''
             quer2='''
             update candidate_details.tbl_candidate_reg_enroll_details set whatsapp_number='{}',candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',present_address_line1='{}',permanaet_address_line1='{}',highest_qualification='{}',stream_specialization='{}',computer_knowledge='{}',technical_knowledge='{}',average_household_income='{}',bank_name='{}',account_number='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
             '''
@@ -5359,7 +5534,7 @@ SELECT					cb.name as candidate_name,
             '''
 
             que_test='''
-                select is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id where 1=1 and batch_code=trim('{}') and coalesce(sp.is_ojt_req,0)=1
+                select sp.is_ojt_req & c.is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id left join masters.tbl_courses as c on c.course_id=b.course_id where 1=1 and coalesce(sp.is_ojt_req,0)=1  and coalesce(c.is_ojt_req,0)=1 and b.batch_id like trim('{}')
                 '''
 
             url = candidate_xml_weburl + xml
@@ -5384,7 +5559,6 @@ SELECT					cb.name as candidate_name,
                     quer1 = '''
                     update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1, Cand_Password=null where candidate_id='{}';
                     '''
-
                 if 'mobilization_type' in data:
                     query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,data['mobilization_type'],1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
                 else:
@@ -5751,7 +5925,7 @@ SELECT					cb.name as candidate_name,
                     temp += '\n' + "({},'SAE',GETDATE(),{},1),".format(row[0],quer_user.format(row[79] if ProjectType == 1 else row[80],row[79] if ProjectType == 1 else row[80]))
 
                 que='''
-                select is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id where 1=1 and batch_code=trim('{}') and coalesce(sp.is_ojt_req,0)=1
+                select sp.is_ojt_req & c.is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id left join masters.tbl_courses as c on c.course_id=b.course_id where 1=1 and coalesce(sp.is_ojt_req,0)=1  and coalesce(c.is_ojt_req,0)=1 and batch_code like trim('{}')
                 '''
                 curs.execute(que.format(row[78] if ProjectType == 1 else row[79]))
                 is_obj = curs.fetchall()
@@ -5763,7 +5937,7 @@ SELECT					cb.name as candidate_name,
                     quer1 = '''
                     update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',secondary_contact_no='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1,Cand_Password=null where candidate_id='{}';
                     '''
-                
+                    
                 if ProjectType==2:
                     query += '\n' + quer8.format(row[82],row[83],row[84],row[85],row[86],row[87],row[88],row[89],row[90],row[91],row[92],row[93],row[94],row[95],row[96],row[97],row[98],row[0])
 
@@ -6051,9 +6225,10 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             # print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
-    def upload_assessment_certificate_number(df,user_id,assigned_user_id,batch_code):
+    def upload_assessment_certificate_number(df,user_id,assigned_user_id,batch_code,batch_id,enrollment_ids):
         try: 
             # print(str(df.to_json(orient='records')))
+            response = []
             con = pyodbc.connect(conn_str)
             cur = con.cursor()            
             json_str=df.to_json(orient='records')
@@ -6079,7 +6254,16 @@ SELECT					cb.name as candidate_name,
                 cur.execute(sql)
                 for row in cur:
                     assigned_by_email_id=row[0]
-                sent_mail.certification_stage_change_mail(1,assigned_to_email_id,assigned_to_name,assigned_by_email_id,batch_code)
+                #sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                #values = (batch_id,enrollment_ids)
+                #cur.execute(sql,(values))
+                #columns = [column[0].title() for column in cur.description]                   
+                #for row in cur:
+                    #for i in range(len(columns)):
+                        #h[columns[i]]=row[i]
+                    #response.append(h.copy())
+                #attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                sent_mail.certification_stage_change_mail(1,assigned_to_email_id,assigned_to_name,assigned_by_email_id,batch_code,'')
                 msg="Uploaded Successfully"
            
             else:
@@ -6456,13 +6640,15 @@ SELECT					cb.name as candidate_name,
         values = (sub_project_id,course_id,is_assigned,planned_batch_id)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
+        is_ojt=0
         for row in cur2:
-            for i in range(len(columns)):
+            for i in range(len(columns)-1):
                 h[columns[i]]=row[i]           
             response.append(h.copy())
+            is_ojt=row[-1]
         cur2.close()
         con.close()
-        return response
+        return {"PlannedBatches":response,"is_ojt":is_ojt}
     def Getcenterroom(center_id):
         response = []
         h={}
@@ -7104,4 +7290,21 @@ SELECT					cb.name as candidate_name,
         cnxn.close()
         return (data,columns)
 
-    
+    def GetSessionsForCourse(CourseId):
+        response=[]
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec [masters].[sp_get_session_for_course]  ?'
+        values = (CourseId,)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        out = {'Sessions':response}
+        cur.commit()
+        cur.close()
+        con.close()       
+        return out

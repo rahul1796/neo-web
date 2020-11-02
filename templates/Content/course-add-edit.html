@@ -28,11 +28,15 @@
                                    $('#Parent_Course').val(data.CourseDetail.Parent_Course_Id);
                                    $('#ddlCourse_Duration_day').val(data.CourseDetail.Course_Duration_Days);
                                    $('#ddlCourse_Duration_hour').val(data.CourseDetail.Course_Duration_Hour);
+                                   if (data.CourseDetail.Is_Ojt_Req!=-1){
+                                    $('input:radio[name=is_ojt_req][value="'+data.CourseDetail.Is_Ojt_Req+'"]').click();
+                                   }
+                                   $('#ddl_OJT_Duration_hour').val(data.CourseDetail.Ojt_Duration);
+
                                    if(data.CourseDetail.Is_Active){
                                         $('#isactive').prop('checked',true);}
                                     else{
                                         $('#isactive').prop('checked',false);}
-
                                }
                            } 
                         },
@@ -42,6 +46,16 @@
                     });
                 }
             });
+            function ojt_req_change(){
+                if($('input:radio[name=is_ojt_req]:checked').val()==1){
+                    $('#divOJTDuration').show();
+                    $('#ddl_OJT_Duration_hour').attr('required');
+                }
+                else{
+                    $('#divOJTDuration').hide();
+                    $('#ddl_OJT_Duration_hour').removeAttr('required');
+                }
+            }
             function LoadParentCourse(){
                 var URL=$('#hdn_web_url').val()+ "/GetAllParentCourse"
                 $.ajax({
@@ -144,7 +158,14 @@
             }
             
             function add_popup_message(){
-
+                var is_ojt_req = $('input:radio[name=is_ojt_req]:checked').val()
+                
+                if (is_ojt_req=='1'){
+                    if($('#ddl_OJT_Duration_hour').val()==''){
+                        alert('OJT Duration is mandatory');
+                        return
+                    }
+                }
                 var URL=$('#hdn_web_url').val()+ "/add_course_details";
                    $.ajax({
                        type:"POST",
@@ -158,6 +179,8 @@
                            "Parent_Course":$('#Parent_Course').val(),
                            "Course_Duration_day":$('#ddlCourse_Duration_day').val(),
                            "Course_Duration_hour":$('#ddlCourse_Duration_hour').val(),
+                           "is_ojt_req" : is_ojt_req,
+                           "OJT_Duration_hour" : $('#ddl_OJT_Duration_hour').val(),
                            "isactive" : $('#isactive').prop('checked')
                        },
                        success:function(data){
@@ -187,7 +210,6 @@
                         }
                     });
            }
-        
         </script>
                 <div class="container-fluid">
                     <form action="javascript:add_popup_message();">
@@ -304,6 +326,31 @@
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-lg-6">
+                                                <label>Is OJT required?*:</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <label class="radio-inline" for="OJT_yes">
+                                                    <input type="radio" id="OJT_yes" name="is_ojt_req" value="1" onchange="ojt_req_change()" required>  Yes        
+                                                </label>
+                                                <label class="radio-inline;" for="OJT_no" style="margin-left: 20px;">
+                                                    <input type="radio" id="OJT_no" name="is_ojt_req" value="0" onchange="ojt_req_change()">  No 
+                                                </label>
+                                            </div>   
+                                        </div>                                     
+                                    </div>
+                                    <div class="form-group" id="divOJTDuration" style="display: none;">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ddl_OJT_Duration_hour">OJT duration in hours*:</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <input type="number" class="form-control" name="ddl_OJT_Duration_hour" id="ddl_OJT_Duration_hour" required="" placeholder="OJT Duration Hour">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
                                                 <label>Is Active :</label>
                                             </div>
                                             <div class="col-lg-6">
@@ -314,8 +361,7 @@
                                                 </div>
                                             </div>   
                                         </div>                                     
-                                    </div>    
-    
+                                    </div>
                                     <div class="form-group mb-0">
                                         <button class="btn btn-primary" type="submit" ClientIdMode="static">Save</button>
                                     </div>

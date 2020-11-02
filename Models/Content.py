@@ -23,8 +23,8 @@ class Content:
         return center_list    
 
     
-    def add_course(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, isactive, user_id):
-        popupMessage = {"PopupMessage": Database.add_course_details(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, isactive, user_id)}
+    def add_course(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, is_ojt_req,OJT_Duration_hour, isactive, user_id):
+        popupMessage = {"PopupMessage": Database.add_course_details(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, is_ojt_req,OJT_Duration_hour, isactive, user_id)}
         return popupMessage
     def get_course(course_id):
         indi_course={"CourseDetail":Database.get_course_details(course_id)}
