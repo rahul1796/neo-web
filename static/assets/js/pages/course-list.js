@@ -48,6 +48,19 @@ function LoadTable(sectors, qps, status)
                 "data": 
                 function (row, type, val, meta) {
                     var varButtons = ""; 
+                    if(row.Session_Count==0)
+                        varButtons=row.Session_Count;
+                    else
+                    {
+                        varButtons += '<a onclick="Get_Sessions(\'' + row.Course_Id + '\',\'' + row.Course_Name + '\',0)"  style="color:blue;cursor:pointer" >' + row.Session_Count + '</a>';
+                    }                    
+                    return varButtons;
+                }
+            },
+            { //"orderable":false,
+                "data": 
+                function (row, type, val, meta) {
+                    var varButtons = ""; 
                     if(row.Project_Count==0)
                         varButtons=row.Project_Count;
                     else
@@ -479,3 +492,66 @@ function Get_Sub_Projects(CourseId,CourseName,IsCourseVariant){
      if($('#hdn_is_course_variant').val()=='1')
         $('#mdl_Cou_variants').modal('show');
  }
+
+ function Get_Sessions(CourseId,CourseName,IsCourseVariant){
+    $('#hdn_is_course_variant').val(IsCourseVariant);
+    if(IsCourseVariant==1) 
+        $('#mdl_Cou_variants').modal('hide');
+    $('#hdCourseNameSession').text('Sessions of '+ CourseName);
+    var URL=$('#hdn_web_url').val()+ "/GetSessionsForCourse?CourseId="+CourseId;
+    $.ajax({
+        type:"GET",
+        url:URL,
+        async:false,
+        overflow:true,        
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        success: function (data){
+            varHtml='';
+            $("#tbl_session").dataTable().fnDestroy();
+            $("#tbl_session tbody").empty();
+            if(!jQuery.isEmptyObject(data))
+            {   
+                if (data.Sessions != null){
+                    var count=data.Sessions.length;
+                    if( count> 0)
+                    {
+                        for(var i=0;i<count;i++)
+                        {
+                            varHtml+='<tr>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Sessions[i].Row +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Sessions[i].Session_Plan_Name +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Sessions[i].Module_Name +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Sessions[i].Session_Name +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Sessions[i].Session_Code +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Sessions[i].Session_Order +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Sessions[i].Duration +'</td>';
+                            varHtml+='</tr>';
+                        }                        
+                    }
+                    $("#tbl_session tbody").append(varHtml);
+                    $("#tbl_session").DataTable();
+                    $('#mdl_Cou_Sessions').modal('show');
+                }
+                else
+                {
+                    varHtml='<tr><td colspan="7" style="text-align:center;">No records found</td></tr>'
+                    $("#tbl_session tbody").append(varHtml);
+                    $('#mdl_Cou_Sessions').modal('show');
+                }
+            }
+            else
+            {
+                varHtml='<tr><td colspan="7" style="text-align:center;">No records found</td></tr>'
+                $("#tbl_session tbody").append(varHtml);
+                $('#mdl_Cou_Sessions').modal('show');
+            }   
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+} 

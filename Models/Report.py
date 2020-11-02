@@ -9,6 +9,8 @@ class Report:
         return Database.AllRegionsBasedOnUser(UserId,UserRoleId,UserRegionId)
     def AllAssessmentStages(UserId,UserRoleId):
         return Database.AllAssessmentStages(UserId,UserRoleId)
+    def AllCertificationStages(UserId,UserRoleId):
+        return Database.AllCertificationStages(UserId,UserRoleId)
     def GetAllCentersBasedOnRegion_User(UserId,UserRoleId,RegionId):
         return Database.GetAllCentersBasedOnRegion_User(UserId,UserRoleId,RegionId)
     def GetAllCoursesBasedOnCenter_User(UserId,UserRoleId,CenterId):
@@ -574,7 +576,7 @@ class Report:
             df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Course') 
 
             worksheet = writer.sheets['Userwise']
-            default_column = ['COO','TM','CM']
+            default_column = ['COO','TM','CM/PC']
             first_row = ['Enrolment', 'New Batch Start','Training Nos', 'Certification','Placement']
             second_row = ['Target', 'Actual','Target', 'Actual','Actual','Target', 'Actual','Target', 'Actual']
             third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%', 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
@@ -607,7 +609,7 @@ class Report:
                 worksheet.write(2, 3+col_num, value, header_format)
 
             worksheet = writer.sheets['User-Sub Project']
-            default_column = ['COO','TM','CM','Sub Project']
+            default_column = ['COO','TM','CM/PC','Sub Project']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
             col=4
@@ -633,7 +635,7 @@ class Report:
                 worksheet.write(2, 4+col_num, value, header_format)
 
             worksheet = writer.sheets['User-Course']            
-            default_column = ['COO','TM','CM','Course']
+            default_column = ['COO','TM','CM/PC','Course']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
             col=4
@@ -1103,6 +1105,8 @@ class Report:
             image_path = config.Base_URL + '/data/OJT/' + 'images/'
             audio_path = config.Base_URL + '/data/OJT/' + 'audio/'
             resp = Database.download_ojt_report(user_id, user_role_id, customer_ids, sub_project_ids, course_ids, batch_code, date_stage, BatchStartFromDate,BatchStartToDate,BatchEndFromDate,BatchEndToDate,OJTStartFromDate,OJTStartToDate,OJTEndFromDate,OJTEndToDate)
+            if len(resp[0])==0:
+                return({'Description':'No data available for the selected items', 'Status':False})
             df = pd.DataFrame(resp[0],columns=resp[1])
             df=df.fillna('')
             df['Stage1_Location'] = df.loc[:,'Stage1_Location'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("'+ x + '","View Location")')

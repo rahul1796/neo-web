@@ -50,7 +50,6 @@ def check_str(st):
     except:
         return False
 
-
 def check_mob_number(mob):
     try:
         mob = str(mob)
@@ -630,10 +629,11 @@ class add_course_details(Resource):
             Parent_Course=request.form['Parent_Course']
             Course_Duration_day=request.form['Course_Duration_day']
             Course_Duration_hour=request.form['Course_Duration_hour']
+            is_ojt_req = request.form['is_ojt_req']
+            OJT_Duration_hour = request.form['OJT_Duration_hour']
             isactive=request.form['isactive']
             user_id=g.user_id
-            
-            return Content.add_course(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, isactive, user_id)
+            return Content.add_course(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, is_ojt_req,OJT_Duration_hour,isactive, user_id)
             
 class GetCourseDetails(Resource):
     @staticmethod
@@ -1064,8 +1064,12 @@ class batch_list_certification(Resource):
             course_ids=''
             if 'course_ids' in request.form:
                 course_ids=request.form['course_ids']
+            assessment_stage_id=''
+            certification_stage_id=''
             if 'assessment_stage_id' in request.form:
                 assessment_stage_id=request.form['assessment_stage_id']
+            if 'certification_stage_id' in request.form:
+                certification_stage_id=request.form['certification_stage_id']
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
@@ -1075,7 +1079,7 @@ class batch_list_certification(Resource):
 
             #print(order_by_column_position)
             
-            return Batch.batch_list_certification(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, assessment_stage_id,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
+            return Batch.batch_list_certification(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, assessment_stage_id,certification_stage_id,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
 
 class add_batch_details(Resource):
     @staticmethod
@@ -3175,6 +3179,38 @@ class AllAssessmentStages(Resource):
 
 api.add_resource(AllAssessmentStages,'/AllAssessmentStages')
 
+class AllCertificationStages(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=[]
+            try:
+                UserId=request.args.get('user_id',0,type=int)
+                UserRoleId=request.args.get('user_role_id',0,type=int)
+                response=Report.AllCertificationStages(UserId,UserRoleId)
+                return {'CertificationStages':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(AllCertificationStages,'/AllCertificationStages')
+
+class AllCertificateNames(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=[]
+            try:
+                batch_id=request.args.get('batch_id',0,type=int)
+                stage=request.args.get('stage',0,type=int)
+                response=Assessments.AllCertificateNames(batch_id,stage)
+                return {'Certificates':response}
+            except Exception as e:
+                print(e)
+                return {'exception':str(e)}
+
+api.add_resource(AllCertificateNames,'/AllCertificateNames')
+
+
 class GetAllCentersBasedOnRegion_User(Resource):
     @staticmethod
     def get():
@@ -3944,9 +3980,9 @@ api.add_resource(GetAllBusBasedOn_User,'/GetAllBusBasedOn_User')
 @app.route("/Downloads/<path:path>")
 def get_download_file(path):
     """Download a file."""
-    print(path)
+    #print(path)
     filename = r"{}{}".format(config.DownloadPathLocal,path)
-    print(filename)
+    #print(filename)
     if not(os.path.exists(filename)):
         filename = r"{}No-image-found.jpg".format(config.DownloadPathWeb)
     return send_file(filename)
@@ -6923,6 +6959,17 @@ class upload_assessment_certificate_copy(Resource):
             batch_id=request.form['batch_id']    
             return Database.upload_assessment_certificate_copy(certi_name,user_id,enrolment_id,batch_id)
 api.add_resource(upload_assessment_certificate_copy,'/upload_assessment_certificate_copy')
+
+class upload_assessment_certificate_copy_bulk_upload(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            certi_name=request.form['file_name']
+            user_id=request.form['user_id']
+            enrolment_id=request.form['enrollment_id']
+            batch_id=request.form['batch_id']    
+            return Database.upload_assessment_certificate_copy_bulk_upload(certi_name,user_id,enrolment_id,batch_id)
+api.add_resource(upload_assessment_certificate_copy_bulk_upload,'/upload_assessment_certificate_copy_bulk_upload')
 class upload_cerification_cand_image(Resource):
     @staticmethod
     def post():
@@ -7058,6 +7105,8 @@ class upload_assessment_certificate_number(Resource):
                 user_id = int(session['user_id'])
                 assigned_user_id = int(request.form["assigned_user_id"])
                 batch_code = str(request.form["batch_code"])
+                batch_id = int(request.form["batch_id"])
+                enrollment_ids = str(request.form["enrollment_ids"])
                 file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
                 f.save(file_name)
     
@@ -7079,7 +7128,7 @@ class upload_assessment_certificate_number(Resource):
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename+'_' + 'errors.csv')
                     return {"Status":False, "message":"Upload Failed (fails to validate data)" }
                 else:
-                    out = Database.upload_assessment_certificate_number(df,user_id,assigned_user_id,batch_code)
+                    out = Database.upload_assessment_certificate_number(df,user_id,assigned_user_id,batch_code,batch_id,enrollment_ids)
                     return out
             except Exception as e:
                  return {"Status":False, "message":"Unable to upload data " + str(e)}         
@@ -7337,6 +7386,20 @@ def batch_status_report_page():
 def batch_status_report():
     if g.user:
         return render_template("home.html",values=g.User_detail_with_ids,html="batch_status_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/Planned_Actual_Batch_Report_page")
+def Planned_Actual_Batch_Report_page():
+    if g.user:
+        return render_template("Reports/planned_actual_batch_report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/Planned_Actual_Batch_Report")
+def Planned_Actual_Batch_Report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="Planned_Actual_Batch_Report_page")
     else:
         return render_template("login.html",error="Session Time Out!!")
 
@@ -8376,13 +8439,17 @@ class GetDocumentForExcel_S3_certiplate(Resource):
         if request.method=='GET':
             image_name=request.args.get('image_name','',type=str)
             image_path=request.args.get('image_path','',type=str)
+
             URL=config.neo_certiplate+image_name
+            path = config.aws_location +'neo_app/images/'+image_name
+            if image_path!='':
+                URL = config.neo_certiplate_def + 'doc' + '/'+ image_name
+                path = config.aws_location +'neo_app/'+ image_path + '/'+image_name
             r = requests.get(url = URL) 
             if r.status_code==200:
                 filename =  URL
             elif r.status_code==404:
-                #print(image_name)/
-                path = config.aws_location +'neo_app/images/'+image_name
+                #path = config.aws_location +'neo_app/images/'+image_name
                 URL = config.COL_URL + 's3_signed_url_for_file_updated'
                 PARAMS = {'file_path':path} 
                 r = requests.get(url = URL, params = PARAMS)
@@ -8394,6 +8461,7 @@ class GetDocumentForExcel_S3_certiplate(Resource):
                 filename=''
             if filename =='':
                 filename= config.Base_URL + '/data/No-image-found.jpg'
+            #return(filename)
             return redirect(filename)
 api.add_resource(GetDocumentForExcel_S3_certiplate,'/GetDocumentForExcel_S3_certiplate')
 
@@ -8676,6 +8744,20 @@ class download_ojt_report(Resource):
             except Exception as e:
                 print({"exceptione":str(e)})
 api.add_resource(download_ojt_report,'/download_ojt_report')
+
+
+class GetSessionsForCourse(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                CourseId=request.args.get('CourseId',0,type=int)
+                response = Master.GetSessionsForCourse(CourseId)
+                return response
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetSessionsForCourse,'/GetSessionsForCourse')
+
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)

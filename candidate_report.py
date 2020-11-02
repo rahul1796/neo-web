@@ -45,7 +45,7 @@ def create_report(candidate_id, user_id, user_role_id, status, customer, project
 
         #columns = [column[0].title() for column in curs.description]
         columns =['REGION','Product','CUSTOMERNAME','CONTRACT ID','CONTRACT NAME','Sub Project ID','Sub Project Name',
-                  'CENTER','Center ID','CENTERTYPE','Channel Partner','State/Cluster','Trainer Name','Trainer Email',
+                  'CENTER','Center ID','CENTERTYPE','Channel Partner','Center Location','State/Cluster','Trainer Name','Trainer Email',
                   'BATCHCODE','BATCHSTARTDATE','BATCHENDDATE','Actual BATCHSTARTDATE','Actual BATCHENDDATE','ENROLLMENTID',
                   'CANDIDATENAME','GENDER','CASTE','RELIGION','DATEOFBIRTH','GUARDIAN','MOBILE','Email ID','Candidate ADDRESS',
                   'Candidate STATE','Candidate DISTRICT','Candidate PINCODE','EDUCATION','VOTERID','AADHAARNUMBER',
@@ -54,7 +54,7 @@ def create_report(candidate_id, user_id, user_role_id, status, customer, project
                   'Assessment Confirmed Date','Assessment Actual Date','Awarding Body','Partner Name','Assessment Type','CERTIFICATION STATUS',
                   'GRADE','SCORE','Assessment ATTENDANCE','ASSESSMENT UPLOADED DATE','EMPLOYER NAME','DESIGNATION','JOINED STATUS',
                   'CTC','DOJ','OFFERLETTERUPLOADEDON','EMPLOYEMENT TYPE','Program Manager NAME','PROJECT STATUS','PRACTICE',
-                  'OJT Completed Date']
+                  'OJT Completed Date','Certificate Distributed Date']
 
         data = curs.fetchall()
         data = list(map(lambda x:list(x), data))
