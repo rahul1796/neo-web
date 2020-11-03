@@ -8758,6 +8758,15 @@ class GetSessionsForCourse(Resource):
                 return {'exception':str(e)}
 api.add_resource(GetSessionsForCourse,'/GetSessionsForCourse')
 
+class GetPartnerCenters(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            partner_id=request.args.get('partner_id',0,type=int)
+            response=Master.GetPartnerCenters(partner_id)
+            return response
+api.add_resource(GetPartnerCenters,'/GetPartnerCenters')
+
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)

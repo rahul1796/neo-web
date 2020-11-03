@@ -7308,3 +7308,21 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return out
+
+    def GetPartnerCenters(partner_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_partner_centers]  ?'
+        values = (partner_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+        
