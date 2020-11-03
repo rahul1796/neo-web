@@ -114,6 +114,18 @@
                 { "data": "Partner_Name" },
                 { "data": "Partner_Type_Name"},
                 { 
+                "data": 
+                function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Center_Count==0)
+                        varButtons=row.Center_Count;
+                    else{
+                        varButtons += '<a onclick="GetPartnerCenters(\'' + row.Partner_Id + '\',\'' + row.Partner_Name + '\')"  style="color:blue;cursor:pointer" >' + row.Center_Count + '</a>';
+                    }
+                    return varButtons;
+                }
+                },
+                { 
                     "data": function (row, type, val, meta) {
                         var varButtons = ""; /*
                         if(row.User_Count=="")
@@ -209,6 +221,77 @@
                     //$("#tbl_users tbody").append(varHtml);
                     $("#tbl_users").DataTable();
                     $('#mdl_Partner_Users').modal('show');
+                }   
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function GetPartnerCenters(PartnerId,PartnerName)
+    {
+        $('#hdn_modal_partner_id_center').val(PartnerId);
+        $('#headerCenters').text(PartnerName);
+        var URL=$('#hdn_web_url').val()+ "/GetPartnerCenters?partner_id="+PartnerId;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            overflow:true,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                varHtml='';
+                $("#tbl_centers").dataTable().fnDestroy();
+                $("#tbl_centers tbody").empty();
+                if(!jQuery.isEmptyObject(data))
+                {   if (data.PartnerCenters != null){
+                        count=data.PartnerCenters.length;
+                        if (count>0)
+                        {   varHtml='';
+                            //console.log(count);
+                            for(var i=0;i<count;i++)
+                            {
+                                td_open= '  <td style="text-align:center;">' ;
+                                td_close=   '</td>';       
+                                varHtml+='<tr>';
+                                varHtml+='  <td style="text-align:center;">'+ data.PartnerCenters[i].S_No +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.PartnerCenters[i].Center_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.PartnerCenters[i].Center_Code +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.PartnerCenters[i].Center_Type_Name +'</td>';                    
+                                varHtml+='  <td style="text-align:center;">'+ data.PartnerCenters[i].Region_Name +'</td>';  
+                                varHtml+='  <td style="text-align:center;">'+ data.PartnerCenters[i].State_Name +'</td>';                    
+                                varHtml+='  <td style="text-align:center;">'+ data.PartnerCenters[i].District_Name +'</td>';  
+                                varHtml+='</tr>';                            
+                            }
+                            $("#tbl_centers tbody").append(varHtml);
+                                $("#tbl_centers").DataTable({
+                                drawCallback: function(){
+                                    $('#tbl_centers_paginate ul.pagination').addClass("pagination-rounded");
+                                }
+                            });
+                                $('#mdl_Partner_Centers').modal('show');
+                                varHtml='';
+                        }
+                        else
+                        {
+                            //varHtml='<tr><td colspan="4" style="text-align:center;">No records found</td></tr>'                            
+                            //$("#tbl_users tbody").append(varHtml);
+                            $("#tbl_centers").DataTable();
+                            $('#mdl_Partner_Centers').modal('show');
+                        } 
+                        
+                    }
+                }
+                else
+                {
+                    //varHtml='<tr><td colspan="4" style="text-align:center;">No records found</td></tr>'
+                    //$("#tbl_users tbody").append(varHtml);
+                    $("#tbl_centers").DataTable();
+                    $('#mdl_Partner_Centers').modal('show');
                 }   
             },
             error:function(err)
@@ -349,6 +432,7 @@
                                     <th>Actions</th>
                                     <th>Partner Name</th>
                                     <th>Partner Type</th>
+                                    <th>Center</th>
                                     <th>POC</th>
                                     <th>Address</th>
                                     <th>Status</th>                                    
@@ -472,6 +556,42 @@
         </div>
     </div>
 </div><!--/.modal-->
+
+<div id="mdl_Partner_Centers" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title" ><span id="headerCenters"></span></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>                    
+            <div class="modal-body">
+                <input type="hidden" id="hdn_modal_partner_id_center" name="hdn_modal_partner_id_center" value="0">
+                <div >
+                    <table id="tbl_centers" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                        <thead>
+                            <tr style="background-color: #f5f6f8;">
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Name</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Code</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Type</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Region</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">State</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">District</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+            </div>
+        </div>
+    </div>
+</div><!--/.modal-->
+
 <!-- ============================================================== -->
 <!-- End Page content -->
 <!-- ============================================================== -->

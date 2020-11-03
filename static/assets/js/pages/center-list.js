@@ -277,6 +277,7 @@ function LoadTable()
             { "data": "Center_Code" },
             { "data": "Center_Name" },
             { "data": "Center_Type_Name"},
+            { "data": "Partner_Name"},
             { 
                 "data": 
                 function (row, type, val, meta) {
