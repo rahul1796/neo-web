@@ -1064,8 +1064,12 @@ class batch_list_certification(Resource):
             course_ids=''
             if 'course_ids' in request.form:
                 course_ids=request.form['course_ids']
+            assessment_stage_id=''
+            certification_stage_id=''
             if 'assessment_stage_id' in request.form:
                 assessment_stage_id=request.form['assessment_stage_id']
+            if 'certification_stage_id' in request.form:
+                certification_stage_id=request.form['certification_stage_id']
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
@@ -1075,7 +1079,7 @@ class batch_list_certification(Resource):
 
             #print(order_by_column_position)
             
-            return Batch.batch_list_certification(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, assessment_stage_id,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
+            return Batch.batch_list_certification(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, assessment_stage_id,certification_stage_id,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
 
 class add_batch_details(Resource):
     @staticmethod
@@ -3174,6 +3178,38 @@ class AllAssessmentStages(Resource):
                 return {'exception':str(e)}
 
 api.add_resource(AllAssessmentStages,'/AllAssessmentStages')
+
+class AllCertificationStages(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=[]
+            try:
+                UserId=request.args.get('user_id',0,type=int)
+                UserRoleId=request.args.get('user_role_id',0,type=int)
+                response=Report.AllCertificationStages(UserId,UserRoleId)
+                return {'CertificationStages':response}
+            except Exception as e:
+                return {'exception':str(e)}
+
+api.add_resource(AllCertificationStages,'/AllCertificationStages')
+
+class AllCertificateNames(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=[]
+            try:
+                batch_id=request.args.get('batch_id',0,type=int)
+                stage=request.args.get('stage',0,type=int)
+                response=Assessments.AllCertificateNames(batch_id,stage)
+                return {'Certificates':response}
+            except Exception as e:
+                print(e)
+                return {'exception':str(e)}
+
+api.add_resource(AllCertificateNames,'/AllCertificateNames')
+
 
 class GetAllCentersBasedOnRegion_User(Resource):
     @staticmethod
@@ -6923,6 +6959,17 @@ class upload_assessment_certificate_copy(Resource):
             batch_id=request.form['batch_id']    
             return Database.upload_assessment_certificate_copy(certi_name,user_id,enrolment_id,batch_id)
 api.add_resource(upload_assessment_certificate_copy,'/upload_assessment_certificate_copy')
+
+class upload_assessment_certificate_copy_bulk_upload(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            certi_name=request.form['file_name']
+            user_id=request.form['user_id']
+            enrolment_id=request.form['enrollment_id']
+            batch_id=request.form['batch_id']    
+            return Database.upload_assessment_certificate_copy_bulk_upload(certi_name,user_id,enrolment_id,batch_id)
+api.add_resource(upload_assessment_certificate_copy_bulk_upload,'/upload_assessment_certificate_copy_bulk_upload')
 class upload_cerification_cand_image(Resource):
     @staticmethod
     def post():
@@ -7058,6 +7105,8 @@ class upload_assessment_certificate_number(Resource):
                 user_id = int(session['user_id'])
                 assigned_user_id = int(request.form["assigned_user_id"])
                 batch_code = str(request.form["batch_code"])
+                batch_id = int(request.form["batch_id"])
+                enrollment_ids = str(request.form["enrollment_ids"])
                 file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
                 f.save(file_name)
     
@@ -7079,7 +7128,7 @@ class upload_assessment_certificate_number(Resource):
                     pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename+'_' + 'errors.csv')
                     return {"Status":False, "message":"Upload Failed (fails to validate data)" }
                 else:
-                    out = Database.upload_assessment_certificate_number(df,user_id,assigned_user_id,batch_code)
+                    out = Database.upload_assessment_certificate_number(df,user_id,assigned_user_id,batch_code,batch_id,enrollment_ids)
                     return out
             except Exception as e:
                  return {"Status":False, "message":"Unable to upload data " + str(e)}         
@@ -7337,6 +7386,20 @@ def batch_status_report_page():
 def batch_status_report():
     if g.user:
         return render_template("home.html",values=g.User_detail_with_ids,html="batch_status_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/Planned_Actual_Batch_Report_page")
+def Planned_Actual_Batch_Report_page():
+    if g.user:
+        return render_template("Reports/planned_actual_batch_report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/Planned_Actual_Batch_Report")
+def Planned_Actual_Batch_Report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="Planned_Actual_Batch_Report_page")
     else:
         return render_template("login.html",error="Session Time Out!!")
 

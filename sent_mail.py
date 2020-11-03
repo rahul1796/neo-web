@@ -1,7 +1,11 @@
 import smtplib
 import json 
+from pathlib import Path
 from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
+from email.utils import COMMASPACE, formatdate
+from email import encoders
 from Database import *
 
 def forget_password(email, password, name):
@@ -29,10 +33,11 @@ def forget_password(email, password, name):
         server.quit()
 
         return {'status':True,'description':'Email sent'}
-    except:
+    except Exception as e:
+        print(e)
         return {'status':False,'description':'Unable to sent email'}
 
-def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch_Code):
+def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch_Code,files):
     #print(NewStageId,emailTo,emailToName,EmailCC,Batch_Code)
     try:
         server = smtplib.SMTP('smtp.office365.com','587')
@@ -59,20 +64,28 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
             stage_name='Distributed'
         msg['From'] = "do-not-reply@labournet.in"
         msg['To'] = emailTo
-        msg['Cc'] = EmailCC
+        msg['Cc'] = EmailCC + ',neo.helpdesk@labournet.in'
         msg['Subject'] = "LN NEO - "+str(Batch_Code)+" Certificates " + str(stage_name)
         html_msg= config.html_email_msg_certification_stage_change
         html_msg = html_msg.format(emailToName,Batch_Code,stage_name,EmailCC)
         msg.attach(MIMEText(html_msg, 'html'))
-        #print(msg['From'], [msg['To']] + EmailCC.split(",") , msg.as_string())
-        res = server.sendmail(msg['From'], [msg['To']] + EmailCC.split(",") , msg.as_string())
+        if files != '':
+            for path in [files]:
+                part = MIMEText('application', "octet-stream")
+                with open(path, 'rb') as file:
+                    part.set_payload(file.read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition',
+                                'attachment; filename="{}"'.format(Path(path).name))
+                msg.attach(part)
+        res = server.sendmail(msg['From'], [msg['To']] + EmailCC.split(",") + ['neo.helpdesk@labournet.in'] , msg.as_string())
         server.quit()
 
         return {'status':True,'description':'Email sent'}
-    except:
+    except Exception as e:
+        print(e)
         return {'status':False,'description':'Unable to sent email'}
-
-def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails):
+def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails,files):
     try:
         server = smtplib.SMTP('smtp.office365.com','587')
         #server = smtplib.SMTP(host='smtp.office365.com')
@@ -95,10 +108,18 @@ def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date,center_name,cou
         html_msg = html_msg.format('Navriti Assessment Team',RequestId,SDMSBatchId,center_name,course_name,customer_name,requested_date)
 
         msg.attach(MIMEText(html_msg, 'html'))
-        #print(msg['From'], [msg['To']] + ccList , msg.as_string())
+        for path in [files]:
+            part = MIMEText('application', "octet-stream")
+            with open(path, 'rb') as file:
+                part.set_payload(file.read())
+            encoders.encode_base64(part)
+            part.add_header('Content-Disposition',
+                            'attachment; filename="{}"'.format(Path(path).name))
+            msg.attach(part)
         res = server.sendmail(msg['From'], [msg['To']] + ccList , msg.as_string())
         server.quit()
 
         return {'status':True,'description':'Email sent'}
-    except:
-        return {'status':False,'description':'Unable to sent email'}
+    except Exception as e:
+        print(e)
+        return {'status':False,'description':e}
