@@ -1075,9 +1075,92 @@ function DownloadBatchTargetPlanTemplate()
     window.location='/Bulk Upload/'+'BatchTargetPlanTemplate.xlsx';
 }
 
-function UploadFileData()
-{
-    
+function UploadFileDataemp(){
+    if ($('#myFileemp').get(0).files.length === 0) {
+        alert("No files selected.");
+    }
+    else if ($('#Month_Year').val()==''){
+        alert('No date selected.');
+    }
+    else
+    {
+        var fileExtension = ['xlsx']
+        if ($.inArray($('#myFileemp').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            alert("Formats allowed are : "+fileExtension.join(', '));
+            return false;
+        }
+        else
+        {          
+            $("#imgSpinner2").show();
+            var files=document.getElementById("myFileemp").files;
+            var file=files[0];
+            var status;
+            status = UploadFileData(file);
+            if(status==0){
+                alert('not able to upload to s3');
+                return;
+            }
+        }
+        
+        var form_data = new FormData($('#formUpload_emp')[0]);
+        form_data.append('user_id',$('#hdn_home_user_id').val());
+        form_data.append('user_role_id',$('#hdn_home_user_role_id').val());
+        $.ajax({
+            type: 'POST',
+            url: $('#hdn_web_url').val()+ "/upload_employee_target_plan",
+            enctype: 'multipart/form-data',
+            data: form_data,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function(data) 
+            {
+                var message="",title="",icon="";
+                if(data.Status){
+                    message=data.message;
+                    title="Success";
+                    icon="success";
+                }
+                else{
+                    if (data.message=="Validation_Error"){
+                        message=data.error;
+                        title="Error";
+                        icon="error";
+                    }
+                    else {
+                        message=data.message;
+                        title="Error";
+                        icon="error";
+                    }
+                }
+                var span = document.createElement("span");
+                span.innerHTML = message;
+                swal({   
+                            title:title,
+                            content: span,
+                            //text:message,
+                            icon:icon,
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                window.location.href = '/sub_project';
+                            }); 
+            },
+            error:function(err)
+            {
+                swal({   
+                    title:"Error",
+                    text:'Error! Please try again',
+                    icon:"error",
+                    confirmButtonClass:"btn btn-confirm mt-2"
+                    }).then(function(){
+                        window.location.href = '/sub_project';
+                });
+            }
+        });        
+    }
+}
+
+function UploadFileDataBatch(){
     if ($('#myFile').get(0).files.length === 0) {
         console.log("No files selected.");
     }
@@ -1090,35 +1173,96 @@ function UploadFileData()
         }
         else
         {          
-//            UploadFileToProcess();
-//        }
-//    }
-//}
             $("#imgSpinner1").show();
             var files=document.getElementById("myFile").files;
             var file=files[0];
-
-            var file_path=$('#hdn_AWS_S3_path').val()+"bulk_upload/project_planner/" + $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + file.name; 
-            var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
-            
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET",api_url );
-                xhr.onreadystatechange = function(){
-                    if(xhr.readyState === 4){
-                    if(xhr.status === 200){
-                        var response = JSON.parse(xhr.responseText);
-                        //console.log(response);
-                        uploadFileToS3(file, response.data, response.url);
-                    }
-                    else{
-                        alert("Could not get signed URL.");
-                    }
-                    }
-                };
-                xhr.send();
-            
+            var status;
+            status = UploadFileData(file);
+            if(status==0){
+                alert('not able to upload to s3');
+                return;
+            }
         }
+        
+        var form_data = new FormData($('#formUpload')[0]);
+        form_data.append('user_id',$('#hdn_home_user_id').val());
+        form_data.append('user_role_id',$('#hdn_home_user_role_id').val());
+        $.ajax({
+            type: 'POST',
+            url: $('#hdn_web_url').val()+ "/upload_batch_target_plan",
+            enctype: 'multipart/form-data',
+            data: form_data,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function(data) 
+            {
+                var message="",title="",icon="";
+                if(data.Status){
+                    message=data.message;
+                    title="Success";
+                    icon="success";
+                }
+                else{
+                    if (data.message=="Validation_Error"){
+                        message=data.error;
+                        title="Error";
+                        icon="error";
+                    }
+                    else {
+                        message=data.message;
+                        title="Error";
+                        icon="error";
+                    }
+                }
+                var span = document.createElement("span");
+                span.innerHTML = message;
+                swal({   
+                            title:title,
+                            content: span,
+                            //text:message,
+                            icon:icon,
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                window.location.href = '/sub_project';
+                            }); 
+            },
+            error:function(err)
+            {
+                swal({   
+                    title:"Error",
+                    text:'Error! Please try again',
+                    icon:"error",
+                    confirmButtonClass:"btn btn-confirm mt-2"
+                    }).then(function(){
+                        window.location.href = '/sub_project';
+                });
+            }
+        });        
     }
+}
+
+function UploadFileData(file)
+{
+    var file_path=$('#hdn_AWS_S3_path').val()+"bulk_upload/project_planner/" + $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + file.name; 
+    var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET",api_url );
+    xhr.onreadystatechange = function(){
+    if(xhr.readyState === 4){
+        var status;
+        if(xhr.status === 200){
+            var response = JSON.parse(xhr.responseText);
+            status = uploadFileToS3(file, response.data, response.url);
+        }
+        else{
+            status =0;
+            alert("Could not get signed URL.");
+        }
+        return(status);
+        }
+    };
+    xhr.send();
 }
 
 function uploadFileToS3(file, s3Data, url){
@@ -1133,80 +1277,19 @@ function uploadFileToS3(file, s3Data, url){
 
     xhr.onreadystatechange = function() {
         if(xhr.readyState === 4){
+        var status;
         if(xhr.status === 200 || xhr.status === 204){
+            status=1;
             var response = xhr;
-            //console.log(response);
-            UploadFileToProcess();
         }
         else{
+            status=0;
             alert("Could not upload file to s3.");
         }
+        return(status);
     }
     };
     xhr.send(postData);
-}
-
-function UploadFileToProcess()
-{
-    //console.log()
-    var form_data = new FormData($('#formUpload')[0]);
-    form_data.append('user_id',$('#hdn_home_user_id').val());
-    form_data.append('user_role_id',$('#hdn_home_user_role_id').val());
-    $.ajax({
-        type: 'POST',
-        url: $('#hdn_web_url').val()+ "/upload_batch_target_plan",
-        enctype: 'multipart/form-data',
-        data: form_data,
-        contentType: false,
-        cache: false,
-        processData: false,
-        success: function(data) 
-        {
-            var message="",title="",icon="";
-            if(data.Status){
-                message=data.message;
-                title="Success";
-                icon="success";
-            }
-            else{
-                if (data.message=="Validation_Error"){
-                    message=data.error;
-                    title="Error";
-                    icon="error";
-                }
-                else {
-                    message=data.message;
-                    title="Error";
-                    icon="error";
-                }
-            }
-            var span = document.createElement("span");
-            span.innerHTML = message;
-            swal({   
-                        title:title,
-                        content: span,
-                        //text:message,
-                        icon:icon,
-                        confirmButtonClass:"btn btn-confirm mt-2"
-                        }).then(function(){
-                            window.location.href = '/sub_project';
-                        }); 
-        
-                
-        },
-        error:function(err)
-        {
-            swal({   
-                title:"Error",
-                text:'Error! Please try again',
-                icon:"error",
-                confirmButtonClass:"btn btn-confirm mt-2"
-                }).then(function(){
-                    window.location.href = '/sub_project';
-                }); 
-            
-        }
-    });
 }
 
 function GetPlannedBatches(SubProjectId,SubProjectName)

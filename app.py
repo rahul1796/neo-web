@@ -5522,10 +5522,10 @@ class otp_send(Resource):
                     param_str=urllib.parse.urlencode(param)
                     short_url='{}/wv?'.format(config.Base_URL)
                     short_url=short_url+param_str
-                    #sms_msg='Hi {},\n\nThank you for registering with LabourNet.\nYour OTP is {}.\n\nThanks,\nNEO Teams.'.format(cand_name, otp)
+                    #sms_msg=   'Hi {},\n\nThank you for getting in touch with Labournet.\nYour OTP is {}.\n\nThanks,\nNEO Teams.'.format(cand_name, otp)
                     #sms_msg='Hi {},\n\nYour OTP is {}.\nOR\nClick here to verify {}\n\nThanks,\nNEO Team.'.format(name, otp,short_url)
                     if is_otp==1:
-                        sms_msg='Hi {},\n\nThank you for getting in touch with Labournet.\nYour OTP for mobile number verification is {}.\n\nThanks,\nNEO Teams.'.format(name, otp)
+                        sms_msg='Hi {},\n\nThank you for getting in touch with Labournet.\nYour Registration Number is {}.\n\nThanks,\nNEO Teams.'.format(name, otp)
                     elif is_otp==0:
                         sms_msg='Hi {},\n\nClick to verify your mobile number with Labournet.{}.\n\nNEO Team.'.format(name,short_url)
                     #print(sms_msg)
@@ -5538,7 +5538,6 @@ class otp_send(Resource):
                     else:
                         res = {'success': False, 'description': data['errors'][0]['message']}
                         return jsonify(res)
-
             else:
                 res = {'success': False, 'description': "client name and password not matching"}
                 return jsonify(res)
@@ -5546,7 +5545,7 @@ class otp_send(Resource):
             res = {'success': False, 'description': "Method is wrong"}
             return jsonify(res)
 
-#Base URL + "/otp_send" api will provide all the unzynched QP data as response
+#Base URL + "/otp_send" api will do mobile number verificaiton in web and app.
 api.add_resource(otp_send, '/otp_send')
 
 class otp_verification(Resource):
@@ -5687,7 +5686,6 @@ class get_batch_list_updated(Resource):
             role_id = int(request.args['role_id'])
             mobilization_type=request.args.get('mobilization_type',1,type=int)
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
-
                 out = Database.get_batch_list_updated(user_id,candidate_id,role_id,mobilization_type)
                 return jsonify(out)
                 
@@ -8779,6 +8777,60 @@ class download_emp_target_template(Resource):
                 print({"exceptione":str(e)})
 api.add_resource(download_emp_target_template,'/download_emp_target_template')
 
+class upload_employee_target_plan(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                #print('hi')
+                f = request.files['myFileemp']
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                Month_Year = request.form["Month_Year"]
+                file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
+                f.save(file_name)
+                df= pd.read_excel(file_name,sheet_name='Employee Target') #,dtype={'E Planned Start Date': str, 'E Planned End Date': str,'C Planned Date': str,'P Planned Start Date': str, 'P Planned End Date': str}
+                df = df.fillna('')
+
+                schema = Schema([
+                        Column('Planned Batch Code'),
+                        Column('Sub Project Code*',str_validation+null_validation),
+                        Column('Sub Project Name*',str_validation+null_validation),
+                        Column('Course Code*',str_validation+null_validation),
+                        Column('Course Name*',str_validation+null_validation),
+                        Column('E Planned Start Date'),
+                        Column('E Planned End Date'),
+                        Column('E Target'),
+                        Column('C Planned Date'),
+                        Column('C Target'),
+                        Column('P Planned Start Date'),
+                        Column('P Planned End Date'),
+                        Column('P Target')
+                        ])
+
+                errors = schema.validate(df)
+                errors_index_rows = [e.row for e in errors]
+                len_error = len(errors_index_rows)
+                os.remove(file_name)
+                if len_error>0:
+                    file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                    pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                    return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                else:
+                    df.columns = df.columns.str.replace(" ", "_")
+                    df.columns = df.columns.str.replace("*", "")
+                    df.insert(0, 'row_index', range(len(df)))
+
+                    out = Database.upload_batch_target_plan(df,user_id,user_role_id)
+                    if out['Status']==False:
+                        file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                        pd.DataFrame(out['data']).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                        return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                    else:
+                        return out   
+            except Exception as e:
+                 return {"Status":False, "message":"Unable to upload " + str(e)}            
+api.add_resource(upload_employee_target_plan,'/upload_employee_target_plan')
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
