@@ -1057,11 +1057,18 @@ function GetCenters(SubProjectId,SubProjectName)
 }
 function UploadBatchTargetMdl()
 {
-    
     $('#HduploadFile').text('Upload Batch Target Plan.');
     $('#imgSpinner1').hide();
     $('#mdl_upload_batch_target_plan').modal('show');
     $('#myFile').val('');
+}
+function uploadEmployeetarget()
+{
+    $('#HduploadFileEmp').text('Upload Employee Target Plan.');
+    $('#imgSpinner2').hide();
+    $('#mdl_upload_employee_target_plan').modal('show');
+    
+    $('#myFileemp').val('');
 }
 function DownloadBatchTargetPlanTemplate()
 {
@@ -1417,9 +1424,7 @@ function DownloadTableBasedOnFilter(){
                         //$("#imgSpinner").hide();
                     }
                 });
-        
     }
-    //$("#imgSpinner").hide();
 }
 
 function ForceDownload(varUrl, varFileName)
@@ -1433,3 +1438,77 @@ function ForceDownload(varUrl, varFileName)
             link.click();
             document.body.removeChild(link);
         }
+
+
+function DownloadEmployeeTargetPlanTemplate(){
+    var date = $('#Month_Year').val()+'-01';
+    //console.log(date);
+    if(date=='-1'){
+        alert('please search date');
+        return 
+    }
+    else{
+        $("#imgSpinner2").show();
+        var URL=$('#hdn_web_url').val()+ "/download_emp_target_template"
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: URL,
+            data: {
+                'user_id':$('#hdn_home_user_id').val(),
+                'user_role_id':$('#hdn_home_user_role_id').val(),
+                'date':date
+            },
+            success: function(resp) 
+            {
+                //console.log(resp)
+                if (resp.Status){
+                    var varAnchor = document.getElementById('lnkDownload');
+                    varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
+                    $("#imgSpinner2").hide();
+                    try 
+                        { 
+                            //in firefox
+                            varAnchor.click();
+                            return;
+                        } catch(ex) {}
+                        
+                        try 
+                        { 
+                            // in chrome
+                            if(document.createEvent) 
+                            {
+                                var e = document.createEvent('MouseEvents');
+                                e.initEvent( 'click', true, true );
+                                varAnchor.dispatchEvent(e);
+                                return;
+                            }
+                        } catch(ex) {}
+                        
+                        try 
+                        { 
+                            // in IE
+                            if(document.createEventObject) 
+                            {
+                                    var evObj = document.createEventObject();
+                                    varAnchor.fireEvent("onclick", evObj);
+                                    return;
+                            }
+                        } catch(ex) {}
+                }
+                else{
+                    alert(resp.Description)
+                    $("#imgSpinner2").hide();
+                    
+                }
+            },
+            error:function()
+            {
+                //console.log(resp)
+                $("#imgSpinner2").hide();
+            }
+        });
+    }
+    
+}
+

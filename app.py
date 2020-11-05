@@ -383,33 +383,6 @@ class get_all_Cluster_Based_On_Region(Resource):
             region_id=request.form['region_id']
             return  Master.get_all_Cluster_Based_On_Region(region_id)
 
-class download_centers_list(Resource):
-    DownloadPath=config.DownloadPathLocal
-    report_name = "Center_List_"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-    @staticmethod
-    def post():
-        if request.method=='POST':
-            try:
-                center_type_ids = request.form['center_type_ids']
-                bu_ids = request.form['bu_ids']
-                status = request.form['status']
-                r=re.compile("Center_List_.*")
-                lst=os.listdir(download_centers_list.DownloadPath)
-                newlist = list(filter(r.match, lst))
-                for i in newlist:
-                    os.remove( download_centers_list.DownloadPath + i)
-                path = '{}{}.xlsx'.format(download_centers_list.DownloadPath,download_centers_list.report_name)
-                res=center_api.DownloadCenterList.download_centers_list(center_type_ids,bu_ids,status,path)
-                print(download_centers_list.report_name)
-                print(path)
-                ImagePath=config.DownloadPathWeb
-                return {'FileName':download_centers_list.report_name,'FilePath':ImagePath}
-            except Exception as e:
-                print(str(e))
-                return {"exceptione":str(e)}
-
-api.add_resource(download_centers_list,'/download_centers_list')
-
 api.add_resource(get_all_BU,'/Get_all_BU')
 api.add_resource(Get_all_Sponser,'/Get_all_Sponser')
 api.add_resource(get_all_Cluster_Based_On_Region,'/Get_all_Cluster_Based_On_Region')
@@ -8766,6 +8739,45 @@ class GetPartnerCenters(Resource):
             response=Master.GetPartnerCenters(partner_id)
             return response
 api.add_resource(GetPartnerCenters,'/GetPartnerCenters')
+
+class download_centers_list(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            center_id = request.form['center_id']
+            user_id = request.form['user_id']
+            user_role_id = request.form['user_role_id'] 
+            user_region_id = request.form['user_region_id'] 
+            center_type_ids = request.form['center_type_ids']
+            bu_ids = request.form['bu_ids']
+            status = request.form['status']
+            regions=request.form['regions']
+            clusters=request.form['clusters']
+            courses=request.form['courses']
+            
+            file_name='Center_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            resp = Report.download_centers_list(file_name, center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses)
+            
+            return resp
+api.add_resource(download_centers_list,'/download_centers_list')
+
+class download_emp_target_template(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
+                date = request.form["date"]
+            
+                file_name='Employee_target_template_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            
+                resp = Report.download_emp_target_template(file_name, user_id, user_role_id, date)
+                return resp
+                
+            except Exception as e:
+                print({"exceptione":str(e)})
+api.add_resource(download_emp_target_template,'/download_emp_target_template')
 
 
 if __name__ == '__main__':
