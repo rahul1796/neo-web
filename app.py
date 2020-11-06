@@ -383,33 +383,6 @@ class get_all_Cluster_Based_On_Region(Resource):
             region_id=request.form['region_id']
             return  Master.get_all_Cluster_Based_On_Region(region_id)
 
-class download_centers_list(Resource):
-    DownloadPath=config.DownloadPathLocal
-    report_name = "Center_List_"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-    @staticmethod
-    def post():
-        if request.method=='POST':
-            try:
-                center_type_ids = request.form['center_type_ids']
-                bu_ids = request.form['bu_ids']
-                status = request.form['status']
-                r=re.compile("Center_List_.*")
-                lst=os.listdir(download_centers_list.DownloadPath)
-                newlist = list(filter(r.match, lst))
-                for i in newlist:
-                    os.remove( download_centers_list.DownloadPath + i)
-                path = '{}{}.xlsx'.format(download_centers_list.DownloadPath,download_centers_list.report_name)
-                res=center_api.DownloadCenterList.download_centers_list(center_type_ids,bu_ids,status,path)
-                print(download_centers_list.report_name)
-                print(path)
-                ImagePath=config.DownloadPathWeb
-                return {'FileName':download_centers_list.report_name,'FilePath':ImagePath}
-            except Exception as e:
-                print(str(e))
-                return {"exceptione":str(e)}
-
-api.add_resource(download_centers_list,'/download_centers_list')
-
 api.add_resource(get_all_BU,'/Get_all_BU')
 api.add_resource(Get_all_Sponser,'/Get_all_Sponser')
 api.add_resource(get_all_Cluster_Based_On_Region,'/Get_all_Cluster_Based_On_Region')
@@ -5549,10 +5522,10 @@ class otp_send(Resource):
                     param_str=urllib.parse.urlencode(param)
                     short_url='{}/wv?'.format(config.Base_URL)
                     short_url=short_url+param_str
-                    #sms_msg='Hi {},\n\nThank you for registering with LabourNet.\nYour OTP is {}.\n\nThanks,\nNEO Teams.'.format(cand_name, otp)
+                    #sms_msg=   'Hi {},\n\nThank you for getting in touch with Labournet.\nYour OTP is {}.\n\nThanks,\nNEO Teams.'.format(cand_name, otp)
                     #sms_msg='Hi {},\n\nYour OTP is {}.\nOR\nClick here to verify {}\n\nThanks,\nNEO Team.'.format(name, otp,short_url)
                     if is_otp==1:
-                        sms_msg='Hi {},\n\nThank you for getting in touch with Labournet.\nYour OTP for mobile number verification is {}.\n\nThanks,\nNEO Teams.'.format(name, otp)
+                        sms_msg='Hi {},\n\nThank you for getting in touch with Labournet.\nYour Registration Number is {}.\n\nThanks,\nNEO Teams.'.format(name, otp)
                     elif is_otp==0:
                         sms_msg='Hi {},\n\nClick to verify your mobile number with Labournet.{}.\n\nNEO Team.'.format(name,short_url)
                     #print(sms_msg)
@@ -5565,7 +5538,6 @@ class otp_send(Resource):
                     else:
                         res = {'success': False, 'description': data['errors'][0]['message']}
                         return jsonify(res)
-
             else:
                 res = {'success': False, 'description': "client name and password not matching"}
                 return jsonify(res)
@@ -5573,7 +5545,7 @@ class otp_send(Resource):
             res = {'success': False, 'description': "Method is wrong"}
             return jsonify(res)
 
-#Base URL + "/otp_send" api will provide all the unzynched QP data as response
+#Base URL + "/otp_send" api will do mobile number verificaiton in web and app.
 api.add_resource(otp_send, '/otp_send')
 
 class otp_verification(Resource):
@@ -5714,7 +5686,6 @@ class get_batch_list_updated(Resource):
             role_id = int(request.args['role_id'])
             mobilization_type=request.args.get('mobilization_type',1,type=int)
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
-
                 out = Database.get_batch_list_updated(user_id,candidate_id,role_id,mobilization_type)
                 return jsonify(out)
                 
@@ -8767,6 +8738,108 @@ class GetPartnerCenters(Resource):
             return response
 api.add_resource(GetPartnerCenters,'/GetPartnerCenters')
 
+class download_centers_list(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            center_id = request.form['center_id']
+            user_id = request.form['user_id']
+            user_role_id = request.form['user_role_id'] 
+            user_region_id = request.form['user_region_id'] 
+            center_type_ids = request.form['center_type_ids']
+            bu_ids = request.form['bu_ids']
+            status = request.form['status']
+            regions=request.form['regions']
+            clusters=request.form['clusters']
+            courses=request.form['courses']
+            
+            file_name='Center_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            resp = Report.download_centers_list(file_name, center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses)
+            
+            return resp
+api.add_resource(download_centers_list,'/download_centers_list')
+
+class download_emp_target_template(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
+                date = request.form["date"]
+            
+                file_name='Employee_target_template_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            
+                resp = Report.download_emp_target_template(file_name, user_id, user_role_id, date)
+                return resp
+                
+            except Exception as e:
+                print({"exceptione":str(e)})
+api.add_resource(download_emp_target_template,'/download_emp_target_template')
+
+class upload_employee_target_plan(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                #print('hi')
+                f = request.files['myFileemp']
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                Month_Year = request.form["Month_Year"]
+                file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
+                f.save(file_name)
+                df= pd.read_excel(file_name,sheet_name='Employee Target') #,dtype={'E Planned Start Date': str, 'E Planned End Date': str,'C Planned Date': str,'P Planned Start Date': str, 'P Planned End Date': str}
+                df = df.fillna('')
+
+                schema = Schema([
+                        Column('Planned Batch Code'),
+                        Column('Sub Project Code*',str_validation+null_validation),
+                        Column('Sub Project Name*',str_validation+null_validation),
+                        Column('Course Code*',str_validation+null_validation),
+                        Column('Course Name*',str_validation+null_validation),
+                        Column('E Planned Start Date'),
+                        Column('E Planned End Date'),
+                        Column('E Target'),
+                        Column('C Planned Date'),
+                        Column('C Target'),
+                        Column('P Planned Start Date'),
+                        Column('P Planned End Date'),
+                        Column('P Target')
+                        ])
+
+                errors = schema.validate(df)
+                errors_index_rows = [e.row for e in errors]
+                len_error = len(errors_index_rows)
+                os.remove(file_name)
+                if len_error>0:
+                    file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                    pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                    return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                else:
+                    df.columns = df.columns.str.replace(" ", "_")
+                    df.columns = df.columns.str.replace("*", "")
+                    df.columns = df.columns.str.replace("(", "_")
+                    df.columns = df.columns.str.replace(")", "")
+                    df.columns = df.columns.str.replace("&", "")
+                    df.insert(0, 'row_index', range(len(df)))
+
+                    col = ['row_index', 'Employee_Code(NE)', 'Employee_name(NE)', 'NEO_Role(NE)', 'Sub_Project_Code(NE)', 'Month_&_Year', 'Week_1_Registration', 'Week_2_Registration', 'Week_3_Registration',
+                            'Week_4_Registration', 'Week_1_Enrollment', 'Week_2_Enrollment', 'Week_3_Enrollment', 'Week_4_Enrollment', 'Week_1_Assessment', 'Week_2_Assessment', 'Week_3_Assessment', 'Week_4_Assessment', 
+                            'Week_1_Certification', 'Week_2_Certification', 'Week_3_Certification', 'Week_4_Certification', 'Week_1_Certification_Distribution', 'Week_2_Certification_Distribution', 'Week_3_Certification_Distribution',
+                            'Week_4_Certification_Distribution', 'Week_1_Placement', 'Week_2_Placement', 'Week_3_Placement', 'Week_4_Placement']
+
+                    df = df[col]
+                    out = Database.upload_employee_target_plan(df,user_id,user_role_id)
+                    if out['Status']==False:
+                        file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                        pd.DataFrame(out['data']).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                        return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                    else:
+                        return out   
+            except Exception as e:
+                 return {"Status":False, "message":"Unable to upload " + str(e)}            
+api.add_resource(upload_employee_target_plan,'/upload_employee_target_plan')
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)

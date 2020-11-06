@@ -1139,3 +1139,72 @@ class Report:
         except Exception as e:
             return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
         
+    def download_centers_list(file_name, center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses):
+        try:
+            name_withpath = config.neo_report_file_path + 'report file/'+ file_name
+            
+            writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
+            workbook  = writer.book
+            header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+
+            resp = Database.download_centers_list(center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses)
+
+            if len(resp[0])==0:
+                return({'Description':'No data available for the selected items', 'Status':False})
+            df = pd.DataFrame(resp[0],columns=resp[1])
+            df=df.fillna('')
+
+            #df['Stage1_Location'] = df.loc[:,'Stage1_Location'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("'+ x + '","View Location")')
+            #df['Stage1_File_Name'] = df.loc[:,'Stage1_File_Name'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + image_path + x + '","View Image")')
+            Header = []
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name=' Center List')
+            worksheet = writer.sheets['Center List']
+            for col_num, value in enumerate(Header):
+                worksheet.write(0, col_num, value, header_format)
+
+            writer.save()
+            return({'Description':'created excel', 'Status':True, 'filename':file_name})
+
+        except Exception as e:
+            return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
+
+    def download_emp_target_template(file_name, user_id, user_role_id, date):
+        try:
+            name_withpath = config.neo_report_file_path + 'report file/'+ file_name
+            
+            writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
+            workbook  = writer.book
+            header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+                
+            resp = Database.download_emp_target_template(user_id, user_role_id, date)
+
+            if len(resp[0])==0:
+                return({'Description':'No data available for the selected items', 'Status':False})
+            df = pd.DataFrame(resp[0],columns=resp[1])
+            df=df.fillna('')
+            
+            Header = ["Employee Code(NE)", "Employee name(NE)", "NEO Role(NE)", "Sub Project Code(NE)", "Sub Project Name(NE)", "Month & Year*", "Week 1 Registration", "Week 2 Registration", "Week 3 Registration", "Week 4 Registration",
+            "Week 1 Enrollment", "Week 2 Enrollment", "Week 3 Enrollment", "Week 4 Enrollment", "Week 1 Assessment", "Week 2 Assessment", "Week 3 Assessment", "Week 4 Assessment", "Week 1 Certification", "Week 2 Certification",
+            "Week 3 Certification", "Week 4 Certification", "Week 1 Certification Distribution", "Week 2 Certification Distribution", "Week 3 Certification Distribution", "Week 4 Certification Distribution", "Week 1 Placement", 
+            "Week 2 Placement", "Week 3 Placement", "Week 4 Placement"]
+            
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Employee Target')
+            worksheet = writer.sheets['Employee Target']
+            
+            for col_num, value in enumerate(Header):
+                worksheet.write(0, col_num, value, header_format)
+
+            writer.save()
+            return({'Description':'created excel', 'Status':True, 'filename':file_name})
+        except Exception as e:
+            return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})

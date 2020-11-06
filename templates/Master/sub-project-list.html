@@ -52,20 +52,20 @@ if(role_id == 1)
 {
     $('#btn_create').show();
     $('#btn_upload').show();
+    $('#btn_upload_emp').show();
     $('#btn_create2').show();
 }
 else 
 {
     $('#btn_create').hide();
     $('#btn_upload').hide();
+    $('#btn_upload_emp').hide();
     $('#btn_create2').hide();
 }
 
 LoadTable(); 
 if ('{{project_id}}'>0)
 GetSub_project('{{project_id}}')
-
-
 });
 </script>
 <form id='form1' method="POST" action="/assign_subproject_add_edit_to_home">
@@ -167,15 +167,16 @@ GetSub_project('{{project_id}}')
                                 <!--button style="margin-top: 30px" type="button" class="btn btn-primary waves-effect waves-light submit" 
                                 onclick="Download()">Download</button-->
                             </div>
-                            <div class="form-group col-lg-2">                                         
+                            <div class="form-group col-lg-1">                                         
                                 <a class="btn btn-primary" style="color:white;font-weight:bold;cursor:pointer;margin-top:30px; float: left;" onclick="DownloadTableBasedOnFilter()">Download</a>  <!-- float: right; -->
                                 <a id="lnkDownload" style="display:none;"></a>
                             </div>
-                            <div class="col-lg-4" >
-                                <button style="float: right; margin-top: 30px;"  id="btn_upload" onclick="UploadBatchTargetMdl()" type="button" class="btn btn-info waves-effect waves-light">Upload Batch Target Plan</a>
-                            </div>
-                            <div class="col-lg-2" >                                        
-                                <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-primary waves-effect">Create Sub Project</a>
+                            <div class="col-lg-7" >
+                                <button style="float: right; margin-top: 30px; margin-right:10px;"  id="btn_create" type="submit" class="btn btn-primary waves-effect">Create Sub Project</a>
+
+                                <button style="float: right; margin-top: 30px; margin-right:10px;"  id="btn_upload" onclick="UploadBatchTargetMdl()" type="button" class="btn btn-info waves-effect waves-light">Upload Batch Target Plan</a>
+                                
+                                <button style="float: right; margin-top: 30px; margin-right:10px;"  id="btn_upload_emp" onclick="uploadEmployeetarget()" type="button" class="btn btn-info waves-effect waves-light">Upload Employee target</a>
                             </div>
                         </div>
                         <div class="row">
@@ -596,10 +597,11 @@ GetSub_project('{{project_id}}')
         </div>
     </div>
 </div><!--/.modal-->
+
 <div id="mdl_upload_batch_target_plan" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content ">
-            <form id="formUpload" action="javascript:UploadFileData()">
+            <form id="formUpload" action="javascript:UploadFileDataBatch()">
             <div class="modal-header">
                 <h4 class="modal-title"><span id="HduploadFile"></span></h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -618,6 +620,7 @@ GetSub_project('{{project_id}}')
                         </div>
                     </div>
                 </div>
+            </div>
             <div class="modal-footer">
                 <button class="btn btn-primary waves-effect" type="submit" >Upload</button>
                 <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Close</button>
@@ -631,6 +634,43 @@ GetSub_project('{{project_id}}')
     </div>
 </div><!--/.modal-->
 
-
-
-
+<div id="mdl_upload_employee_target_plan" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content ">
+            <form id="formUpload_emp" action="javascript:UploadFileDataemp()">
+            <div class="modal-header">
+                <h4 class="modal-title"><span id="HduploadFileEmp"></span></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <label for="myFileemp">Upload File* :</label>
+                        </div>
+                        <div class="col-lg-3">
+                            <input type="month" class="form-control" name="Month_Year" id="Month_Year" placeholder="Month Year" ClientIdMode="static" required>
+                        </div>
+                        <div class="col-lg-3">
+                            <input type="file" id="myFileemp" name="myFileemp">
+                        </div>
+                        <div class="col-lg-3">
+                            <button class="btn btn-info btn-sm waves-effect waves-light" type="button" onclick="DownloadEmployeeTargetPlanTemplate()">Download Template</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div id="imgSpinner2">
+                    <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                    <label style="display:inline-block;">Please wait while uploading...</label>
+                </div>
+                <div>
+                    <button class="btn btn-primary waves-effect" type="submit" >Upload</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Close</button>
+                </div>
+            </div>
+        </form>
+        </div>
+    </div>
+</div><!--/.modal-->
