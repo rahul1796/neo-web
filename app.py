@@ -8819,9 +8819,18 @@ class upload_employee_target_plan(Resource):
                 else:
                     df.columns = df.columns.str.replace(" ", "_")
                     df.columns = df.columns.str.replace("*", "")
+                    df.columns = df.columns.str.replace("(", "_")
+                    df.columns = df.columns.str.replace(")", "")
+                    df.columns = df.columns.str.replace("&", "")
                     df.insert(0, 'row_index', range(len(df)))
 
-                    out = Database.upload_batch_target_plan(df,user_id,user_role_id)
+                    col = ['row_index', 'Employee_Code(NE)', 'Employee_name(NE)', 'NEO_Role(NE)', 'Sub_Project_Code(NE)', 'Month_&_Year', 'Week_1_Registration', 'Week_2_Registration', 'Week_3_Registration',
+                            'Week_4_Registration', 'Week_1_Enrollment', 'Week_2_Enrollment', 'Week_3_Enrollment', 'Week_4_Enrollment', 'Week_1_Assessment', 'Week_2_Assessment', 'Week_3_Assessment', 'Week_4_Assessment', 
+                            'Week_1_Certification', 'Week_2_Certification', 'Week_3_Certification', 'Week_4_Certification', 'Week_1_Certification_Distribution', 'Week_2_Certification_Distribution', 'Week_3_Certification_Distribution',
+                            'Week_4_Certification_Distribution', 'Week_1_Placement', 'Week_2_Placement', 'Week_3_Placement', 'Week_4_Placement']
+
+                    df = df[col]
+                    out = Database.upload_employee_target_plan(df,user_id,user_role_id)
                     if out['Status']==False:
                         file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
                         pd.DataFrame(out['data']).to_csv(config.bulk_upload_path + 'Error/' + file_name)

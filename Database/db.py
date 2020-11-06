@@ -7353,4 +7353,23 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()
         return (data,columns)
+
+    def upload_batch_target_plan(df,user_id,user_role_id):
+        try:            
+            #print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            h=[]           
+            d={} 
+            json_str=df.to_json(orient='records')
+            sql = 'exec	[masters].[sp_validate_upload_batch_target_plan]  ?,?,?'
+            values = (json_str,user_id,user_role_id)
+            cur.execute(sql,(values))
+            
+            cur.commit()
+            cur.close()
+            con.close()
+        except Exception as e:
+            print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
         
