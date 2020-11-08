@@ -1105,6 +1105,7 @@ function UploadFileDataemp(){
         var form_data = new FormData($('#formUpload_emp')[0]);
         form_data.append('user_id',$('#hdn_home_user_id').val());
         form_data.append('user_role_id',$('#hdn_home_user_role_id').val());
+        form_data.append('month_year',$('#Month_Year').val()+'-01');
         $.ajax({
             type: 'POST',
             url: $('#hdn_web_url').val()+ "/upload_employee_target_plan",

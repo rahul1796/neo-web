@@ -86,8 +86,7 @@ dob_validation = [CustomElementValidation(lambda d: check_dob(d), 'either date o
 status_validation = [CustomElementValidation(lambda d: d.lower() in ['certified','notcertified'], 'invalid status (certified, notcertified allowed)')]
 flt_validation = [CustomElementValidation(lambda d: str(d).replace('.', '', 1).isdigit(), 'invalid score (number allowed)')]
 yea_no_validation = [CustomElementValidation(lambda d: str(d).lower() in ['yes','no'], 'invalid option (yes/no allwed)')]
-
-
+int_validation = [CustomElementValidation(lambda d: str(d).isdigit(), 'invalid score (whole number allowed)')]
 #from lib.log import Log
 #from lib.log import log
 
@@ -8782,32 +8781,53 @@ class upload_employee_target_plan(Resource):
     def post():
         if request.method=='POST':
             try:
-                #print('hi')
                 f = request.files['myFileemp']
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
-                Month_Year = request.form["Month_Year"]
+                Month_Year = request.form["month_year"]
+
+                Month_Year_excel = datetime.strptime(Month_Year, '%Y-%m-%d').strftime('%b-%Y').upper()
+                month_year_validation = [CustomElementValidation(lambda d: datetime.strptime(d, '%b-%Y').strftime('%Y-%m-%d')==Month_Year, "only '{}' date allowed".format(Month_Year_excel))]
+
                 file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
                 f.save(file_name)
                 df= pd.read_excel(file_name,sheet_name='Employee Target') #,dtype={'E Planned Start Date': str, 'E Planned End Date': str,'C Planned Date': str,'P Planned Start Date': str, 'P Planned End Date': str}
                 df = df.fillna('')
 
                 schema = Schema([
-                        Column('Planned Batch Code'),
-                        Column('Sub Project Code*',str_validation+null_validation),
-                        Column('Sub Project Name*',str_validation+null_validation),
-                        Column('Course Code*',str_validation+null_validation),
-                        Column('Course Name*',str_validation+null_validation),
-                        Column('E Planned Start Date'),
-                        Column('E Planned End Date'),
-                        Column('E Target'),
-                        Column('C Planned Date'),
-                        Column('C Target'),
-                        Column('P Planned Start Date'),
-                        Column('P Planned End Date'),
-                        Column('P Target')
-                        ])
+                        Column('Employee Code(NE)',str_validation+null_validation),
+                        Column('Employee name(NE)',str_validation+null_validation),
+                        Column('NEO Role(NE)',str_validation+null_validation),
+                        Column('Sub Project Code(NE)',str_validation+null_validation),
+                        Column('Sub Project Name(NE)',null_validation),
+                        Column('Month & Year*',month_year_validation+str_validation+null_validation),
 
+                        Column('Week 1 Registration',int_validation+null_validation),
+                        Column('Week 2 Registration',int_validation+null_validation),
+                        Column('Week 3 Registration',int_validation+null_validation),
+                        Column('Week 4 Registration',int_validation+null_validation),
+                        Column('Week 1 Enrollment',int_validation+null_validation),
+                        Column('Week 2 Enrollment',int_validation+null_validation),
+                        Column('Week 3 Enrollment',int_validation+null_validation),
+                        Column('Week 4 Enrollment',int_validation+null_validation),
+                        Column('Week 1 Assessment',int_validation+null_validation),
+                        Column('Week 2 Assessment',int_validation+null_validation),
+                        Column('Week 3 Assessment',int_validation+null_validation),
+                        Column('Week 4 Assessment',int_validation+null_validation),
+                        Column('Week 1 Certification',int_validation+null_validation),
+                        Column('Week 2 Certification',int_validation+null_validation),
+                        Column('Week 3 Certification',int_validation+null_validation),
+                        Column('Week 4 Certification',int_validation+null_validation),
+                        Column('Week 1 Certification Distribution',int_validation+null_validation),
+                        Column('Week 2 Certification Distribution',int_validation+null_validation),
+                        Column('Week 3 Certification Distribution',int_validation+null_validation),
+                        Column('Week 4 Certification Distribution',int_validation+null_validation),
+                        Column('Week 1 Placement',int_validation+null_validation),
+                        Column('Week 2 Placement',int_validation+null_validation),
+                        Column('Week 3 Placement',int_validation+null_validation),
+                        Column('Week 4 Placement',int_validation+null_validation)
+
+                        ])
                 errors = schema.validate(df)
                 errors_index_rows = [e.row for e in errors]
                 len_error = len(errors_index_rows)
@@ -8822,21 +8842,17 @@ class upload_employee_target_plan(Resource):
                     df.columns = df.columns.str.replace("(", "_")
                     df.columns = df.columns.str.replace(")", "")
                     df.columns = df.columns.str.replace("&", "")
+                    df = df.drop_duplicates()
                     df.insert(0, 'row_index', range(len(df)))
 
-                    col = ['row_index', 'Employee_Code(NE)', 'Employee_name(NE)', 'NEO_Role(NE)', 'Sub_Project_Code(NE)', 'Month_&_Year', 'Week_1_Registration', 'Week_2_Registration', 'Week_3_Registration',
+                    col = ['row_index', 'Employee_Code_NE', 'Employee_name_NE', 'NEO_Role_NE', 'Sub_Project_Code_NE', 'Month__Year', 'Week_1_Registration', 'Week_2_Registration', 'Week_3_Registration',
                             'Week_4_Registration', 'Week_1_Enrollment', 'Week_2_Enrollment', 'Week_3_Enrollment', 'Week_4_Enrollment', 'Week_1_Assessment', 'Week_2_Assessment', 'Week_3_Assessment', 'Week_4_Assessment', 
                             'Week_1_Certification', 'Week_2_Certification', 'Week_3_Certification', 'Week_4_Certification', 'Week_1_Certification_Distribution', 'Week_2_Certification_Distribution', 'Week_3_Certification_Distribution',
                             'Week_4_Certification_Distribution', 'Week_1_Placement', 'Week_2_Placement', 'Week_3_Placement', 'Week_4_Placement']
-
                     df = df[col]
+                    
                     out = Database.upload_employee_target_plan(df,user_id,user_role_id)
-                    if out['Status']==False:
-                        file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
-                        pd.DataFrame(out['data']).to_csv(config.bulk_upload_path + 'Error/' + file_name)
-                        return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
-                    else:
-                        return out   
+                    return out
             except Exception as e:
                  return {"Status":False, "message":"Unable to upload " + str(e)}            
 api.add_resource(upload_employee_target_plan,'/upload_employee_target_plan')
