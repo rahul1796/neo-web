@@ -933,19 +933,27 @@ class Report:
             #print(data['sheet1_columns'])
             if(len(data['sheet1']) < 1):
                 return({'msg':'No Records Found For Selected Filters!', 'success':False})
-              
+                
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
             df = df.fillna('')
-            df.loc[:,'Educational Qualification'] = df.loc[:,'Educational Qualification'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
-            df.loc[:,'Signed Mou'] = df.loc[:,'Signed Mou'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
-            df.loc[:,'Age Proof'] = df.loc[:,'Age Proof'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
-            df.loc[:,'Educational Marksheet'] = df.loc[:,'Educational Marksheet'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
-            df.loc[:,'Income Certificate'] = df.loc[:,'Income Certificate'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
-            df.loc[:,'Candidate_Image'] = df.loc[:,'Candidate_Image'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
-            df['Aadhar_Image_Front'] = df.loc[:,'Aadhar_Image'].map(lambda x: x.split(',')[0] if ((x.split(',')[0]=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x.split(',')[0] +'","View Image")')
-            df['Aadhar_Image_Back'] = df.loc[:,'Aadhar_Image'].map(lambda x: '' if len(x.split(','))<=1 else '=HYPERLINK("' + config.Base_URL +'/GetDocumentForExcel_S3_certiplate?image_name=' + x.split(',')[1] +'","View Image")')
-            df.loc[:,'Identifier_Image'] = df.loc[:,'Identifier_Image'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
-            df.loc[:,'Account_Image'] = df.loc[:,'Account_Image'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
+            
+            def create_image(x):
+                ext = str(x).split('.')[-1]
+                if ext in ['pdf','doc','docx']:
+                    return (x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_path=docs&image_name=' + x + '","View Image")')
+                else:
+                    return (x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
+                    
+            df.loc[:,'Educational Qualification'] = df.loc[:,'Educational Qualification'].map(create_image)
+            df.loc[:,'Signed Mou'] = df.loc[:,'Signed Mou'].map(create_image)
+            df.loc[:,'Age Proof'] = df.loc[:,'Age Proof'].map(create_image)
+            df.loc[:,'Educational Marksheet'] = df.loc[:,'Educational Marksheet'].map(create_image)
+            df.loc[:,'Income Certificate'] = df.loc[:,'Income Certificate'].map(create_image)
+            df.loc[:,'Candidate_Image'] = df.loc[:,'Candidate_Image'].map(create_image)
+            df['Aadhar_Image_Front'] = df.loc[:,'Aadhar_Image'].map(lambda x: x.split(',')[0] if ((x.split(',')[0]=='')) else create_image(x.split(',')[0]))
+            df['Aadhar_Image_Back'] = df.loc[:,'Aadhar_Image'].map(lambda x: '' if len(x.split(','))<=1 else create_image(x.split(',')[1]))
+            df.loc[:,'Identifier_Image'] = df.loc[:,'Identifier_Image'].map(create_image)
+            df.loc[:,'Account_Image'] = df.loc[:,'Account_Image'].map(create_image)
             
             df_mob=df[['Candidate_Id', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 'Age', 'Primary_Contact_No', 'Secondary_Contact_No', 'Email_Id', 'Gender', 'Marital_Status', 'Caste', 'Disability_Status', 'Religion', 'Mother_Tongue', 'Occupation', 'Average_Annual_Income', 'Interested_Course', 'Product','Source_Of_Information','Whatsapp_Number','Mobilized_On','Mobilized_By']]
             df_mob.drop_duplicates(keep='first',inplace=True) 
@@ -1207,4 +1215,4 @@ class Report:
             writer.save()
             return({'Description':'created excel', 'Status':True, 'filename':file_name})
         except Exception as e:
-            return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
+            return({'Description':'Error creating excel' + str(e), 'Status':False, 'Error':str(e)})

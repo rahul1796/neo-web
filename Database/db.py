@@ -5908,6 +5908,7 @@ SELECT					cb.name as candidate_name,
             b=[]
             temp=""
             for row in out:
+
                 que='''
                         SELECT		cs.intervention_id 
                         FROM		candidate_details.tbl_candidate_interventions i
@@ -5919,6 +5920,7 @@ SELECT					cb.name as candidate_name,
                 curs.execute(que)
                 intervention_id = curs.fetchall()
                 if intervention_id!=[]:
+                    
                     query += quer6.format(row[78] if ProjectType == 1 else row[79],intervention_id[0][0])
                 else:
                     b.append(row[78] if ProjectType == 1 else row[79])
@@ -7354,22 +7356,21 @@ SELECT					cb.name as candidate_name,
         cnxn.close()
         return (data,columns)
 
-    def upload_batch_target_plan(df,user_id,user_role_id):
+    def upload_employee_target_plan(df,user_id,user_role_id):
         try:            
             #print(str(df.to_json(orient='records')))
             con = pyodbc.connect(conn_str)
             cur = con.cursor()
-            h=[]           
-            d={} 
+            #print(len(df))
             json_str=df.to_json(orient='records')
-            sql = 'exec	[masters].[sp_validate_upload_batch_target_plan]  ?,?,?'
+            sql = 'exec	[masters].[sp_upload_employee_target] ?,?,?'
             values = (json_str,user_id,user_role_id)
             cur.execute(sql,(values))
             
             cur.commit()
             cur.close()
             con.close()
+            return {"Status":True,'message': "Uploaded successfully"}
         except Exception as e:
-            print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
         
