@@ -302,7 +302,7 @@ var Candidates = {};
                         alert('allowed format are : '+validImageTypes.toString());
                         return
                     }
-                    else if(file.size > 1024*1024){
+                    else if(file.size > 5*1024*1024){
                         alert('Image size is not valid');
                         return
                     }
@@ -318,7 +318,7 @@ var Candidates = {};
         if (!validImageTypes.includes(file['type'])){
             alert('allowed format are : '+validImageTypes.toString());
         }
-        else if(file.size > 1024*1024){
+        else if(file.size > 5*1024*1024){
             alert('Image size is not valid');
         }
         else{
