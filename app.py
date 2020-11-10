@@ -8857,5 +8857,85 @@ class upload_employee_target_plan(Resource):
                  return {"Status":False, "message":"Unable to upload " + str(e)}            
 api.add_resource(upload_employee_target_plan,'/upload_employee_target_plan')
 
+@app.route("/Assessment_report_page")
+def Assessment_report_page():
+    if g.user:
+        return render_template("Reports/Assessment_Report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/Assessment_report")
+def Assessment_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="Assessment_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/Certification_Distribution_Report_page")
+def Certification_Distribution_Report_page():
+    if g.user:
+        return render_template("Reports/Certification_Distribution_Report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/Certification_Distribution_Report")
+def Certification_Distribution_Report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="Certification_Distribution_Report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class download_Assessment_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id=request.form['user_id']
+                user_role_id=request.form['user_role_id']
+                
+                customer = request.form['customer']
+                project = request.form['project']
+                sub_project = request.form['sub_project']
+                region = request.form['region']
+                centers = request.form['centers']
+                Batches = request.form['Batches']
+                FromDate = request.form['FromDate']
+                ToDate = request.form['ToDate']
+
+                file_name='Assessment_Report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            
+                resp = Report.download_Assessment_report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+                return resp
+                
+            except Exception as e:
+                return({"exceptione":str(e)})
+api.add_resource(download_Assessment_report,'/download_Assessment_report')
+
+class download_Certification_Distribution_Report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id=request.form['user_id']
+                user_role_id=request.form['user_role_id']
+                
+                customer = request.form['customer']
+                project = request.form['project']
+                sub_project = request.form['sub_project']
+                region = request.form['region']
+                centers = request.form['centers']
+                Batches = request.form['Batches']
+                FromDate = request.form['FromDate']
+                ToDate = request.form['ToDate']
+
+                file_name='Certification_Distribution_Report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            
+                resp = Report.download_Certification_Distribution_Report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+                return resp
+                
+            except Exception as e:
+                return({"exceptione":str(e)})
+api.add_resource(download_Certification_Distribution_Report,'/download_Certification_Distribution_Report')
+
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)

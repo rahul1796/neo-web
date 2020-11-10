@@ -1216,3 +1216,87 @@ class Report:
             return({'Description':'created excel', 'Status':True, 'filename':file_name})
         except Exception as e:
             return({'Description':'Error creating excel' + str(e), 'Status':False, 'Error':str(e)})
+
+    def download_Assessment_report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+        try:
+            name_withpath = config.neo_report_file_path + 'report file/'+ file_name
+            
+            writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
+            workbook  = writer.book
+            header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+
+            resp = Database.download_Assessment_report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+            if len(resp[0])==0:
+                return({'Description':'No data available for the selected items', 'Status':False})
+            df = pd.DataFrame(resp[0],columns=resp[1])
+            df=df.fillna('')
+            
+            col = ['Region_Name', 'Coo', 'Tm', 'Cm', 'Customer_Name', 'Contract_Name', 'Contract_Code', 'Project_Name', 'Project_Code', 'Sub_Project_Name', 'Sub_Project_Code', 'Center_Name', 
+            'Course_Name', 'Course_Code', 'Qp_Name', 'Qp_Code', 'Enrolled_Count', 'Batch_Code', 'Batch_Name', 'Actual_Start_Date', 'Actual_End_Date', 'Ojt_Startdate', 'Ojt_Enddate', 
+            'Assessment_Types_Name', 'Awarding_Body', 'Partner_Type_Name', 'Partner_Name', 'Requested_Date', 'Scheduled_Date', 
+            'Scheduled_On', 'Assessor_Name', 'Assessor_Mobile', 'Assessor_Email', 'Asses_Candidate', 'Result_Uploaded', 'Certified_Candidate']
+
+            Header = ["Region", "COO", "TM", "CM/PC", "Customer Name", "Contract Name", "Contract Code", "Project Name", "Project Code", "Sub-Project Name", "Sub-Project Code", "Center Name",
+            "Course Name", "Course Code", "QP Name", "QP Code", "Enrolment Count", "Batch Code", "Batch Name", "Batch Start Date", "Batch End Date", "OJT Start Date", "OJT End Date",
+            "Assessment Type", "Awarding Body", "Assessment Partner Type", "Assesment Partner", "Assessment/Re-Assessment Request Date", "Assessment/Re-Assessment Proposed Date",
+            "Actual Assessment/Re-Assessment Date", "Assessor Name", "Assessor Mobile No", "Assessor Email", "Assessed Candidate", "Result Upload Date", "Certified Candidate"]
+            
+            df = df[col]
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Assessment Report')
+            worksheet = writer.sheets['Assessment Report']
+
+            for col_num, value in enumerate(Header):
+                worksheet.write(0, col_num, value, header_format)
+
+            writer.save()
+            return({'Description':'created excel', 'Status':True, 'filename':file_name})
+
+        except Exception as e:
+            return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
+    
+    def download_Certification_Distribution_Report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+        try:
+            name_withpath = config.neo_report_file_path + 'report file/'+ file_name
+            
+            writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
+            workbook  = writer.book
+            header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+
+            resp = Database.download_Certification_Distribution_Report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+            if len(resp[0])==0:
+                return({'Description':'No data available for the selected items', 'Status':False})
+            df = pd.DataFrame(resp[0],columns=resp[1])
+            df=df.fillna('')
+            
+            col = ['Region_Name', 'Coo', 'Tm', 'Cm', 'Customer_Name', 'Contract_Name', 'Contract_Code', 'Project_Name', 'Project_Code', 'Sub_Project_Name', 'Sub_Project_Code', 'Center_Name', 
+            'Course_Name', 'Course_Code', 'Qp_Name', 'Qp_Code', 'Enrolled_Count', 'Batch_Code', 'Batch_Name', 'Actual_Start_Date', 'Actual_End_Date', 'Ojt_Startdate', 'Ojt_Enddate', 
+            'Assessment_Types_Name', 'Awarding_Body', 'Partner_Type_Name', 'Partner_Name', 'Requested_Date', 'Scheduled_Date', 
+            'Scheduled_On', 'Assessor_Name', 'Assessor_Mobile', 'Assessor_Email', 'Asses_Candidate', 'Result_Uploaded', 'Certified_Candidate']
+
+            Header = ["Region", "COO", "TM", "CM/PC", "Customer Name", "Contract Name", "Contract Code", "Project Name", "Project Code", "Sub-Project Name", "Sub-Project Code", "Center Name",
+            "Course Name", "Course Code", "QP Name", "QP Code", "Enrolment Count", "Batch Code", "Batch Name", "Batch Start Date", "Batch End Date", "OJT Start Date", "OJT End Date",
+            "Assessment Type", "Awarding Body", "Assessment Partner Type", "Assesment Partner", "Assessment/Re-Assessment Request Date", "Assessment/Re-Assessment Proposed Date",
+            "Actual Assessment/Re-Assessment Date", "Assessor Name", "Assessor Mobile No", "Assessor Email", "Assessed Candidate", "Result Upload Date", "Certified Candidate"]
+            
+            df = df[col]
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Certification DistributioReport')
+            worksheet = writer.sheets['Certification DistributioReport']
+
+            for col_num, value in enumerate(Header):
+                worksheet.write(0, col_num, value, header_format)
+
+            writer.save()
+            return({'Description':'created excel', 'Status':True, 'filename':file_name})
+
+        except Exception as e:
+            return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
