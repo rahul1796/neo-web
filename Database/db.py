@@ -7391,7 +7391,7 @@ SELECT					cb.name as candidate_name,
     def download_Certification_Distribution_Report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
-        sql = 'exec [reports].[sp_get_assesment_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        sql = 'exec [reports].[sp_get_certification_distribution_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
         values = (user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
         curs.execute(sql,(values))
         columns = [column[0].title() for column in curs.description]
