@@ -5864,6 +5864,7 @@ SELECT					cb.name as candidate_name,
             conn = pyodbc.connect(conn_str)
             curs = conn.cursor()
             
+
             df['Date of Birth*'] = df['Date of Birth*'].astype(str)
             out = df.values.tolist()
 
@@ -5907,6 +5908,15 @@ SELECT					cb.name as candidate_name,
             query = ""
             b=[]
             temp=""
+            df.columns = df.columns.replace('*','')
+            df_batch = df.iloc[:,[0,78]] if ProjectType == 1 else df.iloc[:,[0,79]]
+
+            sql = 'exec	masters.[sp_validate_enrollment] ?'
+            values = (df_batch.to_json(orient='records'),)
+            cur.execute(sql,(values))
+            # ('[{"Candidate_id":171766,"batch_id":"B-5332-02_Sep_2020"}]',)
+            
+            
             for row in out:
 
                 que='''
