@@ -1115,17 +1115,24 @@ function add_map_message(){
                 if(data.AssessmentTypes != null)
                 {
                     $('#ddlAssessmentType').empty();
+                    $('#ddlAssessmentTypePreview').empty();
                     var count=data.AssessmentTypes.length;
                     $('#ddlAssessmentType').append(new Option('Select',''));
+                    $('#ddlAssessmentTypePreview').append(new Option('Select',''));
                     if( count> 0)
                     {
-                        for(var i=0;i<count;i++)                           
+                        for(var i=0;i<count;i++) 
+                        {
                             $('#ddlAssessmentType').append(new Option(data.AssessmentTypes[i].Assessment_Types_Name,data.AssessmentTypes[i].Assessment_Types_Id));
+                            $('#ddlAssessmentTypePreview').append(new Option(data.AssessmentTypes[i].Assessment_Types_Name,data.AssessmentTypes[i].Assessment_Types_Id));
                           
+                        }                          
+                            
                     }
                     else
                     {
                         $('#ddlAssessmentType').append(new Option('ALL','-1'));
+                        $('#ddlAssessmentTypePreview').append(new Option('ALL','-1'));
                     }
                 }
             },
@@ -1148,20 +1155,28 @@ function add_map_message(){
                 if(data.AssessmentAgency != null)
                 {
                     $('#ddlAssessmentAgency').empty();
+                    $('#ddlAssessmentAgencyPreview').empty();
                     var count=data.AssessmentAgency.length;
                     $('#ddlAssessmentAgency').append(new Option('Select',''));
+                    $('#ddlAssessmentAgencyPreview').append(new Option('Select',''));
                     if( count> 0)
                     {
                         for(var i=0;i<count;i++)
+                        {
                             if(data.AssessmentAgency[i].Assessment_Agency_Id != 3)
                             {
                                $('#ddlAssessmentAgency').append(new Option(data.AssessmentAgency[i].Assessment_Agency_Name,data.AssessmentAgency[i].Assessment_Agency_Id));
+                               $('#ddlAssessmentAgencyPreview').append(new Option(data.AssessmentAgency[i].Assessment_Agency_Name,data.AssessmentAgency[i].Assessment_Agency_Id));
+                           
                             }
+                        }
+                            
                     }
 
                     else
                     {
                         $('#ddlAssessmentAgency').append(new Option('ALL','-1'));
+                        $('#ddlAssessmentAgencyPreview').append(new Option('ALL','-1'));
                     }
                 }
             },
@@ -1171,6 +1186,102 @@ function add_map_message(){
                 return false;
             }
         });
+    }
+    function PreviewScheduleAssessment()
+    {
+        var cand_present='';
+        var cand_absent='';
+        $('[name=checkcase]').each(function () {
+            if (this.checked) {
+                cand_present+= $(this).val()+',';
+            }
+            else{
+                cand_absent+= $(this).val()+',';
+            }
+        });
+        if(cand_present=='')
+        {
+            alert("Select atleast one candidate for assessment!");
+            return;
+        }
+        cand_present=cand_present.substring(0,cand_present.length-1);
+        cand_absent=cand_absent.substring(0,cand_absent.length-1)
+        $('#mdl_create_batch_assessments').modal('hide');
+        $('#ddlAssessmentTypePreview').val(($('#ddlAssessmentType').val()));
+        $('#ddlAssessmentAgencyPreview').val(($('#ddlAssessmentAgency').val()));
+        $('#ddlPartnerPreview').val(($('#ddlPartner').val()));
+        $('#ddlPartnerTypePreview').val($('#ddlPartnerType').val());
+        $('#TxtRequestedDatePreview').val($('#TxtRequestedDate').val());
+        if($('#ddlPartnerTypePreview').val()=="2")
+        {
+            $('#DivPartnerTypePreview').show();
+            $('#DivPartnerPreview').show();
+            
+        }
+        $('#tbl_candidate_preview').show();
+        $('#tbl_candidate_preview').dataTable().fnDestroy();    
+        var URL=$('#hdn_web_url').val()+ "/ALLCandidatesEnrolledInBatch?batch_id="+ $('#hdn_batch_assessment_id').val().toString() +"&assessmentId="+ ($('#hdn_assessment_id').val().toString())+"&candidate_id="+cand_present;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            overflow:true,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                varHtml='';
+                let varTxt='';
+                $("#tbl_candidate_preview tbody").empty();
+                if(!jQuery.isEmptyObject(data))
+                {   
+                    if (data.Candidates != null){
+                        var count=data.Candidates.length;
+                        if( count> 0)
+                        {   
+                            for(var i=0;i<count;i++)
+                            {   
+                                
+                                var txt=''
+                                varHtml+='<tr>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].S_No +'</td>';
+                               varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Candidate_Id +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Candidate_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Mobile_Number +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Enrollment_Id +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Attempt +'</td>';
+                                varHtml+='</tr>';
+
+                            }                        
+                        }
+                        $("#tbl_candidate_preview tbody").append(varHtml);
+                      
+                    }
+                    else
+                    {
+                        varHtml='<tr><td colspan="8" style="text-align:center;">No records found</td></tr>'
+                        $("#tbl_candidate_preview tbody").append(varHtml);
+                        
+                    }
+                }
+                else
+                {
+                    varHtml='<tr><td colspan="8" style="text-align:center;">No records found</td></tr>'
+                    $("#tbl_candidate_preview tbody").append(varHtml);
+                   
+                }   
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        $('#mdl_create_batch_assessments_preview').modal('show');
+    }
+    function OpenscheduleModal()
+    {
+        $('#mdl_create_batch_assessments_preview').modal('hide');
+        $('#mdl_create_batch_assessments').modal('show');
     }
     function ScheduleAssessment()
     {   console.log($('#ddlPartner').val());
@@ -1234,15 +1345,14 @@ function add_map_message(){
         var cand_absent='';
         $('[name=checkcase]').each(function () {
             if (this.checked) {
-                cand_absent+= $(this).val()+',';
+                cand_present+= $(this).val()+',';
             }
             else{
-                cand_present+= $(this).val()+',';
+                cand_absent+= $(this).val()+',';
             }
         });
         cand_present=cand_present.substring(0,cand_present.length-1);
         cand_absent=cand_absent.substring(0,cand_absent.length-1)
-        console.log($('#hdn_batch_assessment_id').val(),$('#ddlAssessmentType').val(),$('#TxtRequestedDate').val(),$('#TxtScheduledDate').val(),$('#ddlAssessmentAgency').val());
         var URL=$('#hdn_web_url').val()+ "/ScheduleAssessment";
             $.ajax({
                 type:"POST",
@@ -1333,17 +1443,26 @@ function add_map_message(){
                     if(data.AssessmentPartnerTypes != null)
                     {
                         $('#ddlPartnerType').empty();
+                        $('#ddlPartnerTypePreview').empty();
                         var count=data.AssessmentPartnerTypes.length;
                         if( count> 0)
                         {
                             $('#ddlPartnerType').append(new Option('Choose Assessment Partner Type',''));
-                            for(var i=0;i<count;i++)
-                                $('#ddlPartnerType').append(new Option(data.AssessmentPartnerTypes[i].Assessment_Partner_Type_Name,data.AssessmentPartnerTypes[i].Assessment_Partner_Type_Id));
+                            $('#ddlPartnerTypePreview').append(new Option('Choose Assessment Partner Type',''));
                             
+                            for(var i=0;i<count;i++)
+                            {
+                                $('#ddlPartnerType').append(new Option(data.AssessmentPartnerTypes[i].Assessment_Partner_Type_Name,data.AssessmentPartnerTypes[i].Assessment_Partner_Type_Id));
+                                $('#ddlPartnerTypePreview').append(new Option(data.AssessmentPartnerTypes[i].Assessment_Partner_Type_Name,data.AssessmentPartnerTypes[i].Assessment_Partner_Type_Id));
+                            
+
+                            }
+                                
                         }
                         else
                         {
                             $('#ddlPartnerType').append(new Option('ALL',''));
+                            $('#ddlPartnerTypePreview').append(new Option('ALL',''));
                         }
                     }
                 },
@@ -1396,17 +1515,28 @@ function add_map_message(){
                 if(data.Partners != null)
                 {
                     $('#ddlPartner').empty();
+                    $('#ddlPartnerPreview').empty();
                     var count=data.Partners.length;
                     $('#ddlPartner').append(new Option('Select',''));
+                    $('#ddlPartnerPreview').append(new Option('Select',''));
                     if( count> 0)
                     {
                         for(var i=0;i<count;i++)
+                        {
                             if(data.Partners[i].Partner_Type_Id==2)
-                            $('#ddlPartner').append(new Option(data.Partners[i].Partner_Name,data.Partners[i].Partner_Id));
-                    }
+                            {
+                                $('#ddlPartner').append(new Option(data.Partners[i].Partner_Name,data.Partners[i].Partner_Id));
+                                $('#ddlPartnerPreview').append(new Option(data.Partners[i].Partner_Name,data.Partners[i].Partner_Id));
+                       
+                            }
+                            
+                        }
+                            
+                        }
                     else
                     {
                         $('#ddlPartner').append(new Option('ALL','-1'));
+                        $('#ddlPartnerPreview').append(new Option('ALL','-1'));
                     }
                 }
             },
@@ -1421,7 +1551,7 @@ function add_map_message(){
         flag='absent'
         $('#tbl_mark_absent_candidate').show();
         $('#tbl_mark_absent_candidate').dataTable().fnDestroy();    
-        var URL=$('#hdn_web_url').val()+ "/ALLCandidatesEnrolledInBatch?batch_id="+BatchId+"&assessmentId="+AssessmentId;
+        var URL=$('#hdn_web_url').val()+ "/ALLCandidatesEnrolledInBatch?batch_id="+BatchId+"&assessmentId="+AssessmentId+"&candidate_id=";
         $.ajax({
             type:"GET",
             url:URL,
@@ -1440,7 +1570,7 @@ function add_map_message(){
                         if( count> 0)
                         {   if(StageId==0)
                             {
-                                $("#lblCandidateTable").text("Select Not-Eligible Candidates for Assessment:");
+                                $("#lblCandidateTable").text("Select Candidates for Assessment:");
                                   }
                             else{
                                 $("#lblCandidateTable").text("Select Candidates For Re-Assessment:");

@@ -1195,14 +1195,14 @@ class Database:
         cur.close()
         con.close()
         return content
-    def candidate_enrolled_in_batch(batch_id,assessment_id):
+    def candidate_enrolled_in_batch(batch_id,assessment_id,candidate_id):
         h = {}
         response = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_enrolled_in_batch] ?,?'
+        sql = 'exec [candidate_details].[sp_get_candidate_enrolled_in_batch] ?,?,?'
        
-        values = (batch_id,assessment_id)
+        values = (batch_id,assessment_id,candidate_id)
         print(values)
         cur.execute(sql,(values))
         #print(values)
@@ -4284,8 +4284,8 @@ SELECT					cb.name as candidate_name,
                         Stage=str(row[1])
                         AssessmentDate=str(row[2])
                         BatchAttemptNumber=str(row[3])
-                    if BatchAttemptNumber != '1':
-                        present_candidate = absent_candidate
+                    #if BatchAttemptNumber != '1':
+                        #present_candidate = absent_candidate
                     center_name=''
                     course_name=row=''
                     customer_name=row=''
