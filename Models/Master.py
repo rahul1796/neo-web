@@ -264,7 +264,7 @@ class Master:
         return popupMessage
 
     def GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id):
-        return {"PlannedBatches":Database.GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id)}
+        return Database.GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id)
 
     def GetCenerRoom(center_id):
         return {"CenterRooms":Database.Getcenterroom(center_id)}
@@ -303,3 +303,6 @@ class Master:
         return Database.GetPOCForCustomer(customer_id)
     def GetSessionsForCourse(CourseId):
         return Database.GetSessionsForCourse(CourseId)
+
+    def GetPartnerCenters(partner_id):
+        return {"PartnerCenters":Database.GetPartnerCenters(partner_id)}

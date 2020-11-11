@@ -107,7 +107,7 @@ function toggleCheckbox(e)
                 }
             }
             else{
-                if (file.size > 1024*1024) { 
+                if (file.size > 5*1024*1024) { 
                     sizestatus=0;
                 }
                 else{

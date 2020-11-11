@@ -731,11 +731,11 @@ class Database:
         cur2.close()
         con.close()
         return center
-    def add_course_details(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, isactive, user_id):
+    def add_course_details(CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, is_ojt_req,OJT_Duration_hour, isactive, user_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[content].[sp_add_edit_course] ?, ?, ?, ?, ?, ?, ?, ?,?, ?'
-        values = (CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, isactive, user_id)
+        sql = 'exec	[content].[sp_add_edit_course] ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?'
+        values = (CourseId, CourseName, CourseCode, Sector, Qp, Parent_Course, Course_Duration_day, Course_Duration_hour, is_ojt_req,OJT_Duration_hour, isactive, user_id)
         cur.execute(sql,(values))
 
         for row in cur:
@@ -5461,9 +5461,9 @@ SELECT					cb.name as candidate_name,
             return out
         
         try:
-            quer1 = '''
-            update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1 where candidate_id='{}';
-            '''
+            # quer1 = '''
+            # update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1 where candidate_id='{}';
+            # '''
             quer2='''
             update candidate_details.tbl_candidate_reg_enroll_details set whatsapp_number='{}',candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',present_address_line1='{}',permanaet_address_line1='{}',highest_qualification='{}',stream_specialization='{}',computer_knowledge='{}',technical_knowledge='{}',average_household_income='{}',bank_name='{}',account_number='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
             '''
@@ -5534,7 +5534,7 @@ SELECT					cb.name as candidate_name,
             '''
 
             que_test='''
-                select is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id where 1=1 and batch_code=trim('{}') and coalesce(sp.is_ojt_req,0)=1
+                select sp.is_ojt_req & c.is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id left join masters.tbl_courses as c on c.course_id=b.course_id where 1=1 and coalesce(sp.is_ojt_req,0)=1  and coalesce(c.is_ojt_req,0)=1 and b.batch_id like trim('{}')
                 '''
 
             url = candidate_xml_weburl + xml
@@ -5559,7 +5559,6 @@ SELECT					cb.name as candidate_name,
                     quer1 = '''
                     update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1, Cand_Password=null where candidate_id='{}';
                     '''
-
                 if 'mobilization_type' in data:
                     query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,data['mobilization_type'],1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
                 else:
@@ -5909,6 +5908,7 @@ SELECT					cb.name as candidate_name,
             b=[]
             temp=""
             for row in out:
+
                 que='''
                         SELECT		cs.intervention_id 
                         FROM		candidate_details.tbl_candidate_interventions i
@@ -5920,13 +5920,14 @@ SELECT					cb.name as candidate_name,
                 curs.execute(que)
                 intervention_id = curs.fetchall()
                 if intervention_id!=[]:
+                    
                     query += quer6.format(row[78] if ProjectType == 1 else row[79],intervention_id[0][0])
                 else:
                     b.append(row[78] if ProjectType == 1 else row[79])
                     temp += '\n' + "({},'SAE',GETDATE(),{},1),".format(row[0],quer_user.format(row[79] if ProjectType == 1 else row[80],row[79] if ProjectType == 1 else row[80]))
 
                 que='''
-                select is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id where 1=1 and batch_code=trim('{}') and coalesce(sp.is_ojt_req,0)=1
+                select sp.is_ojt_req & c.is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id left join masters.tbl_courses as c on c.course_id=b.course_id where 1=1 and coalesce(sp.is_ojt_req,0)=1  and coalesce(c.is_ojt_req,0)=1 and batch_code like trim('{}')
                 '''
                 curs.execute(que.format(row[78] if ProjectType == 1 else row[79]))
                 is_obj = curs.fetchall()
@@ -5938,7 +5939,7 @@ SELECT					cb.name as candidate_name,
                     quer1 = '''
                     update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',secondary_contact_no='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1,Cand_Password=null where candidate_id='{}';
                     '''
-                
+                    
                 if ProjectType==2:
                     query += '\n' + quer8.format(row[82],row[83],row[84],row[85],row[86],row[87],row[88],row[89],row[90],row[91],row[92],row[93],row[94],row[95],row[96],row[97],row[98],row[0])
 
@@ -6641,13 +6642,15 @@ SELECT					cb.name as candidate_name,
         values = (sub_project_id,course_id,is_assigned,planned_batch_id)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
+        is_ojt=0
         for row in cur2:
-            for i in range(len(columns)):
+            for i in range(len(columns)-1):
                 h[columns[i]]=row[i]           
             response.append(h.copy())
+            is_ojt=row[-1]
         cur2.close()
         con.close()
-        return response
+        return {"PlannedBatches":response,"is_ojt":is_ojt}
     def Getcenterroom(center_id):
         response = []
         h={}
@@ -7307,3 +7310,95 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return out
+
+    def GetPartnerCenters(partner_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_partner_centers]  ?'
+        values = (partner_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    def download_centers_list(center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses):
+        
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec [masters].[sp_get_centers_download] ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, courses)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        
+        curs.close()
+        cnxn.close()
+        return (data,columns)
+
+    def download_emp_target_template(user_id, user_role_id, date):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec [reports].[sp_get_emp_target_download] ?, ?, ?'
+        values = (user_id, user_role_id, date)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        curs.close()
+        cnxn.close()
+        return (data,columns)
+
+    def upload_employee_target_plan(df,user_id,user_role_id):
+        try:            
+            #print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            #print(len(df))
+            json_str=df.to_json(orient='records')
+            sql = 'exec	[masters].[sp_upload_employee_target] ?,?,?'
+            values = (json_str,user_id,user_role_id)
+            cur.execute(sql,(values))
+            
+            cur.commit()
+            cur.close()
+            con.close()
+            return {"Status":True,'message': "Uploaded successfully"}
+        except Exception as e:
+            return {"Status":False,'message': "error: "+str(e)}
+
+    def download_Assessment_report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec [reports].[sp_get_assesment_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        
+        curs.close()
+        cnxn.close()
+        return (data,columns)
+    
+    def download_Certification_Distribution_Report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec [reports].[sp_get_assesment_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        
+        curs.close()
+        cnxn.close()
+        return (data,columns)
+        
