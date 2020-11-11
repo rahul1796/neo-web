@@ -749,7 +749,7 @@ function GetUsers(SubProjectId,SubProjectName)
                             td_open= '  <td style="text-align:center;">' ;
                             td_close=   '</td>';       
                             varHtml+='<tr>';
-                            if($('#hdn_home_user_role_id').val()=='1' || $('#hdn_home_user_role_id').val()=='15')
+                            if($('#hdn_home_user_role_id').val()=='1' )
                             {
                                 varAddButton='<a onclick="AddUserForSubProject(\'' + data.Users[i].Sub_Project_Id + '\',\'' + SubProjectName +  '\')" class="btn" style="cursor:pointer" ><i title="Tag Users" class="fas fa-edit" ></i></a>';
                                 varRemButton='<a onclick="GetUserListForSubProject(\'' + data.Users[i].Sub_Project_Id + '\')" class="btn" style="cursor:pointer" ><i title="Untag Users" class="fas fa-cut" ></i></a>';
