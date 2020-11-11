@@ -1168,8 +1168,9 @@ class candidates_enrolled_in_batch(Resource):
     def get():
          if request.method == 'GET':  
             batch_id=request.args.get('batch_id',0,type=int)  
-            assessment_id=request.args.get('assessmentId',0,type=int)          
-            return Batch.candidate_enrolled_in_batch(batch_id,assessment_id)
+            assessment_id=request.args.get('assessmentId',0,type=int)  
+            candidate_id=request.args.get('candidate_id','',type=str)          
+            return Batch.candidate_enrolled_in_batch(batch_id,assessment_id,candidate_id)
 
 
 class add_edit_map_candidate_batch(Resource):

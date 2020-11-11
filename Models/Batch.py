@@ -38,8 +38,8 @@ class Batch:
         return Database.candidates_based_on_course(candidate_id,course_ids,batch_id,center_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
     def candidate_maped_in_batch(candidate_id,course_ids,batch_id,center_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         return Database.candidate_maped_in_batch(candidate_id,course_ids,batch_id,center_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-    def candidate_enrolled_in_batch(batch_id,assessment_id):
-        candidate={"Candidates": Database.candidate_enrolled_in_batch(batch_id,assessment_id)}
+    def candidate_enrolled_in_batch(batch_id,assessment_id,candidate_id):
+        candidate={"Candidates": Database.candidate_enrolled_in_batch(batch_id,assessment_id,candidate_id)}
         return candidate    
     def add_edit_candidate_batch(candidate_ids,batch_id,course_id,user_id):
         popupMessage = {"PopupMessage": Database.add_edit_map_candidate_batch(candidate_ids,batch_id,course_id,user_id)}
