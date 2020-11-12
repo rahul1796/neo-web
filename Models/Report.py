@@ -1284,7 +1284,7 @@ class Report:
             'Sent_To_Center_Date', 'Center_Received_Date', 'Actual_Distribution_Date', 'Certification_Distribution_Count']
             
             Header = ["Region", "COO", "TM", "CM/PC", "Customer Name", "Contract Name", "Contract Code", "Project Name", "Project Code", "Sub-Project Name", "Sub-Project Code", "Center Name",
-            "Course Name", "Course Code", "QP Name", "QP Code", "Enrolment Count", "Certified Candidate", "Batch Code", "Batch Name", "Batch Start Date", "Batch End Date", "OJT Start Date", "OJT End Date",
+            "Course Name", "Course Code", "QP Name", "QP Code", "Enrolment Count", "Passed/Certified Candidate", "Batch Code", "Batch Name", "Batch Start Date", "Batch End Date", "OJT Start Date", "OJT End Date",
             "Assessment Type", "Awarding Body", "Assessment Partner Type", "Assesment Partner", "Result Upload Date", "Requested Date for Certificate Printing (PMT)", "Sent for Printing Date (Admin)",
             "Certification Sent to Center Date (Admin)", "Certification Received at Center Date (Center)", "Certification Distributed Date", "Certification Distributed Nos"]
             
