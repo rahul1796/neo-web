@@ -303,3 +303,6 @@ class Master:
         return Database.GetPOCForCustomer(customer_id)
     def GetSessionsForCourse(CourseId):
         return Database.GetSessionsForCourse(CourseId)
+
+    def GetPartnerCenters(partner_id):
+        return {"PartnerCenters":Database.GetPartnerCenters(partner_id)}
