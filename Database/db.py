@@ -5460,6 +5460,31 @@ SELECT					cb.name as candidate_name,
             out = {'success': False, 'description': "Lower App Version", 'app_status':False}
             return out
         
+        url = candidate_xml_weburl + xml
+        r = requests.get(url)
+        data = r.text
+        root = ET.fromstring(data)
+
+        json_array = []
+        for child in root:
+            temp_data = child.attrib
+            json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
+        
+        sql = 'exec	masters.[sp_validate_enrollment] ?'
+        values = (json.dumps(json_array),)
+        curs.execute(sql,(values))
+
+        vali = curs.fetchall()[0][0]
+        # vali ==0 means correct 
+        msg = """Sorry, You can't enroll new candidates to this batch.
+        Note: The Actual Enrolment count has exceeded the Planned Target."""
+        if vali==1:
+            out = {'success': False, 'description': msg, 'app_status':True}
+            return out
+        elif vali==2:
+            out = {'success': False, 'description': "Sorry, enrollment process has ended, you cannot enroll candidates to this batch.", 'app_status':True}
+            return out
+
         try:
             # quer1 = '''
             # update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1 where candidate_id='{}';
@@ -5537,10 +5562,7 @@ SELECT					cb.name as candidate_name,
                 select sp.is_ojt_req & c.is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id left join masters.tbl_courses as c on c.course_id=b.course_id where 1=1 and coalesce(sp.is_ojt_req,0)=1  and coalesce(c.is_ojt_req,0)=1 and b.batch_id like trim('{}')
                 '''
 
-            url = candidate_xml_weburl + xml
-            r = requests.get(url)
-            data = r.text
-            root = ET.fromstring(data)
+            #root = ET.fromstring(data)
             query = ""
             fam_query=""
             out=[]
@@ -5908,14 +5930,22 @@ SELECT					cb.name as candidate_name,
             b=[]
             temp=""
             
-            # df.columns = df.columns.replace('*','')
-            # df_batch = df.iloc[:,[0,78]] if ProjectType == 1 else df.iloc[:,[0,79]]
+            df.columns = df.columns.replace('*','')
+            df_batch = df.iloc[:,[0,78]] if ProjectType == 1 else df.iloc[:,[0,79]]
 
-            # sql = 'exec	masters.[sp_validate_enrollment] ?'
-            # values = (df_batch.to_json(orient='records'),)
-            # cur.execute(sql,(values))
-            # ('[{"Candidate_id":171766,"batch_id":"B-5332-02_Sep_2020"}]',)
-            
+            sql = 'exec	masters.[sp_validate_enrollment] ?'
+            values = (df_batch.to_json(orient='records'),)
+            curs.execute(sql,(values))
+
+            vali = curs.fetchall()[0][0]
+            # vali ==0 means correct 
+            if vali==1:
+                out = {'Status': False, 'message': "Sorry, You can't enroll new candidates to some batch."}
+                return out
+            # elif vali==2:
+            #     out = {'Status': False, 'message': "date issue"}
+            #     return out
+            #('[{"Candidate_id":171766,"batch_id":"B-5332-02_Sep_2020"}]',)
             
             for row in out:
 
