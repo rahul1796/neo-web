@@ -1,0 +1,427 @@
+<link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+        
+<!-- third party css -->
+<link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
+<!-- third party css end -->
+
+<!-- App css -->
+<link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript">
+    var varTable;
+    $(document).ready(function () {
+        $("#imgSpinner").hide();
+        $('.dropdown-search-filter').select2();
+        
+        $(".date-picker").flatpickr({
+            dateFormat:'d-M-Y',
+            minDate: '01.Apr.2019'
+        });
+    
+        LoadRegionddl();
+        loadClient();
+    });
+    function LoadRegionddl(){
+        var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "user_id": $('#hdn_home_user_id').val(),
+                "user_role_id" : $('#hdn_home_user_role_id').val(),
+                "user_region_id" : $('#hdn_user_region_id').val()
+            },
+            success: function (data){
+                if(data.Regions != null)
+                {
+                    $('#ddlRegion').empty();
+                    var count=data.Regions.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlRegion').append(new Option('ALL','-1'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlRegion').append(new Option(data.Regions[i].Region_Name,data.Regions[i].Region_Id));
+                        //$('#ddlCourse').val('-1');
+                    }
+                    else
+                    {
+                        $('#ddlRegion').append(new Option('ALL','-1'));
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error while loading BU! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+
+    function loadClient(){
+        var URL=$('#hdn_web_url').val()+ "/GetALLClient"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "user_id": $('#hdn_home_user_id').val(),
+                "user_role_id": $('#hdn_home_user_role_id').val()
+            },
+            success: function (data){
+                if(data.Clients != null)
+                {
+                    $('#ddlClient').empty();
+                    var count=data.Clients.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlClient').append(new Option('ALL','-1'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlClient').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
+                    }
+                    else
+                    {
+                        $('#ddlClient').append(new Option('ALL','-1'));
+                    }
+                }
+            },
+            error:function(err)
+            {
+                //alert($('#ddlClient').val().toString())
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+    }
+    function loadbasedonclient()
+    {
+        LoadProject();
+    }
+    function LoadProject(){
+        var URL=$('#hdn_web_url').val()+ "/GetALLProject_multiple"  //"/GetALLProject_multiple"
+        $.ajax({
+            type:"POST",
+            url:URL,
+            async:false,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "ClientId":$('#ddlClient').val().toString(),
+                "user_id": $('#hdn_home_user_id').val(),
+                "user_role_id": $('#hdn_home_user_role_id').val()
+            },
+            success: function (data){
+                if(data.Projects != null)
+                {
+                    $('#ddlProject').empty();
+                    var count=data.Projects.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlProject').append(new Option('ALL','-1'));  , 
+                        for(var i=0;i<count;i++)
+                            $('#ddlProject').append(new Option(data.Projects[i].Project_Name,data.Projects[i].Project_Id));
+                    }
+                    else
+                    {
+                        $('#ddlProject').append(new Option('ALL','-1'));
+                    }
+                }
+            },
+            error:function(request, err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function LoadSubProject(){
+        //alert($('#ddlProject').val().toString())
+        var URL=$('#hdn_web_url').val()+ "/get_subproject_basedon_proj_multiple"
+        $.ajax({
+            type:"POST",
+            url:URL,
+            async:false,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "ProjectId":$('#ddlProject').val().toString(),
+                "user_id": $('#hdn_home_user_id').val(),
+                "user_role_id": $('#hdn_home_user_role_id').val()
+            },
+            success: function (data){
+                if(data.Sub_Project != null)
+                {
+                    $('#ddlSubProject').empty();
+                    var count=data.Sub_Project.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlCourse').append(new Option('ALL','-1'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlSubProject').append(new Option(data.Sub_Project[i].Sub_Project_Name,data.Sub_Project[i].Sub_Project_Id));
+                    }
+                    else
+                    {
+                        $('#ddlSubProject').append(new Option('ALL','-1'));
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function LoadCenter(){
+        var URL=$('#hdn_web_url').val()+ "/get_cand_center_basedon_course_multiple"
+        $.ajax({
+            type:"POST",
+            url:URL,
+            async:false,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "CourseId":"",
+                "RegionId":$('#ddlRegion').val().toString()
+            },
+            success: function (data){
+                if(data.Centers != null)
+                {
+                    $('#ddlCenter').empty();
+                    var count=data.Centers.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlCenter').append(new Option('ALL','-1'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlCenter').append(new Option(data.Centers[i].Center_Name,data.Centers[i].Center_Id));
+                    }
+                    else
+                    {
+                        $('#ddlCenter').append(new Option('ALL','-1'));
+                    }
+                }
+            },
+            error:function(err)
+            {   
+                
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+
+    function DownloadTableBasedOnSearch(){
+        if (0==9){
+        console.log(false)
+        }
+        else{
+            $("#imgSpinner").show();   
+            var URL=$('#hdn_web_url').val()+ "/download_Certification_Distribution_Report"
+        
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: URL,
+                data:{
+                    user_id : $('#hdn_home_user_id').val(),
+                    user_role_id  : $('#hdn_home_user_role_id').val(),
+                    customer : $('#ddlClient').val().toString(),
+                    project : $('#ddlProject').val().toString(),
+                    sub_project : $('#ddlSubProject').val().toString(),
+                    region : $('#ddlRegion').val().toString(),
+                    centers : $('#ddlCenter').val().toString(),
+                    Batches : $('#ddlBatches').val(),
+                    FromDate : $('#FromDate').val(),
+                    ToDate : $('#ToDate').val()
+                },
+                success: function(resp) 
+                {
+                    //console.log(resp)
+                    if (resp.Status){
+                        var varAnchor = document.getElementById('lnkDownload');
+                        varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
+                        $("#imgSpinner").hide();
+                        try 
+                            { 
+                                //in firefox
+                                varAnchor.click();
+                                return;
+                            } catch(ex) {}
+                            
+                            try 
+                            { 
+                                // in chrome
+                                if(document.createEvent) 
+                                {
+                                    var e = document.createEvent('MouseEvents');
+                                    e.initEvent( 'click', true, true );
+                                    varAnchor.dispatchEvent(e);
+                                    return;
+                                }
+                            } catch(ex) {}
+                            
+                            try 
+                            { 
+                                // in IE
+                                if(document.createEventObject) 
+                                {
+                                        var evObj = document.createEventObject();
+                                        varAnchor.fireEvent("onclick", evObj);
+                                        return;
+                                }
+                            } catch(ex) {}
+                    }
+                    else{
+                        alert(resp.Description)
+                        $("#imgSpinner").hide();
+                    }
+                },
+                error:function()
+                {
+                    //console.log(resp)
+                    $("#imgSpinner").hide();
+                }
+            });
+        }
+    }
+
+    function ForceDownload(varUrl, varFileName)
+    {
+        var link = document.createElement('a');
+        link.setAttribute('href', varUrl);
+        link.setAttribute('download', varFileName);
+        link.setAttribute('target', '_blank');
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+</script>
+   
+</br>
+    <div class="container-fluid">
+        <!-- start page title -->
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box">
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="/">NEO</a></li>
+                            <li class="breadcrumb-item active">Certification Distribution Report</li>
+                        </ol>
+                    </div>
+                    <h4 class="page-title">Certification Distribution Report</h4>
+                </div>
+            </div>
+        </div>     
+        <!-- end page title -->
+        <div class="row">
+        <div class="col-12">
+            <div class="card-box">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label for="ddlClient" class="mr-2">Customer</label>
+                        <select class="form-control dropdown-search-filter" onchange="loadbasedonclient();" id="ddlClient" multiple>
+                            <!-- <option selected="" value="">All</option> -->
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="ddlProject" class="mr-2">Project</label>
+                        <select class="form-control dropdown-search-filter" onchange="LoadSubProject();" id="ddlProject" multiple>
+                            <!-- <option selected="" value="">All</option> -->
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="ddlSubProject" class="mr-2">Sub Project</label>
+                        <select class="form-control dropdown-search-filter" id="ddlSubProject" multiple>  <!-- onchange="LoadCenter();"-->>
+                            <!-- <option selected="" value="">All</option> -->
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="ddlRegion" class="mr-2">Region</label>
+                        <select class="form-control dropdown-search-filter" onchange="LoadCenter();" id="ddlRegion" multiple>
+                            <!-- <option selected="" value="">All</option> -->
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label for="ddlCenter" class="mr-2">Center</label>
+                        <select class="form-control dropdown-search-filter" id="ddlCenter" multiple>
+                            <!-- <option selected="" value="">All</option> -->
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="ddlBatches" class="mr-2">Batch Code</label>
+                        <input type="text" id="ddlBatches" name="ddlBatches" class="form-control"
+                            ClientIdMode="static" placeholder="Batch Code">
+                    </div>
+                    <div class="col-lg-3" id="divFromDate">
+                        <label for="FromDate" class="mr-2">From Date</label>
+                        <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
+                            ClientIdMode="static" placeholder="From Date">
+                    </div>
+                        <div class="col-lg-3" id="divToDate">
+                        <label for="ToDate" class="mr-2">To Date</label>
+                        <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
+                            ClientIdMode="static" placeholder="To Date">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-1">                                         
+                        <a class="btn btn-primary" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
+                        <a id="lnkDownload" style="display:none;"></a>
+                    </div>
+                    <div class="form-group col-lg-4" style="margin-top:30px;margin-left: 20px;">
+                        <div id="imgSpinner" >
+                            <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-block;"/>
+                            <label style="display:inline-block;">Please wait while downloading report...</label>
+                        </div> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <label style="color: #031529;"><b>Date Reference : </b>Report Data will be pulled based on Certification Distribution date. </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <label style="color: #031529;"><b>Agenda : </b>The report aims to provide summarized details of the certification process. Along with the user who are mapped to respective subproject, batch details and pivoted candidate count being shown according to each stage of certification. </label>
+                    </div>
+                </div>
+                <!-- end row -->
+            </div> <!-- end card-box -->
+        </div><!-- end col-->
+        </div>
+    </div> <!-- end container -->
+   
+<!-- third party js -->
+<script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<!-- third party js ends -->
+
+
+
+

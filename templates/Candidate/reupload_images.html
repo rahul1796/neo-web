@@ -61,23 +61,20 @@ var Candidates = {};
         var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
         //console.log(api_url);
         var xhr = new XMLHttpRequest();
-        xhr.open("GET",api_url );
-            xhr.onreadystatechange = function(){
-                if(xhr.readyState === 4){
-                if(xhr.status === 200){
-                    var response = JSON.parse(xhr.responseText);
-                    uploadFileToS3(file, response.data, response.url);
-                }
-                else{
-                    alert("Could not get signed URL.");
-                }
-                }
-            };
-            xhr.send();
+        xhr.open("GET",api_url,false);
+        xhr.send();
+    
+        if(xhr.status === 200){
+            var response = JSON.parse(xhr.responseText);
+            uploadFileToS3(file, response.data, response.url);
+        }
+        else{
+            alert("Could not get signed URL.");
+        }
     }
     function uploadFileToS3(file, s3Data, url){
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", s3Data.url);
+        xhr.open("POST", s3Data.url, false);
 
         var postData = new FormData();
         for(key in s3Data.fields){
@@ -85,17 +82,13 @@ var Candidates = {};
         }
         postData.append('file', file);
 
-        xhr.onreadystatechange = function() {
-            if(xhr.readyState === 4){
-            if(xhr.status === 200 || xhr.status === 204){
-                var response = xhr;
-            }
-            else{
-                alert("Could not upload file to s3.");
-            }
-        }
-        };
         xhr.send(postData);
+        if(xhr.status === 200 || xhr.status === 204){
+            var response = xhr;
+        }
+        else{
+            alert("Could not upload file to s3.");
+        }
     }
     function download_images()
     {
@@ -302,7 +295,7 @@ var Candidates = {};
                         alert('allowed format are : '+validImageTypes.toString());
                         return
                     }
-                    else if(file.size > 1024*1024){
+                    else if(file.size > 5*1024*1024){
                         alert('Image size is not valid');
                         return
                     }
@@ -318,7 +311,7 @@ var Candidates = {};
         if (!validImageTypes.includes(file['type'])){
             alert('allowed format are : '+validImageTypes.toString());
         }
-        else if(file.size > 1024*1024){
+        else if(file.size > 5*1024*1024){
             alert('Image size is not valid');
         }
         else{
@@ -338,18 +331,20 @@ var Candidates = {};
                 processData: false,
                 success: function(data) 
                 {   
+                    var status;
                     if (id!=2){
                     //console.log(file)
                     file = document.getElementById('myFile'+id).files[0]
                     UploadFileData_s3(file,filename);
+                    status = true;
                     }
                     else{
                         for (var x = 0; x < ins; x++) {
                             var file = document.getElementById('myFile'+id).files[x]
                             UploadFileData_s3(file,filename_prefix + file.name)
                         }
+                        status = true;
                     }
-
                     var message="",title="",icon="";
                     if(data.Status){
                         message=data.message;
@@ -377,7 +372,7 @@ var Candidates = {};
                                 confirmButtonClass:"btn btn-confirm mt-2"
                                 }).then(function(){
                                     window.location.href = '/after_popup_reload_image';
-                                });        
+                                });
                 },
                 error:function(err)
                 {
@@ -406,6 +401,21 @@ function validate_upload(id){
         }
     }
 }
+// function async level1()
+// {
+//     await level2();
+// }
+
+// function async level2()
+// {
+//     await level3();
+// }
+
+// function async level3()
+// {
+
+//     //activity
+// }
 </script>
 
 <div class="container-fluid">
@@ -455,7 +465,7 @@ function validate_upload(id){
                                 <label for="ur_Aadhar_Image">Aadhar Image</label>
                             </div>
                             <div class="col-lg-4">
-                                <div id="Aadhar_Image1_img"> <!-- class="col-lg-2"  -->>
+                                <div id="Aadhar_Image1_img"> <!-- class="col-lg-2"  -->
                                     <img id="ur_Aadhar_Image1" name="ur_Aadhar_Image1" src="static\assets\images\noimage2.png" alt="Aadhar Image" style="float:left;width:50%;padding: 5px;">
                                 </div>
                                 <div id="Aadhar_Image1_doc" style="display: none;">

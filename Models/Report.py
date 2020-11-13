@@ -933,19 +933,27 @@ class Report:
             #print(data['sheet1_columns'])
             if(len(data['sheet1']) < 1):
                 return({'msg':'No Records Found For Selected Filters!', 'success':False})
-              
+                
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
             df = df.fillna('')
-            df.loc[:,'Educational Qualification'] = df.loc[:,'Educational Qualification'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
-            df.loc[:,'Signed Mou'] = df.loc[:,'Signed Mou'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
-            df.loc[:,'Age Proof'] = df.loc[:,'Age Proof'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
-            df.loc[:,'Educational Marksheet'] = df.loc[:,'Educational Marksheet'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
-            df.loc[:,'Income Certificate'] = df.loc[:,'Income Certificate'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
-            df.loc[:,'Candidate_Image'] = df.loc[:,'Candidate_Image'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
-            df['Aadhar_Image_Front'] = df.loc[:,'Aadhar_Image'].map(lambda x: x.split(',')[0] if ((x.split(',')[0]=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x.split(',')[0] +'","View Image")')
-            df['Aadhar_Image_Back'] = df.loc[:,'Aadhar_Image'].map(lambda x: '' if len(x.split(','))<=1 else '=HYPERLINK("' + config.Base_URL +'/GetDocumentForExcel_S3_certiplate?image_name=' + x.split(',')[1] +'","View Image")')
-            df.loc[:,'Identifier_Image'] = df.loc[:,'Identifier_Image'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
-            df.loc[:,'Account_Image'] = df.loc[:,'Account_Image'].map(lambda x: x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x +'","View Image")')
+            
+            def create_image(x):
+                ext = str(x).split('.')[-1]
+                if ext in ['pdf','doc','docx']:
+                    return (x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_path=docs&image_name=' + x + '","View Image")')
+                else:
+                    return (x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3_certiplate?image_name=' + x + '","View Image")')
+                    
+            df.loc[:,'Educational Qualification'] = df.loc[:,'Educational Qualification'].map(create_image)
+            df.loc[:,'Signed Mou'] = df.loc[:,'Signed Mou'].map(create_image)
+            df.loc[:,'Age Proof'] = df.loc[:,'Age Proof'].map(create_image)
+            df.loc[:,'Educational Marksheet'] = df.loc[:,'Educational Marksheet'].map(create_image)
+            df.loc[:,'Income Certificate'] = df.loc[:,'Income Certificate'].map(create_image)
+            df.loc[:,'Candidate_Image'] = df.loc[:,'Candidate_Image'].map(create_image)
+            df['Aadhar_Image_Front'] = df.loc[:,'Aadhar_Image'].map(lambda x: x.split(',')[0] if ((x.split(',')[0]=='')) else create_image(x.split(',')[0]))
+            df['Aadhar_Image_Back'] = df.loc[:,'Aadhar_Image'].map(lambda x: '' if len(x.split(','))<=1 else create_image(x.split(',')[1]))
+            df.loc[:,'Identifier_Image'] = df.loc[:,'Identifier_Image'].map(create_image)
+            df.loc[:,'Account_Image'] = df.loc[:,'Account_Image'].map(create_image)
             
             df_mob=df[['Candidate_Id', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 'Age', 'Primary_Contact_No', 'Secondary_Contact_No', 'Email_Id', 'Gender', 'Marital_Status', 'Caste', 'Disability_Status', 'Religion', 'Mother_Tongue', 'Occupation', 'Average_Annual_Income', 'Interested_Course', 'Product','Source_Of_Information','Whatsapp_Number','Mobilized_On','Mobilized_By']]
             df_mob.drop_duplicates(keep='first',inplace=True) 
@@ -1139,3 +1147,156 @@ class Report:
         except Exception as e:
             return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
         
+    def download_centers_list(file_name, center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses):
+        try:
+            name_withpath = config.neo_report_file_path + 'report file/'+ file_name
+            
+            writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
+            workbook  = writer.book
+            header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+
+            resp = Database.download_centers_list(center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses)
+
+            if len(resp[0])==0:
+                return({'Description':'No data available for the selected items', 'Status':False})
+            df = pd.DataFrame(resp[0],columns=resp[1])
+            df=df.fillna('')
+
+            #df['Stage1_Location'] = df.loc[:,'Stage1_Location'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("'+ x + '","View Location")')
+            #df['Stage1_File_Name'] = df.loc[:,'Stage1_File_Name'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + image_path + x + '","View Image")')
+            Header = []
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name=' Center List')
+            worksheet = writer.sheets['Center List']
+            for col_num, value in enumerate(Header):
+                worksheet.write(0, col_num, value, header_format)
+
+            writer.save()
+            return({'Description':'created excel', 'Status':True, 'filename':file_name})
+
+        except Exception as e:
+            return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
+
+    def download_emp_target_template(file_name, user_id, user_role_id, date):
+        try:
+            name_withpath = config.neo_report_file_path + 'report file/'+ file_name
+            
+            writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
+            workbook  = writer.book
+            header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+                
+            resp = Database.download_emp_target_template(user_id, user_role_id, date)
+
+            if len(resp[0])==0:
+                return({'Description':'No data available for the selected items', 'Status':False})
+            df = pd.DataFrame(resp[0],columns=resp[1])
+            df=df.fillna('')
+            
+            Header = ["Employee Code(NE)", "Employee name(NE)", "NEO Role(NE)", "Sub Project Code(NE)", "Sub Project Name(NE)", "Month & Year*", "Week 1 Registration", "Week 2 Registration", "Week 3 Registration", "Week 4 Registration",
+            "Week 1 Enrollment", "Week 2 Enrollment", "Week 3 Enrollment", "Week 4 Enrollment", "Week 1 Assessment", "Week 2 Assessment", "Week 3 Assessment", "Week 4 Assessment", "Week 1 Certification", "Week 2 Certification",
+            "Week 3 Certification", "Week 4 Certification", "Week 1 Certification Distribution", "Week 2 Certification Distribution", "Week 3 Certification Distribution", "Week 4 Certification Distribution", "Week 1 Placement", 
+            "Week 2 Placement", "Week 3 Placement", "Week 4 Placement"]
+            
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Employee Target')
+            worksheet = writer.sheets['Employee Target']
+            
+            for col_num, value in enumerate(Header):
+                worksheet.write(0, col_num, value, header_format)
+
+            writer.save()
+            return({'Description':'created excel', 'Status':True, 'filename':file_name})
+        except Exception as e:
+            return({'Description':'Error creating excel' + str(e), 'Status':False, 'Error':str(e)})
+
+    def download_Assessment_report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+        try:
+            name_withpath = config.neo_report_file_path + 'report file/'+ file_name
+            
+            writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
+            workbook  = writer.book
+            header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+
+            resp = Database.download_Assessment_report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+            if len(resp[0])==0:
+                return({'Description':'No data available for the selected items', 'Status':False})
+            df = pd.DataFrame(resp[0],columns=resp[1])
+            df=df.fillna('')
+            
+            col = ['Region_Name', 'Coo', 'Tm', 'Cm', 'Customer_Name', 'Contract_Name', 'Contract_Code', 'Project_Name', 'Project_Code', 'Sub_Project_Name', 'Sub_Project_Code', 'Center_Name', 
+            'Course_Name', 'Course_Code', 'Qp_Name', 'Qp_Code', 'Enrolled_Count', 'Batch_Code', 'Batch_Name', 'Actual_Start_Date', 'Actual_End_Date', 'Ojt_Startdate', 'Ojt_Enddate', 
+            'Assessment_Types_Name', 'Awarding_Body', 'Partner_Category_Name', 'Partner_Name', 'Requested_Date', 'Scheduled_Date', 
+            'Scheduled_On', 'Assessor_Name', 'Assessor_Mobile', 'Assessor_Email', 'Asses_Candidate', 'Result_Uploaded', 'Certified_Candidate']
+
+            Header = ["Region", "COO", "TM", "CM/PC", "Customer Name", "Contract Name", "Contract Code", "Project Name", "Project Code", "Sub-Project Name", "Sub-Project Code", "Center Name",
+            "Course Name", "Course Code", "QP Name", "QP Code", "Enrolment Count", "Batch Code", "Batch Name", "Batch Start Date", "Batch End Date", "OJT Start Date", "OJT End Date",
+            "Assessment Type", "Awarding Body", "Assessment Partner Type", "Assesment Partner", "Assessment/Re-Assessment Request Date", "Assessment/Re-Assessment Proposed Date",
+            "Actual Assessment/Re-Assessment Date", "Assessor Name", "Assessor Mobile No", "Assessor Email", "Assessed Candidate", "Result Upload Date", "Certified Candidate"]
+            
+            df = df[col]
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Assessment Report')
+            worksheet = writer.sheets['Assessment Report']
+
+            for col_num, value in enumerate(Header):
+                worksheet.write(0, col_num, value, header_format)
+
+            writer.save()
+            return({'Description':'created excel', 'Status':True, 'filename':file_name})
+
+        except Exception as e:
+            return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
+    
+    def download_Certification_Distribution_Report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+        try:
+            name_withpath = config.neo_report_file_path + 'report file/'+ file_name
+            
+            writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
+            workbook  = writer.book
+            header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+
+            resp = Database.download_Certification_Distribution_Report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+            if len(resp[0])==0:
+                return({'Description':'No data available for the selected items', 'Status':False})
+            df = pd.DataFrame(resp[0],columns=resp[1])
+            df=df.fillna('')
+
+            col = ['Region_Name', 'Coo', 'Tm', 'Cm', 'Customer_Name', 'Contract_Name', 'Contract_Code', 'Project_Name', 'Project_Code', 'Sub_Project_Name', 'Sub_Project_Code', 'Center_Name', 
+            'Course_Name', 'Course_Code', 'Qp_Name', 'Qp_Code', 'Enrolled_Count', 'Certified_Count', 'Batch_Code', 'Batch_Name', 'Actual_Start_Date', 'Actual_End_Date', 'Ojt_Startdate', 'Ojt_Enddate', 
+            'Assessment_Types_Name', 'Awarding_Body', 'Partner_Category_Name', 'Partner_Name', 'Result_Upload_Date', 'Requested_Date', 'Sent_For_Printing_Date', 
+            'Sent_To_Center_Date', 'Center_Received_Date', 'Actual_Distribution_Date', 'Certification_Distribution_Count']
+            
+            Header = ["Region", "COO", "TM", "CM/PC", "Customer Name", "Contract Name", "Contract Code", "Project Name", "Project Code", "Sub-Project Name", "Sub-Project Code", "Center Name",
+            "Course Name", "Course Code", "QP Name", "QP Code", "Enrolment Count", "Passed/Certified Candidate", "Batch Code", "Batch Name", "Batch Start Date", "Batch End Date", "OJT Start Date", "OJT End Date",
+            "Assessment Type", "Awarding Body", "Assessment Partner Type", "Assesment Partner", "Result Upload Date", "Requested Date for Certificate Printing (PMT)", "Sent for Printing Date (Admin)",
+            "Certification Sent to Center Date (Admin)", "Certification Received at Center Date (Center)", "Certification Distributed Date", "Certification Distributed Nos"]
+            
+            df = df[col]
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Certification DistributioReport')
+            worksheet = writer.sheets['Certification DistributioReport']
+
+            for col_num, value in enumerate(Header):
+                worksheet.write(0, col_num, value, header_format)
+
+            writer.save()
+            return({'Description':'created excel', 'Status':True, 'filename':file_name})
+
+        except Exception as e:
+            return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})

@@ -1195,14 +1195,14 @@ class Database:
         cur.close()
         con.close()
         return content
-    def candidate_enrolled_in_batch(batch_id,assessment_id):
+    def candidate_enrolled_in_batch(batch_id,assessment_id,candidate_id):
         h = {}
         response = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_enrolled_in_batch] ?,?'
+        sql = 'exec [candidate_details].[sp_get_candidate_enrolled_in_batch] ?,?,?'
        
-        values = (batch_id,assessment_id)
+        values = (batch_id,assessment_id,candidate_id)
         print(values)
         cur.execute(sql,(values))
         #print(values)
@@ -4284,8 +4284,8 @@ SELECT					cb.name as candidate_name,
                         Stage=str(row[1])
                         AssessmentDate=str(row[2])
                         BatchAttemptNumber=str(row[3])
-                    if BatchAttemptNumber != '1':
-                        present_candidate = absent_candidate
+                    #if BatchAttemptNumber != '1':
+                        #present_candidate = absent_candidate
                     center_name=''
                     course_name=row=''
                     customer_name=row=''
@@ -5907,7 +5907,18 @@ SELECT					cb.name as candidate_name,
             query = ""
             b=[]
             temp=""
+            
+            # df.columns = df.columns.replace('*','')
+            # df_batch = df.iloc[:,[0,78]] if ProjectType == 1 else df.iloc[:,[0,79]]
+
+            # sql = 'exec	masters.[sp_validate_enrollment] ?'
+            # values = (df_batch.to_json(orient='records'),)
+            # cur.execute(sql,(values))
+            # ('[{"Candidate_id":171766,"batch_id":"B-5332-02_Sep_2020"}]',)
+            
+            
             for row in out:
+
                 que='''
                         SELECT		cs.intervention_id 
                         FROM		candidate_details.tbl_candidate_interventions i
@@ -5919,6 +5930,7 @@ SELECT					cb.name as candidate_name,
                 curs.execute(que)
                 intervention_id = curs.fetchall()
                 if intervention_id!=[]:
+                    
                     query += quer6.format(row[78] if ProjectType == 1 else row[79],intervention_id[0][0])
                 else:
                     b.append(row[78] if ProjectType == 1 else row[79])
@@ -7308,3 +7320,95 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()       
         return out
+
+    def GetPartnerCenters(partner_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_partner_centers]  ?'
+        values = (partner_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    def download_centers_list(center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses):
+        
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec [masters].[sp_get_centers_download] ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, courses)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        
+        curs.close()
+        cnxn.close()
+        return (data,columns)
+
+    def download_emp_target_template(user_id, user_role_id, date):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec [reports].[sp_get_emp_target_download] ?, ?, ?'
+        values = (user_id, user_role_id, date)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        curs.close()
+        cnxn.close()
+        return (data,columns)
+
+    def upload_employee_target_plan(df,user_id,user_role_id):
+        try:            
+            #print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            #print(len(df))
+            json_str=df.to_json(orient='records')
+            sql = 'exec	[masters].[sp_upload_employee_target] ?,?,?'
+            values = (json_str,user_id,user_role_id)
+            cur.execute(sql,(values))
+            
+            cur.commit()
+            cur.close()
+            con.close()
+            return {"Status":True,'message': "Uploaded successfully"}
+        except Exception as e:
+            return {"Status":False,'message': "error: "+str(e)}
+
+    def download_Assessment_report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec [reports].[sp_get_assesment_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        
+        curs.close()
+        cnxn.close()
+        return (data,columns)
+    
+    def download_Certification_Distribution_Report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec [reports].[sp_get_certification_distribution_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        
+        curs.close()
+        cnxn.close()
+        return (data,columns)
+        
