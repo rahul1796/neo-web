@@ -5465,25 +5465,25 @@ SELECT					cb.name as candidate_name,
         data = r.text
         root = ET.fromstring(data)
 
-        # json_array = []
-        # for child in root:
-        #     temp_data = child.attrib
-        #     json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
+        json_array = []
+        for child in root:
+            temp_data = child.attrib
+            json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
         
-        # sql = 'exec	masters.[sp_validate_enrollment] ?'
-        # values = (json.dumps(json_array),)
-        # curs.execute(sql,(values))
+        sql = 'exec	masters.[sp_validate_enrollment] ?'
+        values = (json.dumps(json_array),)
+        curs.execute(sql,(values))
 
-        # vali = curs.fetchall()[0][0]
-        # # vali ==0 means correct 
-        # msg = """Sorry, You can't enroll new candidates to this batch.
-        # Note: The Actual Enrolment count has exceeded the Planned Target."""
-        # if vali==1:
-        #     out = {'success': False, 'description': msg, 'app_status':True}
-        #     return out
-        # elif vali==2:
-        #     out = {'success': False, 'description': "Sorry, enrollment process has ended, you cannot enroll candidates to this batch.", 'app_status':True}
-        #     return out
+        vali = curs.fetchall()[0][0]
+        # vali ==0 means correct 
+        msg = """Sorry, You can't enroll new candidates to this batch.
+        Note: The Actual Enrolment count has exceeded the Planned Target."""
+        if vali==1:
+            out = {'success': False, 'description': msg, 'app_status':True}
+            return out
+        elif vali==2:
+            out = {'success': False, 'description': "Sorry, enrollment process has ended, you cannot enroll candidates to this batch.", 'app_status':True}
+            return out
 
         try:
             # quer1 = '''
@@ -5930,23 +5930,23 @@ SELECT					cb.name as candidate_name,
             b=[]
             temp=""
             
-            # df.columns = df.columns.replace('*','')
-            # df_batch = df.iloc[:,[0,78]] if ProjectType == 1 else df.iloc[:,[0,79]]
+            df.columns = df.columns.replace('*','')
+            df_batch = df.iloc[:,[0,78]] if ProjectType == 1 else df.iloc[:,[0,79]]
 
-            # sql = 'exec	masters.[sp_validate_enrollment] ?'
-            # values = (df_batch.to_json(orient='records'),)
-            # curs.execute(sql,(values))
+            sql = 'exec	masters.[sp_validate_enrollment] ?'
+            values = (df_batch.to_json(orient='records'),)
+            curs.execute(sql,(values))
 
-            # vali = curs.fetchall()[0][0]
-            # # vali ==0 means correct 
-            # if vali==1:
-            #     out = {'Status': False, 'message': "Sorry, You can't enroll new candidates to some batch."}
-            #     return out
+            vali = curs.fetchall()[0][0]
+            # vali ==0 means correct 
+            if vali==1:
+                out = {'Status': False, 'message': "Sorry, You can't enroll new candidates to some batch."}
+                return out
             # elif vali==2:
             #     out = {'Status': False, 'message': "date issue"}
             #     return out
-            #('[{"Candidate_id":171766,"batch_id":"B-5332-02_Sep_2020"}]',)
-            
+            # ('[{"Candidate_id":171766,"batch_id":"B-5332-02_Sep_2020"}]',)
+
             for row in out:
 
                 que='''
