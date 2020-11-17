@@ -3954,7 +3954,7 @@ api.add_resource(GetAllBusBasedOn_User,'/GetAllBusBasedOn_User')
 def get_download_file(path):
     """Download a file."""
     #print(path)
-    filename = r"{}{}".format(config.DownloadPathLocal,path)
+    filename = r"{}{}".format(config.DownloadPathLocal_download,path)
     #print(filename)
     if not(os.path.exists(filename)):
         filename = r"{}No-image-found.jpg".format(config.DownloadPathWeb)
