@@ -1240,7 +1240,7 @@ class Report:
             'Course_Name', 'Course_Code', 'Qp_Name', 'Qp_Code', 'Enrolled_Count', 'Batch_Code', 'Batch_Name', 'Actual_Start_Date', 'Actual_End_Date', 'Ojt_Startdate', 'Ojt_Enddate', 
             'Assessment_Types_Name', 'Awarding_Body', 'Partner_Category_Name', 'Partner_Name', 'Requested_Date', 'Scheduled_Date', 
             'Scheduled_On', 'Assessor_Name', 'Assessor_Mobile', 'Assessor_Email', 'Asses_Candidate', 'Result_Uploaded', 'Certified_Candidate']
-
+            
             Header = ["Region", "COO", "TM", "CM/PC", "Customer Name", "Contract Name", "Contract Code", "Project Name", "Project Code", "Sub-Project Name", "Sub-Project Code", "Center Name",
             "Course Name", "Course Code", "QP Name", "QP Code", "Enrolment Count", "Batch Code", "Batch Name", "Batch Start Date", "Batch End Date", "OJT Start Date", "OJT End Date",
             "Assessment Type", "Awarding Body", "Assessment Partner Type", "Assesment Partner", "Assessment/Re-Assessment Request Date", "Assessment/Re-Assessment Proposed Date",
