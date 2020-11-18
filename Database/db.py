@@ -5529,6 +5529,16 @@ SELECT					cb.name as candidate_name,
             quer7 = '''
             DELETE FROM [candidate_details].[tbl_candidate_family_details]  where candidate_id='{}';
             '''
+            #to restrict ELS data to sync in shiksha
+            quer8 = '''
+            update candidate_details.tbl_map_candidate_intervention_skilling
+            set    shiksha_sync_status=1 
+            where batch_id in (	select batch_id 
+					from batches.vw_batch_info 
+					where bu_name='ELS'
+				   );
+            '''
+            
             update_query_she='''
             UPDATE [candidate_details].[tbl_candidate_she_details] SET
                 [Address as per Aadhar Card (incl pin code)]='{}'
@@ -5614,6 +5624,7 @@ SELECT					cb.name as candidate_name,
                 quer5 += '\n' + "({},(select course_id from batches.tbl_batches where batch_id={}),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],out[i],out[i],user_id)
             quer5 = quer5[:-1]+';'
             curs.execute(quer5)
+            curs.execute(quer8)
             curs.commit()
             
             if fam_query!="":
@@ -5926,6 +5937,15 @@ SELECT					cb.name as candidate_name,
             [Farm land]='{}',Others='{}',[Address as per Aadhar Card (incl pin code)]='{}',[Educational qualification]='{}',[Age proof]='{}',[Signed MoU]='{}',[MoU signed date]='{}'
             where candidate_id={}
             '''
+            #to restrict sync to shiksha of ELS data
+            quer9='''
+            update candidate_details.tbl_map_candidate_intervention_skilling
+            set    shiksha_sync_status=1 
+            where batch_id in (	select batch_id 
+					from batches.vw_batch_info 
+					where bu_name='ELS'
+				   );
+            '''
             query = ""
             b=[]
             temp=""
@@ -6014,6 +6034,7 @@ SELECT					cb.name as candidate_name,
                 quer5 = quer5+ temp2[:-1]+';'
                 #print(quer5)
                 curs.execute(quer5)
+                curs.execute(quer9)
                 curs.commit()
 
             out = {'Status': True, 'message': "Submitted Successfully"}

@@ -1189,6 +1189,11 @@ function add_map_message(){
     }
     function PreviewScheduleAssessment()
     {
+        if($('#TxtScheduledDate').val()!='') 
+        {
+            ScheduleAssessment();
+            return;
+        }
         var cand_present='';
         var cand_absent='';
         $('[name=checkcase]').each(function () {
