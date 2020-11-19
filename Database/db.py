@@ -1195,14 +1195,14 @@ class Database:
         cur.close()
         con.close()
         return content
-    def candidate_enrolled_in_batch(batch_id,assessment_id):
+    def candidate_enrolled_in_batch(batch_id,assessment_id,candidate_id):
         h = {}
         response = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_enrolled_in_batch] ?,?'
+        sql = 'exec [candidate_details].[sp_get_candidate_enrolled_in_batch] ?,?,?'
        
-        values = (batch_id,assessment_id)
+        values = (batch_id,assessment_id,candidate_id)
         print(values)
         cur.execute(sql,(values))
         #print(values)
@@ -4284,8 +4284,8 @@ SELECT					cb.name as candidate_name,
                         Stage=str(row[1])
                         AssessmentDate=str(row[2])
                         BatchAttemptNumber=str(row[3])
-                    if BatchAttemptNumber != '1':
-                        present_candidate = absent_candidate
+                    #if BatchAttemptNumber != '1':
+                        #present_candidate = absent_candidate
                     center_name=''
                     course_name=row=''
                     customer_name=row=''
@@ -5529,6 +5529,16 @@ SELECT					cb.name as candidate_name,
             quer7 = '''
             DELETE FROM [candidate_details].[tbl_candidate_family_details]  where candidate_id='{}';
             '''
+            #to restrict ELS data to sync in shiksha
+            quer8 = '''
+            update candidate_details.tbl_map_candidate_intervention_skilling
+            set    shiksha_sync_status=1 
+            where batch_id in (	select batch_id 
+					from batches.vw_batch_info 
+					where bu_name='ELS'
+				   );
+            '''
+            
             update_query_she='''
             UPDATE [candidate_details].[tbl_candidate_she_details] SET
                 [Address as per Aadhar Card (incl pin code)]='{}'
@@ -5614,6 +5624,7 @@ SELECT					cb.name as candidate_name,
                 quer5 += '\n' + "({},(select course_id from batches.tbl_batches where batch_id={}),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],out[i],out[i],user_id)
             quer5 = quer5[:-1]+';'
             curs.execute(quer5)
+            curs.execute(quer8)
             curs.commit()
             
             if fam_query!="":
@@ -5926,6 +5937,15 @@ SELECT					cb.name as candidate_name,
             [Farm land]='{}',Others='{}',[Address as per Aadhar Card (incl pin code)]='{}',[Educational qualification]='{}',[Age proof]='{}',[Signed MoU]='{}',[MoU signed date]='{}'
             where candidate_id={}
             '''
+            #to restrict sync to shiksha of ELS data
+            quer9='''
+            update candidate_details.tbl_map_candidate_intervention_skilling
+            set    shiksha_sync_status=1 
+            where batch_id in (	select batch_id 
+					from batches.vw_batch_info 
+					where bu_name='ELS'
+				   );
+            '''
             query = ""
             b=[]
             temp=""
@@ -6014,6 +6034,7 @@ SELECT					cb.name as candidate_name,
                 quer5 = quer5+ temp2[:-1]+';'
                 #print(quer5)
                 curs.execute(quer5)
+                curs.execute(quer9)
                 curs.commit()
 
             out = {'Status': True, 'message': "Submitted Successfully"}
@@ -6891,6 +6912,25 @@ SELECT					cb.name as candidate_name,
         return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
         cur2.close()
         con.close()    
+    def DownloadAssessmentProductivityReport(customer_ids,contract_ids,month,user_id,user_role_id):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        
+        sql=''
+        sql = 'exec [reports].[sp_get_assessment_productivity_report_data] ?, ?, ?,?,?'
+        
+        values = (customer_ids, contract_ids, month,user_id,user_role_id)
+        
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))        
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+        cur2.close()
+        con.close()    
+    
     def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()

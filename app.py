@@ -1168,8 +1168,9 @@ class candidates_enrolled_in_batch(Resource):
     def get():
          if request.method == 'GET':  
             batch_id=request.args.get('batch_id',0,type=int)  
-            assessment_id=request.args.get('assessmentId',0,type=int)          
-            return Batch.candidate_enrolled_in_batch(batch_id,assessment_id)
+            assessment_id=request.args.get('assessmentId',0,type=int)  
+            candidate_id=request.args.get('candidate_id','',type=str)          
+            return Batch.candidate_enrolled_in_batch(batch_id,assessment_id,candidate_id)
 
 
 class add_edit_map_candidate_batch(Resource):
@@ -7730,6 +7731,20 @@ def ops_productivity_report():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+@app.route("/assessment_productivity_report_page")
+def assessment_productivity_report_page():
+    if g.user:
+        return render_template("Reports/assessment-productivity-report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/assessment_productivity_report")
+def assessment_productivity_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="assessment_productivity_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
 @app.route("/region_productivity_report_page")
 def region_productivity_report_page():
     if g.user:
@@ -7772,6 +7787,20 @@ class DownloadOpsProductivityReport(Resource):
             return resp
 
 api.add_resource(DownloadOpsProductivityReport,'/DownloadOpsProductivityReport')
+
+class DownloadAssessmentProductivityReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            month = request.form["month"]
+            customer_ids = request.form["customer_ids"]
+            contract_ids = request.form["contract_ids"]
+            user_id =  session['user_id']
+            user_role_id =  session['user_role_id']
+            resp = Report.DownloadAssessmentProductivityReport(customer_ids,contract_ids,month,user_id,user_role_id)
+            return resp
+
+api.add_resource(DownloadAssessmentProductivityReport,'/DownloadAssessmentProductivityReport')
 
 class DownloadRegionProductivityReport(Resource):
     @staticmethod
