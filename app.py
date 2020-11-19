@@ -8966,5 +8966,36 @@ class download_Certification_Distribution_Report(Resource):
                 return({"exceptione":str(e)})
 api.add_resource(download_Certification_Distribution_Report,'/download_Certification_Distribution_Report')
 
+@app.route("/Certification_Distribution_productivity_report_page")
+def Certification_Distribution_productivity_report_page():
+    if g.user:
+        return render_template("Reports/Certification_Distribution_Productivity_Report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/Certification_Distribution_productivity_report")
+def Certification_Distribution_productivity_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="Certification_Distribution_productivity_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class DownloadCertification_DistributionProductivityReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            month = request.form["month"]
+            customer_ids = request.form["customer_ids"]
+            project_ids = request.form["project_ids"]
+            sub_project_ids = request.form["sub_project_ids"]
+            regions = request.form["regions"]
+            
+            user_id =  session['user_id']
+            user_role_id =  session['user_role_id']
+            #
+            resp = Report.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
+            return resp
+api.add_resource(DownloadCertification_DistributionProductivityReport,'/DownloadCertification_DistributionProductivityReport')
+
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
