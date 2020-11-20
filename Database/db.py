@@ -5758,7 +5758,6 @@ SELECT					cb.name as candidate_name,
                 quer1 += '\n'+quer
             quer1 = quer1[:-1]+';'
             #print(quer1)
-            print(quer1)
             cur.execute(quer1)
             d = list(map(lambda x:x[0],cur.fetchall()))
             cur.commit()
@@ -5780,7 +5779,7 @@ SELECT					cb.name as candidate_name,
                 quer =  quer2 + '\n' + quer3 + '\n' + quer5
             else:
                 quer =  quer2 + '\n' + quer3
-            
+            #print(quer)
             cur.execute(quer)
             cur.commit()
             out = {'Status': True, 'message': "Submitted Successfully"}
@@ -5880,7 +5879,7 @@ SELECT					cb.name as candidate_name,
                     
                 if ProjectType==2:
                     query += quer7_res
-                
+               
             #print(query)
             cur.execute(query)
             cur.commit()
@@ -6548,6 +6547,7 @@ SELECT					cb.name as candidate_name,
                     left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
                     where		ur.user_role_id in (24,5,38)
                     and         coalesce(ur.is_active,0)=1
+                    and         u.is_active=1
                     UNION
                     select		distinct
                                 coalesce(ud.email,'') as email
@@ -6556,6 +6556,7 @@ SELECT					cb.name as candidate_name,
                     left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
                     where		ur.user_role_id in (24,5,38)
                     and         coalesce(ur.is_active,0)=1
+                    and         u.is_active=1
                     """
         else:
             quer = """
@@ -6566,6 +6567,7 @@ SELECT					cb.name as candidate_name,
                     left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
                     where		ur.user_role_id in (2,24,5,38)
                     and         coalesce(ur.is_active,0)=1
+                    and         u.is_active=1
                     UNION
                     select		distinct
                                 coalesce(ud.email,'') as email
@@ -6574,6 +6576,7 @@ SELECT					cb.name as candidate_name,
                     left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
                     where		ur.user_role_id in (2,24,5,38)
                     and         coalesce(ur.is_active,0)=1
+                    and         u.is_active=1
                     """
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
