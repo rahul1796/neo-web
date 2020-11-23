@@ -17,6 +17,10 @@ $(document).ready(function () {
         $('#btn_create').show();
     else 
         $('#btn_create').hide();
+    if(role_id == 1 || role_id==15)
+        $('#btn_download').show();
+    else 
+        $('#btn_download').hide();
 
     LoadTable(); 
 
@@ -279,3 +283,79 @@ function GetPOC(customer_id, client_name)
     });
     return false;
 } 
+function Download()
+{
+    $("#imgSpinner").show();
+       
+    if (0==9){
+    console.log(false)
+    }
+    else{
+        var URL=$('#hdn_web_url').val()+ "/client_download_report"
+        //window.location = URL + "?ActivityDate=2019-09-09"
+        $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: URL, 
+                    data: {
+                        'user_id':$('#hdn_home_user_id').val(),
+                        'user_role_id':$('#hdn_home_user_role_id').val(),
+                        'client_id':0,
+                        'funding_sources':$('#ddlFundingSource').val().toString(),
+                        'is_active': 1,
+                        'customer_groups':$('#ddlcustomergroup').val().toString(),
+                        'category_type_ids':$('#ddlCategoryType').val().toString()
+                    },
+                    success: function(resp) 
+                    {
+
+                        if (resp.Status){
+                            var varAnchor = document.getElementById('lnkDownload');
+                            varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
+                            $("#imgSpinner").hide();
+                            try 
+                                { 
+                                    //in firefox
+                                    varAnchor.click();
+                                    return;
+                                } catch(ex) {}
+                                
+                                try 
+                                { 
+                                    // in chrome
+                                    if(document.createEvent) 
+                                    {
+                                        var e = document.createEvent('MouseEvents');
+                                        e.initEvent( 'click', true, true );
+                                        varAnchor.dispatchEvent(e);
+                                        return;
+                                    }
+                                } catch(ex) {}
+                                
+                                try 
+                                { 
+                                    // in IE
+                                    if(document.createEventObject) 
+                                    {
+                                            var evObj = document.createEventObject();
+                                            varAnchor.fireEvent("onclick", evObj);
+                                            return;
+                                    }
+                                } catch(ex) {}
+                            
+                        }
+                        else{
+                            //alert(resp.Description)
+                            //alert('Not success')
+                            $("#imgSpinner").hide();
+                            
+                        }
+                    },
+                    error:function()
+                    {
+                        //$("#imgSpinner").hide();
+                    }
+                });
+        
+    }
+}

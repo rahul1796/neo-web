@@ -7154,6 +7154,27 @@ class batch_download_report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(batch_download_report,'/batch_download_report')
 
+class client_download_report(Resource):
+    @staticmethod
+    def post():
+        print(request.form)
+        if request.method=='POST':
+            try:
+                #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
+                user_id = request.form['user_id'] 
+                user_role_id = request.form['user_role_id'] 
+                client_id = request.form['client_id']                
+                funding_sources = request.form['funding_sources']
+                customer_groups = request.form['customer_groups']
+                category_type_ids = request.form['category_type_ids']
+                resp = Report.create_client_report(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids)
+                return resp
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(client_download_report,'/client_download_report')
+
 class GetECPReportDonload(Resource):
     @staticmethod
     def post():

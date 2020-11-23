@@ -58,11 +58,17 @@
                                         <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
                                         onclick="LoadTable()">Search</button>
                                     
-                                        <!--button style="margin-top: 30px" type="button" class="btn btn-primary waves-effect waves-light submit" 
-                                        onclick="Download()">Download</!--button-->
+                                        <button style="margin-top: 30px" type="button" id="btn_download" class="btn btn-primary waves-effect waves-light submit" 
+                                        onclick="Download()">Download</button>
                                     </div>
                                     <div class="col-lg-2" >                                        
                                         <button style="margin-top: 30px; float: right;"  id="btn_create" type="submit" class="btn btn-primary">Create Customer</a>  <!---->
+                                    </div>
+                                    <div class="form-group col-lg-3">
+                                        <div id="imgSpinner" style="display: none;">
+                                            <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-none;"/>
+                                            <label style="display:inline-block;">Please wait while downloading report...</label>
+                                        </div> 
                                     </div>
                                 </div>
                             </div>
