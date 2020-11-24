@@ -6983,7 +6983,23 @@ SELECT					cb.name as candidate_name,
         data = curs.fetchall()
         sheet2 = list(map(lambda x:list(x), data))        
         return {'sheet1':sheet1,'sheet2':sheet2,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns}
-        cur2.close()
+        curs.close()
+        con.close()    
+    def DownloadContractReport(user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+      
+        sql=''
+        sql = 'exec [reports].[sp_get_contract_download] ?, ?, ?,?,?,?,?,?,?'
+        values = (user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids)
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+        curs.close()
         con.close()    
     
     def DownloadAssessmentProductivityReport(customer_ids,contract_ids,month,user_id,user_role_id):

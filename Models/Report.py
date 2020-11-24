@@ -716,6 +716,52 @@ class Report:
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+    def create_contract_report(user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids):
+        try:
+            data=Database.DownloadContractReport(user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids)
+            print(data)
+            DownloadPath=config.neo_report_file_path+'report file/'
+            report_name = 'Contract_Report'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
+            r=re.compile('Contract_Report.*')
+            lst=os.listdir(DownloadPath)
+            newlist = list(filter(r.match, lst))
+            for i in newlist:
+                os.remove( DownloadPath + i)
+            path = '{}{}'.format(DownloadPath,report_name)
+            res={}
+            res=Report.CreateExcelContracteport(data,path)
+            
+            if res['success']:
+                return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
+            else:
+                return {"success":False,"msg":res['msg']}
+        except Exception as e:
+            return {"success":False,"msg":str(e)}
+
+    def CreateExcelContracteport(data,path):
+        try:
+            writer = pd.ExcelWriter(path, engine='xlsxwriter')
+            workbook  = writer.book
+
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+            df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Contracts')            
+
+            first_row = ['Contract Name','Customer Name','From Date','To Date','Stage','Contract Code','Entity Name','Sales Category','Account Manager','Sales Manager','Created By','Created On','Last Modified By','Last Modified On']
+            worksheet = writer.sheets['Contracts']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format)           
+            
+            writer.save()
+
+            return({'msg':'created excel', 'success':True, 'filename':path})
+        except Exception as e:
+            return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
     
     def DownloadAssessmentProductivityReport(customer_ids,contract_ids,month,user_id,user_role_id):
         try:
