@@ -666,7 +666,6 @@ class Report:
     def create_client_report(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids):
         try:
             data=Database.DownloadClientReport(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids)
-            print(data)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = 'Customer_Report'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile('Customer_Report.*')
@@ -719,7 +718,6 @@ class Report:
     def create_contract_report(user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids):
         try:
             data=Database.DownloadContractReport(user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids)
-            print(data)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = 'Contract_Report'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile('Contract_Report.*')
