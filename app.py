@@ -7155,6 +7155,48 @@ class batch_download_report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(batch_download_report,'/batch_download_report')
 
+class client_download_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
+                user_id = request.form['user_id'] 
+                user_role_id = request.form['user_role_id'] 
+                client_id = request.form['client_id']                
+                funding_sources = request.form['funding_sources']
+                customer_groups = request.form['customer_groups']
+                category_type_ids = request.form['category_type_ids']
+                resp = Report.create_client_report(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids)
+                return resp
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(client_download_report,'/client_download_report')
+
+class contract_download_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id'] 
+                user_role_id = request.form['user_role_id'] 
+                contract_id = request.form['contract_id']                
+                customer_ids = request.form['customer_ids']
+                stage_ids = request.form['stage_ids']
+                from_date = request.form['from_date']
+                to_date = request.form['to_date']
+                entity_ids = request.form['entity_ids']
+                sales_category_ids = request.form['sales_category_ids']
+                resp = Report.create_contract_report(user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids)
+                return resp
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(contract_download_report,'/contract_download_report')
+
 class GetECPReportDonload(Resource):
     @staticmethod
     def post():
