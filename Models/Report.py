@@ -1406,7 +1406,7 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Certificate Productivity')
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Certification Productivity')
             default_column = ['COO','TM','CM/PC']
             first_row = ['Certificate Printing', 'Certificate Dispatch', 'Certificate Distribution']
             second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual']
@@ -1414,7 +1414,7 @@ class Report:
                          'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
                          'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %']
     
-            worksheet = writer.sheets['Certificate Productivity']
+            worksheet = writer.sheets['Certification Productivity']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
             col=3
