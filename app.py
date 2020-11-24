@@ -7158,7 +7158,6 @@ api.add_resource(batch_download_report,'/batch_download_report')
 class client_download_report(Resource):
     @staticmethod
     def post():
-        print(request.form)
         if request.method=='POST':
             try:
                 #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
@@ -7179,7 +7178,6 @@ api.add_resource(client_download_report,'/client_download_report')
 class contract_download_report(Resource):
     @staticmethod
     def post():
-        print(request.form)
         if request.method=='POST':
             try:
                 user_id = request.form['user_id'] 
