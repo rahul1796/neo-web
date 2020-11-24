@@ -306,50 +306,21 @@ function Download()
                         'customer_groups':$('#ddlcustomergroup').val().toString(),
                         'category_type_ids':$('#ddlCategoryType').val().toString()
                     },
-                    success: function(resp) 
-                    {
-
-                        if (resp.Status){
-                            var varAnchor = document.getElementById('lnkDownload');
-                            varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
-                            $("#imgSpinner").hide();
-                            try 
-                                { 
-                                    //in firefox
-                                    varAnchor.click();
-                                    return;
-                                } catch(ex) {}
-                                
-                                try 
-                                { 
-                                    // in chrome
-                                    if(document.createEvent) 
-                                    {
-                                        var e = document.createEvent('MouseEvents');
-                                        e.initEvent( 'click', true, true );
-                                        varAnchor.dispatchEvent(e);
-                                        return;
-                                    }
-                                } catch(ex) {}
-                                
-                                try 
-                                { 
-                                    // in IE
-                                    if(document.createEventObject) 
-                                    {
-                                            var evObj = document.createEventObject();
-                                            varAnchor.fireEvent("onclick", evObj);
-                                            return;
-                                    }
-                                } catch(ex) {}
-                            
-                        }
-                        else{
-                            //alert(resp.Description)
-                            //alert('Not success')
-                            $("#imgSpinner").hide();
-                            
-                        }
+                    success:function(data){
+                        if(data!=null)
+                        {         
+                            if(data.success)
+                            {
+                                $("#imgSpinner").hide();        
+                                window.location=data.FilePath+data.FileName;
+                            }    
+                            else
+                            {
+                                $("#imgSpinner").hide(); 
+                                alert(data.msg);
+                                return false;
+                            }  
+                        }                    
                     },
                     error:function()
                     {

@@ -676,7 +676,7 @@ class Report:
             path = '{}{}'.format(DownloadPath,report_name)
             res={}
             res=Report.CreateExcelClientReport(data,path)
-            
+            os.chmod(DownloadPath+report_name, 0o777)
             if res['success']:
                 return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
             else:
@@ -719,16 +719,16 @@ class Report:
         try:
             data=Database.DownloadContractReport(user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids)
             DownloadPath=config.neo_report_file_path+'report file/'
-            report_name = 'Contract_Report'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
-            r=re.compile('Contract_Report.*')
+            report_name = 'Contract_Report_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
+            r=re.compile('Contract_Report_.*')
             lst=os.listdir(DownloadPath)
             newlist = list(filter(r.match, lst))
             for i in newlist:
                 os.remove( DownloadPath + i)
             path = '{}{}'.format(DownloadPath,report_name)
             res={}
-            res=Report.CreateExcelContracteport(data,path)
-            
+            res=Report.CreateExcelContractReport(data,path)
+            os.chmod(DownloadPath+report_name, 0o777)
             if res['success']:
                 return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
             else:
@@ -736,7 +736,7 @@ class Report:
         except Exception as e:
             return {"success":False,"msg":str(e)}
 
-    def CreateExcelContracteport(data,path):
+    def CreateExcelContractReport(data,path):
         try:
             writer = pd.ExcelWriter(path, engine='xlsxwriter')
             workbook  = writer.book
