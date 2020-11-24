@@ -5250,6 +5250,8 @@ SELECT					cb.name as candidate_name,
         conn.close()
         df.to_xml(candidate_xmlPath + filenmae)
 
+        return {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae,'mobilization_types':mobilization_types}
+
         candidatexml_fullPath = candidate_xmlPath+filenmae
         api_url=COL_URL + "s3_signature?file_name="+aws_location_full+"&file_type=" + 'text/xml'
         requests.get(api_url)
@@ -5322,8 +5324,8 @@ SELECT					cb.name as candidate_name,
             (candidate_id,present_address_line2,present_village,present_panchayat,present_taluk_block,permanent_address_line2,permanent_village,permanent_panchayat,permanent_taluk_block,created_on,created_by,is_active)
             values
             '''
-            #url = candidate_xml_weburl + xml
-            url = download_aws_url+aws_location+'neo_app/xml_files/'+'mobilization/' +xml
+            url = candidate_xml_weburl + xml
+            #url = download_aws_url+aws_location+'neo_app/xml_files/'+'mobilization/' +xml
 
             r = requests.get(url)
             data = r.text
@@ -5426,8 +5428,9 @@ SELECT					cb.name as candidate_name,
             VALUES
             '''
 
-            #url = candidate_xml_weburl + xml
-            url = download_aws_url+aws_location+'neo_app/xml_files/'+'registration/' +xml            
+            url = candidate_xml_weburl + xml
+            #url = download_aws_url+aws_location+'neo_app/xml_files/'+'registration/' +xml    
+
             r = requests.get(url)
             data = r.text
             root = ET.fromstring(data)
@@ -5484,8 +5487,9 @@ SELECT					cb.name as candidate_name,
             out = {'success': False, 'description': "Lower App Version", 'app_status':False}
             return out
         
-        #url = candidate_xml_weburl + xml
-        url = download_aws_url+aws_location+'neo_app/xml_files/'+'enrollment/' +xml            
+        url = candidate_xml_weburl + xml
+        #url = download_aws_url+aws_location+'neo_app/xml_files/'+'enrollment/' +xml   
+
         r = requests.get(url)
         data = r.text
         root = ET.fromstring(data)
@@ -6821,8 +6825,10 @@ SELECT					cb.name as candidate_name,
         conn.close()
         df.to_xml(candidate_xmlPath + filenmae)
 
-        aws_location_full = aws_location+'neo_app/xml_files/'+'enrollment/' +filenmae
+        return {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
 
+
+        aws_location_full = aws_location+'neo_app/xml_files/'+'enrollment/' +filenmae
         candidatexml_fullPath = candidate_xmlPath + filenmae
         api_url=COL_URL + "s3_signature?file_name="+aws_location_full+"&file_type=" + 'text/xml'
         requests.get(api_url)
