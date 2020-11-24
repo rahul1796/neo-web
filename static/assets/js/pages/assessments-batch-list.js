@@ -1425,8 +1425,13 @@ function add_map_message(){
             },
             success:function(data){
                 if(data!=null)
-                {                       
-                    window.location=data.FilePath+data.FileName;
+                {     
+                    if(data.status){
+                        window.location=data.FilePath+data.FileName;
+                    }
+                    else{
+                        alert(data.exception);
+                    }
                     //$('#divLoader').hide();
                 }                    
             },
@@ -1734,10 +1739,15 @@ function add_map_message(){
                      "Batch_Code":Batch_Code
             },
             success:function(data){
+                console.log(data);
                 if(data!=null)
                 {   
-                    window.location=data.FilePath+data.FileName;
-                    //$('#divLoader').hide();
+                    if(data.status){
+                        window.location=data.FilePath+data.FileName;
+                    }
+                    else{
+                        alert(data.exception);
+                    }
                 }                    
             },
             error:function(x){
@@ -1745,8 +1755,7 @@ function add_map_message(){
             }
         }); 
     }
-
-    
+   
 function UploadFileData()
 {
     if ($('#myFile').get(0).files.length === 0) {
