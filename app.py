@@ -5785,7 +5785,8 @@ class upload_bulk_upload(Resource):
             all_state=Database.all_state_validation()
             
             #regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[.]\w+$'
-            regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[\.A-Za-z]+\w+$'
+            #regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[\.A-Za-z]+\w+$'
+            regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[A-Za-z0-9]+[@]\w+[.][\.A-Za-z]+\w+$'
             regex2 = '[\.]{2,}'
             state_validation = [CustomElementValidation(lambda d: d.lower() in all_state, 'Invalid State')]
             cand_email_format_validation = [CustomElementValidation(lambda d: ((re.search(regex2,d)==None)and(re.search(regex,d)!=None)), 'Inavalid email format. Please provide correct email')]
