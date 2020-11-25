@@ -5504,14 +5504,15 @@ SELECT					cb.name as candidate_name,
         curs.execute(sql,(values))
 
         vali = curs.fetchall()[0][0]
-        # vali ==0 means correct 
-        msg = """Sorry, You can't enroll new candidates to this batch.
+        # vali ==0 means correct
+
+        msg = """Sorry, You can't enroll new candidates to the batch.
         Note: The Actual Enrolment count has exceeded the Planned Target."""
         if vali==1:
             out = {'success': False, 'description': msg, 'app_status':True}
             return out
         elif vali==2:
-            out = {'success': False, 'description': "Sorry, enrollment process has ended, you cannot enroll candidates to this batch.", 'app_status':True}
+            out = {'success': False, 'description': "Sorry, enrollment process has ended, you cannot enroll candidates to the batch.", 'app_status':True}
             return out
 
         try:
@@ -5986,9 +5987,10 @@ SELECT					cb.name as candidate_name,
             curs.execute(sql,(values))
 
             vali = curs.fetchall()[0][0]
+            
             # vali ==0 means correct 
             if vali==1:
-                out = {'Status': False, 'message': "Sorry, You can't enroll new candidates to some batch."}
+                out = {'Status': False, 'message': "Sorry, You can't enroll new candidates to the batch, Note: The Actual Enrolment count has exceeded the Planned Target."}
                 return out
             # elif vali==2:
             #     out = {'Status': False, 'message': "date issue"}
