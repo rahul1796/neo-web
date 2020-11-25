@@ -17,6 +17,10 @@ $(document).ready(function () {
         $('#btn_create').show();
     else 
         $('#btn_create').hide();
+    if(role_id == 1 || role_id==15)
+        $('#btn_download').show();
+    else 
+        $('#btn_download').hide();
 
     LoadTable(); 
 
@@ -279,3 +283,50 @@ function GetPOC(customer_id, client_name)
     });
     return false;
 } 
+function Download()
+{
+    $("#imgSpinner").show();
+       
+    if (0==9){
+    console.log(false)
+    }
+    else{
+        var URL=$('#hdn_web_url').val()+ "/client_download_report"
+        //window.location = URL + "?ActivityDate=2019-09-09"
+        $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: URL, 
+                    data: {
+                        'user_id':$('#hdn_home_user_id').val(),
+                        'user_role_id':$('#hdn_home_user_role_id').val(),
+                        'client_id':0,
+                        'funding_sources':$('#ddlFundingSource').val().toString(),
+                        'is_active': 1,
+                        'customer_groups':$('#ddlcustomergroup').val().toString(),
+                        'category_type_ids':$('#ddlCategoryType').val().toString()
+                    },
+                    success:function(data){
+                        if(data!=null)
+                        {         
+                            if(data.success)
+                            {
+                                $("#imgSpinner").hide();        
+                                window.location=data.FilePath+data.FileName;
+                            }    
+                            else
+                            {
+                                $("#imgSpinner").hide(); 
+                                alert(data.msg);
+                                return false;
+                            }  
+                        }                    
+                    },
+                    error:function()
+                    {
+                        //$("#imgSpinner").hide();
+                    }
+                });
+        
+    }
+}

@@ -28,6 +28,10 @@
         //LoadStages();
         Loadentityddl();
         LoadSalesCategoryddl();
+        if(role_id == 1 || role_id==15)
+            $('#btn_download').show();
+        else 
+            $('#btn_download').hide();
         if ('{{status}}'==1)
             $('#ddlStage').val("1");
             role_id=parseInt($('#hdn_home_user_role_id').val());
@@ -256,9 +260,59 @@
         $('#form1').submit();
         
     }
-
+    
     function LoadTableBasedOnSearch(){
         LoadTable();
+    }
+    function Download()
+    {
+        $("#imgSpinner").show();
+        
+        if (0==9){
+        console.log(false)
+        }
+        else{
+            var URL=$('#hdn_web_url').val()+ "/contract_download_report"
+            //window.location = URL + "?ActivityDate=2019-09-09"
+            $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: URL, 
+                        data: {
+                            'user_id':$('#hdn_home_user_id').val(),
+                            'user_role_id':$('#hdn_home_user_role_id').val(),                           
+                            'contract_id':0,
+                            'customer_ids':$('#ddlCustomer').val().toString(),
+                            'stage_ids':$('#ddlStage').val().toString(),
+                            'from_date':$('#FromDate').val().toString(),
+                            'to_date':$('#ToDate').val().toString(),
+                            'entity_ids':$('#ddlentity').val().toString(),
+                            'sales_category_ids':$('#ddlSalesCategory').val().toString()
+
+                        },
+                        success:function(data){
+                            if(data!=null)
+                            {         
+                                if(data.success)
+                                {
+                                    $("#imgSpinner").hide();        
+                                    window.location=data.FilePath+data.FileName;
+                                }    
+                                else
+                                {
+                                    $("#imgSpinner").hide(); 
+                                    alert(data.msg);
+                                    return false;
+                                }  
+                            }                    
+                        },
+                        error:function()
+                        {
+                            //$("#imgSpinner").hide();
+                        }
+                    });
+            
+        }
     }
 </script>
 
@@ -326,11 +380,18 @@
                         </br>
                         </div>
                         <div class="row">                             
-                            <div class="col-lg-6" >
+                            <div class="col-lg-1" >
                                 <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
                             </div>
                             <div class="col-lg-6" >                                        
-                                <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-primary">Create Contract</a>
+                                <button style="float: left;margin-top: 30px" type="button" id="btn_download" class="btn btn-primary waves-effect waves-light submit" 
+                                onclick="Download()">Download</button></div>
+                           
+                            <div class="form-group col-lg-3">
+                                <div id="imgSpinner" style="display: none;">
+                                    <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-none;"/>
+                                    <label style="display:inline-block;">Please wait while downloading report...</label>
+                                </div> 
                             </div>
                         </div>
                     </form>
@@ -345,6 +406,10 @@
                                <div class="col-lg-6">
                                    <h4 class="header-title">Contract List</h4>
                                </div>
+                               <div class="col-lg-6" >                                        
+                                <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-primary">Create Contract</a>
+                            </div>
+                           
                            </div>
                            <br/>
                            <div class="col-lg-12">
