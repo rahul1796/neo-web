@@ -7564,8 +7564,22 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()
         return (data,columns)
+
+    def download_Certification_Distribution_Report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec [reports].[sp_get_certification_distribution_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        
+        curs.close()
+        cnxn.close()
+        return (data,columns)
     
-    def download_Certification_Distribution_Report(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id):
+    def DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
 

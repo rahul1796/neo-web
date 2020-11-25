@@ -1475,7 +1475,7 @@ class Report:
 
     def DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id):
         try:
-            data=Database.download_Certification_Distribution_Report(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
+            data=Database.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.CertificateProductivityFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.CertificateProductivityFileName + ".*")
