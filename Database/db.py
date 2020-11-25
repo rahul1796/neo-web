@@ -5499,7 +5499,7 @@ SELECT					cb.name as candidate_name,
             temp_data = child.attrib
             json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
         
-        sql = 'exec	masters.[sp_validate_enrollment] ?'
+        sql = 'exec	[masters].[sp_validate_enrollment_m] ?'
         values = (json.dumps(json_array),)
         curs.execute(sql,(values))
 
