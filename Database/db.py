@@ -861,8 +861,8 @@ class Database:
         cur = con.cursor()
         sql = 'exec [users].[sp_get_trainer_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?'
         values = (user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids,TrainerType)
+        
         cur.execute(sql,(values))
-        print(values)
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
@@ -5216,15 +5216,20 @@ SELECT					cb.name as candidate_name,
             conn.close()
             out = {'success': False, 'description': "Lower App Version", 'app_status':False}
             return out
+        
+        aws_location_full = ''
         if cand_stage==1:
             sql = 'exec [candidate_details].[sp_get_candidate_list_stage_M]  ?, ?, ?'
             filenmae = 'candidate_list_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_M.xml'
+            aws_location_full = aws_location+'neo_app/xml_files/'+'mobilization/' +filenmae
         elif cand_stage==2:
             sql = 'exec [candidate_details].[sp_get_candidate_list_stage_R]  ?, ?, ?'
             filenmae = 'candidate_list_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_R.xml'
+            aws_location_full = aws_location+'neo_app/xml_files/'+'registration/' +filenmae
         elif cand_stage==3:
             sql = 'exec [candidate_details].[sp_get_candidate_list_stage_E]  ?, ?, ?'
             filenmae = 'candidate_list_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_E.xml'
+            aws_location_full = aws_location+'neo_app/xml_files/'+'enrollment/' +filenmae
         else:
             out = {'success': False, 'description': "incorrect stage", 'app_status':True}
             return out
@@ -5245,7 +5250,26 @@ SELECT					cb.name as candidate_name,
         conn.close()
         df.to_xml(candidate_xmlPath + filenmae)
         mobilization_types=Database.get_user_mobilization_type(user_id)
-        out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae,'mobilization_types':mobilization_types}
+        return {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae,'mobilization_types':mobilization_types}
+
+        candidatexml_fullPath = candidate_xmlPath+filenmae
+        api_url=COL_URL + "s3_signature?file_name="+aws_location_full+"&file_type=" + 'text/xml'
+        requests.get(api_url)
+        r = requests.get(api_url)
+        json = r.json()
+        
+        json_data = json['data']
+        data = json_data['fields']
+        URL = json_data['url']
+        raws=''
+        with open(candidatexml_fullPath, 'r') as f:
+            raws = requests.post(url = URL, data = data, files = {'file':(filenmae,f,'text/xml')})
+        os.remove(candidatexml_fullPath)
+        if (raws.status_code==200)or(raws.status_code==204):
+            mobilization_types=Database.get_user_mobilization_type(user_id)
+            out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae,'mobilization_types':mobilization_types}
+        else:
+            out = {'success': False, 'description': "Unable to upload to s3", 'app_status':True}
         return out
 
     def get_user_mobilization_type(user_id):
@@ -5301,6 +5325,8 @@ SELECT					cb.name as candidate_name,
             values
             '''
             url = candidate_xml_weburl + xml
+            #url = download_aws_url+aws_location+'neo_app/xml_files/'+'mobilization/' +xml
+
             r = requests.get(url)
             data = r.text
             root = ET.fromstring(data)
@@ -5357,8 +5383,6 @@ SELECT					cb.name as candidate_name,
             quer3 = '''
             update candidate_details.tbl_candidates set isFresher={}, project_type={},created_by='{}',is_active=1,created_on=getdate() where candidate_id='{}';
             '''
-
-           
             
             insert_query_she='''
             INSERT INTO [candidate_details].[tbl_candidate_she_details]
@@ -5403,7 +5427,10 @@ SELECT					cb.name as candidate_name,
                 ,[is_active])
             VALUES
             '''
+
             url = candidate_xml_weburl + xml
+            #url = download_aws_url+aws_location+'neo_app/xml_files/'+'registration/' +xml    
+
             r = requests.get(url)
             data = r.text
             root = ET.fromstring(data)
@@ -5460,6 +5487,34 @@ SELECT					cb.name as candidate_name,
             out = {'success': False, 'description': "Lower App Version", 'app_status':False}
             return out
         
+        url = candidate_xml_weburl + xml
+        #url = download_aws_url+aws_location+'neo_app/xml_files/'+'enrollment/' +xml   
+
+        r = requests.get(url)
+        data = r.text
+        root = ET.fromstring(data)
+
+        json_array = []
+        for child in root:
+            temp_data = child.attrib
+            json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
+        
+        sql = 'exec	[masters].[sp_validate_enrollment_m] ?'
+        values = (json.dumps(json_array),)
+        curs.execute(sql,(values))
+
+        vali = curs.fetchall()[0][0]
+        # vali ==0 means correct
+
+        msg = """Sorry, You can't enroll new candidates to the batch.
+        Note: The Actual Enrolment count has exceeded the Planned Target."""
+        if vali==1:
+            out = {'success': False, 'description': msg, 'app_status':True}
+            return out
+        elif vali==2:
+            out = {'success': False, 'description': "Sorry, enrollment process has ended, you cannot enroll candidates to the batch.", 'app_status':True}
+            return out
+
         try:
             # quer1 = '''
             # update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1 where candidate_id='{}';
@@ -5504,6 +5559,16 @@ SELECT					cb.name as candidate_name,
             quer7 = '''
             DELETE FROM [candidate_details].[tbl_candidate_family_details]  where candidate_id='{}';
             '''
+            #to restrict ELS data to sync in shiksha
+            quer8 = '''
+            update candidate_details.tbl_map_candidate_intervention_skilling
+            set    shiksha_sync_status=1 
+            where batch_id in (	select batch_id 
+					from batches.vw_batch_info 
+					where bu_name='ELS'
+				   );
+            '''
+            
             update_query_she='''
             UPDATE [candidate_details].[tbl_candidate_she_details] SET
                 [Address as per Aadhar Card (incl pin code)]='{}'
@@ -5537,10 +5602,7 @@ SELECT					cb.name as candidate_name,
                 select sp.is_ojt_req & c.is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id left join masters.tbl_courses as c on c.course_id=b.course_id where 1=1 and coalesce(sp.is_ojt_req,0)=1  and coalesce(c.is_ojt_req,0)=1 and b.batch_id like trim('{}')
                 '''
 
-            url = candidate_xml_weburl + xml
-            r = requests.get(url)
-            data = r.text
-            root = ET.fromstring(data)
+            #root = ET.fromstring(data)
             query = ""
             fam_query=""
             out=[]
@@ -5592,6 +5654,7 @@ SELECT					cb.name as candidate_name,
                 quer5 += '\n' + "({},(select course_id from batches.tbl_batches where batch_id={}),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],out[i],out[i],user_id)
             quer5 = quer5[:-1]+';'
             curs.execute(quer5)
+            curs.execute(quer8)
             curs.commit()
             
             if fam_query!="":
@@ -5725,7 +5788,6 @@ SELECT					cb.name as candidate_name,
                 quer1 += '\n'+quer
             quer1 = quer1[:-1]+';'
             #print(quer1)
-            print(quer1)
             cur.execute(quer1)
             d = list(map(lambda x:x[0],cur.fetchall()))
             cur.commit()
@@ -5747,7 +5809,7 @@ SELECT					cb.name as candidate_name,
                 quer =  quer2 + '\n' + quer3 + '\n' + quer5
             else:
                 quer =  quer2 + '\n' + quer3
-            
+            #print(quer)
             cur.execute(quer)
             cur.commit()
             out = {'Status': True, 'message': "Submitted Successfully"}
@@ -5847,7 +5909,7 @@ SELECT					cb.name as candidate_name,
                     
                 if ProjectType==2:
                     query += quer7_res
-                
+               
             #print(query)
             cur.execute(query)
             cur.commit()
@@ -5904,19 +5966,37 @@ SELECT					cb.name as candidate_name,
             [Farm land]='{}',Others='{}',[Address as per Aadhar Card (incl pin code)]='{}',[Educational qualification]='{}',[Age proof]='{}',[Signed MoU]='{}',[MoU signed date]='{}'
             where candidate_id={}
             '''
+            #to restrict sync to shiksha of ELS data
+            quer9='''
+            update candidate_details.tbl_map_candidate_intervention_skilling
+            set    shiksha_sync_status=1 
+            where batch_id in (	select batch_id 
+					from batches.vw_batch_info 
+					where bu_name='ELS'
+				   );
+            '''
             query = ""
             b=[]
             temp=""
             
-            # df.columns = df.columns.replace('*','')
-            # df_batch = df.iloc[:,[0,78]] if ProjectType == 1 else df.iloc[:,[0,79]]
+            df.columns = df.columns.str.replace('*','')
+            df_batch = df.iloc[:,[0,78]] if ProjectType == 1 else df.iloc[:,[0,79]]
 
-            # sql = 'exec	masters.[sp_validate_enrollment] ?'
-            # values = (df_batch.to_json(orient='records'),)
-            # cur.execute(sql,(values))
+            sql = 'exec	masters.[sp_validate_enrollment] ?'
+            values = (df_batch.to_json(orient='records'),)
+            curs.execute(sql,(values))
+
+            vali = curs.fetchall()[0][0]
+            
+            # vali ==0 means correct 
+            if vali==1:
+                out = {'Status': False, 'message': "Sorry, You can't enroll new candidates to the batch, Note: The Actual Enrolment count has exceeded the Planned Target."}
+                return out
+            # elif vali==2:
+            #     out = {'Status': False, 'message': "date issue"}
+            #     return out
             # ('[{"Candidate_id":171766,"batch_id":"B-5332-02_Sep_2020"}]',)
-            
-            
+
             for row in out:
 
                 que='''
@@ -5984,6 +6064,7 @@ SELECT					cb.name as candidate_name,
                 quer5 = quer5+ temp2[:-1]+';'
                 #print(quer5)
                 curs.execute(quer5)
+                curs.execute(quer9)
                 curs.commit()
 
             out = {'Status': True, 'message': "Submitted Successfully"}
@@ -6497,6 +6578,7 @@ SELECT					cb.name as candidate_name,
                     left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
                     where		ur.user_role_id in (24,5,38)
                     and         coalesce(ur.is_active,0)=1
+                    and         u.is_active=1
                     UNION
                     select		distinct
                                 coalesce(ud.email,'') as email
@@ -6505,6 +6587,7 @@ SELECT					cb.name as candidate_name,
                     left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
                     where		ur.user_role_id in (24,5,38)
                     and         coalesce(ur.is_active,0)=1
+                    and         u.is_active=1
                     """
         else:
             quer = """
@@ -6515,6 +6598,7 @@ SELECT					cb.name as candidate_name,
                     left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
                     where		ur.user_role_id in (2,24,5,38)
                     and         coalesce(ur.is_active,0)=1
+                    and         u.is_active=1
                     UNION
                     select		distinct
                                 coalesce(ud.email,'') as email
@@ -6523,6 +6607,7 @@ SELECT					cb.name as candidate_name,
                     left join   users.tbl_map_User_UserRole as ur on ur.user_id=u.user_id
                     where		ur.user_role_id in (2,24,5,38)
                     and         coalesce(ur.is_active,0)=1
+                    and         u.is_active=1
                     """
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
@@ -6741,9 +6826,29 @@ SELECT					cb.name as candidate_name,
         curs.close()
         conn.close()
         df.to_xml(candidate_xmlPath + filenmae)
-        out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
-        return out
 
+        return {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
+
+
+        aws_location_full = aws_location+'neo_app/xml_files/'+'enrollment/' +filenmae
+        candidatexml_fullPath = candidate_xmlPath + filenmae
+        api_url=COL_URL + "s3_signature?file_name="+aws_location_full+"&file_type=" + 'text/xml'
+        requests.get(api_url)
+        r = requests.get(api_url)
+        json = r.json()
+        
+        json_data = json['data']
+        data = json_data['fields']
+        URL = json_data['url']
+        raws=''
+        with open(candidatexml_fullPath, 'r') as f:
+            raws = requests.post(url = URL, data = data, files = {'file':(filenmae,f,'text/xml')})
+        os.remove(candidatexml_fullPath)
+        if (raws.status_code==200)or(raws.status_code==204):
+            out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
+        else:
+            out = {'success': False, 'description': "Unable to upload to s3", 'app_status':True}
+        return out
 
     def GetUserTarget(user_id):
         response = []
@@ -6861,6 +6966,68 @@ SELECT					cb.name as candidate_name,
         return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
         cur2.close()
         con.close()    
+    def DownloadClientReport(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        sheet2=[]
+        sheet2_columns=[]
+       
+        sql=''
+        sql1=''
+        sql = 'exec [reports].[sp_get_customer_download] ?, ?, ?,?,?,?'
+        sql1 = 'exec [reports].[sp_get_customer_poc_download] ?, ?, ?,?,?,?'
+        
+        values = (user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids)
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))
+        
+
+        curs.execute(sql1,(values))
+        sheet2_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet2 = list(map(lambda x:list(x), data))        
+        return {'sheet1':sheet1,'sheet2':sheet2,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns}
+        curs.close()
+        con.close()    
+    def DownloadContractReport(user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+      
+        sql=''
+        sql = 'exec [reports].[sp_get_contract_download] ?, ?, ?,?,?,?,?,?,?'
+        values = (user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids)
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+        curs.close()
+        con.close()    
+    
+    def DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        
+        sql = 'exec [reports].[sp_get_assessment_productivity_report_data] ?,?,?,?, ?, ?,?,?'
+        
+        values = (customer_ids, contract_ids,project_ids,sub_project_ids,regions, month,user_id,user_role_id)
+        
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))        
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+        cur2.close()
+        con.close()    
+    
     def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
@@ -7398,17 +7565,21 @@ SELECT					cb.name as candidate_name,
         cnxn.close()
         return (data,columns)
     
-    def download_Certification_Distribution_Report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+    def download_Certification_Distribution_Report(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
-        sql = 'exec [reports].[sp_get_certification_distribution_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
-        curs.execute(sql,(values))
-        columns = [column[0].title() for column in curs.description]
-        data = curs.fetchall()
-        data = list(map(lambda x:list(x), data))
+
+        sheet1=[]
+        sheet1_columns=[]
+
+        sql = 'exec [reports].[sp_get_certificate_distribution_productivity_report] ?, ?, ?,?,?, ?, ?'
+        values = (month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
         
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))        
         curs.close()
-        cnxn.close()
-        return (data,columns)
+        cnxn.close()    
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
         

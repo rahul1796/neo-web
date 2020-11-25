@@ -193,7 +193,8 @@
                                     varHtml+='  <td style="text-align:center;">'+ ''+'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.PartnerUsers[i].User_Name +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.PartnerUsers[i].Email +'</td>';                    
-                                varHtml+='  <td style="text-align:center;">'+ data.PartnerUsers[i].Mobile +'</td>';  
+                                varHtml+='  <td style="text-align:center;">'+ data.PartnerUsers[i].Mobile +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.PartnerUsers[i].Role +'</td>';   
                                 varHtml+='</tr>';                            
                             }
                             $("#tbl_users tbody").append(varHtml);
@@ -476,6 +477,7 @@
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Name</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Email</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Mobile</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">NEO Role</th>
                             </tr>
                         </thead>
                         <tbody>

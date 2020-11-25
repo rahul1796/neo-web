@@ -3954,7 +3954,7 @@ api.add_resource(GetAllBusBasedOn_User,'/GetAllBusBasedOn_User')
 def get_download_file(path):
     """Download a file."""
     #print(path)
-    filename = r"{}{}".format(config.DownloadPathLocal,path)
+    filename = r"{}{}".format(config.DownloadPathLocal_download,path)
     #print(filename)
     if not(os.path.exists(filename)):
         filename = r"{}No-image-found.jpg".format(config.DownloadPathWeb)
@@ -5785,7 +5785,8 @@ class upload_bulk_upload(Resource):
             all_state=Database.all_state_validation()
             
             #regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[.]\w+$'
-            regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[\.A-Za-z]+\w+$'
+            #regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[@]\w+[\.A-Za-z]+\w+$'
+            regex = r'^[A-Za-z0-9]+[\._A-Za-z0-9]+[A-Za-z0-9]+[@]\w+[.][\.A-Za-z]+\w+$'
             regex2 = '[\.]{2,}'
             state_validation = [CustomElementValidation(lambda d: d.lower() in all_state, 'Invalid State')]
             cand_email_format_validation = [CustomElementValidation(lambda d: ((re.search(regex2,d)==None)and(re.search(regex,d)!=None)), 'Inavalid email format. Please provide correct email')]
@@ -7154,6 +7155,48 @@ class batch_download_report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(batch_download_report,'/batch_download_report')
 
+class client_download_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                #candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
+                user_id = request.form['user_id'] 
+                user_role_id = request.form['user_role_id'] 
+                client_id = request.form['client_id']                
+                funding_sources = request.form['funding_sources']
+                customer_groups = request.form['customer_groups']
+                category_type_ids = request.form['category_type_ids']
+                resp = Report.create_client_report(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids)
+                return resp
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(client_download_report,'/client_download_report')
+
+class contract_download_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id'] 
+                user_role_id = request.form['user_role_id'] 
+                contract_id = request.form['contract_id']                
+                customer_ids = request.form['customer_ids']
+                stage_ids = request.form['stage_ids']
+                from_date = request.form['from_date']
+                to_date = request.form['to_date']
+                entity_ids = request.form['entity_ids']
+                sales_category_ids = request.form['sales_category_ids']
+                resp = Report.create_contract_report(user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids)
+                return resp
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(contract_download_report,'/contract_download_report')
+
 class GetECPReportDonload(Resource):
     @staticmethod
     def post():
@@ -7731,6 +7774,20 @@ def ops_productivity_report():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+@app.route("/assessment_productivity_report_page")
+def assessment_productivity_report_page():
+    if g.user:
+        return render_template("Reports/assessment-productivity-report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/assessment_productivity_report")
+def assessment_productivity_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="assessment_productivity_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
 @app.route("/region_productivity_report_page")
 def region_productivity_report_page():
     if g.user:
@@ -7773,6 +7830,23 @@ class DownloadOpsProductivityReport(Resource):
             return resp
 
 api.add_resource(DownloadOpsProductivityReport,'/DownloadOpsProductivityReport')
+
+class DownloadAssessmentProductivityReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            month = request.form["month"]
+            customer_ids = request.form["customer_ids"]
+            contract_ids = request.form["contract_ids"]
+            project_ids = request.form["project_ids"]
+            sub_project_ids = request.form["sub_project_ids"]
+            regions = request.form["regions"]
+            user_id =  session['user_id']
+            user_role_id =  session['user_role_id']
+            resp = Report.DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id)
+            return resp
+
+api.add_resource(DownloadAssessmentProductivityReport,'/DownloadAssessmentProductivityReport')
 
 class DownloadRegionProductivityReport(Resource):
     @staticmethod
@@ -8937,6 +9011,37 @@ class download_Certification_Distribution_Report(Resource):
             except Exception as e:
                 return({"exceptione":str(e)})
 api.add_resource(download_Certification_Distribution_Report,'/download_Certification_Distribution_Report')
+
+@app.route("/Certification_Distribution_productivity_report_page")
+def Certification_Distribution_productivity_report_page():
+    if g.user:
+        return render_template("Reports/Certification_Distribution_Productivity_Report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/Certification_Distribution_productivity_report")
+def Certification_Distribution_productivity_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="Certification_Distribution_productivity_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class DownloadCertification_DistributionProductivityReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            month = request.form["month"]
+            customer_ids = request.form["customer_ids"]
+            project_ids = request.form["project_ids"]
+            sub_project_ids = request.form["sub_project_ids"]
+            regions = request.form["regions"]
+            
+            user_id =  session['user_id']
+            user_role_id =  session['user_role_id']
+            #
+            resp = Report.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
+            return resp
+api.add_resource(DownloadCertification_DistributionProductivityReport,'/DownloadCertification_DistributionProductivityReport')
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)

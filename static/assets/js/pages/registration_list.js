@@ -16,44 +16,35 @@ function UploadFileData_s3(file,file_name)
     var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
     
     var xhr = new XMLHttpRequest();
-    xhr.open("GET",api_url );
-        xhr.onreadystatechange = function(){
-            if(xhr.readyState === 4){
-            if(xhr.status === 200){
-                var response = JSON.parse(xhr.responseText);
-                console.log(response);
-                uploadFileToS3(file, response.data, response.url);
-            }
-            else{
-                alert("Could not get signed URL.");
-            }
-            }
-        };
-        xhr.send();
+    xhr.open("GET",api_url,false);
+    xhr.send();
+
+    if(xhr.status === 200){
+        var response = JSON.parse(xhr.responseText);
+        console.log(response);
+        uploadFileToS3(file, response.data, response.url);
+    }
+    else{
+        alert("Could not get signed URL.");
+    }
 }
 function uploadFileToS3(file, s3Data, url){
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", s3Data.url);
-
+    xhr.open("POST", s3Data.url,false);
     var postData = new FormData();
     for(key in s3Data.fields){
         postData.append(key, s3Data.fields[key]);
     }
     postData.append('file', file);
-
-    xhr.onreadystatechange = function() {
-        if(xhr.readyState === 4){
-        if(xhr.status === 200 || xhr.status === 204){
-            var response = xhr;
-            console.log(response);
-            //UploadFileToProcess();
-        }
-        else{
-            alert("Could not upload file to s3.");
-        }
-    }
-    };
     xhr.send(postData);
+    if(xhr.status === 200 || xhr.status === 204){
+        var response = xhr;
+        console.log(response);
+        //UploadFileToProcess();
+    }
+    else{
+        alert("Could not upload file to s3.");
+    }
 }
 
 function toggleCheckbox(e)
