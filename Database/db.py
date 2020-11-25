@@ -5249,7 +5249,7 @@ SELECT					cb.name as candidate_name,
         curs.close()
         conn.close()
         df.to_xml(candidate_xmlPath + filenmae)
-
+        mobilization_types=Database.get_user_mobilization_type(user_id)
         return {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae,'mobilization_types':mobilization_types}
 
         candidatexml_fullPath = candidate_xmlPath+filenmae
