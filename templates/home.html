@@ -95,6 +95,7 @@
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
                         $('#Productivity_Report').show();
+                            $('#certificate_distribution_Productivity_Report').show();
                             $('#region_productivity_report').show();
                             $('#mobilizer_productivity_report').show();
                             $('#Ops_Productivity_Report').show();
@@ -145,6 +146,7 @@
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').hide();
                             $('#Assessment_report_Menu').hide();
+                            $('#Assessment_Productivity_Report').hide();
                             $('#Certification_Distribution_Report_Menu').hide();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
@@ -248,6 +250,7 @@
                             $('#TrainerProductivityReport').hide();
                             $('#Assessment_report_Menu').hide();
                             $('#Certification_Distribution_Report_Menu').hide();
+                            $('#Assessment_Productivity_Report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -289,6 +292,7 @@
                             $('#Batch_Status_report').show();
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
+                            $('#Assessment_Productivity_Report').hide();
                         
                         if(goto !="")
                             $("#box").load(goto);
@@ -324,6 +328,7 @@
                                 $('#OJT_Monitoring_Report').show();
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
+                            $('#Assessment_Productivity_Report').hide();
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
@@ -367,6 +372,7 @@
                                 $('#OJT_Monitoring_Report').show();
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
+                            $('#Assessment_Productivity_Report').hide();
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
@@ -413,6 +419,7 @@
                                 $('#OJT_Monitoring_Report').show();
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
+                            $('#Assessment_Productivity_Report').hide();
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
@@ -453,6 +460,7 @@
                                 $('#OJT_Monitoring_Report').show();
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
+                            $('#Assessment_Productivity_Report').hide();
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
@@ -501,6 +509,7 @@
                             $('#TrainerProductivityReport').hide();
                             $('#Assessment_report_Menu').hide();
                             $('#Certification_Distribution_Report_Menu').hide();
+                            $('#Assessment_Productivity_Report').hide();
                         $('#TMA_attendance_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
@@ -742,6 +751,7 @@
                             $('#TrainerProductivityReport').hide();
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
+                            $('#Assessment_Productivity_Report').hide();
                         console.log(goto);
                         if(goto !="" && goto!="dashboard")
                             $("#box").load(goto);
@@ -782,6 +792,8 @@
                             $('#Batch_Status_report').show();
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
+                            $('# Assessment_Productivity_Report').hide();
+                           
                         $('#TMA_attendance_Menu').hide();
                         $('#TMA_content').hide();
                             $('#tma_report_filter').show();
@@ -1044,6 +1056,37 @@
                                 <a href="#" class="active">
                                     <i class="fe-airplay"></i>Report <div class="arrow-down"></div></a>
                                 <ul class="submenu"> 
+                                    <li class="has-submenu"  id="Productivity_Report" style="display:none">
+                                        <!--<li class="has-submenu dropdown-menu-left "  id="Productivity_Report" style="display:none"> -->
+                                             <a href="#">Productivity Report<div class="arrow-down"></div></a>
+                                             <ul class="submenu">      
+                                                 <!--<li  id="TMA_batch_Menu">
+                                                     <a href="/tma_batch" class="active"> Trainer Deployment <div class="button"></div></a>
+                                                 </li-->
+                                                 <li id="Assessment_Productivity_Report">
+                                                    <a href="/assessment_productivity_report" class="active">Assessment Productivity Report<div class="button"></div></a>
+                                                </li>
+                                                <li id="certificate_distribution_Productivity_Report">
+                                                    <a href="/Certification_Distribution_productivity_report" class="active">Certificate Distribution Productivity Report<div class="button"></div></a>
+                                                </li>
+                                                 <li id="region_productivity_report">
+                                                     <a href="/region_productivity_report" class="active">Region-Wise Productivity Report<div class="button"></div></a>
+                                                 </li>
+
+                                                 <li id="mobilizer_productivity_report">
+                                                     <a href="/mobilizer_productivity_report" class="active">Mobilizer Productivity Report<div class="button"></div></a>
+                                                 </li>
+                                                 <li id="TrainerProductivityReport">
+                                                    <a href="/TrainerProductivityReport" class="active">Trainer Productivity Report<div class="button"></div></a>
+                                                </li>
+                                                 <li id="Ops_Productivity_Report">
+                                                     <a href="/ops_productivity_report" class="active">Ops Productivity Report<div class="button"></div></a>
+                                                 </li>
+                                                 <li id="customer_productivity_report">
+                                                     <a href="/customer_productivity_report" class="active">Customer-wise Productivity Report<div class="button"></div></a>
+                                                 </li>
+                                             </ul>
+                                    </li>
                                     <li>
 										<a href="/ecp_report" id="ECP_report" class="active">ECP Report<div class="button"></div></a>
                                     </li>
@@ -1085,30 +1128,7 @@
                                     </li>
                                 </ul>
                             </li>
-                                    <li class="has-submenu"  id="Productivity_Report" style="display:none">
-                                        <!--<li class="has-submenu dropdown-menu-left "  id="Productivity_Report" style="display:none"> -->
-                                             <a href="#">Productivity Report<div class="arrow-down"></div></a>
-                                             <ul class="submenu">      
-                                                 <!--<li  id="TMA_batch_Menu">
-                                                     <a href="/tma_batch" class="active"> Trainer Deployment <div class="button"></div></a>
-                                                 </li-->
-                                                 <li id="region_productivity_report">
-                                                     <a href="/region_productivity_report" class="active">Region-Wise Productivity Report<div class="button"></div></a>
-                                                 </li>
-                                                 <li id="mobilizer_productivity_report">
-                                                     <a href="/mobilizer_productivity_report" class="active">Mobilizer Productivity Report<div class="button"></div></a>
-                                                 </li>
-                                                 <li id="TrainerProductivityReport">
-                                                    <a href="/TrainerProductivityReport" class="active">Trainer Productivity Report<div class="button"></div></a>
-                                                </li>
-                                                 <li id="Ops_Productivity_Report">
-                                                     <a href="/ops_productivity_report" class="active">Ops Productivity Report<div class="button"></div></a>
-                                                 </li>
-                                                 <li id="customer_productivity_report">
-                                                     <a href="/customer_productivity_report" class="active">Customer-wise Productivity Report<div class="button"></div></a>
-                                                 </li>
-                                             </ul>
-                                    </li>
+                                   
                                     <li class="has-submenu"  id="OJT_report" style="display:none">
                                         <!--<li class="has-submenu dropdown-menu-left "  id="Productivity_Report" style="display:none"> -->
                                              <a href="#">OJT Report<div class="arrow-down"></div></a>

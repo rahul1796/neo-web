@@ -23,16 +23,13 @@ class Assessments:
 
 class DownloadAssessmentResultUploadTemplate(Resource):
     DownloadPath=config.DownloadcandidateResultPathLocal
-    
     @staticmethod
     def get():
         if request.method=='GET':
             try:
-                
                 AssessmentId=request.args.get('AssessmentId',0,type=int)
                 BatchId=request.args.get('BatchId',0,type=int)
                 Batch_Code=request.args.get('Batch_Code','',type=str)
-                print(Batch_Code)
                 report_name = config.AssessmentCandidateResultUploadTemplate+'_'+Batch_Code.replace('/','_')+'_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"   
                 r=re.compile(config.DumpFileName + ".*")
                 lst=os.listdir(DownloadAssessmentResultUploadTemplate.DownloadPath)
@@ -43,15 +40,14 @@ class DownloadAssessmentResultUploadTemplate(Resource):
                 response=Database.GetAssessmentCandidateResultUploadTemplate(AssessmentId,BatchId)
                 res=DownloadAssessmentResult.CreateExcelForDump(response,path,'Template')
                 ImagePath=config.DownloadcandidateResultPathWeb
-                return {'FileName':report_name,'FilePath':ImagePath}
+                return {"status":True,'FileName':report_name,'FilePath':ImagePath}
             except Exception as e:
-                print(str(e))
-                return {"exception":str(e),"File":"HI"}
+                return {"status":False,"exception":"Error : " + str(e),"File":"HI"}
+                #return {"exception":str(e),"File":"HI"}
 
 class DownloadAssessmentResult(Resource):
     DownloadPath=config.DownloadcandidateResultPathLocal
     #print(DownloadPath)
-    
     @staticmethod
     def get():
         if request.method=='GET':
@@ -71,10 +67,9 @@ class DownloadAssessmentResult(Resource):
                 response=Database.GetAssessmentCandidateResults(AssessmentId)
                 res=DownloadAssessmentResult.CreateExcelForDump(response,path,'Result')
                 ImagePath=config.DownloadcandidateResultPathWeb
-                return {'FileName':report_name,'FilePath':ImagePath}
+                return {"status":True, 'FileName':report_name,'FilePath':ImagePath}
             except Exception as e:
-                print(str(e))
-                return {"exception":str(e),"File":"HI"}
+                return {"status":False,"exception":"Error : " + str(e),"File":"HI"}
 
     def CreateExcelForDump(Response,file_path,sheet_name):
         try:
