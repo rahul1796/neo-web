@@ -5978,7 +5978,7 @@ SELECT					cb.name as candidate_name,
             b=[]
             temp=""
             
-            df.columns = df.columns.replace('*','')
+            df.columns = df.columns.str.replace('*','')
             df_batch = df.iloc[:,[0,78]] if ProjectType == 1 else df.iloc[:,[0,79]]
 
             sql = 'exec	masters.[sp_validate_enrollment] ?'
