@@ -7838,9 +7838,12 @@ class DownloadAssessmentProductivityReport(Resource):
             month = request.form["month"]
             customer_ids = request.form["customer_ids"]
             contract_ids = request.form["contract_ids"]
+            project_ids = request.form["project_ids"]
+            sub_project_ids = request.form["sub_project_ids"]
+            regions = request.form["regions"]
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            resp = Report.DownloadAssessmentProductivityReport(customer_ids,contract_ids,month,user_id,user_role_id)
+            resp = Report.DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id)
             return resp
 
 api.add_resource(DownloadAssessmentProductivityReport,'/DownloadAssessmentProductivityReport')

@@ -861,8 +861,8 @@ class Database:
         cur = con.cursor()
         sql = 'exec [users].[sp_get_trainer_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?'
         values = (user_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_role_id,centers, status, Region_id, Cluster_id, Dept,entity_ids,project_ids,sector_ids,TrainerType)
+        
         cur.execute(sql,(values))
-        print(values)
         columns = [column[0].title() for column in cur.description]
         record="0"
         fil="0"
@@ -7010,15 +7010,15 @@ SELECT					cb.name as candidate_name,
         curs.close()
         con.close()    
     
-    def DownloadAssessmentProductivityReport(customer_ids,contract_ids,month,user_id,user_role_id):
+    def DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
         sheet1_columns=[]
         
-        sql = 'exec [reports].[sp_get_assessment_productivity_report_data] ?, ?, ?,?,?'
+        sql = 'exec [reports].[sp_get_assessment_productivity_report_data] ?,?,?,?, ?, ?,?,?'
         
-        values = (customer_ids, contract_ids, month,user_id,user_role_id)
+        values = (customer_ids, contract_ids,project_ids,sub_project_ids,regions, month,user_id,user_role_id)
         
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
