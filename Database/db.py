@@ -5504,16 +5504,17 @@ SELECT					cb.name as candidate_name,
         values = (json.dumps(json_array),)
         curs.execute(sql,(values))
 
-        vali = curs.fetchall()[0][0]
+        vali = curs.fetchall()[0]
         # vali ==0 means correct
+        if vali[0]==1:
+            msg = """Sorry, You can't enroll new candidates to the batch : {}
+            Note: The Actual Enrolment count has exceeded the Planned Target.""".format(vali[1])
 
-        msg = """Sorry, You can't enroll new candidates to the batch.
-        Note: The Actual Enrolment count has exceeded the Planned Target."""
-        if vali==1:
             out = {'success': False, 'description': msg, 'app_status':True}
             return out
-        elif vali==2:
-            out = {'success': False, 'description': "Sorry, enrollment process has ended, you cannot enroll candidates to the batch.", 'app_status':True}
+        elif vali[0]==2:
+            msg = """Sorry, enrollment process has ended, you cannot enroll candidates to the batch : {}.""".format(vali[1])
+            out = {'success': False, 'description': msg, 'app_status':True}
             return out
 
         try:
@@ -5987,19 +5988,19 @@ SELECT					cb.name as candidate_name,
             values = (df_batch.to_json(orient='records'),)
             curs.execute(sql,(values))
 
-            vali = curs.fetchall()[0][0]
-            
-            # vali ==0 means correct 
-            if vali==1:
-                out = {'Status': False, 'message': "Sorry, You can't enroll new candidates to the batch, Note: The Actual Enrolment count has exceeded the Planned Target."}
+            vali = curs.fetchall()[0]
+            # vali[0]==0 means correct 
+            if vali[0]==1:
+                msg = """Sorry, You can't enroll new candidates to the batch : {}<br>
+                Note: The Actual Enrolment count has exceeded the Planned Target.""".format(vali[1])
+                out = {'Status': False, 'message': msg}
                 return out
-            # elif vali==2:
-            #     out = {'Status': False, 'message': "date issue"}
+            # elif vali[0]==2:
+            #     msg = """Sorry, enrollment process has ended, you cannot enroll candidates to the batch : {}.""".format(vali[1])
+            #     out = {'success': False, 'message': msg}
             #     return out
-            # ('[{"Candidate_id":171766,"batch_id":"B-5332-02_Sep_2020"}]',)
 
             for row in out:
-
                 que='''
                         SELECT		cs.intervention_id 
                         FROM		candidate_details.tbl_candidate_interventions i
