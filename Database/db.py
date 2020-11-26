@@ -5249,7 +5249,7 @@ SELECT					cb.name as candidate_name,
         curs.close()
         conn.close()
         df.to_xml(candidate_xmlPath + filenmae)
-
+        mobilization_types=Database.get_user_mobilization_type(user_id)
         return {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae,'mobilization_types':mobilization_types}
 
         candidatexml_fullPath = candidate_xmlPath+filenmae
@@ -5499,19 +5499,20 @@ SELECT					cb.name as candidate_name,
             temp_data = child.attrib
             json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
         
-        sql = 'exec	masters.[sp_validate_enrollment] ?'
+        sql = 'exec	[masters].[sp_validate_enrollment_m] ?'
         values = (json.dumps(json_array),)
         curs.execute(sql,(values))
 
         vali = curs.fetchall()[0][0]
-        # vali ==0 means correct 
-        msg = """Sorry, You can't enroll new candidates to this batch.
+        # vali ==0 means correct
+
+        msg = """Sorry, You can't enroll new candidates to the batch.
         Note: The Actual Enrolment count has exceeded the Planned Target."""
         if vali==1:
             out = {'success': False, 'description': msg, 'app_status':True}
             return out
         elif vali==2:
-            out = {'success': False, 'description': "Sorry, enrollment process has ended, you cannot enroll candidates to this batch.", 'app_status':True}
+            out = {'success': False, 'description': "Sorry, enrollment process has ended, you cannot enroll candidates to the batch.", 'app_status':True}
             return out
 
         try:
@@ -5978,7 +5979,7 @@ SELECT					cb.name as candidate_name,
             b=[]
             temp=""
             
-            df.columns = df.columns.replace('*','')
+            df.columns = df.columns.str.replace('*','')
             df_batch = df.iloc[:,[0,78]] if ProjectType == 1 else df.iloc[:,[0,79]]
 
             sql = 'exec	masters.[sp_validate_enrollment] ?'
@@ -5986,9 +5987,10 @@ SELECT					cb.name as candidate_name,
             curs.execute(sql,(values))
 
             vali = curs.fetchall()[0][0]
+            
             # vali ==0 means correct 
             if vali==1:
-                out = {'Status': False, 'message': "Sorry, You can't enroll new candidates to some batch."}
+                out = {'Status': False, 'message': "Sorry, You can't enroll new candidates to the batch, Note: The Actual Enrolment count has exceeded the Planned Target."}
                 return out
             # elif vali==2:
             #     out = {'Status': False, 'message': "date issue"}
@@ -7562,8 +7564,22 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()
         return (data,columns)
+
+    def download_Certification_Distribution_Report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec [reports].[sp_get_certification_distribution_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        
+        curs.close()
+        cnxn.close()
+        return (data,columns)
     
-    def download_Certification_Distribution_Report(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id):
+    def DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
 
