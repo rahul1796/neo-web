@@ -5644,6 +5644,8 @@ class submit_candidate_updated(Resource):
                     out = Database.get_submit_candidate_reg(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 elif cand_stage==3:
                     out = Database.get_submit_candidate_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                elif cand_stage==4:
+                    out = Database.get_submit_candidate_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 else:
                     out = {'success': False, 'description': "incorrect stage", 'app_status':True}
                 return jsonify(out)
