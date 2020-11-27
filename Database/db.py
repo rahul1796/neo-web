@@ -5488,8 +5488,8 @@ SELECT					cb.name as candidate_name,
             out = {'success': False, 'description': "Lower App Version", 'app_status':False}
             return out
         
-        url = candidate_xml_weburl + xml
-        #url = download_aws_url+aws_location+'neo_app/xml_files/'+'enrollment/' +xml   
+        #url = candidate_xml_weburl + xml
+        url = download_aws_url+aws_location+'neo_app/xml_files/'+'enrollment/' +xml   
 
         r = requests.get(url)
         data = r.text
