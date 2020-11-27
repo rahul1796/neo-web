@@ -2,7 +2,7 @@ def create_report(sub_project,project,region,customer,user_id,user_role_id,emplo
     try:
         import pandas as pd
         import pypyodbc as pyodbc
-        import xlsxwriter
+        import xlsxwriter,os
         from Database import config
     except:
         return({'Description':'Module Error', 'Status':False})
@@ -35,6 +35,7 @@ def create_report(sub_project,project,region,customer,user_id,user_role_id,emplo
         for col_num, value in enumerate(Column):
             worksheet.write(0, col_num, value, header_format)                 
         writer.save()
+        os.chmod(name_withpath, 0o777)
         curs.close()
         cnxn.close()
         return({'Description':'created excel', 'Status':True, 'filename':file_name})

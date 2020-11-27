@@ -7008,8 +7008,91 @@ SELECT					cb.name as candidate_name,
         sheet1 = list(map(lambda x:list(x), data))
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
         curs.close()
+        con.close() 
+
+    def DownloadProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        sheet2=[]
+        sheet2_columns=[]
+        sheet3=[]
+        sheet3_columns=[]
+        sql=''
+        sql1=''
+        sql2=''
+        sql = 'exec [reports].[sp_get_project_download] ?, ?, ?,?,?,?,?,?,?,?,?'
+        sql1 = 'exec [reports].[sp_get_project_center_download] ?, ?, ?,?,?,?,?,?,?,?,?'
+        sql2 = 'exec [reports].[sp_get_project_course_download]  ?, ?, ?,?,?,?,?,?,?,?,?'
+        values = (user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))        
+
+        curs.execute(sql1,(values))
+        sheet2_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet2 = list(map(lambda x:list(x), data))  
+
+        curs.execute(sql2,(values))
+        sheet3_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet3 = list(map(lambda x:list(x), data))        
+        return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
+        curs.close()
         con.close()    
-    
+       
+    def DownloadSubProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        sheet2=[]
+        sheet2_columns=[]
+        sheet3=[]
+        sheet3_columns=[]
+        sheet4=[]
+        sheet4_columns=[]
+        sheet5=[]
+        sheet5_columns=[]
+        sql=''
+        sql1=''
+        sql2=''
+        sql3=''
+        sql4=''
+        sql = 'exec [reports].[sp_get_sub_project_download] ?, ?, ?,?,?,?,?,?,?,?,?,?'
+        sql1 = 'exec [reports].[sp_get_sub_project_center_download] ?, ?, ?,?,?,?,?,?,?,?,?,?'
+        sql2 = 'exec [reports].[sp_get_sub_project_course_download]  ?, ?, ?,?,?,?,?,?,?,?,?,?'
+        sql3 = 'exec [reports].[sp_get_sub_project_user_download] ?, ?, ?,?,?,?,?,?,?,?,?,?'
+        sql4 = 'exec [reports].[sp_get_sub_project_planned_batches_download]  ?, ?, ?,?,?,?,?,?,?,?,?,?'
+        values = (user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project)
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))        
+
+        curs.execute(sql1,(values))
+        sheet2_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet2 = list(map(lambda x:list(x), data))  
+
+        curs.execute(sql2,(values))
+        sheet3_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet3 = list(map(lambda x:list(x), data)) 
+        curs.execute(sql3,(values))
+        sheet4_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet4 = list(map(lambda x:list(x), data)) 
+        curs.execute(sql4,(values))
+        sheet5_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet5 = list(map(lambda x:list(x), data))        
+        return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet4':sheet4,'sheet5':sheet5,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns,'sheet4_columns':sheet4_columns,'sheet5_columns':sheet5_columns}
+        curs.close()
+        con.close()  
     def DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
