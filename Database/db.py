@@ -5496,26 +5496,31 @@ SELECT					cb.name as candidate_name,
         root = ET.fromstring(data)
 
         json_array = []
+        mobilization_type = 1
         for child in root:
             temp_data = child.attrib
+            if 'mobilization_type' in temp_data:
+                mobilization_type = temp_data['mobilization_type']
             json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
         
-        sql = 'exec	[masters].[sp_validate_enrollment_m] ?'
-        values = (json.dumps(json_array),)
-        curs.execute(sql,(values))
+        if mobilization_type==1:
+            sql = 'exec	[masters].[sp_validate_enrollment_m] ?'
+            values = (json.dumps(json_array),)
+            curs.execute(sql,(values))
 
-        vali = curs.fetchall()[0]
-        # vali ==0 means correct
-        if vali[0]==1:
-            msg = """Sorry, You can't enroll new candidates to the batch : {}
-            Note: The Actual Enrolment count has exceeded the Planned Target.""".format(vali[1])
+            vali = curs.fetchall()[0]
+            # vali ==0 means correct
 
-            out = {'success': False, 'description': msg, 'app_status':True}
-            return out
-        elif vali[0]==2:
-            msg = """Sorry, enrollment process has ended, you cannot enroll candidates to the batch : {}.""".format(vali[1])
-            out = {'success': False, 'description': msg, 'app_status':True}
-            return out
+            if vali[0]==1:
+                msg = """Sorry, You can't enroll new candidates to the batch : {}
+                Note: The Actual Enrolment count has exceeded the Planned Target.""".format(vali[1])
+
+                out = {'success': False, 'description': msg, 'app_status':True}
+                return out
+            elif vali[0]==2:
+                msg = """Sorry, enrollment process has ended, you cannot enroll candidates to the batch : {}.""".format(vali[1])
+                out = {'success': False, 'description': msg, 'app_status':True}
+                return out
 
         try:
             # quer1 = '''
