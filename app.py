@@ -7197,6 +7197,55 @@ class contract_download_report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(contract_download_report,'/contract_download_report')
 
+class project_download_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                entity = request.form['entity']
+                customer = request.form['customer']
+                p_group = request.form['p_group']
+                block = request.form['block']
+                practice = request.form['practice']
+                bu = request.form['bu']
+                product = request.form['product']
+                status = request.form['status']                
+                user_id = request.form['user_id']
+                user_role_id = request.form['user_role_id'] 
+                user_region_id = request.form['user_region_id']                
+                resp = Report.create_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+                return resp
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(project_download_report,'/project_download_report')
+
+class sub_project_download_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                entity = request.form['entity']
+                customer = request.form['customer']
+                p_group = request.form['p_group']
+                block = request.form['block']
+                practice = request.form['practice']
+                bu = request.form['bu']
+                product = request.form['product']
+                status = request.form['status']            
+                user_id = request.form['user_id']
+                user_role_id = request.form['user_role_id'] 
+                user_region_id = request.form['user_region_id']
+                project=request.form['project']                
+                resp = Report.create_sub_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project)
+                return resp
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(sub_project_download_report,'/sub_project_download_report')
+
 class GetECPReportDonload(Resource):
     @staticmethod
     def post():

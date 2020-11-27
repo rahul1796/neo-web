@@ -17,7 +17,7 @@ $(document).ready(function () {
         $('#btn_create').show();
     else 
         $('#btn_create').hide();
-    if(role_id == 1 || role_id==15)
+    if(role_id == 1)
         $('#btn_download').show();
     else 
         $('#btn_download').hide();
