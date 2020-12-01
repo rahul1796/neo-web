@@ -5030,9 +5030,9 @@ SELECT					cb.name as candidate_name,
         
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
-            for i in range(len(columns)):
-                h[columns[i]]=row[i]           
-            response.append(h.copy())
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":','.join(set(row[1].split(','))),""+columns[2]+"":','.join(set(row[2].split(','))),""+columns[3]+"":','.join(set(row[3].split(','))),""+columns[4]+"":','.join(set(row[4].split(','))),""+columns[5]+"":','.join(set(row[5].split(','))),""+columns[6]+"":','.join(set(row[6].split(','))),""+columns[7]+"":','.join(set(row[7].split(','))),""+columns[8]+"":','.join(set(row[8].split(','))),""+columns[9]+"":','.join(set(row[9].split(',')))}
+            response.append(h)
+            
         cur2.close()
         con.close()
         #print(response)
