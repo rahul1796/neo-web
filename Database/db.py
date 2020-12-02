@@ -5504,7 +5504,7 @@ SELECT					cb.name as candidate_name,
                 mobilization_type = temp_data['mobilization_type']
             json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
         
-        if mobilization_type==1:
+        if int(mobilization_type)==1:
             sql = 'exec	[masters].[sp_validate_enrollment_m] ?'
             values = (json.dumps(json_array),)
             curs.execute(sql,(values))

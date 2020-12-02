@@ -9040,7 +9040,7 @@ class DownloadCertification_DistributionProductivityReport(Resource):
             
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            #
+            
             resp = Report.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
             return resp
 api.add_resource(DownloadCertification_DistributionProductivityReport,'/DownloadCertification_DistributionProductivityReport')
