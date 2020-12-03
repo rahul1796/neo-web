@@ -5644,6 +5644,8 @@ class submit_candidate_updated(Resource):
                     out = Database.get_submit_candidate_reg(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 elif cand_stage==3:
                     out = Database.get_submit_candidate_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                elif cand_stage==4:
+                    out = Database.get_submit_candidate_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 else:
                     out = {'success': False, 'description': "incorrect stage", 'app_status':True}
                 return jsonify(out)
@@ -7196,6 +7198,74 @@ class contract_download_report(Resource):
                 print(str(e))
                 return {"exceptione":str(e)}
 api.add_resource(contract_download_report,'/contract_download_report')
+
+class project_download_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                entity = request.form['entity']
+                customer = request.form['customer']
+                p_group = request.form['p_group']
+                block = request.form['block']
+                practice = request.form['practice']
+                bu = request.form['bu']
+                product = request.form['product']
+                status = request.form['status']                
+                user_id = request.form['user_id']
+                user_role_id = request.form['user_role_id'] 
+                user_region_id = request.form['user_region_id']                
+                resp = Report.create_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+                return resp
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(project_download_report,'/project_download_report')
+
+class sub_project_download_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                entity = request.form['entity']
+                customer = request.form['customer']
+                p_group = request.form['p_group']
+                block = request.form['block']
+                practice = request.form['practice']
+                bu = request.form['bu']
+                product = request.form['product']
+                status = request.form['status']            
+                user_id = request.form['user_id']
+                user_role_id = request.form['user_role_id'] 
+                user_region_id = request.form['user_region_id']
+                project=request.form['project']                
+                resp = Report.create_sub_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project)
+                return resp
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(sub_project_download_report,'/sub_project_download_report')
+
+class download_centers_list(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            center_id = request.form['center_id']
+            user_id = request.form['user_id']
+            user_role_id = request.form['user_role_id'] 
+            user_region_id = request.form['user_region_id'] 
+            center_type_ids = request.form['center_type_ids']
+            bu_ids = request.form['bu_ids']
+            status = request.form['status']
+            regions=request.form['regions']
+            clusters=request.form['clusters']
+            courses=request.form['courses']    
+            resp = Report.download_centers_list(center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses)
+            
+            return resp
+api.add_resource(download_centers_list,'/download_centers_list')
 
 class GetECPReportDonload(Resource):
     @staticmethod
@@ -8812,26 +8882,7 @@ class GetPartnerCenters(Resource):
             return response
 api.add_resource(GetPartnerCenters,'/GetPartnerCenters')
 
-class download_centers_list(Resource):
-    @staticmethod
-    def post():
-        if request.method == 'POST':
-            center_id = request.form['center_id']
-            user_id = request.form['user_id']
-            user_role_id = request.form['user_role_id'] 
-            user_region_id = request.form['user_region_id'] 
-            center_type_ids = request.form['center_type_ids']
-            bu_ids = request.form['bu_ids']
-            status = request.form['status']
-            regions=request.form['regions']
-            clusters=request.form['clusters']
-            courses=request.form['courses']
-            
-            file_name='Center_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
-            resp = Report.download_centers_list(file_name, center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses)
-            
-            return resp
-api.add_resource(download_centers_list,'/download_centers_list')
+
 
 class download_emp_target_template(Resource):
     @staticmethod
