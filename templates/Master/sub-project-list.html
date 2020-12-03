@@ -12,7 +12,6 @@
         padding: 20px;
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     }
-    
     .hidedialog {
         display: none;
     }
@@ -52,15 +51,16 @@ if(role_id == 1)
 {
     $('#btn_create').show();
     $('#btn_upload').show();
-    $('#btn_upload_emp').hide();
-    $('#btn_create2').show();
+    $('#btn_upload_emp').show();
+    //$('#btn_create2').show();
+    $('#btn_download').show();
 }
-else 
+else
 {
     $('#btn_create').hide();
     $('#btn_upload').hide();
     $('#btn_upload_emp').hide();
-    $('#btn_create2').hide();
+    $('#btn_download').hide();
 }
 
 LoadTable(); 
@@ -98,14 +98,12 @@ GetSub_project('{{project_id}}')
                                <label for="ddlEntity" class="mr-2">Entity</label>
                                <select class="form-control dropdown-search-filter" id="ddlEntity" multiple>
                                    <option selected="" value="">All</option>
-                                   
                                </select>
                            </div>
                            <div class="col-lg-3">
                                <label for="ddlCustomer" class="mr-2">Customer</label>
                                <select class="form-control dropdown-search-filter" id="ddlCustomer" onchange="LoadProject();" multiple>
                                    <option selected="" value="">All</option>
-                                   
                                </select>
                            </div>
                            <div class="col-lg-3">
@@ -167,22 +165,23 @@ GetSub_project('{{project_id}}')
                                 <!--button style="margin-top: 30px" type="button" class="btn btn-primary waves-effect waves-light submit" 
                                 onclick="Download()">Download</button-->
                             </div>
-                            <div class="form-group col-lg-1">                                         
-                                <a class="btn btn-primary" style="color:white;font-weight:bold;cursor:pointer;margin-top:30px; float: left;" onclick="DownloadTableBasedOnFilter()">Download</a>  <!-- float: right; -->
-                                <a id="lnkDownload" style="display:none;"></a>
-                            </div>
-                            <div class="col-lg-7" >
-                                <button style="float: right; margin-top: 30px; margin-right:10px;"  id="btn_create" type="submit" class="btn btn-primary waves-effect">Create Sub Project</a>
+                            <div class="col-lg-2" >                                        
+                                <button style="float: left;margin-top: 30px" type="button" id="btn_download" class="btn btn-primary waves-effect waves-light submit" 
+                                onclick="Download()">Download</button></div>
+                           
+                           
+                            <div class="col-lg-6" >
+                                <button style="float: left; margin-top: 30px; margin-right:10px;"  id="btn_create" type="submit" class="btn btn-primary waves-effect">Create Sub Project</a>
 
-                                <button style="float: right; margin-top: 30px; margin-right:10px;"  id="btn_upload" onclick="UploadBatchTargetMdl()" type="button" class="btn btn-info waves-effect waves-light">Upload Batch Target Plan</a>
+                                <button style="float: left; margin-top: 30px; margin-right:10px;"  id="btn_upload" onclick="UploadBatchTargetMdl()" type="button" class="btn btn-info waves-effect waves-light">Upload Batch Target Plan</a>
                                 
-                                <button style="float: right; margin-top: 30px; margin-right:10px; display:none;"  id="btn_upload_emp" onclick="uploadEmployeetarget()" type="button" class="btn btn-info waves-effect waves-light">Upload Employee target</a>
+                                <button style="float: left; margin-top: 30px; margin-right:10px; display:none;"  id="btn_upload_emp" onclick="uploadEmployeetarget()" type="button" class="btn btn-info waves-effect waves-light">Upload Employee target</a>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="form-group col-lg-6">
-                                <div id="imgSpinner">
-                                    <img src="static/assets/images/spinner1.gif" style="margin-top:opx; height:30px;display:inline-block;"/>
+                            <div class="form-group col-lg-3">
+                                <div id="imgSpinner" style="display: none;">
+                                    <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-none;"/>
                                     <label style="display:inline-block;">Please wait while downloading report...</label>
                                 </div> 
                             </div>
@@ -421,7 +420,7 @@ GetSub_project('{{project_id}}')
                             <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Name</th>
                             <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Email</th>
                             <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Role</th>
-                              </tr>
+                            </tr>
                     </thead>
                     <tbody>
  
