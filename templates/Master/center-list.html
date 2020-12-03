@@ -24,6 +24,11 @@
             else{
                 $('#btn_create').hide();
             }
+            if(role_id == 1 )
+                $('#btn_download').show();
+            else{
+                $('#btn_download').hide();
+            }
             $('#ddlStatus').empty();
             $('#ddlStatus').append(new Option('All','-1'));
             $('#ddlStatus').append(new Option('Active','1'));
@@ -110,16 +115,21 @@
                                         </select>
                                     </div>
                                     
-                                    <div class="col-lg-3" >
+                                    <div class="col-lg-1" >
                                         <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
                                         onclick="LoadTableBasedOnSearch()">Search</button>
-                                        &nbsp
-                                        <button style="margin-top: 30px; display: none;" type="button" class="btn btn-primary waves-effect waves-light submit" 
-                                        onclick="Download()">Download</button>
+                                         </div>
+                                    <div class="col-lg-3" >                                        
+                                        <button style="float: left;margin-top: 30px" type="button" id="btn_download" class="btn btn-primary waves-effect waves-light submit" 
+                                        onclick="DownloadTableBasedOnSearch()">Download</button></div>
+                                   
+                                    <div class="form-group col-lg-3">
+                                        <div id="imgSpinner" style="display: none;">
+                                            <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-none;"/>
+                                            <label style="display:inline-block;">Please wait while downloading report...</label>
+                                        </div> 
                                     </div>
-                                    <div class="col-lg-9" >
-                                        <button style="margin-top: 30px;float: right;" type="submit" id="btn_create" class="btn btn-primary waves-effect waves-light submit">Create Center</button>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -132,8 +142,8 @@
                                         <div class="col-lg-6">
                                             <h4 class="header-title">Center List</h4>
                                         </div>
-                                        <div class="col-lg-6" >                                        
-                                                <button style="float: right; display: none;" type="submit" class="btn btn-primary">Create center</a>
+                                        <div class="col-lg-6" >
+                                            <button style="margin-top: 30px;float: right;" type="submit" id="btn_create" class="btn btn-primary waves-effect waves-light submit">Create Center</button>
                                         </div>
                                     </div>
                                     <br/>

@@ -5644,6 +5644,8 @@ class submit_candidate_updated(Resource):
                     out = Database.get_submit_candidate_reg(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 elif cand_stage==3:
                     out = Database.get_submit_candidate_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                elif cand_stage==4:
+                    out = Database.get_submit_candidate_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 else:
                     out = {'success': False, 'description': "incorrect stage", 'app_status':True}
                 return jsonify(out)
@@ -7196,6 +7198,74 @@ class contract_download_report(Resource):
                 print(str(e))
                 return {"exceptione":str(e)}
 api.add_resource(contract_download_report,'/contract_download_report')
+
+class project_download_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                entity = request.form['entity']
+                customer = request.form['customer']
+                p_group = request.form['p_group']
+                block = request.form['block']
+                practice = request.form['practice']
+                bu = request.form['bu']
+                product = request.form['product']
+                status = request.form['status']                
+                user_id = request.form['user_id']
+                user_role_id = request.form['user_role_id'] 
+                user_region_id = request.form['user_region_id']                
+                resp = Report.create_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+                return resp
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(project_download_report,'/project_download_report')
+
+class sub_project_download_report(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                entity = request.form['entity']
+                customer = request.form['customer']
+                p_group = request.form['p_group']
+                block = request.form['block']
+                practice = request.form['practice']
+                bu = request.form['bu']
+                product = request.form['product']
+                status = request.form['status']            
+                user_id = request.form['user_id']
+                user_role_id = request.form['user_role_id'] 
+                user_region_id = request.form['user_region_id']
+                project=request.form['project']                
+                resp = Report.create_sub_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project)
+                return resp
+                #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
+            except Exception as e:
+                print(str(e))
+                return {"exceptione":str(e)}
+api.add_resource(sub_project_download_report,'/sub_project_download_report')
+
+class download_centers_list(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            center_id = request.form['center_id']
+            user_id = request.form['user_id']
+            user_role_id = request.form['user_role_id'] 
+            user_region_id = request.form['user_region_id'] 
+            center_type_ids = request.form['center_type_ids']
+            bu_ids = request.form['bu_ids']
+            status = request.form['status']
+            regions=request.form['regions']
+            clusters=request.form['clusters']
+            courses=request.form['courses']    
+            resp = Report.download_centers_list(center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses)
+            
+            return resp
+api.add_resource(download_centers_list,'/download_centers_list')
 
 class GetECPReportDonload(Resource):
     @staticmethod
@@ -8812,26 +8882,7 @@ class GetPartnerCenters(Resource):
             return response
 api.add_resource(GetPartnerCenters,'/GetPartnerCenters')
 
-class download_centers_list(Resource):
-    @staticmethod
-    def post():
-        if request.method == 'POST':
-            center_id = request.form['center_id']
-            user_id = request.form['user_id']
-            user_role_id = request.form['user_role_id'] 
-            user_region_id = request.form['user_region_id'] 
-            center_type_ids = request.form['center_type_ids']
-            bu_ids = request.form['bu_ids']
-            status = request.form['status']
-            regions=request.form['regions']
-            clusters=request.form['clusters']
-            courses=request.form['courses']
-            
-            file_name='Center_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
-            resp = Report.download_centers_list(file_name, center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses)
-            
-            return resp
-api.add_resource(download_centers_list,'/download_centers_list')
+
 
 class download_emp_target_template(Resource):
     @staticmethod
@@ -8841,7 +8892,7 @@ class download_emp_target_template(Resource):
                 user_id = request.form['user_id']
                 user_role_id  = request.form['user_role_id']
                 date = request.form["date"]
-            
+                
                 file_name='Employee_target_template_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
             
                 resp = Report.download_emp_target_template(file_name, user_id, user_role_id, date)
@@ -9042,6 +9093,90 @@ class DownloadCertification_DistributionProductivityReport(Resource):
             resp = Report.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
             return resp
 api.add_resource(DownloadCertification_DistributionProductivityReport,'/DownloadCertification_DistributionProductivityReport')
+
+class download_Partner_Target_dump(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:  
+                user_id = request.form['user_id']
+                user_role_id = request.form['user_role_id'] 
+                user_region_id = request.form['user_region_id']
+                
+                report_name = "Partner_Target_Dump_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                resp = Report.download_Partner_Target_dump(user_id,user_role_id,user_region_id,report_name)
+                
+                return resp
+                
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(download_Partner_Target_dump,'/download_Partner_Target_dump')
+
+class upload_partner_target_plan(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                f = request.files['filename']
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
+                f.save(file_name)
+                
+                d = ['E Planned Start Date', 'E Planned End Date', 'A Planned Date', 'Certification distribution date', 'P Planned Start Date', 'P Planned End Date']
+                dtype_dict = dict.fromkeys(d,str)
+
+                df= pd.read_excel(file_name,sheet_name='Template',dtype=dtype_dict)
+                df = df.fillna('')
+                os.remove(file_name)
+
+                schema = Schema([
+                        #null check
+                        Column('Partner/Vendor id*'),
+
+                        Column('Partner/Vendor name*',str_validation+null_validation),
+                        Column('Sub Project Code*',str_validation+null_validation),
+                        Column('Sub Project Name*',str_validation+null_validation),
+                        Column('Course Code*',str_validation+null_validation),
+                        Column('Course Name*',str_validation+null_validation),
+
+                        Column('E Planned Start Date',str_validation+null_validation),
+                        Column('E Planned End Date',str_validation+null_validation),
+                        Column('E Target',str_validation+null_validation),
+                        Column('A Planned Date',str_validation+null_validation),
+                        Column('A Target',str_validation+null_validation),
+                        Column('Certification distribution date',str_validation+null_validation),
+                        Column('CD Target',str_validation+null_validation),
+                        Column('P Planned Start Date',str_validation+null_validation),
+                        Column('P Planned End Date',str_validation+null_validation),
+                        Column('P Target',str_validation+null_validation)
+                        ])
+                errors = schema.validate(df)
+                errors_index_rows = [e.row for e in errors]
+                len_error = len(errors_index_rows)
+                # os.remove(file_name)
+                if len_error>0:
+                    file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                    pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                    return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                else:
+                    df.columns = df.columns.str.replace(" ", "_")
+                    df.columns = df.columns.str.replace("*", "")
+                    df.columns = df.columns.str.replace('/','_')
+                    df.columns = df.columns.str.replace(' ','_')
+
+                    df.insert(0, 'row_index', range(len(df)))
+
+                    out = Database.upload_batch_target_plan(df,user_id,user_role_id)
+                    if out['Status']==False:
+                        file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                        pd.DataFrame(out['data']).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                        return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                    else:
+                        return out
+            except Exception as e:
+                return {"Status":False, "message":"Unable to upload " + str(e)}
+api.add_resource(upload_partner_target_plan,'/upload_partner_target_plan')
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
