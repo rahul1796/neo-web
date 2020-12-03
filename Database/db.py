@@ -5324,8 +5324,8 @@ SELECT					cb.name as candidate_name,
             (candidate_id,present_address_line2,present_village,present_panchayat,present_taluk_block,permanent_address_line2,permanent_village,permanent_panchayat,permanent_taluk_block,created_on,created_by,is_active)
             values
             '''
-            url = candidate_xml_weburl + xml
-            #url = download_aws_url+aws_location+'neo_app/xml_files/'+'mobilization/' +xml
+            #url = candidate_xml_weburl + xml
+            url = download_aws_url+aws_location+'neo_app/xml_files/'+'mobilization/' +xml
 
             r = requests.get(url)
             data = r.text
@@ -5335,12 +5335,13 @@ SELECT					cb.name as candidate_name,
             for child in root:
                 data = child.attrib
                 out.append(data)
-                #quer1_a + = 
-                quer = "({},'{}','{}','{}','{}','{}',{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},{},1,'m','{}','{}','{}','{}'),".format(1 if data['isFresher']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],
+                #print(data)
+                quer = "({},'{}','{}','{}','{}','{}',{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},{},1,'m','{}','{}','{}','{}'),".format(1 if data['isFresher']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],
                             data['candDob'],1 if data['dobEntered']=='true' else 0,data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'], data['disableStatus'], data['candReligion'],
                             data['candSource'], data['presPincode'],data['presDistrict'],data['permDistrict'],data['permPincode'],user_id,role_id,data['permState'],data['permCountry'] ,data['presState'],data['presCountry'])
                 quer1 += '\n'+quer
             quer1 = quer1[:-1]+';'
+            #print(quer1)
             curs.execute(quer1)
             d = list(map(lambda x:x[0],curs.fetchall()))
             curs.commit()
@@ -5351,6 +5352,7 @@ SELECT					cb.name as candidate_name,
               
             quer2 = quer2[:-1]+';'
             quer3 = quer3[:-1]+';'
+            #print(quer2 + '\n' + quer3)
             curs.execute(quer2 + '\n' + quer3)
             curs.commit()
             out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
@@ -5428,8 +5430,8 @@ SELECT					cb.name as candidate_name,
             VALUES
             '''
 
-            url = candidate_xml_weburl + xml
-            #url = download_aws_url+aws_location+'neo_app/xml_files/'+'registration/' +xml    
+            #url = candidate_xml_weburl + xml
+            url = download_aws_url+aws_location+'neo_app/xml_files/'+'registration/' +xml    
 
             r = requests.get(url)
             data = r.text
@@ -5487,8 +5489,8 @@ SELECT					cb.name as candidate_name,
             out = {'success': False, 'description': "Lower App Version", 'app_status':False}
             return out
         
-        url = candidate_xml_weburl + xml
-        #url = download_aws_url+aws_location+'neo_app/xml_files/'+'enrollment/' +xml   
+        #url = candidate_xml_weburl + xml
+        url = download_aws_url+aws_location+'neo_app/xml_files/'+'enrollment/' +xml   
 
         r = requests.get(url)
         data = r.text
