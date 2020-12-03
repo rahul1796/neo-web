@@ -1579,7 +1579,7 @@ function ForceDownload(varUrl, varFileName)
 function DownloadEmployeeTargetPlanTemplate(){
     var date = $('#Month_Year').val()+'-01';
     //console.log(date);
-    if(date=='-1'){
+    if(date=='-01'){
         alert('please search date');
         return 
     }

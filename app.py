@@ -8892,7 +8892,7 @@ class download_emp_target_template(Resource):
                 user_id = request.form['user_id']
                 user_role_id  = request.form['user_role_id']
                 date = request.form["date"]
-            
+                
                 file_name='Employee_target_template_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
             
                 resp = Report.download_emp_target_template(file_name, user_id, user_role_id, date)
