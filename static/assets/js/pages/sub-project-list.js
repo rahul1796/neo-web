@@ -1430,7 +1430,7 @@ function CancelPlannedBatch(planned_batch_code)
     
 }
 
-function DownloadTableBasedOnFilter(){
+/*function DownloadTableBasedOnFilter(){
     $("#imgSpinner").show();
     // from candidate
     if($('#To_Date').val()=='')
@@ -1509,7 +1509,59 @@ function DownloadTableBasedOnFilter(){
                     }
                 });
     }
-}
+}*/
+function Download()
+    {
+        $("#imgSpinner").show();
+        
+        if (0==9){
+        console.log(false)
+        }
+        else{
+            var URL=$('#hdn_web_url').val()+ "/sub_project_download_report"
+            //window.location = URL + "?ActivityDate=2019-09-09"
+            $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: URL, 
+                        data: {                           
+                            "entity":$('#ddlEntity').val().toString(),
+                            "customer":$('#ddlCustomer').val().toString(),
+                            "p_group":$('#ddlP_Group').val().toString(),
+                            "block":$('#ddlBlock').val().toString(),
+                            "practice":$('#ddlPractice').val().toString(),
+                            "bu":$('#ddlBU').val().toString(),
+                            "product":$('#ddlProduct').val().toString(),
+                            "status":$('#ddlStatus').val().toString(),
+                            "project":$('#ddlProject').val().toString(),
+                            "user_id":$('#hdn_home_user_id').val(),
+                            "user_role_id":$('#hdn_home_user_role_id').val(),
+                            "user_region_id":$('#hdn_user_region_id').val()
+                        },
+                        success:function(data){
+                            if(data!=null)
+                            {         
+                                if(data.success)
+                                {
+                                    $("#imgSpinner").hide();        
+                                    window.location=data.FilePath+data.FileName;
+                                }    
+                                else
+                                {
+                                    $("#imgSpinner").hide(); 
+                                    alert(data.msg);
+                                    return false;
+                                }  
+                            }                    
+                        },
+                        error:function()
+                        {
+                            //$("#imgSpinner").hide();
+                        }
+                    });
+            
+        }
+    }
 
 function ForceDownload(varUrl, varFileName)
         {
