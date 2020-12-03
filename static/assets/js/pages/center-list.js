@@ -379,31 +379,85 @@ function LoadTableBasedOnSearch()
     LoadTable();
 }
 
-function Download()
-    {                   
-        var URL=$('#hdn_web_url').val()+ "/download_centers_list";            
+function DownloadTableBasedOnSearch()
+{                   
+    $("#imgSpinner").show();
+    // from candidate
+    if(0==1)
+        {
+            
+            $("#imgSpinner").hide();
+        }
+    else{
+        var URL=$('#hdn_web_url').val()+ "/download_centers_list"
         $.ajax({
-            type:"POST",
-            url:URL,
-            async:false,        
-            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-            datatype:"json",
-            data:{         
-                "center_type_ids":$('#ddlCenterType').val().toString(),
-                "bu_ids":$('#ddlBu').val().toString(),
-                "status":$('#ddlStatus').val().toString()
-            },
-            success:function(data){
-                if(data!=null)
-                {
-                    window.location=data.FilePath+data.FileName+'.xlsx';
-                }                    
-            },
-            error:function(x){
-                alert('Error while downloading Report. ');
-            }
-        });        
+                    type: "POST",
+                    dataType: "json",
+                    url: URL, 
+                    data: {
+                        "center_id":0,
+                        "user_id":$('#hdn_home_user_id').val(),
+                        "user_role_id":$('#hdn_home_user_role_id').val(),
+                        "user_region_id":$('#hdn_user_region_id').val(),
+                        "center_type_ids":$('#ddlCenterType').val().toString(),
+                        "bu_ids":$('#ddlBu').val().toString(),
+                        "status":$('#ddlStatus').val().toString(),
+                        "regions":$('#ddlRegion').val().toString(),
+                        "clusters":$('#ddlCluster').val().toString(),
+                        "courses":$('#ddlCourse').val().toString()                        
+                    },
+                    success: function(resp) 
+                    {
+                        if (resp.Status){
+                            var varAnchor = document.getElementById('lnkDownload');
+                            varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
+                            $("#imgSpinner").hide();
+                            try 
+                                { 
+                                    //in firefox
+                                    varAnchor.click();
+                                    return;
+                                } catch(ex) {}
+                                
+                                try 
+                                { 
+                                    // in chrome
+                                    if(document.createEvent) 
+                                    {
+                                        var e = document.createEvent('MouseEvents');
+                                        e.initEvent( 'click', true, true );
+                                        varAnchor.dispatchEvent(e);
+                                        return;
+                                    }
+                                } catch(ex) {}
+                                
+                                try 
+                                { 
+                                    // in IE
+                                    if(document.createEventObject) 
+                                    {
+                                         var evObj = document.createEventObject();
+                                         varAnchor.fireEvent("onclick", evObj);
+                                         return;
+                                    }
+                                } catch(ex) {}
+                            
+                        }
+                        else{
+                            console.log(resp)
+                            //alert('Not success')
+                            $("#imgSpinner").hide();
+                            
+                        }
+                    },
+                    error:function()
+                    {
+                        //$("#imgSpinner").hide();
+                    }
+                });
+        
     }
+}
 
 function GetProjectDetails(CenterId,CenterName)
 {
