@@ -6628,7 +6628,7 @@ SELECT					cb.name as candidate_name,
         cur2 = con.cursor()
         sql = 'exec [reports].[sp_get_batch_status_report_data]    ?,?,?,?,?,?,?,?'
         values = (user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date)
-        #print(values)
+        print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -7589,19 +7589,17 @@ SELECT					cb.name as candidate_name,
         return response
 
     def download_centers_list(center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses):
-        
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
-        sql = 'exec [masters].[sp_get_centers_download] ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, courses)
+        sql = 'exec [reports].[sp_get_centers_download] ?, ?, ?,?, ?, ?, ?, ?, ?, ?'
+        values = (center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses)
         curs.execute(sql,(values))
         columns = [column[0].title() for column in curs.description]
         data = curs.fetchall()
         data = list(map(lambda x:list(x), data))
-        
         curs.close()
         cnxn.close()
-        return (data,columns)
+        return {'sheet1':data,'sheet1_columns':columns}
 
     def download_emp_target_template(user_id, user_role_id, date):
         cnxn=pyodbc.connect(conn_str)

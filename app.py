@@ -7246,6 +7246,25 @@ class sub_project_download_report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(sub_project_download_report,'/sub_project_download_report')
 
+class download_centers_list(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            center_id = request.form['center_id']
+            user_id = request.form['user_id']
+            user_role_id = request.form['user_role_id'] 
+            user_region_id = request.form['user_region_id'] 
+            center_type_ids = request.form['center_type_ids']
+            bu_ids = request.form['bu_ids']
+            status = request.form['status']
+            regions=request.form['regions']
+            clusters=request.form['clusters']
+            courses=request.form['courses']    
+            resp = Report.download_centers_list(center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses)
+            
+            return resp
+api.add_resource(download_centers_list,'/download_centers_list')
+
 class GetECPReportDonload(Resource):
     @staticmethod
     def post():
@@ -8861,26 +8880,7 @@ class GetPartnerCenters(Resource):
             return response
 api.add_resource(GetPartnerCenters,'/GetPartnerCenters')
 
-class download_centers_list(Resource):
-    @staticmethod
-    def post():
-        if request.method == 'POST':
-            center_id = request.form['center_id']
-            user_id = request.form['user_id']
-            user_role_id = request.form['user_role_id'] 
-            user_region_id = request.form['user_region_id'] 
-            center_type_ids = request.form['center_type_ids']
-            bu_ids = request.form['bu_ids']
-            status = request.form['status']
-            regions=request.form['regions']
-            clusters=request.form['clusters']
-            courses=request.form['courses']
-            
-            file_name='Center_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
-            resp = Report.download_centers_list(file_name, center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses)
-            
-            return resp
-api.add_resource(download_centers_list,'/download_centers_list')
+
 
 class download_emp_target_template(Resource):
     @staticmethod
