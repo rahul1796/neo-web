@@ -1544,4 +1544,38 @@ class Report:
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+
+    def download_Partner_Target_dump(user_id,user_role_id,user_region_id,report_name):
+        try:
+            name_withpath = config.bulk_upload_path + report_name
+            
+            writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
+            workbook  = writer.book
+            header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+
+            resp = Database.download_Partner_Target_dump(user_id,user_role_id,user_region_id)
+            df = pd.DataFrame(resp[0])
+            
+            # print(resp[1])
+            # columns = ['Entity_Name', 'Customer_Name', 'Project_Code', 'Project_Name', 'Sub_Project_Code', 'Sub_Project_Name', 'Region_Name', 'State_Name', 'Center_Count', 'Center_Name', 'Course_Count', 'Course_Name', 'Users_Count', 'Planned_Batches', 'Project_Group_Name', 'Project_Type_Name', 'Block_Name', 'Practice_Name', 'Bu_Name', 'Product_Name', 'Project_Manager', 'Start_Date', 'End_Date', 'Status']
+            # df=df[columns]
+
+            header = ['Partner/Vendor id*', 'Partner/Vendor name*', 'Sub Project Code*', 'Sub Project Name*', 'Course Code*', 'Course Name*','E Planned Start Date', 
+            'E Planned End Date', 'E Target', 'A Planned Date', 'A Target', 'Certification distribution date', 'CD Target', 'P Planned Start Date',	'P Planned End Date', 'P Target']
+            
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Dump')
+            worksheet = writer.sheets['Dump']
+            for col_num, value in enumerate(header):
+                worksheet.write(0, col_num, value, header_format)
+                
+            writer.save()
+            return({'Description':'created excel', 'Status':True, 'filename':report_name})
+            
+        except Exception as e:
+            return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
           

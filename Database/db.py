@@ -6669,7 +6669,7 @@ SELECT					cb.name as candidate_name,
             h=[]           
             d={} 
             json_str=df.to_json(orient='records')
-            sql = 'exec	[masters].[sp_validate_upload_batch_target_plan]  ?,?,?'
+            sql = 'exec	[masters].[sp_validate_upload_partner_target_plan] ?,?,?'  #[masters].[sp_validate_upload_batch_target_plan]
             values = (json_str,user_id,user_role_id)
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]
@@ -6692,7 +6692,7 @@ SELECT					cb.name as candidate_name,
             cur.close()
             con.close()
         except Exception as e:
-            print(str(e))
+            #print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
             
     def upload_user(df,user_id,user_role_id):
@@ -7596,4 +7596,18 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()    
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+
+    def download_Partner_Target_dump(user_id,user_role_id,user_region_id):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec masters.[sp_get_parrtner_target_dump] ?, ?, ?'
+        values = (user_id,user_role_id,user_region_id)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        
+        curs.close()
+        cnxn.close()
+        return (data,columns)
         
