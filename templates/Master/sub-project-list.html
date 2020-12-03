@@ -12,7 +12,6 @@
         padding: 20px;
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     }
-    
     .hidedialog {
         display: none;
     }
@@ -52,10 +51,10 @@ if(role_id == 1)
 {
     $('#btn_create').show();
     $('#btn_upload').show();
-    $('#btn_upload_emp').hide();
+    $('#btn_upload_emp').show();
     $('#btn_create2').show();
 }
-else 
+else
 {
     $('#btn_create').hide();
     $('#btn_upload').hide();
@@ -98,14 +97,12 @@ GetSub_project('{{project_id}}')
                                <label for="ddlEntity" class="mr-2">Entity</label>
                                <select class="form-control dropdown-search-filter" id="ddlEntity" multiple>
                                    <option selected="" value="">All</option>
-                                   
                                </select>
                            </div>
                            <div class="col-lg-3">
                                <label for="ddlCustomer" class="mr-2">Customer</label>
                                <select class="form-control dropdown-search-filter" id="ddlCustomer" onchange="LoadProject();" multiple>
                                    <option selected="" value="">All</option>
-                                   
                                </select>
                            </div>
                            <div class="col-lg-3">
@@ -421,7 +418,7 @@ GetSub_project('{{project_id}}')
                             <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Name</th>
                             <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Email</th>
                             <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Role</th>
-                              </tr>
+                            </tr>
                     </thead>
                     <tbody>
  
