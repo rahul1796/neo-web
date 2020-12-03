@@ -37,9 +37,18 @@
         }
         else
         {
-            $('#btn_create').hide();
+            $('#btn_create').show();
             $('#btn_add').hide();
         }
+        if(role_id == 1)
+        {
+            $('#btn_upload').show();
+        }
+        else
+        {
+            $('#btn_upload').hide();
+        }
+
 
     });
     function LoadPartnerTypes()
