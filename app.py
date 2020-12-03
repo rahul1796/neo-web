@@ -9164,7 +9164,7 @@ class upload_partner_target_plan(Resource):
                     df.columns = df.columns.str.replace("*", "")
                     df.columns = df.columns.str.replace('/','_')
                     df.columns = df.columns.str.replace(' ','_')
-                    
+
                     df.insert(0, 'row_index', range(len(df)))
 
                     out = Database.upload_batch_target_plan(df,user_id,user_role_id)
