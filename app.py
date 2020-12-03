@@ -9094,5 +9094,89 @@ class DownloadCertification_DistributionProductivityReport(Resource):
             return resp
 api.add_resource(DownloadCertification_DistributionProductivityReport,'/DownloadCertification_DistributionProductivityReport')
 
+class download_Partner_Target_dump(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:  
+                user_id = request.form['user_id']
+                user_role_id = request.form['user_role_id'] 
+                user_region_id = request.form['user_region_id']
+                
+                report_name = "Partner_Target_Dump_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+                resp = Report.download_Partner_Target_dump(user_id,user_role_id,user_region_id,report_name)
+                
+                return resp
+                
+            except Exception as e:
+                return {"exceptione":str(e)}
+api.add_resource(download_Partner_Target_dump,'/download_Partner_Target_dump')
+
+class upload_partner_target_plan(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                f = request.files['filename']
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
+                f.save(file_name)
+                
+                d = ['E Planned Start Date', 'E Planned End Date', 'A Planned Date', 'Certification distribution date', 'P Planned Start Date', 'P Planned End Date']
+                dtype_dict = dict.fromkeys(d,str)
+
+                df= pd.read_excel(file_name,sheet_name='Template',dtype=dtype_dict)
+                df = df.fillna('')
+                os.remove(file_name)
+
+                schema = Schema([
+                        #null check
+                        Column('Partner/Vendor id*'),
+
+                        Column('Partner/Vendor name*',str_validation+null_validation),
+                        Column('Sub Project Code*',str_validation+null_validation),
+                        Column('Sub Project Name*',str_validation+null_validation),
+                        Column('Course Code*',str_validation+null_validation),
+                        Column('Course Name*',str_validation+null_validation),
+
+                        Column('E Planned Start Date',str_validation+null_validation),
+                        Column('E Planned End Date',str_validation+null_validation),
+                        Column('E Target',str_validation+null_validation),
+                        Column('A Planned Date',str_validation+null_validation),
+                        Column('A Target',str_validation+null_validation),
+                        Column('Certification distribution date',str_validation+null_validation),
+                        Column('CD Target',str_validation+null_validation),
+                        Column('P Planned Start Date',str_validation+null_validation),
+                        Column('P Planned End Date',str_validation+null_validation),
+                        Column('P Target',str_validation+null_validation)
+                        ])
+                errors = schema.validate(df)
+                errors_index_rows = [e.row for e in errors]
+                len_error = len(errors_index_rows)
+                # os.remove(file_name)
+                if len_error>0:
+                    file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                    pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                    return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                else:
+                    df.columns = df.columns.str.replace(" ", "_")
+                    df.columns = df.columns.str.replace("*", "")
+                    df.columns = df.columns.str.replace('/','_')
+                    df.columns = df.columns.str.replace(' ','_')
+                    
+                    df.insert(0, 'row_index', range(len(df)))
+
+                    out = Database.upload_batch_target_plan(df,user_id,user_role_id)
+                    if out['Status']==False:
+                        file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                        pd.DataFrame(out['data']).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                        return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                    else:
+                        return out
+            except Exception as e:
+                return {"Status":False, "message":"Unable to upload " + str(e)}
+api.add_resource(upload_partner_target_plan,'/upload_partner_target_plan')
+
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
