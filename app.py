@@ -5645,7 +5645,7 @@ class submit_candidate_updated(Resource):
                 elif cand_stage==3:
                     out = Database.get_submit_candidate_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 elif cand_stage==4:
-                    out = Database.get_submit_candidate_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                    out = Database.get_submit_candidate_re_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 else:
                     out = {'success': False, 'description': "incorrect stage", 'app_status':True}
                 return jsonify(out)
@@ -9089,7 +9089,7 @@ class DownloadCertification_DistributionProductivityReport(Resource):
             
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            #
+            
             resp = Report.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
             return resp
 api.add_resource(DownloadCertification_DistributionProductivityReport,'/DownloadCertification_DistributionProductivityReport')
