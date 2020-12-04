@@ -37,9 +37,18 @@
         }
         else
         {
-            $('#btn_create').hide();
+            $('#btn_create').show();
             $('#btn_add').hide();
         }
+        if(role_id == 1)
+        {
+            $('#btn_upload').show();
+        }
+        else
+        {
+            $('#btn_upload').hide();
+        }
+
 
     });
     function LoadPartnerTypes()
@@ -368,6 +377,223 @@
             }
         });
     }
+//////////////////////////////// Upload parter target  UploadFileDataPartner
+function Upload_DownloadPartnerTargetMdl()
+{
+    $('#HduploadFile').text('Upload Partner Target Plan.');
+    $('#imgSpinner2').hide();
+    $('#mdl_upload_download_partner_target_plan').modal('show');
+    $('#myFile').val('');
+}
+function DownloadPartnerTargetPlanTemplate()
+{
+    window.location='/Bulk Upload/'+'PartnerTargetPlanTemplate.xlsx';
+}
+function Download_Partner_Target()
+{   
+    $("#imgSpinner2").show();
+    if(1==0)
+        {
+            alert("Please select date.");
+            $("#imgSpinner2").hide();
+        }
+    else{
+        var id = document.getElementById('imgSpinner2_label');
+        id.innerText ='Please wait while downloading...'
+
+        var URL=$('#hdn_web_url').val()+ "/download_Partner_Target_dump"
+        $.ajax({
+
+            type: "POST",
+            dataType: "json",
+            url: URL, 
+            data: {
+                "user_id":$('#hdn_home_user_id').val(),
+                "user_role_id":$('#hdn_home_user_role_id').val(),
+                "user_region_id":$('#hdn_user_region_id').val()
+            },
+            success: function(resp) 
+            {
+                if (resp.Status){
+                    $("#imgSpinner2").hide();
+                    var varAnchor = document.getElementById('lnkDownload');
+                    varAnchor.href = $('#hdn_web_url').val() + '/Bulk Upload/' + resp.filename;
+                    try 
+                        { 
+                            //in firefox
+                            varAnchor.click();
+                            return;
+                        } catch(ex) {}
+                        
+                        try 
+                        { 
+                            // in chrome
+                            if(document.createEvent) 
+                            {
+                                var e = document.createEvent('MouseEvents');
+                                e.initEvent( 'click', true, true );
+                                varAnchor.dispatchEvent(e);
+                                return;
+                            }
+                        } catch(ex) {}
+                        
+                        try 
+                        { 
+                            // in IE
+                            if(document.createEventObject) 
+                            {
+                                    var evObj = document.createEventObject();
+                                    varAnchor.fireEvent("onclick", evObj);
+                                    return;
+                            }
+                        } catch(ex) {}
+                    
+                }
+                else{
+                    console.log(resp)
+                    //alert('Not success')
+                    $("#imgSpinner").hide();
+                    
+                }
+            },
+            error:function()
+            {
+                //$("#imgSpinner").hide();
+            }
+        });
+    }
+}
+function ForceDownload(varUrl, varFileName)
+{
+    var link = document.createElement('a');
+    link.setAttribute('href', varUrl);
+    link.setAttribute('download', varFileName);
+    link.setAttribute('target', '_blank');
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function UploadFileDataPartner(){
+    
+    var id = document.getElementById('imgSpinner2_label');
+    id.innerText ='Please wait while uploading...'
+
+    if ($('#myFile').get(0).files.length === 0) {
+        console.log("No files selected.");
+    }
+    else
+    {
+        var fileExtension = ['xlsx']
+        if ($.inArray($('#myFile').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            alert("Formats allowed are : "+fileExtension.join(', '));
+            return false;
+        }
+        else
+        {          
+            $("#imgSpinner2").show();
+            var files=document.getElementById("myFile").files;
+            var file=files[0];
+            var status;
+            UploadFileData(file);
+        }
+        
+        var form_data = new FormData($('#formUpload')[0]);
+        form_data.append('user_id',$('#hdn_home_user_id').val());
+        form_data.append('user_role_id',$('#hdn_home_user_role_id').val());
+        $.ajax({
+            type: 'POST',
+            url: $('#hdn_web_url').val()+ "/upload_partner_target_plan",
+            enctype: 'multipart/form-data',
+            data: form_data,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function(data) 
+            {
+                var message="",title="",icon="";
+                if(data.Status){
+                    message=data.message;
+                    title="Success";
+                    icon="success";
+                }
+                else{
+                    if (data.message=="Validation_Error"){
+                        message=data.error;
+                        title="Error";
+                        icon="error";
+                    }
+                    else {
+                        message=data.message;
+                        title="Error";
+                        icon="error";
+                    }
+                }
+                var span = document.createElement("span");
+                span.innerHTML = message;
+                swal({   
+                            title:title,
+                            content: span,
+                            //text:message,
+                            icon:icon,
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                window.location.href = '/partner';
+                            }); 
+            },
+            error:function(err)
+            {
+                swal({   
+                    title:"Error",
+                    text:'Error! Please try again',
+                    icon:"error",
+                    confirmButtonClass:"btn btn-confirm mt-2"
+                    }).then(function(){
+                        window.location.href = '/partner';
+                });
+            }
+        });        
+    }
+}
+
+function UploadFileData(file)
+{
+    var file_path=$('#hdn_AWS_S3_path').val()+"bulk_upload/partner_planner/" + $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + file.name; 
+    var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET",api_url, false );
+    xhr.send();
+
+    if(xhr.status === 200 || xhr.status === 204){
+        var response = JSON.parse(xhr.responseText);
+        uploadFileToS3(file, response.data, response.url);
+    }
+    else{
+        alert("Could not get signed URL.");
+    }
+}
+
+function uploadFileToS3(file, s3Data, url){
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", s3Data.url, false);
+
+    var postData = new FormData();
+    for(key in s3Data.fields){
+        postData.append(key, s3Data.fields[key]);
+    }
+    postData.append('file', file);
+
+    xhr.send(postData);
+    //console.log(xhr.response);
+    if(xhr.status === 200 || xhr.status === 204){
+        var response = xhr;
+    }
+    else{
+        alert("Could not upload file to s3.");
+    }
+}
+
 </script>
 <!-- ============================================================== -->
 <!-- Start Page Content here -->
@@ -405,7 +631,10 @@
                         <div class="col-lg-3" >
                             <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTable()">Search</button>
                         </div>
-                        <div class="col-lg-6" >                                        
+                        <div class="col-lg-4" >
+                            <button style="float: right; margin-top: 30px; margin-right:10px;"  id="btn_upload" onclick="Upload_DownloadPartnerTargetMdl()" type="button" class="btn btn-info waves-effect waves-light">Upload/Download Target</a>
+                        </div>
+                        <div class="col-lg-2" >                                        
                             <button style="margin-top: 30px; float: right;" type="submit" id="btn_create" class="btn btn-primary">Create Partner</a>
                         </div>
                     </div>
@@ -590,6 +819,53 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
             </div>
+        </div>
+    </div>
+</div><!--/.modal-->
+
+<div id="mdl_upload_download_partner_target_plan" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content ">
+            <form id="formUpload" action="javascript:UploadFileDataPartner()">
+            <div class="modal-header">
+                <h4 class="modal-title"><span id="HduploadFile"></span></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <label for="myFile">Upload File* :</label>
+                        </div>
+                        <div class="col-lg-4">
+                            <input type="file" id="myFile" name="filename">
+                        </div>
+                        <div class="col-lg-4">
+                            <button class="btn btn-info btn-sm waves-effect waves-light" style="float: right;" type="button" onclick="DownloadPartnerTargetPlanTemplate()">Download Template</button>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <button class="btn btn-info btn-sm waves-effect waves-light" style="float: right;" type="button" onclick="Download_Partner_Target()">Download Partner Target</button>
+                            <!-- <a class="btn btn-primary" style="color:white;font-weight:bold;cursor:pointer;margin-top:30px; float: left;" onclick="DownloadTableBasedOnFilter()">Download</a>  float: right; -->
+                            <a id="lnkDownload" style="display:none;"></a>
+                        </div>    
+                    </div>  
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div id="imgSpinner2"> <!--style="margin-top: 9px;margin-bottom: -23px;"-->
+                    <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                    <label id="imgSpinner2_label" style="display:inline-block;">Please wait while uploading...</label>
+                </div>
+                <div>
+                    <button class="btn btn-primary waves-effect" type="submit" >Upload</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Close</button>
+                </div>
+            </div>
+        </form>
         </div>
     </div>
 </div><!--/.modal-->

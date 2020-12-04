@@ -41,6 +41,10 @@
         $('#btn_create2').show();
     else 
         $('#btn_create2').hide();
+    if(role_id == 1 )
+        $('#btn_download').show();
+    else 
+        $('#btn_download').hide();
         
     LoadTable(); 
     if ('{{project_id}}'>0)
@@ -145,22 +149,20 @@
                                         onclick="LoadTable()">Search</button>
                                         &nbsp
                                         
-                                        <!--button style="margin-top: 30px" type="button" class="btn btn-primary waves-effect waves-light submit" 
-                                        onclick="Download()">Download</button-->
+                                       
                                     </div>
-                                    <div class="form-group col-lg-2">                                         
-                                        <a class="btn btn-primary" style="color:white;font-weight:bold;cursor:pointer;margin-top:30px; float: right;" onclick="DownloadTableBasedOnFilter()">Download</a>  <!-- float: right; -->
-                                        <a id="lnkDownload" style="display:none;"></a>
-                                    </div>
+                                    <div class="col-lg-3" >                                        
+                                        <button style="float: left;margin-top: 30px" type="button" id="btn_download" class="btn btn-primary waves-effect waves-light submit" 
+                                        onclick="Download()">Download</button></div>
+                                   
                                     <div class="form-group col-lg-3">
-                                        <div id="imgSpinner">
-                                            <img src="static/assets/images/spinner1.gif" style="margin-top:30px; height:30px;display:inline-block;"/>
+                                        <div id="imgSpinner" style="display: none;">
+                                            <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-none;"/>
                                             <label style="display:inline-block;">Please wait while downloading report...</label>
                                         </div> 
                                     </div>
-                                    <div class="col-lg-6" >                                        
-                                        <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-primary">Create Project</a>
-                                    </div>
+                                   
+                                    
                                 </div>
                             </div>
                         </div>
@@ -175,8 +177,8 @@
                                         <div class="col-lg-6">
                                             <h4 class="header-title"></h4>
                                         </div>
-                                        <div class="col-lg-6" >                                        
-                                                <button style="float: right; display: none;" type="submit" class="btn btn-primary">Create Project</a>
+                                        <div class="col-lg-12" >                                        
+                                            <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-primary">Create Project</a>
                                         </div>
                                     </div>
                                     <br/>

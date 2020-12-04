@@ -5030,9 +5030,9 @@ SELECT					cb.name as candidate_name,
         
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
-            for i in range(len(columns)):
-                h[columns[i]]=row[i]           
-            response.append(h.copy())
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":','.join(set(row[1].split(','))),""+columns[2]+"":','.join(set(row[2].split(','))),""+columns[3]+"":','.join(set(row[3].split(','))),""+columns[4]+"":','.join(set(row[4].split(','))),""+columns[5]+"":','.join(set(row[5].split(','))),""+columns[6]+"":','.join(set(row[6].split(','))),""+columns[7]+"":','.join(set(row[7].split(','))),""+columns[8]+"":','.join(set(row[8].split(','))),""+columns[9]+"":','.join(set(row[9].split(',')))}
+            response.append(h)
+            
         cur2.close()
         con.close()
         #print(response)
@@ -5337,12 +5337,13 @@ SELECT					cb.name as candidate_name,
             for child in root:
                 data = child.attrib
                 out.append(data)
-                #quer1_a + = 
-                quer = "({},'{}','{}','{}','{}','{}',{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},{},1,'m','{}','{}','{}','{}'),".format(1 if data['isFresher']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],
+                #print(data)
+                quer = "({},'{}','{}','{}','{}','{}',{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},{},1,'m','{}','{}','{}','{}'),".format(1 if data['isFresher']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],
                             data['candDob'],1 if data['dobEntered']=='true' else 0,data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'], data['disableStatus'], data['candReligion'],
                             data['candSource'], data['presPincode'],data['presDistrict'],data['permDistrict'],data['permPincode'],user_id,role_id,data['permState'],data['permCountry'] ,data['presState'],data['presCountry'])
                 quer1 += '\n'+quer
             quer1 = quer1[:-1]+';'
+            #print(quer1)
             curs.execute(quer1)
             d = list(map(lambda x:x[0],curs.fetchall()))
             curs.commit()
@@ -5353,6 +5354,7 @@ SELECT					cb.name as candidate_name,
               
             quer2 = quer2[:-1]+';'
             quer3 = quer3[:-1]+';'
+            #print(quer2 + '\n' + quer3)
             curs.execute(quer2 + '\n' + quer3)
             curs.commit()
             out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
@@ -6919,7 +6921,7 @@ SELECT					cb.name as candidate_name,
         cur2 = con.cursor()
         sql = 'exec [reports].[sp_get_batch_status_report_data]    ?,?,?,?,?,?,?,?'
         values = (user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date)
-        #print(values)
+        print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -6960,7 +6962,7 @@ SELECT					cb.name as candidate_name,
             h=[]           
             d={} 
             json_str=df.to_json(orient='records')
-            sql = 'exec	[masters].[sp_validate_upload_batch_target_plan]  ?,?,?'
+            sql = 'exec	[masters].[sp_validate_upload_partner_target_plan] ?,?,?'  #[masters].[sp_validate_upload_batch_target_plan]
             values = (json_str,user_id,user_role_id)
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]
@@ -6983,7 +6985,7 @@ SELECT					cb.name as candidate_name,
             cur.close()
             con.close()
         except Exception as e:
-            print(str(e))
+            #print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
             
     def upload_user(df,user_id,user_role_id):
@@ -7297,8 +7299,91 @@ SELECT					cb.name as candidate_name,
         sheet1 = list(map(lambda x:list(x), data))
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
         curs.close()
+        con.close() 
+
+    def DownloadProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        sheet2=[]
+        sheet2_columns=[]
+        sheet3=[]
+        sheet3_columns=[]
+        sql=''
+        sql1=''
+        sql2=''
+        sql = 'exec [reports].[sp_get_project_download] ?, ?, ?,?,?,?,?,?,?,?,?'
+        sql1 = 'exec [reports].[sp_get_project_center_download] ?, ?, ?,?,?,?,?,?,?,?,?'
+        sql2 = 'exec [reports].[sp_get_project_course_download]  ?, ?, ?,?,?,?,?,?,?,?,?'
+        values = (user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))        
+
+        curs.execute(sql1,(values))
+        sheet2_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet2 = list(map(lambda x:list(x), data))  
+
+        curs.execute(sql2,(values))
+        sheet3_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet3 = list(map(lambda x:list(x), data))        
+        return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
+        curs.close()
         con.close()    
-    
+       
+    def DownloadSubProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        sheet2=[]
+        sheet2_columns=[]
+        sheet3=[]
+        sheet3_columns=[]
+        sheet4=[]
+        sheet4_columns=[]
+        sheet5=[]
+        sheet5_columns=[]
+        sql=''
+        sql1=''
+        sql2=''
+        sql3=''
+        sql4=''
+        sql = 'exec [reports].[sp_get_sub_project_download] ?, ?, ?,?,?,?,?,?,?,?,?,?'
+        sql1 = 'exec [reports].[sp_get_sub_project_center_download] ?, ?, ?,?,?,?,?,?,?,?,?,?'
+        sql2 = 'exec [reports].[sp_get_sub_project_course_download]  ?, ?, ?,?,?,?,?,?,?,?,?,?'
+        sql3 = 'exec [reports].[sp_get_sub_project_user_download] ?, ?, ?,?,?,?,?,?,?,?,?,?'
+        sql4 = 'exec [reports].[sp_get_sub_project_planned_batches_download]  ?, ?, ?,?,?,?,?,?,?,?,?,?'
+        values = (user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project)
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))        
+
+        curs.execute(sql1,(values))
+        sheet2_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet2 = list(map(lambda x:list(x), data))  
+
+        curs.execute(sql2,(values))
+        sheet3_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet3 = list(map(lambda x:list(x), data)) 
+        curs.execute(sql3,(values))
+        sheet4_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet4 = list(map(lambda x:list(x), data)) 
+        curs.execute(sql4,(values))
+        sheet5_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet5 = list(map(lambda x:list(x), data))        
+        return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet4':sheet4,'sheet5':sheet5,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns,'sheet4_columns':sheet4_columns,'sheet5_columns':sheet5_columns}
+        curs.close()
+        con.close()  
     def DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
@@ -7795,19 +7880,17 @@ SELECT					cb.name as candidate_name,
         return response
 
     def download_centers_list(center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses):
-        
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
-        sql = 'exec [masters].[sp_get_centers_download] ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, courses)
+        sql = 'exec [reports].[sp_get_centers_download] ?, ?, ?,?, ?, ?, ?, ?, ?, ?'
+        values = (center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses)
         curs.execute(sql,(values))
         columns = [column[0].title() for column in curs.description]
         data = curs.fetchall()
         data = list(map(lambda x:list(x), data))
-        
         curs.close()
         cnxn.close()
-        return (data,columns)
+        return {'sheet1':data,'sheet1_columns':columns}
 
     def download_emp_target_template(user_id, user_role_id, date):
         cnxn=pyodbc.connect(conn_str)
@@ -7885,4 +7968,18 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()    
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+
+    def download_Partner_Target_dump(user_id,user_role_id,user_region_id):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec masters.[sp_get_parrtner_target_dump] ?, ?, ?'
+        values = (user_id,user_role_id,user_region_id)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        
+        curs.close()
+        cnxn.close()
+        return (data,columns)
         

@@ -592,7 +592,6 @@ function GetProjectDetails(User_Id,User_Name)
     return false;
 }
 
-
 function Getusertarget(UserId,UserName)
     {
         $('#hdn_modal_user_id').val(UserId);
