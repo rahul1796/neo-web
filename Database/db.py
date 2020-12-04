@@ -6962,7 +6962,8 @@ SELECT					cb.name as candidate_name,
             h=[]           
             d={} 
             json_str=df.to_json(orient='records')
-            sql = 'exec	[masters].[sp_validate_upload_partner_target_plan] ?,?,?'  #[masters].[sp_validate_upload_batch_target_plan]
+            
+            sql = 'exec	[masters].[sp_validate_upload_batch_target_plan] ?,?,?'  #[masters].[sp_validate_upload_batch_target_plan]
             values = (json_str,user_id,user_role_id)
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]
@@ -6974,6 +6975,9 @@ SELECT					cb.name as candidate_name,
                     d[columns[i]]=row[i]
                 h.append(d.copy())
             cur.commit()
+            f=open('testing.txt','w')
+            f.write(str(h))
+            f.close()
             if pop==0 :
                 Status=False
                 msg="Error"
