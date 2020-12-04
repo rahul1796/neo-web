@@ -7265,6 +7265,28 @@ class download_centers_list(Resource):
             return resp
 api.add_resource(download_centers_list,'/download_centers_list')
 
+class download_users_list(Resource):
+    @staticmethod
+    def post():
+        
+        if request.method == 'POST':
+            user_id = request.form['user_id']
+            dept_ids=request.form['dept_ids']
+            role_ids=request.form['role_ids']
+            entity_ids=request.form['entity_ids']
+            region_ids=request.form['region_ids']
+            RM_Role_ids=request.form['RM_Role_ids']
+            R_mangager_ids=request.form['R_mangager_ids']
+            filter_role_id=request.form['filter_role_id']
+            user_region_id=request.form['user_region_id']
+            user_role_id=request.form['user_role_id']
+            status_ids=request.form['status_ids']
+            project_ids=request.form['project_ids']
+            #print(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,dept_ids,role_ids,entity_ids,region_ids,RM_Role_ids,R_mangager_ids,filter_role_id,user_region_id,user_role_id,status_ids,project_ids)
+            resp= Report.download_users_list(user_id,filter_role_id,user_region_id,user_role_id, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids)
+            return resp
+api.add_resource(download_users_list,'/download_users_list')
+
 class GetECPReportDonload(Resource):
     @staticmethod
     def post():
