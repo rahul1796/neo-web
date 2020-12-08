@@ -7010,7 +7010,7 @@ class GetPartners(Resource):
         if request.method=='GET':
             try:
                 PartnerTypeId=request.args.get('PartnerTypeId',0,type=int)
-                print(PartnerTypeId)
+                #print(PartnerTypeId)
                 response = Master.GetPartners(PartnerTypeId)
                 return response 
             except Exception as e:
@@ -9177,6 +9177,38 @@ class upload_partner_target_plan(Resource):
             except Exception as e:
                 return {"Status":False, "message":"Unable to upload " + str(e)}
 api.add_resource(upload_partner_target_plan,'/upload_partner_target_plan')
+
+@app.route("/partner_productivity_report_page")
+def partner_productivity_report_page():
+    if g.user:
+        return render_template("Reports/partner_productivity_report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/partner_productivity_report")
+def partner_productivity_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="partner_productivity_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class DownloadPartnerProductivityReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            month = request.form["month"]
+            partner_ids = request.form["partner_ids"]
+            customer_ids = request.form["customer_ids"]
+            #contract_ids = request.form["contract_ids"]
+            project_ids = request.form["project_ids"]
+            sub_project_ids = request.form["sub_project_ids"]
+            
+            user_id =  session['user_id']
+            user_role_id =  session['user_role_id']
+            resp = Report.DownloadPartnerProductivityReport(partner_ids,customer_ids,project_ids,sub_project_ids,month,user_id,user_role_id)
+            return resp
+api.add_resource(DownloadPartnerProductivityReport,'/DownloadPartnerProductivityReport')
+
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)

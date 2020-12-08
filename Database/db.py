@@ -7986,4 +7986,22 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()
         return (data,columns)
+
+    def DownloadPartnerProductivityReport(partner_ids,customer_ids,project_ids,sub_project_ids,month,user_id,user_role_id):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        
+        sql = 'exec [reports].[sp_get_assessment_productivity_report_data] ?,?,?,?, ?, ?,?,?'
+        
+        values = (partner_ids,customer_ids,project_ids,sub_project_ids,month,user_id,user_role_id)
+        
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))        
+        cur2.close()
+        con.close()
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
         
