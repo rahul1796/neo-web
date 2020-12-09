@@ -9231,6 +9231,5 @@ class DownloadPartnerProductivityReport(Resource):
             return resp
 api.add_resource(DownloadPartnerProductivityReport,'/DownloadPartnerProductivityReport')
 
-
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)

@@ -56,6 +56,7 @@
                 switch(role_id)
 				{
                     case 1:             //Admin
+
                         $('#Home').show();
 						$('#Mobilization_Menu').show();
                         $('#Registration_Menu').show();
@@ -96,6 +97,7 @@
                             $('#Certification_Distribution_Report_Menu').show();
                         $('#Productivity_Report').show();
                             $('#certificate_distribution_Productivity_Report').show();
+                            $('#partner_productivity_report').show();
                             $('#region_productivity_report').show();
                             $('#mobilizer_productivity_report').show();
                             $('#Ops_Productivity_Report').show();
@@ -151,6 +153,7 @@
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
                         $('#Productivity_Report').show();
+                            $('#partner_productivity_report').hide();
                             $('#region_productivity_report').show();
                             $('#mobilizer_productivity_report').show();
                             $('#Ops_Productivity_Report').show();
@@ -203,6 +206,7 @@
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
                         $('#Productivity_Report').show();
+                            $('#partner_productivity_report').hide();
                             $('#region_productivity_report').show();
                             $('#mobilizer_productivity_report').show();
                             $('#Ops_Productivity_Report').show();
@@ -251,6 +255,7 @@
                             $('#Assessment_report_Menu').hide();
                             $('#Certification_Distribution_Report_Menu').hide();
                             $('#Assessment_Productivity_Report').hide();
+                        $('#partner_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -293,6 +298,7 @@
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
                             $('#Assessment_Productivity_Report').hide();
+                            $('#partner_productivity_report').hide();
                         
                         if(goto !="")
                             $("#box").load(goto);
@@ -335,6 +341,7 @@
                             $('#Batch_Status_report').show();
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
+                            $('#partner_productivity_report').hide();
                         $('#TMA_attendance_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
@@ -376,10 +383,10 @@
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
-
                             $('#Batch_Status_report').show();
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
+                            $('#partner_productivity_report').hide();
                         $('#TMA_attendance_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
@@ -423,9 +430,10 @@
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
-							          $('#Batch_Status_report').show();
+							$('#Batch_Status_report').show();
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
+                            $('#partner_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -467,6 +475,7 @@
                             $('#Batch_Status_report').show();
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
+                            $('#partner_productivity_report').hide();
                         $('#TMA_attendance_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
@@ -510,6 +519,7 @@
                             $('#Assessment_report_Menu').hide();
                             $('#Certification_Distribution_Report_Menu').hide();
                             $('#Assessment_Productivity_Report').hide();
+                            $('#partner_productivity_report').hide();
                         $('#TMA_attendance_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
@@ -551,6 +561,7 @@
                             $('#TrainerProductivityReport').hide();
                             $('#Assessment_report_Menu').hide();
                             $('#Certification_Distribution_Report_Menu').hide();
+                            $('#partner_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -589,6 +600,7 @@
                             $('#TrainerProductivityReport').hide();
                             $('#Assessment_report_Menu').hide();
                             $('#Certification_Distribution_Report_Menu').hide();
+                            $('#partner_productivity_report').hide();
                         $('#TMA_attendance_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
@@ -630,6 +642,7 @@
                             $('#TrainerProductivityReport').hide();
                             $('#Assessment_report_Menu').hide();
                             $('#Certification_Distribution_Report_Menu').hide();
+                            $('#partner_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -669,6 +682,7 @@
                             $('#TrainerProductivityReport').hide();
                             $('#Assessment_report_Menu').hide();
                             $('#Certification_Distribution_Report_Menu').hide();
+                            $('#partner_productivity_report').hide();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -709,6 +723,7 @@
                             $('#TrainerProductivityReport').hide();
                             $('#Assessment_report_Menu').hide();
                             $('#Certification_Distribution_Report_Menu').hide();
+                            $('#partner_productivity_report').hide();
                         console.log(goto);
                         if(goto !="" && goto!="dashboard")
                             $("#box").load(goto);
@@ -752,6 +767,7 @@
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
                             $('#Assessment_Productivity_Report').hide();
+                            $('#partner_productivity_report').hide();
                         console.log(goto);
                         if(goto !="" && goto!="dashboard")
                             $("#box").load(goto);
@@ -793,7 +809,7 @@
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
                             $('# Assessment_Productivity_Report').hide();
-                           
+                            $('#partner_productivity_report').hide();
                         $('#TMA_attendance_Menu').hide();
                         $('#TMA_content').hide();
                             $('#tma_report_filter').show();
@@ -837,6 +853,7 @@
                             $('#TrainerProductivityReport').hide(); 
                             $('#Assessment_report_Menu').hide();
                             $('#Certification_Distribution_Report_Menu').hide();               
+                            $('#partner_productivity_report').hide();
                     if(goto !="")
                         $("#box").load(goto);
                     break;
@@ -1068,6 +1085,10 @@
                                                 </li>
                                                 <li id="certificate_distribution_Productivity_Report">
                                                     <a href="/Certification_Distribution_productivity_report" class="active">Certificate Distribution Productivity Report<div class="button"></div></a>
+                                                </li>
+                                                
+                                                <li id="partner_productivity_report">
+                                                    <a href="/partner_productivity_report" class="active">Partner Productivity Report<div class="button"></div></a>
                                                 </li>
                                                  <li id="region_productivity_report">
                                                      <a href="/region_productivity_report" class="active">Region-Wise Productivity Report<div class="button"></div></a>

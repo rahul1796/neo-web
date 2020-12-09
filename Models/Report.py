@@ -1780,7 +1780,7 @@ class Report:
                 os.remove( DownloadPath + i)
             path = '{}{}'.format(DownloadPath,report_name)
             res={}
-            res=Report.CreateExcelForAssessmentProductivity(data,path)
+            res=Report.CreateExcelForPartnerProductivity(data,path)
             
             if res['success']:
                 return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
@@ -1800,41 +1800,23 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='AssessmentProductivity')             
-            default_column = ['COO','TM','CM/PC']
-            first_row = ['Assessment Planned', 'Assessed','Certified']
-            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual']
-            third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
-                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
-                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %']
+            df.to_excel(writer, index=None, header=None ,startrow=2 ,sheet_name='PartnerProductivity') 
+
+            default_column = ['Partner Name','Partner code','Partner Status','Project Name','Project Code','Subproject Name','Subproject Code','State','Location']
+            first_row = ['Enrolment','Assessment','Certification Distribution','Placement']
+            second_row = ['Target','Actual','%Conversion','Target','Actual','%Conversion','Target','Actual','%Conversion','Target','Actual','%Conversion']
             
-            
-            
-            worksheet = writer.sheets['AssessmentProductivity']
+            worksheet = writer.sheets['PartnerProductivity']
             for col_num, value in enumerate(default_column):
-                worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=3
-            for col_num, value in enumerate(first_row):
-                if col_num==-1:
-                    worksheet.merge_range(0, col, 0, 4+col, value, header_format)
-                    col=col+5                    
-                else:
-                    worksheet.merge_range(0, col, 0, 10+col, value, header_format)
-                    col=col+11
-            col=3
-            for col_num, value in enumerate(second_row):
-                if col_num==-1:
-                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
-                    col=col+5
-                elif value=='Target':
-                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
-                    col=col+5
-                elif value=='Actual':
-                    worksheet.merge_range(1, col, 1, 5+col, value, header_format)
-                    col=col+6                
+                worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
             
-            for col_num, value in enumerate(third_row):
-                worksheet.write(2, 3+col_num, value, header_format)
+            col=9
+            for col_num, value in enumerate(first_row):
+                worksheet.merge_range(0, col, 0, 2+col, value, header_format)
+                col=col+3
+
+            for col_num, value in enumerate(second_row):
+                worksheet.write(1, 9+col_num, value, header_format)
             
             writer.save()
             return({'msg':'created excel', 'success':True, 'filename':path})
