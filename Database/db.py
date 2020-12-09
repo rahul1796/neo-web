@@ -7151,7 +7151,9 @@ SELECT					cb.name as candidate_name,
             raws = requests.post(url = URL, data = data, files = {'file':(filenmae,f,'text/xml')})
         os.remove(candidatexml_fullPath)
         if (raws.status_code==200)or(raws.status_code==204):
-            out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
+            mobilization_types=Database.get_user_mobilization_type(user_id)
+            out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae,'mobilization_types':mobilization_types}
+            #out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
         else:
             out = {'success': False, 'description': "Unable to upload to s3", 'app_status':True}
         return out
