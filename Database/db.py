@@ -8004,7 +8004,7 @@ SELECT					cb.name as candidate_name,
         sheet1=[]
         sheet1_columns=[]
         
-        sql = 'exec [reports].[sp_get_assessment_productivity_report_data] ?,?,?,?, ?, ?,?,?'
+        sql = 'exec [reports].[sp_get_partner_productivity_report_data] ?,?,?,?, ?, ?,?'
         
         values = (partner_ids,customer_ids,project_ids,sub_project_ids,month,user_id,user_role_id)
         
@@ -8012,7 +8012,6 @@ SELECT					cb.name as candidate_name,
         sheet1_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
         sheet1 = list(map(lambda x:list(x), data))        
-        cur2.close()
+        curs.close()
         con.close()
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
-        
