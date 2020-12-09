@@ -5646,7 +5646,7 @@ SELECT					cb.name as candidate_name,
                 #quer = "({},'{}',GETDATE(),{},1),".format(data['cand_id'],intervention_category,user_id)
                 #quer = "({},'SAE',GETDATE(),{},1),".format(data['cand_id'],user_id)
                 #quer4 += '\n'+quer
-                merger_skilling.push({"batch_id":data['assign_batch'],"cand_id":data['cand_id'],"intervention_category":intervention_category,"user_id":user_id})
+                merger_skilling.append({"batch_id":data['assign_batch'],"cand_id":data['cand_id'],"intervention_category":intervention_category,"user_id":user_id})
 
                 for fam in child.findall('family_details'):
                     dt=fam.attrib
@@ -5909,7 +5909,7 @@ SELECT					cb.name as candidate_name,
                     intervention_category="EAL"              
                 # quer = "({},'{}',GETDATE(),{},1),".format(data['cand_id'],intervention_category,user_id)
                 # quer4 += '\n'+quer
-                merger_skilling.push({"batch_id":data['assign_batch'],"cand_id":data['cand_id'],"intervention_category":intervention_category,"user_id":user_id})
+                merger_skilling.append({"batch_id":data['assign_batch'],"cand_id":data['cand_id'],"intervention_category":intervention_category,"user_id":user_id})
 
                 for fam in child.findall('family_details'):
                     dt=fam.attrib
