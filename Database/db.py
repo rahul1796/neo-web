@@ -5665,6 +5665,7 @@ SELECT					cb.name as candidate_name,
             sql = 'exec	candidate_details.sp_candidate_re_enr_skilling ?'
             values = (json.dumps(merger_skilling),)
             curs.execute(sql,(values))
+            d = list(map(lambda x:x[0],curs.fetchall()))
             
             # quer4 = quer4[:-1]+';'
             # curs.execute(quer4)
@@ -5950,7 +5951,7 @@ SELECT					cb.name as candidate_name,
             sql = 'exec	candidate_details.sp_candidate_re_enr_skilling ?'
             values = (json.dumps(merger_skilling),)
             curs.execute(sql,(values))
-            
+            d = list(map(lambda x:x[0],curs.fetchall()))
             # quer4 = quer4[:-1]+';'
             # curs.execute(quer4)
             # d = list(map(lambda x:x[0],curs.fetchall()))
@@ -5969,7 +5970,7 @@ SELECT					cb.name as candidate_name,
                 curs.commit()
             response_data=[]
             intervention_string =','.join(map(str, d))
-            response_query = 'SELECT c.candidate_id as Candidate_Id,c.first_name as First_Name,COALESCE(middle_name,\'\') as Middle_Name,COALESCE(last_name,\'\') as Last_Name,c.primary_contact_no as Mobile_Number,cis.intervention_value as Enrollment_Id FROM candidate_details.tbl_candidate_interventions ci LEFT JOIN candidate_details.tbl_candidates as c on c.candidate_id=ci.candidate_id LEFT JOIN candidate_details. tbl_map_candidate_intervention_skilling as cis on cis.intervention_id=ci.candidate_intervention_id where ci.candidate_intervention_id IN ('+intervention_string+');'
+            response_query = 'SELECT c.candidate_id as Candidate_Id,c.first_name as First_Name,COALESCE(middle_name,\'\') as Middle_Name,COALESCE(last_name,\'\') as Last_Name,c.primary_contact_no as Mobile_Number,cis.intervention_value as Enrollment_Id FROM candidate_details.tbl_candidate_interventions ci LEFT JOIN candidate_details.tbl_candidates as c on c.candidate_id=ci.candidate_id LEFT JOIN candidate_details. tbl_map_candidate_intervention_skilling as cis on cis.intervention_id=ci.candidate_intervention_id where cis.is_active=1 and ci.candidate_intervention_id IN ('+intervention_string+');'
             curs.execute(response_query)
             columns = [column[0].title() for column in curs.description]
             for row in curs:
