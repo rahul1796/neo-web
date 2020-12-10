@@ -5881,6 +5881,8 @@ SELECT					cb.name as candidate_name,
             fam_query=""
             out=[]
             she_query=""
+            temp_she_query=""
+            dell_query=""
             merger_skilling=[]
             for child in root:
                 data = child.attrib
