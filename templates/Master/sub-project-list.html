@@ -47,17 +47,24 @@ LoadProductdl();
 if ('{{status}}'==1)
 $('#ddlStatus').val('2');
 role_id=parseInt($('#hdn_home_user_role_id').val());
+if(role_id == 1 || role_id == 15)
+{
+    $('#btn_upload').show();
+}
+else
+{
+    $('#btn_upload').hide();
+}
+
 if(role_id == 1)
 {
     $('#btn_create').show();
-    $('#btn_upload').show();
     $('#btn_upload_emp').show();
     $('#btn_download').show();
 }
 else
 {
     $('#btn_create').hide();
-    $('#btn_upload').hide();
     $('#btn_upload_emp').hide();
     $('#btn_download').hide();
 }
@@ -614,6 +621,7 @@ GetSub_project('{{project_id}}')
                         </div>
                         <div class="col-lg-4">
                             <button class="btn btn-info btn-sm waves-effect waves-light" type="button" onclick="DownloadBatchTargetPlanTemplate()">Download Template</button>
+                            
                         </div>
                     </div>
                 </div>
@@ -655,6 +663,7 @@ GetSub_project('{{project_id}}')
                         </div>
                         <div class="col-lg-3">
                             <button class="btn btn-info btn-sm waves-effect waves-light" type="button" onclick="DownloadEmployeeTargetPlanTemplate()">Download Template</button>
+                            <a id="lnkDownload" style="display:none;"></a>
                         </div>
                     </div>
                 </div>
