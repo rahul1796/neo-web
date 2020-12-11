@@ -8933,7 +8933,7 @@ class upload_employee_target_plan(Resource):
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
                 Month_Year = request.form["month_year"]
-
+                
                 Month_Year_excel = datetime.strptime(Month_Year, '%Y-%m-%d').strftime('%b-%Y').upper()
                 month_year_validation = [CustomElementValidation(lambda d: datetime.strptime(d, '%b-%Y').strftime('%Y-%m-%d')==Month_Year, "only '{}' date allowed".format(Month_Year_excel))]
 
