@@ -9189,7 +9189,7 @@ class upload_partner_target_plan(Resource):
 
                     df.insert(0, 'row_index', range(len(df)))
 
-                    out = Database.upload_batch_target_plan(df,user_id,user_role_id)
+                    out = Database.upload_partner_target_plan(df,user_id,user_role_id)
                     if out['Status']==False:
                         file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
                         pd.DataFrame(out['data']).to_csv(config.bulk_upload_path + 'Error/' + file_name)
