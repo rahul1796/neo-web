@@ -5802,34 +5802,34 @@ SELECT					cb.name as candidate_name,
                     );
             '''
             
-            update_query_she='''
-            UPDATE [candidate_details].[tbl_candidate_she_details] SET
-                [Address as per Aadhar Card (incl pin code)]='{}'
-                ,[Number of members earning in the family]='{}'
-                ,[Rented or own house?]='{}'
-                ,[Size of the house]='{}'
-                ,[Ration card (APL or BPL)]='{}'
-                ,[TV]='{}'
-                ,[Refrigerator]='{}'
-                ,[Washing Machine]='{}'
-                ,[AC /Cooler]='{}'
-                ,[Car]='{}'                
-                ,[Medical Insurance]='{}'
-                ,[Life Insurance]='{}'
-                ,[Others]='{}'
-                ,[Educational qualification]='{}'
-                ,[Age proof]='{}'
-                ,[Signed MoU]='{}'
-                ,[MoU signed date]='{}'
-                ,[Kit given date]='{}'
-                ,[Head of the household]='{}'
-                ,[Farm land]='{}'
-                ,[If yes, acres of land]='{}'
-                ,[created_on]=GETDATE()
-                ,[created_by]={}
-                ,[is_active]=1
-                where candidate_id={};
-            '''
+            # update_query_she='''
+            # UPDATE [candidate_details].[tbl_candidate_she_details] SET
+            #     [Address as per Aadhar Card (incl pin code)]='{}'
+            #     ,[Number of members earning in the family]='{}'
+            #     ,[Rented or own house?]='{}'
+            #     ,[Size of the house]='{}'
+            #     ,[Ration card (APL or BPL)]='{}'
+            #     ,[TV]='{}'
+            #     ,[Refrigerator]='{}'
+            #     ,[Washing Machine]='{}'
+            #     ,[AC /Cooler]='{}'
+            #     ,[Car]='{}'                
+            #     ,[Medical Insurance]='{}'
+            #     ,[Life Insurance]='{}'
+            #     ,[Others]='{}'
+            #     ,[Educational qualification]='{}'
+            #     ,[Age proof]='{}'
+            #     ,[Signed MoU]='{}'
+            #     ,[MoU signed date]='{}'
+            #     ,[Kit given date]='{}'
+            #     ,[Head of the household]='{}'
+            #     ,[Farm land]='{}'
+            #     ,[If yes, acres of land]='{}'
+            #     ,[created_on]=GETDATE()
+            #     ,[created_by]={}
+            #     ,[is_active]=1
+            #     where candidate_id={};
+            # '''
 
             insert_query_she='''
             INSERT INTO [candidate_details].[tbl_candidate_she_details]
@@ -5857,6 +5857,29 @@ SELECT					cb.name as candidate_name,
                 ,[Will you able to work full time or at least 6 hours a day?]
                 ,[Are you willing to travel from one place to another within panchayat?]
                 ,[Do you have a bank account?]
+				
+				,[Address as per Aadhar Card (incl pin code)]
+                ,[Number of members earning in the family]
+                ,[Rented or own house?]
+                ,[Size of the house]
+                ,[Ration card (APL or BPL)]
+                ,[TV]
+                ,[Refrigerator]
+                ,[Washing Machine]
+                ,[AC /Cooler]
+                ,[Car]              
+                ,[Medical Insurance]
+                ,[Life Insurance]
+                ,[Others]
+                ,[Educational qualification]
+                ,[Age proof]
+                ,[Signed MoU]
+                ,[MoU signed date]
+                ,[Kit given date]
+                ,[Head of the household]
+                ,[Farm land]
+                ,[If yes, acres of land]
+
                 ,[created_on]
                 ,[created_by]
                 ,[is_active])
@@ -5957,8 +5980,7 @@ SELECT					cb.name as candidate_name,
 
                     if 'mobilization_type' in data:
                         if int(data['mobilization_type'])==2:
-                            she_query += '\n' + update_query_she.format(data['aadhar_address'],data['family_members'],data['rented_or_own'],data['size_of_house'],data['ration_card'],data['tv'],data['refrigerator'],data['washing_machine'],data['ac_cooler'],data['car'],data['medical_insurance'],data['life_insurance'],data['others'],data['educational_qualification'],data['age_proof'],data['signed_mou'],data['mou_signed_date'],data['kit_given_date'],data['head_of_household'],data['farm_land'],data['acres_of_land'],int(user_id),int(data['cand_id']))
-                            temp_she_query="({},{},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),int(data['score']),int(data['result']),data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['serve_as_she'],data['sign_contract_with_LN'],data['adopt_digital_transaction'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['age_18_40'],data['eight_pass'],data['past_work_exp'],data['full_time_work'],data['trvl_within_panchayat'],data['bank_act'],user_id)
+                            temp_she_query="({},{},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),int(data['score']),int(data['result']),data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['serve_as_she'],data['sign_contract_with_LN'],data['adopt_digital_transaction'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['age_18_40'],data['eight_pass'],data['past_work_exp'],data['full_time_work'],data['trvl_within_panchayat'],data['bank_act'],data['aadhar_address'],data['family_members'],data['rented_or_own'],data['size_of_house'],data['ration_card'],data['tv'],data['refrigerator'],data['washing_machine'],data['ac_cooler'],data['car'],data['medical_insurance'],data['life_insurance'],data['others'],data['educational_qualification'],data['age_proof'],data['signed_mou'],data['mou_signed_date'],data['kit_given_date'],data['head_of_household'],data['farm_land'],data['acres_of_land'],int(user_id))
                             insert_query_she += '\n'+temp_she_query
                         elif int(data['mobilization_type'])==4:
                             dell_query="({},{},'{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),data['edu_marsheet'],data['asp_district'],data['dell_income_certi'],user_id)
@@ -5967,13 +5989,14 @@ SELECT					cb.name as candidate_name,
             if query!="":     
                 curs.execute(query)
                 curs.commit()
-            if she_query!="":
-                curs.execute(she_query)
-                curs.commit()
             if temp_she_query!="":    
                 insert_query_she=insert_query_she[:-1]+';'
                 curs.execute(insert_query_she)
                 curs.commit()
+            # if she_query!="":
+            #     curs.execute(she_query)
+            #     curs.commit()
+            
             if dell_query!="":
                 insert_query_dell=insert_query_dell[:-1]+';'
                 curs.execute(insert_query_dell)
