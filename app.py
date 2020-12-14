@@ -9132,7 +9132,7 @@ class upload_partner_target_plan(Resource):
 
                 schema = Schema([
                         #null check
-                        Column('Partner/Vendor id*'),
+                        Column('Partner/Vendor code*'),
 
                         Column('Partner/Vendor name*',str_validation+null_validation),
                         Column('Sub Project Code*',str_validation+null_validation),
