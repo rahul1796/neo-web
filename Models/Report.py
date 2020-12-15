@@ -921,13 +921,32 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Centers')            
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Centers') 
+            df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Centers-Course')  
+            df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Centers-Sub Projects')  
+            df = pd.DataFrame(data['sheet4'], columns=data['sheet4_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Centers-Room')             
             
             first_row = ['center_name','center_type_name','partner_name','center_category_name','bu_name','region_name','cluster_name','country_name','state_name','district_name','location','active_status','center_code','created by','created on','last modified by','last modified on']
             worksheet = writer.sheets['Centers']
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format)           
             
+            first_row = ['S No','center_code','center_name','course_code','course_name','qp_code','qp_name','mapped by','mapped on']
+            worksheet = writer.sheets['Centers-Course']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format) 
+
+            first_row = ['S No','center_code','center_name','sub_project_code','sub_project_name','project_code','project_name','mapped by','mapped on']
+            worksheet = writer.sheets['Centers-Sub Projects']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format) 
+            first_row = ['S No','center_code','center_name','room_name','room_type','room_size','room_capacity','course_name','mapped by','mapped on']
+            worksheet = writer.sheets['Centers-Room']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format) 
             writer.save()
 
             return({'msg':'created excel', 'success':True, 'filename':path})
