@@ -47,10 +47,12 @@
             role_id=parseInt($('#hdn_home_user_role_id').val());
             if(role_id == 5)
                 $('#btn_create').hide();                
-            if(role_id == 1)
+            if(role_id == 1){
                 $('#btn_upload').show();
-            else 
+                $('#btn_download').show();}
+            else {
                 $('#btn_upload').hide();
+                $('#btn_download').hide();}
         });
         </script>
        <form id='form1' method="POST" action="/assign_user_add_edit_to_home">
@@ -128,13 +130,25 @@
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
-                                    <div class="col-lg-3" >
+                                    <div class="col-lg-1" >
                                         <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
                                         onclick="LoadTable('-1')">Search</button>
                                         
                                     </div>
+                                    <div class="col-lg-2" >                                        
+                                        <button style="float: left;margin-top: 30px" type="button" id="btn_download" class="btn btn-primary waves-effect waves-light submit" 
+                                        onclick="DownloadTableBasedOnSearch()">Download</button></div>
+                                   
+                                   
+                                    
                                     <div class="col-lg-3" >                                        
                                         <button style="float: left; margin-top: 30px; display: none;"  id="btn_upload" onclick="UploadUserMdl()" type="button" class="btn btn-info waves-effect waves-light">Add/Modify Employees</a>
+                                    </div>
+                                    <div class="form-group col-lg-3">
+                                        <div id="imgSpinner" style="display: none;">
+                                            <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-none;"/>
+                                            <label style="display:inline-block;">Please wait while downloading report...</label>
+                                        </div> 
                                     </div>
                                 </div>
                                
