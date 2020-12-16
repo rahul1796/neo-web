@@ -5645,7 +5645,7 @@ class submit_candidate_updated(Resource):
                 elif cand_stage==3:
                     out = Database.get_submit_candidate_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 elif cand_stage==4:
-                    out = Database.get_submit_candidate_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
+                    out = Database.get_submit_candidate_re_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 else:
                     out = {'success': False, 'description': "incorrect stage", 'app_status':True}
                 return jsonify(out)
@@ -7010,7 +7010,7 @@ class GetPartners(Resource):
         if request.method=='GET':
             try:
                 PartnerTypeId=request.args.get('PartnerTypeId',0,type=int)
-                print(PartnerTypeId)
+                #print(PartnerTypeId)
                 response = Master.GetPartners(PartnerTypeId)
                 return response 
             except Exception as e:
@@ -7266,6 +7266,28 @@ class download_centers_list(Resource):
             
             return resp
 api.add_resource(download_centers_list,'/download_centers_list')
+
+class download_users_list(Resource):
+    @staticmethod
+    def post():
+        
+        if request.method == 'POST':
+            user_id = request.form['user_id']
+            dept_ids=request.form['dept_ids']
+            role_ids=request.form['role_ids']
+            entity_ids=request.form['entity_ids']
+            region_ids=request.form['region_ids']
+            RM_Role_ids=request.form['RM_Role_ids']
+            R_mangager_ids=request.form['R_mangager_ids']
+            filter_role_id=request.form['filter_role_id']
+            user_region_id=request.form['user_region_id']
+            user_role_id=request.form['user_role_id']
+            status_ids=request.form['status_ids']
+            project_ids=request.form['project_ids']
+            #print(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,dept_ids,role_ids,entity_ids,region_ids,RM_Role_ids,R_mangager_ids,filter_role_id,user_region_id,user_role_id,status_ids,project_ids)
+            resp= Report.download_users_list(user_id,filter_role_id,user_region_id,user_role_id, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids)
+            return resp
+api.add_resource(download_users_list,'/download_users_list')
 
 class GetECPReportDonload(Resource):
     @staticmethod
@@ -8911,7 +8933,7 @@ class upload_employee_target_plan(Resource):
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
                 Month_Year = request.form["month_year"]
-
+                
                 Month_Year_excel = datetime.strptime(Month_Year, '%Y-%m-%d').strftime('%b-%Y').upper()
                 month_year_validation = [CustomElementValidation(lambda d: datetime.strptime(d, '%b-%Y').strftime('%Y-%m-%d')==Month_Year, "only '{}' date allowed".format(Month_Year_excel))]
 
@@ -9089,7 +9111,7 @@ class DownloadCertification_DistributionProductivityReport(Resource):
             
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            #
+            
             resp = Report.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
             return resp
 api.add_resource(DownloadCertification_DistributionProductivityReport,'/DownloadCertification_DistributionProductivityReport')
@@ -9132,7 +9154,7 @@ class upload_partner_target_plan(Resource):
 
                 schema = Schema([
                         #null check
-                        Column('Partner/Vendor id*'),
+                        Column('Partner/Vendor code*'),
 
                         Column('Partner/Vendor name*',str_validation+null_validation),
                         Column('Sub Project Code*',str_validation+null_validation),
@@ -9167,7 +9189,7 @@ class upload_partner_target_plan(Resource):
 
                     df.insert(0, 'row_index', range(len(df)))
 
-                    out = Database.upload_batch_target_plan(df,user_id,user_role_id)
+                    out = Database.upload_partner_target_plan(df,user_id,user_role_id)
                     if out['Status']==False:
                         file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
                         pd.DataFrame(out['data']).to_csv(config.bulk_upload_path + 'Error/' + file_name)
@@ -9177,6 +9199,37 @@ class upload_partner_target_plan(Resource):
             except Exception as e:
                 return {"Status":False, "message":"Unable to upload " + str(e)}
 api.add_resource(upload_partner_target_plan,'/upload_partner_target_plan')
+
+@app.route("/partner_productivity_report_page")
+def partner_productivity_report_page():
+    if g.user:
+        return render_template("Reports/partner_productivity_report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/partner_productivity_report")
+def partner_productivity_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="partner_productivity_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class DownloadPartnerProductivityReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            month = request.form["month"]
+            partner_ids = request.form["partner_ids"]
+            customer_ids = request.form["customer_ids"]
+            #contract_ids = request.form["contract_ids"]
+            project_ids = request.form["project_ids"]
+            sub_project_ids = request.form["sub_project_ids"]
+            
+            user_id =  session['user_id']
+            user_role_id =  session['user_role_id']
+            resp = Report.DownloadPartnerProductivityReport(partner_ids,customer_ids,project_ids,sub_project_ids,month,user_id,user_role_id)
+            return resp
+api.add_resource(DownloadPartnerProductivityReport,'/DownloadPartnerProductivityReport')
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)

@@ -47,18 +47,24 @@ LoadProductdl();
 if ('{{status}}'==1)
 $('#ddlStatus').val('2');
 role_id=parseInt($('#hdn_home_user_role_id').val());
+if(role_id == 1 || role_id == 15)
+{
+    $('#btn_upload').show();
+}
+else
+{
+    $('#btn_upload').hide();
+}
+
 if(role_id == 1)
 {
     $('#btn_create').show();
-    $('#btn_upload').show();
     $('#btn_upload_emp').show();
-    //$('#btn_create2').show();
     $('#btn_download').show();
 }
 else
 {
     $('#btn_create').hide();
-    $('#btn_upload').hide();
     $('#btn_upload_emp').hide();
     $('#btn_download').hide();
 }
@@ -160,22 +166,21 @@ GetSub_project('{{project_id}}')
                             <div class="col-lg-1" >    
                                 <button style="float: right; margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
                                 onclick="LoadTable()">Search</button>
-                                &nbsp
-                                
+                                &nbsp     
                                 <!--button style="margin-top: 30px" type="button" class="btn btn-primary waves-effect waves-light submit" 
                                 onclick="Download()">Download</button-->
                             </div>
                             <div class="col-lg-2" >                                        
                                 <button style="float: left;margin-top: 30px" type="button" id="btn_download" class="btn btn-primary waves-effect waves-light submit" 
-                                onclick="Download()">Download</button></div>
-                           
+                                onclick="Download()">Download</button>
+                            </div>
                            
                             <div class="col-lg-6" >
-                                <button style="float: left; margin-top: 30px; margin-right:10px;"  id="btn_create" type="submit" class="btn btn-primary waves-effect">Create Sub Project</a>
+                                <button style="float: left; margin-top: 30px; margin-right:8px; display:none;"  id="btn_create" type="submit" class="btn btn-primary waves-effect">Create Sub Project</a>
 
-                                <button style="float: left; margin-top: 30px; margin-right:10px;"  id="btn_upload" onclick="UploadBatchTargetMdl()" type="button" class="btn btn-info waves-effect waves-light">Upload Batch Target Plan</a>
+                                <button style="float: left; margin-top: 30px; margin-right:8px; display:none;"  id="btn_upload" onclick="UploadBatchTargetMdl()" type="button" class="btn btn-info waves-effect waves-light">Upload Batch Target Plan</a>
                                 
-                                <button style="float: left; margin-top: 30px; margin-right:10px; display:none;"  id="btn_upload_emp" onclick="uploadEmployeetarget()" type="button" class="btn btn-info waves-effect waves-light">Upload Employee target</a>
+                                <button style="float: left; margin-top: 30px; margin-right:8px; display:none;"  id="btn_upload_emp" onclick="uploadEmployeetarget()" type="button" class="btn btn-info waves-effect waves-light">Upload Employee target</a>
                             </div>
                         </div>
                         <div class="row">
@@ -616,18 +621,21 @@ GetSub_project('{{project_id}}')
                         </div>
                         <div class="col-lg-4">
                             <button class="btn btn-info btn-sm waves-effect waves-light" type="button" onclick="DownloadBatchTargetPlanTemplate()">Download Template</button>
+                            
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary waves-effect" type="submit" >Upload</button>
-                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Close</button>
+                <div id="imgSpinner1">
+                    <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                    <label style="display:inline-block;">Please wait while uploading...</label>
+                </div>
+                <div>
+                    <button class="btn btn-primary waves-effect" type="submit" >Upload</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Close</button>
+                </div>
             </div>
-            <div id="imgSpinner1">
-                <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
-                <label style="display:inline-block;">Please wait while uploading...</label>
-            </div> 
         </form>
         </div>
     </div>
@@ -655,6 +663,7 @@ GetSub_project('{{project_id}}')
                         </div>
                         <div class="col-lg-3">
                             <button class="btn btn-info btn-sm waves-effect waves-light" type="button" onclick="DownloadEmployeeTargetPlanTemplate()">Download Template</button>
+                            <a id="lnkDownload" style="display:none;"></a>
                         </div>
                     </div>
                 </div>

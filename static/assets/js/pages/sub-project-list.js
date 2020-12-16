@@ -1597,7 +1597,7 @@ function DownloadEmployeeTargetPlanTemplate(){
             },
             success: function(resp) 
             {
-                //console.log(resp)
+                console.log(resp)
                 if (resp.Status){
                     var varAnchor = document.getElementById('lnkDownload');
                     varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;

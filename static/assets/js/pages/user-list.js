@@ -896,3 +896,57 @@ function Getusertarget(UserId,UserName)
             }
         });
     }
+    function DownloadTableBasedOnSearch()
+{                   
+    $("#imgSpinner").show();
+    // from candidate
+    if(0==1)
+        {
+            
+            $("#imgSpinner").hide();
+        }
+    else{
+        var URL=$('#hdn_web_url').val()+ "/download_users_list"
+        $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: URL, 
+                    data: {
+                        
+                        "user_id":$('#hdn_home_user_id').val(),
+                        "user_role_id":$('#hdn_home_user_role_id').val(),
+                        "user_region_id":$('#hdn_user_region_id').val(),
+                        "entity_ids":$('#ddlentity').val().toString(),
+                        "dept_ids":$('#ddlDEPT').val().toString(),
+                        "role_ids":$('#ddlRole').val().toString(),
+                        "region_ids":$('#ddlRegion').val().toString(),
+                        "RM_Role_ids":'',
+                        "project_ids":$('#ddl_Project').val().toString() ,     
+                        "R_mangager_ids":$('#ddl_R_Manager').val().toString(),
+                        "status_ids":$('#ddl_status').val().toString(),
+                        "filter_role_id":filter_role_id               
+                    },
+                    success:function(data){
+                        if(data!=null)
+                        {         
+                            if(data.success)
+                            {
+                                $("#imgSpinner").hide();        
+                                window.location=data.FilePath+data.FileName;
+                            }    
+                            else
+                            {
+                                $("#imgSpinner").hide(); 
+                                alert(data.msg);
+                                return false;
+                            }  
+                        }                    
+                    },
+                    error:function()
+                    {
+                        //$("#imgSpinner").hide();
+                    }
+                });
+        
+    }
+}
