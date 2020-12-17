@@ -362,28 +362,32 @@ class Report:
 
             worksheet = writer.sheets['Userwise']
             default_column = ['COO']
-            first_row = ['Registration', 'Enrolment', 'New Batch Start','Training Nos', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
-            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
+            first_row = ['Registration', 'Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
+            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
             third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%', 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
-                         'W-1', 'W-2','W-3','W-4','Total',
-                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+            first_row_sp = ['Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
+            second_row_sp = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
+            third_row_sp = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
+                            'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
             
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
             col=1
             for col_num, value in enumerate(first_row):
-                if col_num==3:
-                    worksheet.merge_range(0, col, 0, 4+col, value, header_format)
-                    col=col+5                    
-                else:
-                    worksheet.merge_range(0, col, 0, 10+col, value, header_format)
-                    col=col+11
+                # if col_num==3:
+                #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+                #     col=col+5                    
+                # else:
+                worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+                col=col+11
             col=1
             for col_num, value in enumerate(second_row):
-                if col_num==6:
-                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
-                    col=col+5
-                elif value=='Target':
+                # if col_num==6:
+                #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                #     col=col+5
+                if value=='Target':
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
                     col=col+5
                 elif value=='Actual':
@@ -392,31 +396,32 @@ class Report:
                 
             for col_num, value in enumerate(third_row):
                 worksheet.write(2, 1+col_num, value, header_format)
-
+            
+            # first_row_sp,second_row_sp,third_row_sp
             worksheet = writer.sheets['User-Sub Project']
             default_column = ['COO','Sub Project']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
             col=2
-            for col_num, value in enumerate(first_row):
-                if col_num==3:
-                    worksheet.merge_range(0, col, 0, 4+col, value, header_format)
-                    col=col+5                    
-                else:
-                    worksheet.merge_range(0, col, 0, 10+col, value, header_format)
-                    col=col+11
+            for col_num, value in enumerate(first_row_sp):
+                # if col_num==3:
+                #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+                #     col=col+5                    
+                # else:
+                worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+                col=col+11
             col=2
-            for col_num, value in enumerate(second_row):
-                if col_num==6:
-                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
-                    col=col+5
-                elif value=='Target':
+            for col_num, value in enumerate(second_row_sp):
+                # if col_num==6:
+                #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                #     col=col+5
+                if value=='Target':
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
                     col=col+5
                 elif value=='Actual':
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6                
-            for col_num, value in enumerate(third_row):
+            for col_num, value in enumerate(third_row_sp):
                 worksheet.write(2, 2+col_num, value, header_format)
 
             # worksheet = writer.sheets['User-Course']            
@@ -472,27 +477,32 @@ class Report:
 
             worksheet = writer.sheets['Userwise']
             default_column = ['COO','TM']
-            first_row = ['Registration', 'Enrolment', 'New Batch Start','Training Nos', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
-            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
+            first_row = ['Registration', 'Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
+            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
             third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%', 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
-                         'W-1', 'W-2','W-3','W-4','Total',
-                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+            first_row_sp = ['Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
+            second_row_sp = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
+            third_row_sp = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
+                            'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+            
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
             col=2
             for col_num, value in enumerate(first_row):
-                if col_num==3:
-                    worksheet.merge_range(0, col, 0, 4+col, value, header_format)
-                    col=col+5                    
-                else:
-                    worksheet.merge_range(0, col, 0, 10+col, value, header_format)
-                    col=col+11
+                # if col_num==3:
+                #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+                #     col=col+5                    
+                # else:
+                worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+                col=col+11
             col=2
             for col_num, value in enumerate(second_row):
-                if col_num==6:
-                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
-                    col=col+5
-                elif value=='Target':
+                # if col_num==6:
+                #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                #     col=col+5
+                if value=='Target':
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
                     col=col+5
                 elif value=='Actual':
@@ -502,29 +512,30 @@ class Report:
                 worksheet.write(2, 2+col_num, value, header_format)
 
             worksheet = writer.sheets['User-Sub Project']
+            # first_row_sp,second_row_sp,third_row_sp
             default_column = ['COO','TM','Sub Project']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
             col=3
-            for col_num, value in enumerate(first_row):
-                if col_num==3:
-                    worksheet.merge_range(0, col, 0, 4+col, value, header_format)
-                    col=col+5                    
-                else:
-                    worksheet.merge_range(0, col, 0, 10+col, value, header_format)
-                    col=col+11
+            for col_num, value in enumerate(first_row_sp):
+                # if col_num==3:
+                #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+                #     col=col+5                    
+                # else:
+                worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+                col=col+11
             col=3
-            for col_num, value in enumerate(second_row):
-                if col_num==6:
-                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
-                    col=col+5
-                elif value=='Target':
+            for col_num, value in enumerate(second_row_sp):
+                # if col_num==6:
+                #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                #     col=col+5
+                if value=='Target':
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
                     col=col+5
                 elif value=='Actual':
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6                
-            for col_num, value in enumerate(third_row):
+            for col_num, value in enumerate(third_row_sp):
                 worksheet.write(2, 3+col_num, value, header_format)
 
             # worksheet = writer.sheets['User-Course']            
@@ -579,28 +590,32 @@ class Report:
 
             worksheet = writer.sheets['Userwise']
             default_column = ['COO','TM','CM/PC']
-            first_row = ['Registration', 'Enrolment', 'New Batch Start','Training Nos', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
-            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
+            first_row = ['Registration', 'Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
+            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
             third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%', 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
-                         'W-1', 'W-2','W-3','W-4','Total',
-                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+            first_row_sp = ['Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
+            second_row_sp = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
+            third_row_sp = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
+                            'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
             
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
             col=3
             for col_num, value in enumerate(first_row):
-                if col_num==3:
-                    worksheet.merge_range(0, col, 0, 4+col, value, header_format)
-                    col=col+5                    
-                else:
-                    worksheet.merge_range(0, col, 0, 10+col, value, header_format)
-                    col=col+11
+                # if col_num==3:
+                #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+                #     col=col+5                    
+                # else:
+                worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+                col=col+11
             col=3
             for col_num, value in enumerate(second_row):
-                if col_num==6:
-                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
-                    col=col+5
-                elif value=='Target':
+                # if col_num==6:
+                #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                #     col=col+5
+                if value=='Target':
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
                     col=col+5
                 elif value=='Actual':
@@ -609,31 +624,31 @@ class Report:
                 
             for col_num, value in enumerate(third_row):
                 worksheet.write(2, 3+col_num, value, header_format)
-
+            # first_row_sp,second_row_sp,third_row_sp
             worksheet = writer.sheets['User-Sub Project']
             default_column = ['COO','TM','CM/PC','Sub Project']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
             col=4
-            for col_num, value in enumerate(first_row):
-                if col_num==3:
-                    worksheet.merge_range(0, col, 0, 4+col, value, header_format)
-                    col=col+5                    
-                else:
-                    worksheet.merge_range(0, col, 0, 10+col, value, header_format)
-                    col=col+11
+            for col_num, value in enumerate(first_row_sp):
+                # if col_num==3:
+                #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+                #     col=col+5                    
+                # else:
+                worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+                col=col+11
             col=4
-            for col_num, value in enumerate(second_row):
-                if col_num==6:
-                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
-                    col=col+5
-                elif value=='Target':
+            for col_num, value in enumerate(second_row_sp):
+                # if col_num==6:
+                #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                #     col=col+5
+                if value=='Target':
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
                     col=col+5
                 elif value=='Actual':
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6                
-            for col_num, value in enumerate(third_row):
+            for col_num, value in enumerate(third_row_sp):
                 worksheet.write(2, 4+col_num, value, header_format)
 
             # worksheet = writer.sheets['User-Course']            
