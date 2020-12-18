@@ -287,8 +287,8 @@
                             $('#AnchorOperationDashboard').show();
                         $('#My_Projects_Menu').hide();
                         $('#Report_Menu').show();
-                            $('#OJT_report').hide();
-                                $('#OJT_Monitoring_Report').hide();
+                            $('#OJT_report').show();
+                                $('#OJT_Monitoring_Report').show();
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
                         $('#Productivity_Report').show();
@@ -297,7 +297,7 @@
                             $('#Batch_Status_report').show();
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
-                            $('#Assessment_Productivity_Report').hide();
+                            $('#Assessment_Productivity_Report').show();
                             $('#partner_productivity_report').hide();
                         
                         if(goto !="")
@@ -334,7 +334,7 @@
                                 $('#OJT_Monitoring_Report').show();
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
-                            $('#Assessment_Productivity_Report').hide();
+                            $('#Assessment_Productivity_Report').show();
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
@@ -356,6 +356,7 @@
                         $('#Enrollment_Menu').hide();
                         $('#Candidate_Menu').show();
                         $('#Assessment_Menu').show();
+                        $('#Certification_Menu').show(); 
                         $('#Content_Menu').show();
                             $('#AnchorSectors').show();
                             $('#AnchorQP').show();
@@ -379,7 +380,7 @@
                                 $('#OJT_Monitoring_Report').show();
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
-                            $('#Assessment_Productivity_Report').hide();
+                            $('#Assessment_Productivity_Report').show();
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
@@ -396,9 +397,9 @@
                         break;
                     case 14:            //Territory Manager / Cluster Manager
                         $('#Home').show();
-						$('#Mobilization_Menu').hide();
-                        $('#Registration_Menu').hide();
-                        $('#Enrollment_Menu').hide();
+						$('#Mobilization_Menu').show();
+                        $('#Registration_Menu').show();
+                        $('#Enrollment_Menu').show();
                         $('#Candidate_Menu').show();
                         $('#Assessment_Menu').show();
                         $('#Certification_Menu').show();   
@@ -472,7 +473,7 @@
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
-                            $('#Batch_Status_report').show();
+                            $('#batch_reports').hide();
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
                             $('#partner_productivity_report').hide();
@@ -632,12 +633,15 @@
                         $('#Insight_Menu').hide();
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
-                        $('#Report_Menu').hide();
+                        $('#Report_Menu').show();
                             $('#OJT_report').hide();
                                 $('#OJT_Monitoring_Report').hide();
-                            $('#ECP_report').hide();
+                            $('#ECP_report').show();
                             $('#Qp_wise_report').hide();
-                            $('#Batch_Status_report').hide();
+                            $('#batch_reports').hide();
+                            $('#customer_reports').hide();
+                            $('#Candidate_Report').hide();
+                            $('#user_sp_report').hide();
                             $('#ops_productivity_report').hide();
                             $('#TrainerProductivityReport').hide();
                             $('#Assessment_report_Menu').hide();
@@ -805,7 +809,7 @@
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
-                            $('#Batch_Status_report').show();
+                            $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
                             $('# Assessment_Productivity_Report').hide();
@@ -848,7 +852,7 @@
                                 $('#OJT_Monitoring_Report').hide();
                             $('#ECP_report').hide();
                             $('#Qp_wise_report').hide();
-                            $('#Batch_Status_report').hide();
+                            $('#batch_reports').hide();
                             $('#ops_productivity_report').hide();
                             $('#TrainerProductivityReport').hide(); 
                             $('#Assessment_report_Menu').hide();
@@ -1159,8 +1163,8 @@
                                                 </li>
                                             </ul>
                                     </li>
-                                    <li>
-                                        <a href="/user_sub_project" id="User_Sub+Project_Menu" class="active">User-Sub Project Report<div class="button"></div></a>
+                                    <li id="user_sp_report">
+                                        <a href="/user_sub_project" id="User_Sub_Project_Menu" class="active">User-Sub Project Report<div class="button"></div></a>
                                     </li>
                                    
                                     
