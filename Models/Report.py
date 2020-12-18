@@ -1402,7 +1402,7 @@ class Report:
                 worksheet2.write(0,i ,default_column_reg[i], header_format)
             
             df_enr=df[['Candidate_Id','Batch_Code','Intervention_Value',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Highest_Qualification', 'Stream_Specialization', 'Computer_Knowledge', 'Technical_Knowledge','Name_Of_Institute', 'University', 'Year_Of_Pass', 'Percentage','Family Salutation', 'Name', 'Family_Date_Of_Birth', 'Family_Age', 'Family_Primary_Contact', 'Family_Email_Address', 'Family Gender', 'Relationship', 'Education_Qualification', 'Members_Occupation','Bank_Name', 'Account_Number','Branch_Name', 'Branch_Code', 'Account_Type','Account_Image','Project_Type','Enrolled_On','Enrolled_By']]
-            #df_enr.drop_duplicates(keep='first',inplace=True) 
+            df_enr.drop_duplicates(keep='first',inplace=True)
             df_enr.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Enrolment') 
             worksheet4 = writer.sheets['Enrolment']
             default_column_enr = ['Candidate_Id','Batch_Code','Enrollment Id', 'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Highest_Qualification', 'Stream_Specialization', 'Computer_Knowledge', 'Technical_Knowledge','Name_Of_Institute', 'University', 'Year_Of_Pass', 'Percentage','Family Salutation', 'Name', 'Family_Date_Of_Birth', 'Family_Age', 'Family_Primary_Contact', 'Family_Email_Address', 'Family Gender', 'Relationship', 'Education_Qualification', 'Members_Occupation','Bank_Name', 'Account_Number','Branch_Name', 'Branch_Code', 'Account_Type','Account_Image','Project_Type','Enrolled_On','Enrolled_By']
@@ -1410,7 +1410,7 @@ class Report:
                 worksheet4.write(0,i ,default_column_enr[i], header_format)
             
             df_dell=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Aspirational District','Educational Marksheet','Income Certificate']]
-            #df_enr.drop_duplicates(keep='first',inplace=True) 
+            df_dell.drop_duplicates(keep='first',inplace=True) 
             df_dell.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Dell') 
             worksheet5 = writer.sheets['Dell']
             default_column_dell = ['Candidate_Id', 'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Aspirational District','Educational Marksheet','Income Certificate']
@@ -1747,6 +1747,95 @@ class Report:
             
             for col_num, value in enumerate(third_row):
                 worksheet.write(2, 3+col_num, value, header_format)
+            
+            writer.save()
+            return({'msg':'created excel', 'success':True, 'filename':path})
+        except Exception as e:
+            return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+
+    def download_Partner_Target_dump(user_id,user_role_id,user_region_id,report_name):
+        try:
+            name_withpath = config.bulk_upload_path + report_name
+            
+            writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
+            workbook  = writer.book
+            header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+
+            resp = Database.download_Partner_Target_dump(user_id,user_role_id,user_region_id)
+            df = pd.DataFrame(resp[0])
+            
+            # print(resp[1])
+            # columns = ['Entity_Name', 'Customer_Name', 'Project_Code', 'Project_Name', 'Sub_Project_Code', 'Sub_Project_Name', 'Region_Name', 'State_Name', 'Center_Count', 'Center_Name', 'Course_Count', 'Course_Name', 'Users_Count', 'Planned_Batches', 'Project_Group_Name', 'Project_Type_Name', 'Block_Name', 'Practice_Name', 'Bu_Name', 'Product_Name', 'Project_Manager', 'Start_Date', 'End_Date', 'Status']
+            # df=df[columns]
+
+            header = ['Partner/Vendor id*', 'Partner/Vendor name*', 'Sub Project Code*', 'Sub Project Name*', 'Course Code*', 'Course Name*','E Planned Start Date', 
+            'E Planned End Date', 'E Target', 'A Planned Date', 'A Target', 'Certification distribution date', 'CD Target', 'P Planned Start Date',	'P Planned End Date', 'P Target']
+            
+            df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Dump')
+            worksheet = writer.sheets['Dump']
+            for col_num, value in enumerate(header):
+                worksheet.write(0, col_num, value, header_format)
+                
+            writer.save()
+            return({'Description':'created excel', 'Status':True, 'filename':report_name})
+            
+        except Exception as e:
+            return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
+
+    def DownloadPartnerProductivityReport(partner_ids,customer_ids,project_ids,sub_project_ids,month,user_id,user_role_id):
+        try:
+            data=Database.DownloadPartnerProductivityReport(partner_ids,customer_ids,project_ids,sub_project_ids,month,user_id,user_role_id)
+            DownloadPath=config.neo_report_file_path+'report file/'
+            report_name = config.PartnerProductivityFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
+            r=re.compile(config.PartnerProductivityFileName + ".*")
+            lst=os.listdir(DownloadPath)
+            newlist = list(filter(r.match, lst))
+            for i in newlist:
+                os.remove( DownloadPath + i)
+            path = '{}{}'.format(DownloadPath,report_name)
+            res={}
+            res=Report.CreateExcelForPartnerProductivity(data,path)
+            
+            if res['success']:
+                return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
+            else:
+                return {"success":False,"msg":res['msg']}
+        except Exception as e:
+            return {"success":False,"msg":str(e)}
+    def CreateExcelForPartnerProductivity(data,path):
+        try:
+            writer = pd.ExcelWriter(path, engine='xlsxwriter')
+            workbook  = writer.book
+
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+            df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=2 ,sheet_name='PartnerProductivity') 
+
+            default_column = ['Partner Name','Partner code','Partner Status','Project Name','Project Code','Subproject Name','Subproject Code','State','Location']
+            first_row = ['Enrolment','Assessment','Certification Distribution','Placement']
+            second_row = ['Target','Actual','%Conversion','Target','Actual','%Conversion','Target','Actual','%Conversion','Target','Actual','%Conversion']
+            
+            worksheet = writer.sheets['PartnerProductivity']
+            for col_num, value in enumerate(default_column):
+                worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
+            
+            col=9
+            for col_num, value in enumerate(first_row):
+                worksheet.merge_range(0, col, 0, 2+col, value, header_format)
+                col=col+3
+
+            for col_num, value in enumerate(second_row):
+                worksheet.write(1, 9+col_num, value, header_format)
             
             writer.save()
             return({'msg':'created excel', 'success':True, 'filename':path})

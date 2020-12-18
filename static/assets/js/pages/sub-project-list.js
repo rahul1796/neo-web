@@ -1579,7 +1579,7 @@ function ForceDownload(varUrl, varFileName)
 function DownloadEmployeeTargetPlanTemplate(){
     var date = $('#Month_Year').val()+'-01';
     //console.log(date);
-    if(date=='-1'){
+    if(date=='-01'){
         alert('please search date');
         return 
     }
@@ -1597,7 +1597,7 @@ function DownloadEmployeeTargetPlanTemplate(){
             },
             success: function(resp) 
             {
-                //console.log(resp)
+                console.log(resp)
                 if (resp.Status){
                     var varAnchor = document.getElementById('lnkDownload');
                     varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
@@ -1647,4 +1647,3 @@ function DownloadEmployeeTargetPlanTemplate(){
     }
     
 }
-

@@ -5249,8 +5249,9 @@ SELECT					cb.name as candidate_name,
         curs.close()
         conn.close()
         df.to_xml(candidate_xmlPath + filenmae)
-        mobilization_types=Database.get_user_mobilization_type(user_id)
-        return {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae,'mobilization_types':mobilization_types}
+        
+        #mobilization_types=Database.get_user_mobilization_type(user_id)
+        #return {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae,'mobilization_types':mobilization_types}
 
         candidatexml_fullPath = candidate_xmlPath+filenmae
         api_url=COL_URL + "s3_signature?file_name="+aws_location_full+"&file_type=" + 'text/xml'
@@ -5264,6 +5265,7 @@ SELECT					cb.name as candidate_name,
         raws=''
         with open(candidatexml_fullPath, 'r') as f:
             raws = requests.post(url = URL, data = data, files = {'file':(filenmae,f,'text/xml')})
+        
         os.remove(candidatexml_fullPath)
         if (raws.status_code==200)or(raws.status_code==204):
             mobilization_types=Database.get_user_mobilization_type(user_id)
@@ -5324,8 +5326,8 @@ SELECT					cb.name as candidate_name,
             (candidate_id,present_address_line2,present_village,present_panchayat,present_taluk_block,permanent_address_line2,permanent_village,permanent_panchayat,permanent_taluk_block,created_on,created_by,is_active)
             values
             '''
-            url = candidate_xml_weburl + xml
-            #url = download_aws_url+aws_location+'neo_app/xml_files/'+'mobilization/' +xml
+            #url = candidate_xml_weburl + xml
+            url = download_aws_url+aws_location+'neo_app/xml_files/'+'mobilization/' +xml
 
             r = requests.get(url)
             data = r.text
@@ -5335,12 +5337,13 @@ SELECT					cb.name as candidate_name,
             for child in root:
                 data = child.attrib
                 out.append(data)
-                #quer1_a + = 
-                quer = "({},'{}','{}','{}','{}','{}',{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},{},1,'m','{}','{}','{}','{}'),".format(1 if data['isFresher']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],
+                #print(data)
+                quer = "({},'{}','{}','{}','{}','{}',{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},{},1,'m','{}','{}','{}','{}'),".format(1 if data['isFresher']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],
                             data['candDob'],1 if data['dobEntered']=='true' else 0,data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'], data['disableStatus'], data['candReligion'],
                             data['candSource'], data['presPincode'],data['presDistrict'],data['permDistrict'],data['permPincode'],user_id,role_id,data['permState'],data['permCountry'] ,data['presState'],data['presCountry'])
                 quer1 += '\n'+quer
             quer1 = quer1[:-1]+';'
+            #print(quer1)
             curs.execute(quer1)
             d = list(map(lambda x:x[0],curs.fetchall()))
             curs.commit()
@@ -5351,6 +5354,7 @@ SELECT					cb.name as candidate_name,
               
             quer2 = quer2[:-1]+';'
             quer3 = quer3[:-1]+';'
+            #print(quer2 + '\n' + quer3)
             curs.execute(quer2 + '\n' + quer3)
             curs.commit()
             out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
@@ -5428,8 +5432,8 @@ SELECT					cb.name as candidate_name,
             VALUES
             '''
 
-            url = candidate_xml_weburl + xml
-            #url = download_aws_url+aws_location+'neo_app/xml_files/'+'registration/' +xml    
+            #url = candidate_xml_weburl + xml
+            url = download_aws_url+aws_location+'neo_app/xml_files/'+'registration/' +xml    
 
             r = requests.get(url)
             data = r.text
@@ -5473,7 +5477,7 @@ SELECT					cb.name as candidate_name,
             curs.close()
             conn.close()
             return out
-            
+
     def get_submit_candidate_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
@@ -5487,33 +5491,39 @@ SELECT					cb.name as candidate_name,
             out = {'success': False, 'description': "Lower App Version", 'app_status':False}
             return out
         
-        url = candidate_xml_weburl + xml
-        #url = download_aws_url+aws_location+'neo_app/xml_files/'+'enrollment/' +xml   
+        #url = candidate_xml_weburl + xml
+        url = download_aws_url+aws_location+'neo_app/xml_files/'+'enrollment/' +xml   
 
         r = requests.get(url)
         data = r.text
         root = ET.fromstring(data)
 
         json_array = []
+        mobilization_type = 1
         for child in root:
             temp_data = child.attrib
+            if 'mobilization_type' in temp_data:
+                mobilization_type = temp_data['mobilization_type']
             json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
         
-        sql = 'exec	[masters].[sp_validate_enrollment_m] ?'
-        values = (json.dumps(json_array),)
-        curs.execute(sql,(values))
+        if mobilization_type==1:
+            sql = 'exec	[masters].[sp_validate_enrollment_m] ?'
+            values = (json.dumps(json_array),)
+            curs.execute(sql,(values))
 
-        vali = curs.fetchall()[0][0]
-        # vali ==0 means correct
+            vali = curs.fetchall()[0]
+            # vali ==0 means correct
 
-        msg = """Sorry, You can't enroll new candidates to the batch.
-        Note: The Actual Enrolment count has exceeded the Planned Target."""
-        if vali==1:
-            out = {'success': False, 'description': msg, 'app_status':True}
-            return out
-        elif vali==2:
-            out = {'success': False, 'description': "Sorry, enrollment process has ended, you cannot enroll candidates to the batch.", 'app_status':True}
-            return out
+            if vali[0]==1:
+                msg = """Sorry, You can't enroll new candidates to the batch : {}
+                Note: The Actual Enrolment count has exceeded the Planned Target.""".format(vali[1])
+
+                out = {'success': False, 'description': msg, 'app_status':True}
+                return out
+            elif vali[0]==2:
+                msg = """Sorry, enrollment process has ended, you cannot enroll candidates to the batch : {}.""".format(vali[1])
+                out = {'success': False, 'description': msg, 'app_status':True}
+                return out
 
         try:
             # quer1 = '''
@@ -5607,6 +5617,7 @@ SELECT					cb.name as candidate_name,
             fam_query=""
             out=[]
             she_query=""
+            merger_skilling=[]
             for child in root:
                 data = child.attrib
                 out.append(data['assign_batch'])
@@ -5632,9 +5643,11 @@ SELECT					cb.name as candidate_name,
                 intervention_category="SAE"
                 if data['candProduct']=="Placement":
                     intervention_category="EAL"                
-                quer = "({},'{}',GETDATE(),{},1),".format(data['cand_id'],intervention_category,user_id)
+                #quer = "({},'{}',GETDATE(),{},1),".format(data['cand_id'],intervention_category,user_id)
                 #quer = "({},'SAE',GETDATE(),{},1),".format(data['cand_id'],user_id)
-                quer4 += '\n'+quer
+                #quer4 += '\n'+quer
+                merger_skilling.append({"batch_id":data['assign_batch'],"cand_id":data['cand_id'],"intervention_category":intervention_category,"user_id":user_id})
+
                 for fam in child.findall('family_details'):
                     dt=fam.attrib
                     fam_query+="({},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',{},GETDATE(),1),".format(data['cand_id'],dt['memberSal'],dt['memberName'],dt['memberDob'],dt['memberAge'],dt['memberContact'],dt['memberEmail'],dt['memberGender'],dt['memberRelation'],dt['memberQuali'],dt['memberOccuptn'],user_id)
@@ -5646,14 +5659,23 @@ SELECT					cb.name as candidate_name,
             if she_query!="":
                 curs.execute(she_query)
                 curs.commit()
-            quer4 = quer4[:-1]+';'
-            curs.execute(quer4)
+            
+            ##### MERGE query for intervemtion skilling
+            #{"batch_id":data['assign_batch'],"cand_id":data['cand_id'],"intervention_category":intervention_category,"user_id":user_id}
+            sql = 'exec	candidate_details.sp_candidate_re_enr_skilling ?'
+            values = (json.dumps(merger_skilling),)
+            curs.execute(sql,(values))
             d = list(map(lambda x:x[0],curs.fetchall()))
-            curs.commit()
-            for i in range(len(d)):
-                quer5 += '\n' + "({},(select course_id from batches.tbl_batches where batch_id={}),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],out[i],out[i],user_id)
-            quer5 = quer5[:-1]+';'
-            curs.execute(quer5)
+            
+            # quer4 = quer4[:-1]+';'
+            # curs.execute(quer4)
+            # d = list(map(lambda x:x[0],curs.fetchall()))
+            # curs.commit()
+            # for i in range(len(d)):
+            #     quer5 += '\n' + "({},(select course_id from batches.tbl_batches where batch_id={}),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],out[i],out[i],user_id)
+            # quer5 = quer5[:-1]+';'
+            # curs.execute(quer5)
+
             curs.execute(quer8)
             curs.commit()
             
@@ -5676,7 +5698,347 @@ SELECT					cb.name as candidate_name,
         except Exception as e:            
             out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
             return out
-          
+
+    def get_submit_candidate_re_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        quer = "SELECT TOP (1) version_code FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        curs.execute(quer)
+        data=curs.fetchall()
+        data = '' if data==[] else data[0][0]
+        if int(app_version) < int(data):
+            curs.close()
+            conn.close()
+            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            return out
+        
+        #url = candidate_xml_weburl + xml
+        url = download_aws_url+aws_location+'neo_app/xml_files/'+'enrollment/' +xml   
+
+        r = requests.get(url)
+        data = r.text
+        root = ET.fromstring(data)
+
+        json_array = []
+        mobilization_type = 1
+        for child in root:
+            temp_data = child.attrib
+            if 'mobilization_type' in temp_data:
+                mobilization_type = temp_data['mobilization_type']
+            if 'assign_batch' in temp_data:
+                json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
+        
+        if int(mobilization_type)==1:
+            if json_array!=[]:
+                sql = 'exec	[masters].[sp_validate_enrollment_m] ?'
+                values = (json.dumps(json_array),)
+                curs.execute(sql,(values))
+                vali = curs.fetchall()[0]
+
+                # vali ==0 means correct
+
+                if vali[0]==1:
+                    msg = """Sorry, You can't enroll new candidates to the batch : {}
+                    Note: The Actual Enrolment count has exceeded the Planned Target.""".format(vali[1])
+
+                    out = {'success': False, 'description': msg, 'app_status':True}
+                    return out
+                elif vali[0]==2:
+                    msg = """Sorry, enrollment process has ended, you cannot enroll candidates to the batch : {}.""".format(vali[1])
+                    out = {'success': False, 'description': msg, 'app_status':True}
+                    return out
+
+        try:
+            # quer1 = '''
+            # update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1 where candidate_id='{}';
+            # '''
+            quer2='''
+            update candidate_details.tbl_candidate_reg_enroll_details set whatsapp_number='{}',candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',present_address_line1='{}',permanaet_address_line1='{}',highest_qualification='{}',stream_specialization='{}',computer_knowledge='{}',technical_knowledge='{}',average_household_income='{}',bank_name='{}',account_number='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            '''
+            quer3='''
+            update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set present_address_line2='{}',present_village='{}',present_panchayat='{}',present_taluk_block='{}',permanent_address_line2='{}',permanent_village='{}',permanent_panchayat='{}',permanent_taluk_block='{}',name_of_institute='{}',university='{}',year_of_pass='{}',percentage='{}',branch_name='{}',branch_code='{}',account_type='{}',attachment_image_name='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            '''
+            quer4='''
+            insert into candidate_details.tbl_candidate_interventions
+            (candidate_id,intervention_category,created_on,created_by,is_active)
+            OUTPUT inserted.candidate_intervention_id
+            values
+            '''
+
+            quer5='''
+            insert into candidate_details.tbl_map_candidate_intervention_skilling
+            (intervention_id, course_id, batch_id, intervention_value, created_on,created_by,is_active)
+            values
+            '''
+
+            quer6='''
+            INSERT INTO [candidate_details].[tbl_candidate_family_details]
+                ([candidate_id]
+                ,[salutation]
+                ,[name]
+                ,[family_date_of_birth]
+                ,[family_age]
+                ,[family_primary_contact]
+                ,[family_email_address]
+                ,[gender]
+                ,[relationship]
+                ,[education_qualification]
+                ,[current_occupation]
+                ,[created_by]
+                ,[created_on]
+                ,[is_active])
+            VALUES
+            '''
+            quer7 = '''
+            DELETE FROM [candidate_details].[tbl_candidate_family_details]  where candidate_id='{}';
+            '''
+            #to restrict ELS data to sync in shiksha
+            quer8 = '''
+            update candidate_details.tbl_map_candidate_intervention_skilling
+            set    shiksha_sync_status=1 
+            where batch_id in (	select batch_id 
+                    from batches.vw_batch_info 
+                    where bu_name='ELS'
+                    );
+            '''
+            
+            # update_query_she='''
+            # UPDATE [candidate_details].[tbl_candidate_she_details] SET
+            #     [Address as per Aadhar Card (incl pin code)]='{}'
+            #     ,[Number of members earning in the family]='{}'
+            #     ,[Rented or own house?]='{}'
+            #     ,[Size of the house]='{}'
+            #     ,[Ration card (APL or BPL)]='{}'
+            #     ,[TV]='{}'
+            #     ,[Refrigerator]='{}'
+            #     ,[Washing Machine]='{}'
+            #     ,[AC /Cooler]='{}'
+            #     ,[Car]='{}'                
+            #     ,[Medical Insurance]='{}'
+            #     ,[Life Insurance]='{}'
+            #     ,[Others]='{}'
+            #     ,[Educational qualification]='{}'
+            #     ,[Age proof]='{}'
+            #     ,[Signed MoU]='{}'
+            #     ,[MoU signed date]='{}'
+            #     ,[Kit given date]='{}'
+            #     ,[Head of the household]='{}'
+            #     ,[Farm land]='{}'
+            #     ,[If yes, acres of land]='{}'
+            #     ,[created_on]=GETDATE()
+            #     ,[created_by]={}
+            #     ,[is_active]=1
+            #     where candidate_id={};
+            # '''
+
+            insert_query_she='''
+            INSERT INTO [candidate_details].[tbl_candidate_she_details]
+                ([candidate_id]
+                ,[mobilization_type]
+                ,[score]
+                ,[result]
+                ,[Are you able to read and write local language?]
+                ,[Do you have a smart phone?]
+                ,[Are you willing to buy a smartphone?]
+                ,[Do you own two wheeler?]
+                ,[Are you willing to serve the community at this time of COVID-19 pandemic as Sanitization & Hygiene Entrepreneurs (SHE)?]
+                ,[Are you willing to work and sign the work contract with LN?]
+                ,[Are you willing to adopt digital transactions in your business?]
+                ,[Have you availed any loan in the past?]
+                ,[Do you have any active loan?]
+                ,[Are you willing to take up a loan to purchase tools and consumables?]
+                ,[Are you covered under any health insurance?]
+                ,[Are you allergic to any chemicals and dust?]
+                ,[Are you willing to follow  Environment, Health and Safety Norms in your business?]
+                ,[Have you ever been subjected to any legal enquiry for Non ethical work/business?]
+                ,[Date of birth (age between 18 to 40)]
+                ,[Are you 8th Pass?]
+                ,[Do you have any work experience in the past?]
+                ,[Will you able to work full time or at least 6 hours a day?]
+                ,[Are you willing to travel from one place to another within panchayat?]
+                ,[Do you have a bank account?]
+				
+				,[Address as per Aadhar Card (incl pin code)]
+                ,[Number of members earning in the family]
+                ,[Rented or own house?]
+                ,[Size of the house]
+                ,[Ration card (APL or BPL)]
+                ,[TV]
+                ,[Refrigerator]
+                ,[Washing Machine]
+                ,[AC /Cooler]
+                ,[Car]              
+                ,[Medical Insurance]
+                ,[Life Insurance]
+                ,[Others]
+                ,[Educational qualification]
+                ,[Age proof]
+                ,[Signed MoU]
+                ,[MoU signed date]
+                ,[Kit given date]
+                ,[Head of the household]
+                ,[Farm land]
+                ,[If yes, acres of land]
+
+                ,[created_on]
+                ,[created_by]
+                ,[is_active])
+            VALUES
+            '''
+            insert_query_dell='''
+            INSERT INTO [candidate_details].[tbl_candidate_dell_details]
+                ([candidate_id]
+                ,[mobilization_type]
+                ,[Educational Marksheet]
+                ,[Aspirational District]
+                ,[Income Certificate]
+                ,[created_on]
+                ,[created_by]
+                ,[is_active])
+            VALUES
+            '''
+
+            que_test='''
+                select sp.is_ojt_req & c.is_ojt_req from batches.tbl_batches as b left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id left join masters.tbl_courses as c on c.course_id=b.course_id where 1=1 and coalesce(sp.is_ojt_req,0)=1  and coalesce(c.is_ojt_req,0)=1 and b.batch_id like trim('{}')
+                '''
+            #root = ET.fromstring(data)
+            query = ""
+            fam_query=""
+            out=[]
+            she_query=""
+            temp_she_query=""
+            dell_query=""
+            merger_skilling=[]
+            for child in root:
+                result = 1
+                data = child.attrib
+                #['cand_id', 'latitude', 'longitude', 'timestamp',
+                if 'result' in data:
+                    if data['result']=='0':
+                        result=0
+                        quer1_f = '''
+                        update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1, Cand_Password=null where candidate_id='{}';
+                        '''
+                        quer2_f='''
+                        update candidate_details.tbl_candidate_reg_enroll_details set whatsapp_number='{}',candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',present_address_line1='{}',permanaet_address_line1='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+                        '''
+                        quer3_f='''
+                        update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set present_address_line2='{}',present_village='{}',present_panchayat='{}',present_taluk_block='{}',permanent_address_line2='{}',permanent_village='{}',permanent_panchayat='{}',permanent_taluk_block='{}',created_by='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+                        '''
+                        
+                        query += '\n' + quer1_f.format(1 if data['isFresher']=='true' else 0 ,data['mobilization_type'],1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
+                        query += '\n' + quer2_f.format(data['whatsapp_number'],data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['presAddrOne'],data['permAddrOne'],user_id,data['cand_id'])
+                        query += '\n' + quer3_f.format(data['presAddrTwo'],data['presVillage'],data['presPanchayat'],data['presTaluk'],data['permAddrTwo'],data['permVillage'],data['permPanchayat'],data['permTaluk'],user_id,data['cand_id'])
+
+                        if int(data['mobilization_type'])==2:
+                            temp_she_query="({},{},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),int(data['score']),int(data['result']),data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['serve_as_she'],data['sign_contract_with_LN'],data['adopt_digital_transaction'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['age_18_40'],data['eight_pass'],data['past_work_exp'],data['full_time_work'],data['trvl_within_panchayat'],data['bank_act'],user_id)
+                            insert_query_she += '\n'+temp_she_query
+
+                if result==1:
+                    intervention_category="SAE"
+                    if data['candProduct']=="Placement":
+                        intervention_category="EAL"  
+
+                    if 'assign_batch' in data:                
+                        merger_skilling.append({"batch_id":data['assign_batch'],"cand_id":data['cand_id'],"intervention_category":intervention_category,"user_id":user_id})
+                        out.append(data['assign_batch'])
+
+                        curs.execute(que_test.format(data['assign_batch']))
+                        is_obj = curs.fetchall()
+                        if is_obj!=[]:
+                            quer1 = '''
+                            update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1,Cand_Password='Password' where candidate_id='{}';
+                            '''
+                        else:
+                            quer1 = '''
+                            update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1, Cand_Password=null where candidate_id='{}';
+                            '''
+                    else:
+                        quer1 = '''
+                            update candidate_details.tbl_candidates set isFresher={},project_type='{}',isDob={},salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',present_district='{}',present_state='{}',present_pincode='{}',present_country='{}',permanent_district='{}',permanent_state='{}',permanent_pincode='{}',permanent_country='{}',candidate_stage_id=3,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}', is_active=1, Cand_Password=null where candidate_id='{}';
+                            '''
+                    if 'mobilization_type' in data:
+                        query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,data['mobilization_type'],1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
+                    else:
+                        query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1,1 if data['dobEntered']=='true' else 0,data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],data['presDistrict'],data['presState'],data['presPincode'],data['presCountry'],data['permDistrict'],data['permState'],data['permPincode'],data['permCountry'],user_id,role_id,data['cand_id'])
+
+                    query += '\n' + quer2.format(data['whatsapp_number'],data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['presAddrOne'],data['permAddrOne'],data['highQuali'],data['candStream'],data['compKnow'],data['techKnow'],data['houseIncome'],data['bankName'],data['accNum'],user_id,data['cand_id'])
+                    query += '\n' + quer3.format(data['presAddrTwo'],data['presVillage'],data['presPanchayat'],data['presTaluk'],data['permAddrTwo'],data['permVillage'],data['permPanchayat'],data['permTaluk'],data['instiName'],data['university'],data['yrPass'],data['percentage'],data['branchName'],data['ifscCode'],data['accType'],data['bankCopy'],user_id,data['cand_id'])
+                    query += '\n' + quer7.format(data['cand_id'])
+
+                                
+                    # quer = "({},'{}',GETDATE(),{},1),".format(data['cand_id'],intervention_category,user_id)
+                    # quer4 += '\n'+quer
+
+                    for fam in child.findall('family_details'):
+                        dt=fam.attrib
+                        fam_query+="({},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',{},GETDATE(),1),".format(data['cand_id'],dt['memberSal'],dt['memberName'],dt['memberDob'],dt['memberAge'],dt['memberContact'],dt['memberEmail'],dt['memberGender'],dt['memberRelation'],dt['memberQuali'],dt['memberOccuptn'],user_id)
+
+                    if int(data['mobilization_type'])==4:
+                        dell_query="({},{},'{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),data['edu_marsheet'],data['asp_district'],data['dell_income_certi'],user_id)
+                        insert_query_dell += '\n'+dell_query
+
+                    if 'mobilization_type' in data:
+                        if int(data['mobilization_type'])==2:
+                            temp_she_query="({},{},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),int(data['score']),int(data['result']),data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['serve_as_she'],data['sign_contract_with_LN'],data['adopt_digital_transaction'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['age_18_40'],data['eight_pass'],data['past_work_exp'],data['full_time_work'],data['trvl_within_panchayat'],data['bank_act'],data['aadhar_address'],data['family_members'],data['rented_or_own'],data['size_of_house'],data['ration_card'],data['tv'],data['refrigerator'],data['washing_machine'],data['ac_cooler'],data['car'],data['medical_insurance'],data['life_insurance'],data['others'],data['educational_qualification'],data['age_proof'],data['signed_mou'],data['mou_signed_date'],data['kit_given_date'],data['head_of_household'],data['farm_land'],data['acres_of_land'],int(user_id))
+                            insert_query_she += '\n'+temp_she_query
+                        elif int(data['mobilization_type'])==4:
+                            dell_query="({},{},'{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),data['edu_marsheet'],data['asp_district'],data['dell_income_certi'],user_id)
+                            insert_query_dell += '\n'+dell_query
+
+            if query!="":     
+                curs.execute(query)
+                curs.commit()
+            if temp_she_query!="":    
+                insert_query_she=insert_query_she[:-1]+';'
+                curs.execute(insert_query_she)
+                curs.commit()
+            # if she_query!="":
+            #     curs.execute(she_query)
+            #     curs.commit()
+            
+            if dell_query!="":
+                insert_query_dell=insert_query_dell[:-1]+';'
+                curs.execute(insert_query_dell)
+                curs.commit()
+
+            ##### MERGE query for intervemtion skilling
+            #{"batch_id":data['assign_batch'],"cand_id":data['cand_id'],"intervention_category":intervention_category,"user_id":user_id}
+            d=[]
+            response_data=[]
+            if merger_skilling!=[]:
+                sql = 'exec	candidate_details.sp_candidate_re_enr_skilling ?'
+                values = (json.dumps(merger_skilling),)
+                curs.execute(sql,(values))
+                columns = [column[0].title() for column in curs.description]
+                for row in curs:
+                    h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5]}
+                    response_data.append(h)
+                    
+                # quer4 = quer4[:-1]+';'
+                # curs.execute(quer4)
+                # d = list(map(lambda x:x[0],curs.fetchall()))
+                # curs.commit()
+                # for i in range(len(d)):
+                #     quer5 += '\n' + "({},(select course_id from batches.tbl_batches where batch_id={}),{},concat('ENR',(NEXT VALUE FOR candidate_details.sq_candidate_enrollment_no)),GETDATE(),{},1),".format(d[i],out[i],out[i],user_id)
+                # quer5 = quer5[:-1]+';'
+                # curs.execute(quer5)
+
+            curs.execute(quer8)
+            curs.commit()    
+            if fam_query!="":
+                quer6 += fam_query[:-1]+';'
+                curs.execute(quer6)
+                curs.commit()
+            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True,'data':response_data}
+            curs.close()
+            conn.close()
+            return out
+
+        except Exception as e:            
+            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+            return out
+
     def get_batch_list_updated(user_id,candidate_id,role_id,mobilization_type):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
@@ -5986,19 +6348,19 @@ SELECT					cb.name as candidate_name,
             values = (df_batch.to_json(orient='records'),)
             curs.execute(sql,(values))
 
-            vali = curs.fetchall()[0][0]
-            
-            # vali ==0 means correct 
-            if vali==1:
-                out = {'Status': False, 'message': "Sorry, You can't enroll new candidates to the batch, Note: The Actual Enrolment count has exceeded the Planned Target."}
+            vali = curs.fetchall()[0]
+            # vali[0]==0 means correct 
+            if vali[0]==1:
+                msg = """Sorry, You can't enroll new candidates to the batch : {}<br>
+                Note: The Actual Enrolment count has exceeded the Planned Target.""".format(vali[1])
+                out = {'Status': False, 'message': msg}
                 return out
-            # elif vali==2:
-            #     out = {'Status': False, 'message': "date issue"}
+            # elif vali[0]==2:
+            #     msg = """Sorry, enrollment process has ended, you cannot enroll candidates to the batch : {}.""".format(vali[1])
+            #     out = {'success': False, 'message': msg}
             #     return out
-            # ('[{"Candidate_id":171766,"batch_id":"B-5332-02_Sep_2020"}]',)
 
             for row in out:
-
                 que='''
                         SELECT		cs.intervention_id 
                         FROM		candidate_details.tbl_candidate_interventions i
@@ -6669,7 +7031,8 @@ SELECT					cb.name as candidate_name,
             h=[]           
             d={} 
             json_str=df.to_json(orient='records')
-            sql = 'exec	[masters].[sp_validate_upload_batch_target_plan]  ?,?,?'
+            
+            sql = 'exec	[masters].[sp_validate_upload_batch_target_plan] ?,?,?'  #[masters].[sp_validate_upload_batch_target_plan]
             values = (json_str,user_id,user_role_id)
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]
@@ -6681,6 +7044,9 @@ SELECT					cb.name as candidate_name,
                     d[columns[i]]=row[i]
                 h.append(d.copy())
             cur.commit()
+            #f=open('testing.txt','w')
+            #f.write(str(h))
+            #f.close()
             if pop==0 :
                 Status=False
                 msg="Error"
@@ -6692,7 +7058,7 @@ SELECT					cb.name as candidate_name,
             cur.close()
             con.close()
         except Exception as e:
-            print(str(e))
+            #print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
             
     def upload_user(df,user_id,user_role_id):
@@ -6827,9 +7193,7 @@ SELECT					cb.name as candidate_name,
         conn.close()
         df.to_xml(candidate_xmlPath + filenmae)
 
-        return {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
-
-
+        #return {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
         aws_location_full = aws_location+'neo_app/xml_files/'+'enrollment/' +filenmae
         candidatexml_fullPath = candidate_xmlPath + filenmae
         api_url=COL_URL + "s3_signature?file_name="+aws_location_full+"&file_type=" + 'text/xml'
@@ -6845,7 +7209,9 @@ SELECT					cb.name as candidate_name,
             raws = requests.post(url = URL, data = data, files = {'file':(filenmae,f,'text/xml')})
         os.remove(candidatexml_fullPath)
         if (raws.status_code==200)or(raws.status_code==204):
-            out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
+            mobilization_types=Database.get_user_mobilization_type(user_id)
+            out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae,'mobilization_types':mobilization_types}
+            #out = {'success': True, 'description': "XML Created", 'app_status':True, 'filename':filenmae}
         else:
             out = {'success': False, 'description': "Unable to upload to s3", 'app_status':True}
         return out
@@ -7713,4 +8079,73 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()    
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+
+    def upload_partner_target_plan(df,user_id,user_role_id):
+        try:            
+            #print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            h=[]           
+            d={} 
+            json_str=df.to_json(orient='records')
+            
+            sql = 'exec	[masters].[sp_validate_upload_partner_target_plan] ?,?,?'  #[masters].[sp_validate_upload_batch_target_plan]
+            values = (json_str,user_id,user_role_id)
+            cur.execute(sql,(values))
+            columns = [column[0].title() for column in cur.description]
+            col_len=len(columns)
+            pop=0
+            for row in cur:
+                pop=row[0]
+                for i in range(col_len):
+                    d[columns[i]]=row[i]
+                h.append(d.copy())
+            cur.commit()
+            #f=open('testing.txt','w')
+            #f.write(str(h))
+            #f.close()
+            if pop==0 :
+                Status=False
+                msg="Error"
+                return {"Status":Status,'message':msg,'data':h}
+            else:
+                msg="Uploaded Successfully"
+                Status=True
+                return {"Status":Status,'message':msg}
+            cur.close()
+            con.close()
+        except Exception as e:
+            #print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+
+    def download_Partner_Target_dump(user_id,user_role_id,user_region_id):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec masters.[sp_get_parrtner_target_dump] ?, ?, ?'
+        values = (user_id,user_role_id,user_region_id)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
         
+        curs.close()
+        cnxn.close()
+        return (data,columns)
+
+    def DownloadPartnerProductivityReport(partner_ids,customer_ids,project_ids,sub_project_ids,month,user_id,user_role_id):
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        
+        sql = 'exec [reports].[sp_get_partner_productivity_report_data] ?,?,?,?, ?, ?,?'
+        
+        values = (partner_ids,customer_ids,project_ids,sub_project_ids,month,user_id,user_role_id)
+        
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))        
+        curs.close()
+        con.close()
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
