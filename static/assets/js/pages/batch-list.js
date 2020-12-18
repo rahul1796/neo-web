@@ -322,7 +322,7 @@ function LoadTable()
 
             								
             { "data": "S_No"},
-            {"visible": ($('#hdn_home_user_role_id').val()=='1'||$('#hdn_home_user_role_id').val()=='5'||$('#hdn_home_user_role_id').val()=='15')?true:false,
+            {"visible": ($('#hdn_home_user_role_id').val()=='1'||$('#hdn_home_user_role_id').val()=='5'||$('#hdn_home_user_role_id').val()=='15'||$('#hdn_home_user_role_id').val()=='14'||$('#hdn_home_user_role_id').val()=='38')?true:false,
             // function (){
             //     if(($('#hdn_home_user_role_id').val() =='1') || ($('#hdn_home_user_role_id').val() =='5')||($('#hdn_home_user_role_id').val() =='15'))
             //         return true;
