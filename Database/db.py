@@ -8149,3 +8149,56 @@ SELECT					cb.name as candidate_name,
         curs.close()
         con.close()
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+
+    def SaveRmInfo(user_id, batch_id, CompanyName, Address, RMName, RMmobilenumber, RMemailid):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        # quer = "SELECT TOP (1) version_code FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        # curs.execute(quer)
+        # data=curs.fetchall()
+        # data = '' if data==[] else data[0][0]
+        # if int(app_version) < int(data):
+        #     curs.close()
+        #     conn.close()
+        #     out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+        #     return out
+        try:
+            quer = '''
+            INSERT INTO candidate_details.[tbl_map_candidate_rm_info]
+            ([candidate_id], [batch_id], [Company_Name], [Address], [RM_Name], [RM_mobile_number], [RM_email_id], [created_on], [created_by], [is_active])
+            VALUES
+            '''
+            quer += "({},{},'{}','{}','{}','{}','{}',GETDATE(),{},1)".format(user_id, batch_id, CompanyName, Address, RMName, RMmobilenumber, RMemailid, user_id)
+            
+            curs.execute(quer)
+            curs.commit()
+            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
+        except Exception as e:
+            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+        finally:
+            curs.close()
+            conn.close()
+            return out
+
+    def get_OJT_History(user_id, batch_id):
+        response = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        try:
+            sql = 'exec [masters].[sp_get_OJT_History] ?, ?'
+            values = (user_id, batch_id)
+            cur2.execute(sql,(values))
+            #cur2.commit()
+            data = list(map(lambda x:list(x), cur2.fetchall()))
+            if len(data)==0:
+                out = {'success': True, 'description': "No data found", 'app_status':True, 'data':[]}
+            else:
+                for temp in data:
+                    response.append({'date':temp[2], 'stage1':temp[3], 'stage2':temp[4], 'stage3':temp[5]})
+                out = {'success': True, 'description': "No data found", 'app_status':True, 'data':response}
+        except Exception as e:
+            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+        finally:
+            cur2.close()
+            con.close()
+            return out

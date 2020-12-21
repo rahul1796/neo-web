@@ -5456,23 +5456,10 @@ class check_user_pass(Resource):
 
             if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
                 out = Database.check_password(username,password,app_version,device_model,imei_num,android_version)
-                    
-            #     if out[0]=='false':
-            #         res = {'success': False, 'description': out[1]}
-            #         return jsonify(res)
-            #     elif out[0]=='true' and out[2]!=7:
-            #         res = {'success': True, 'description': out[1], 'role_id':out[2],'user_id':out[3],'user_name':out[4],'center_details':out[5],'prac_course_list':out[6]}
-            #         return jsonify(res)
-            #     elif out[0]=='true' and out[2]==7:
-            #         res = {'success': True, 'description': out[1], 'role_id':out[2],'app_version_id':out[3],'app_version_code':out[4],'app_version_number':out[5],'app_version_description':out[6],'app_uploaded_date_time':out[7],'app_uploaded_by':out[8],'user_id':out[9],'user_name':out[10],'trainer_email':out[11]}
-            #         return jsonify(res)
-            #     else:
-            #         res = {'success': False, 'description': "some problem in db fetching",'app_status':False}
-            #         return jsonify(res)
-
             else:
                 out = {'success': False, 'description': "client name and password not matching", 'app_status':True}
             return jsonify(out)
+
 #Base URL + "/login" api will provide all the unzynched QP data as response
 api.add_resource(check_user_pass, '/login')
 
@@ -8157,6 +8144,7 @@ class GetBatchList(Resource):
             response=None
             try:
                 #app_version_details=Database.GetAppVersionDetails()
+                #BatchStatusId UserId CenterId role_id  app_version 
                 BatchStatusId=request.args.get('batch_stage_id',2,type=int)
                 UserId=request.args.get('user_id',0,type=int)
                 CenterId=request.args.get('center_id',0,type=int)
@@ -9230,6 +9218,51 @@ class DownloadPartnerProductivityReport(Resource):
             resp = Report.DownloadPartnerProductivityReport(partner_ids,customer_ids,project_ids,sub_project_ids,month,user_id,user_role_id)
             return resp
 api.add_resource(DownloadPartnerProductivityReport,'/DownloadPartnerProductivityReport')
+
+class SaveRmInfo(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            client_id = str(request.form['client_id'])
+            client_key = str(request.form['client_key'])
+            user_id = int(request.form['user_id'])
+            batch_id = int(request.form['batch_id'])
+            
+            CompanyName = str(request.form['CompanyName'])
+            Address = str(request.form['Address'])
+            RMName = str(request.form['RMName'])
+            RMmobilenumber = str(request.form['RMmobilenumber'])
+            RMemailid = str(request.form['RMemailid'])
+            
+            if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                try:
+                    out = Database.SaveRmInfo(user_id, batch_id, CompanyName, Address, RMName, RMmobilenumber, RMemailid)
+                except Exception as e:
+                    out = {'success': False, 'description': "Error : "+str(e), 'app_status':True}
+                finally:
+                    return jsonify(out)
+            else:
+                res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
+                return jsonify(res)
+api.add_resource(SaveRmInfo, '/SaveRmInfo')
+
+class get_OJT_History(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                batch_id=request.args.get('batch_id',0,type=int)
+                client_id=request.args.get('client_id','',type=str)
+                client_key=request.args.get('client_key','',type=str)
+                if (client_id==config.API_secret_id) and (client_key==config.API_secret_key):
+                    res = Database.get_OJT_History(user_id, batch_id)
+                else:
+                    res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
+                return jsonify(res)
+            except Exception as e:
+                return {'success': False, 'description': "Error : "+str(e), 'app_status':True}
+api.add_resource(get_OJT_History,'/get_OJT_History')
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
