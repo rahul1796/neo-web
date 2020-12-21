@@ -410,7 +410,7 @@ function LoadTable()
         },
         "columns": [
             { "data": "S_No"},
-            {"visible": ($('#hdn_home_user_role_id').val()=='1'||$('#hdn_home_user_role_id').val()=='15')?true:false,
+            {"visible": ($('#hdn_home_user_role_id').val()=='1')?true:false,
             
              "data": function (row, type, val, meta) {
                 var varButtons = ""; 
