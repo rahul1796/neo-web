@@ -15,7 +15,7 @@ import os
 import xlsxwriter,re,os,zipfile,zlib 
 
 
-def to_xml(df, filename=None, mode='w'):
+def to_xml(df, filename=None, mode='wb'):
     if len(df)>0:
         if 'Candidate_Family_Details_Id' in df:
             df1=df[['Candidate_Id','Family_Salutation','Family_Name','Family_Date_Of_Birth','Family_Age','Family_Primary_Contact','Family_Email_Address','Family_Gender','Family_Education','Family_Relationship','Family_Current_Occupation','Candidate_Family_Details_Id']]
@@ -70,7 +70,7 @@ def to_xml(df, filename=None, mode='w'):
     if filename is None:
         return res
     with open(filename, mode) as f:
-        f.write(res)
+        f.write(bytes(res, 'utf-8'))
 
 pd.DataFrame.to_xml = to_xml
 
