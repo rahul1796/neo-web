@@ -777,10 +777,11 @@
                             $("#box").load(goto);
                         break;
                     case 38:             //Project Coordinator
-                        $('#Home').show();
+                    $('#Home').show();
 						$('#Mobilization_Menu').show();
                         $('#Registration_Menu').show();
                         $('#Enrollment_Menu').show();
+                        $('#Certification_Menu').show();   
                         $('#Candidate_Menu').show();
                         $('#Assessment_Menu').show();
                         $('#Content_Menu').show();
@@ -802,21 +803,22 @@
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
                         $('#Report_Menu').show();
-                            $('#OJT_report').hide();
-                                $('#OJT_Monitoring_Report').hide();
+                            $('#OJT_report').show();
+                                $('#OJT_Monitoring_Report').show();
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
+                            $('#Assessment_Productivity_Report').hide();
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
-                            $('#Batch_Status_report').hide();
+                            $('#batch_reports').hide();
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
-                            $('# Assessment_Productivity_Report').hide();
                             $('#partner_productivity_report').hide();
-                        $('#TMA_attendance_Menu').hide();
-                        $('#TMA_content').hide();
+                        $('#TMA_attendance_Menu').show();
+                        $('#TMA_content').show();
                             $('#tma_report_filter').show();
+
                         if(goto !="")
                             $("#box").load(goto);
                         break;
