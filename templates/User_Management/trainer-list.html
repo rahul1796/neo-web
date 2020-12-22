@@ -471,7 +471,7 @@ function LoadClusterddl(){
 	
 	function DownloadReport()
     {
-        if($('#ddlCenter').val().toString()==''|| $('#ddlCenter').val().toString()==null){
+        if(1==0){
             alert("Please select a Center.");
         }
         else
@@ -486,8 +486,18 @@ function LoadClusterddl(){
                 data:{ 
 					'user_id': $('#hdn_home_user_id').val(),
 					'user_role_id' : $('#hdn_home_user_role_id').val(),
-					'centers' : $('#ddlCenter').val().toString(),
-					'status' : $('#ddlStatus').val()
+					'centers' : '',
+					'Dept' : $('#ddlDept').val().toString(),        // ddlbu
+                    'Region_id' : $('#ddlRegion').val().toString(), 
+                    'Cluster_id' : '', //$('#ddlCluster').val().toString();,
+                    'status' : $('#ddlStatus').val().toString(),
+                    'TrainerType' : $('#ddlTrainerType').val(),
+
+                    'user_region_id' : $('#hdn_user_region_id').val(),
+                    'entity_ids' : $('#ddlentity').val().toString(),
+                    'project_ids' : $('#ddl_Project').val().toString(),
+                    'sector_ids' : $('#ddlSector').val().toString()
+                    
                 },
                 success:function(data){
                     if(data!=null)
@@ -502,6 +512,7 @@ function LoadClusterddl(){
             });
         }
     }
+
     function GetProjectDetails(User_Id,User_Name)
     {
         var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForUser?user_id="+User_Id;
@@ -642,10 +653,19 @@ function LoadClusterddl(){
                                 <option  value="">All</option>
                             </select>
                         </div>
-                        <div class="col-lg-1" >
-                            <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
+
+                        <div class="col-lg-1" >    
+                            <button style="float: left; margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
+                            onclick="LoadTableBasedOnSearch()">Search</button>
+                            &nbsp     
+                            <!--button style="margin-top: 30px" type="button" class="btn btn-primary waves-effect waves-light submit" 
+                            onclick="Download()">Download</button-->
                         </div>
-                        <div class="col-lg-4" >                                        
+                        <div class="col-lg-2" >                                        
+                            <button style="float: left;margin-top: 30px" type="button" id="btn_download" class="btn btn-primary waves-effect waves-light submit" 
+                            onclick="DownloadReport()">Download</button>
+                        </div>
+                        <div class="col-lg-6" >                                        
                              <button style="float: right; margin-top: 30px;"  id="btn_create" type="submit" class="btn btn-success">Create External Trainer</a>
                         </div>
                         <div class="col-lg-1" >
