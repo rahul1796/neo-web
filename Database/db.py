@@ -3502,36 +3502,22 @@ SELECT					cb.name as candidate_name,
         return response
 
     @classmethod
-    def download_trainer_filter(cls, user_id, user_role_id, centers, status, path):
+    def download_trainer_filter(cls, user_id, user_role_id, centers, entity_ids, Dept, Region_id, Cluster_id, status, TrainerType, user_region_id, project_ids, sector_ids):
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [users].[sp_get_trainer_list_download] ?, ?, ?, ?'
-        values = (user_id, user_role_id, centers, status)
+        sql = 'exec [users].[sp_get_trainer_list_download] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id, user_role_id, centers, entity_ids, Dept, Region_id, Cluster_id, status, TrainerType, user_region_id, project_ids, sector_ids)
         cur.execute(sql,(values))
 
-        columns = [column[0].title() for column in cur.description]
-        data=cur.fetchall()
+        sheet1_columns = [column[0].title() for column in cur.description]        
+        data = cur.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))   
 
-        writer = pd.ExcelWriter(path, engine='xlsxwriter')
-        workbook  = writer.book
-
-        header_format = workbook.add_format({
-            'bold': True,
-            'text_wrap': True,
-            'valign': 'center',
-            'fg_color': '#D7E4BC',
-            'border': 1})
-
-        df = pd.DataFrame(data)
-        df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Trainer List')
-        worksheet = writer.sheets['Trainer List']
-        for col_num, value in enumerate(columns):
-            worksheet.write(0, col_num, value, header_format)
-        writer.save()
         cur.close()
         con.close()
-        return True
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+        
     def GetAllContractStages():
         client = []
         con = pyodbc.connect(conn_str)

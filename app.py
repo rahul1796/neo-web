@@ -4083,8 +4083,6 @@ def get_tma_file(path):
     return send_file(filename)
 
 class download_trainer_filter(Resource):
-    DownloadPath=config.neo_report_file_path
-    file_name = "Trainer_Filtered"+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
     @staticmethod
     def post():
         if request.method=='POST':
@@ -4092,13 +4090,18 @@ class download_trainer_filter(Resource):
                 user_id = request.form['user_id']
                 user_role_id=request.form['user_role_id']
                 centers=request.form['centers']
+                entity_ids=request.form['entity_ids']
+                Dept = request.form['Dept']
+                Region_id=request.form['Region_id']
+                Cluster_id=request.form['Cluster_id']
                 status=request.form['status']
+                TrainerType = request.form['TrainerType']
+                user_region_id=request.form['user_region_id']
+                project_ids=request.form['project_ids']
+                sector_ids=request.form['sector_ids']
                 
-                path = download_trainer_filter.DownloadPath + download_trainer_filter.file_name +'.xlsx'
-                Database.download_trainer_filter(user_id, user_role_id, centers, status, path)
-                
-                #send_file(config.ReportDownloadPathLocal+download_tma_registration_compliance_report.report_name+'.xlsx')
-                return {'FileName':download_trainer_filter.file_name,'FilePath':config.neo_report_file_path_web}
+                resp = Report.create_download_trainer_filter(user_id, user_role_id, centers, entity_ids, Dept, Region_id, Cluster_id, status, TrainerType, user_region_id, project_ids, sector_ids)
+                return resp
             except Exception as e:
                 print(str(e))
                 return {"exceptione":str(e)}
