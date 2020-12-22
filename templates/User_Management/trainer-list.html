@@ -487,23 +487,26 @@ function LoadClusterddl(){
 					'user_id': $('#hdn_home_user_id').val(),
 					'user_role_id' : $('#hdn_home_user_role_id').val(),
 					'centers' : '',
+                    'entity_ids' : $('#ddlentity').val().toString(),
 					'Dept' : $('#ddlDept').val().toString(),        // ddlbu
                     'Region_id' : $('#ddlRegion').val().toString(), 
                     'Cluster_id' : '', //$('#ddlCluster').val().toString();,
                     'status' : $('#ddlStatus').val().toString(),
                     'TrainerType' : $('#ddlTrainerType').val(),
-
+                    
                     'user_region_id' : $('#hdn_user_region_id').val(),
-                    'entity_ids' : $('#ddlentity').val().toString(),
                     'project_ids' : $('#ddl_Project').val().toString(),
                     'sector_ids' : $('#ddlSector').val().toString()
-                    
                 },
                 success:function(data){
                     if(data!=null)
-                    {
-						//alert(data.FilePath+data.FileName+'.xlsx');
-                        window.location=data.FilePath+data.FileName+'.xlsx';
+                    {   
+                        if(data.success){
+                            window.location=data.FilePath+data.FileName; //+'.xlsx'
+                        }
+                        else{
+                            alert(data.msg)
+                        }
                     }                    
                 },
                 error:function(x){
