@@ -364,11 +364,10 @@ class Report:
 
             worksheet = writer.sheets['Userwise']
             default_column = ['COO']
-            first_row = ['Registration', 'Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
-            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
+            first_row = ['Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement'] # 'Registration', 
+            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual'] # 'Target', 'Actual',
             third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%', 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
-                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
-                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%'] #'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%'
             first_row_sp = ['Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
             second_row_sp = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
             third_row_sp = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
@@ -479,11 +478,10 @@ class Report:
 
             worksheet = writer.sheets['Userwise']
             default_column = ['COO','TM']
-            first_row = ['Registration', 'Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
-            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
+            first_row = ['Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement'] #'Registration', 
+            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual'] #'Target', 'Actual',
             third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%', 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
-                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
-                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%'] # 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%'
             first_row_sp = ['Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
             second_row_sp = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
             third_row_sp = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
@@ -592,11 +590,10 @@ class Report:
 
             worksheet = writer.sheets['Userwise']
             default_column = ['COO','TM','CM/PC']
-            first_row = ['Registration', 'Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
-            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
+            first_row = ['Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement'] #'Registration', 
+            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual'] #'Target', 'Actual',
             third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%', 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
-                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
-                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%'] # 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%'
             first_row_sp = ['Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
             second_row_sp = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
             third_row_sp = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
