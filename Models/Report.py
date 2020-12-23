@@ -346,7 +346,6 @@ class Report:
         try:
             writer = pd.ExcelWriter(path, engine='xlsxwriter')
             workbook  = writer.book
-
             header_format = workbook.add_format({
                 'bold': True,
                 #'text_wrap': True,
