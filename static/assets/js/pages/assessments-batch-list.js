@@ -1290,6 +1290,7 @@ function add_map_message(){
     }
     function ScheduleAssessment()
     {   console.log($('#ddlPartner').val());
+        var cur_date = new Date(); // toDateString
         var DateRequested = new Date($('#TxtRequestedDate').val());
         var DateScheduled = new Date($('#TxtScheduledDate').val());
         var DateAssessed = new Date($('#TxtAssessmentDate').val());
@@ -1309,6 +1310,11 @@ function add_map_message(){
         else if($('#TxtRequestedDate').val()=='')
         {
             alert("Please enter proposed date.");
+            return false;
+        }
+        else if(cur_date.toDateString()>=DateRequested.toDateString())
+        {
+            alert("Assessment cannot be scheduled for the same day. Please schedule the future dates.");
             return false;
         }
         else if(($('#hdn_mobilization_type').val().toString())=="4")
