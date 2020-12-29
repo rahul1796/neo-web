@@ -1313,9 +1313,13 @@ function add_map_message(){
             return false;
         }
         else if(new Date(cur_date.toDateString())>=new Date(DateRequested.toDateString()))
-        {
-            alert("Assessment cannot be scheduled for the same day. Please schedule the future dates.");
-            return false;
+        {   
+            if(!(($('#hdn_current_stage_id').val()=="1") || $('#hdn_current_stage_id').val()=="2" )|| ( $('#hdn_current_stage_id').val()=="3"))
+            
+            {
+                alert("Assessment cannot be scheduled for the same day. Please schedule the future dates.");
+                return false;
+            }
         }
         else if(($('#hdn_mobilization_type').val().toString())=="4")
         {
