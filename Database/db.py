@@ -15,7 +15,7 @@ import os
 import xlsxwriter,re,os,zipfile,zlib 
 
 
-def to_xml(df, filename=None, mode='w'):
+def to_xml(df, filename=None, mode='wb'):
     if len(df)>0:
         if 'Candidate_Family_Details_Id' in df:
             df1=df[['Candidate_Id','Family_Salutation','Family_Name','Family_Date_Of_Birth','Family_Age','Family_Primary_Contact','Family_Email_Address','Family_Gender','Family_Education','Family_Relationship','Family_Current_Occupation','Candidate_Family_Details_Id']]
@@ -70,7 +70,7 @@ def to_xml(df, filename=None, mode='w'):
     if filename is None:
         return res
     with open(filename, mode) as f:
-        f.write(res)
+        f.write(bytes(res, 'utf-8'))
 
 pd.DataFrame.to_xml = to_xml
 
@@ -3502,36 +3502,22 @@ SELECT					cb.name as candidate_name,
         return response
 
     @classmethod
-    def download_trainer_filter(cls, user_id, user_role_id, centers, status, path):
+    def download_trainer_filter(cls, user_id, user_role_id, centers, entity_ids, Dept, Region_id, Cluster_id, status, TrainerType, user_region_id, project_ids, sector_ids):
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [users].[sp_get_trainer_list_download] ?, ?, ?, ?'
-        values = (user_id, user_role_id, centers, status)
+        sql = 'exec [users].[sp_get_trainer_list_download] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id, user_role_id, centers, entity_ids, Dept, Region_id, Cluster_id, status, TrainerType, user_region_id, project_ids, sector_ids)
         cur.execute(sql,(values))
 
-        columns = [column[0].title() for column in cur.description]
-        data=cur.fetchall()
+        sheet1_columns = [column[0].title() for column in cur.description]        
+        data = cur.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))   
 
-        writer = pd.ExcelWriter(path, engine='xlsxwriter')
-        workbook  = writer.book
-
-        header_format = workbook.add_format({
-            'bold': True,
-            'text_wrap': True,
-            'valign': 'center',
-            'fg_color': '#D7E4BC',
-            'border': 1})
-
-        df = pd.DataFrame(data)
-        df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Trainer List')
-        worksheet = writer.sheets['Trainer List']
-        for col_num, value in enumerate(columns):
-            worksheet.write(0, col_num, value, header_format)
-        writer.save()
         cur.close()
         con.close()
-        return True
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+        
     def GetAllContractStages():
         client = []
         con = pyodbc.connect(conn_str)
@@ -8149,3 +8135,56 @@ SELECT					cb.name as candidate_name,
         curs.close()
         con.close()
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+
+    def SaveRmInfo(user_id, batch_id, CompanyName, Address, RMName, RMmobilenumber, RMemailid):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        # quer = "SELECT TOP (1) version_code FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        # curs.execute(quer)
+        # data=curs.fetchall()
+        # data = '' if data==[] else data[0][0]
+        # if int(app_version) < int(data):
+        #     curs.close()
+        #     conn.close()
+        #     out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+        #     return out
+        try:
+            quer = '''
+            INSERT INTO candidate_details.[tbl_map_candidate_rm_info]
+            ([candidate_id], [batch_id], [Company_Name], [Address], [RM_Name], [RM_mobile_number], [RM_email_id], [created_on], [created_by], [is_active])
+            VALUES
+            '''
+            quer += "({},{},'{}','{}','{}','{}','{}',GETDATE(),{},1)".format(user_id, batch_id, CompanyName, Address, RMName, RMmobilenumber, RMemailid, user_id)
+            
+            curs.execute(quer)
+            curs.commit()
+            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
+        except Exception as e:
+            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+        finally:
+            curs.close()
+            conn.close()
+            return out
+
+    def get_OJT_History(user_id, batch_id):
+        response = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        try:
+            sql = 'exec [masters].[sp_get_OJT_History] ?, ?'
+            values = (user_id, batch_id)
+            cur2.execute(sql,(values))
+            #cur2.commit()
+            data = list(map(lambda x:list(x), cur2.fetchall()))
+            if len(data)==0:
+                out = {'success': True, 'description': "No data found", 'app_status':True, 'data':[]}
+            else:
+                for temp in data:
+                    response.append({'date':temp[2], 'stage1':temp[3], 'stage2':temp[4], 'stage3':temp[5]})
+                out = {'success': True, 'description': "No data found", 'app_status':True, 'data':response}
+        except Exception as e:
+            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+        finally:
+            cur2.close()
+            con.close()
+            return out
