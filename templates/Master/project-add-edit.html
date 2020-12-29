@@ -737,7 +737,6 @@
         });
         
         varJson='[ ' + varJson.substring(0, varJson.length - 1) + ' ]';
-        console.log(varJson);
         
         var URL=$('#hdn_web_url').val()+ "/SaveProjectBillingMilestones"
         $.ajax({
@@ -759,6 +758,7 @@
                             confirmButtonClass:"btn btn-confirm mt-2"
                             }).then(function(){
                                 //GetProjectMilestone();
+                                MilestoneObject={}   //added by prakash for save milestone issue
                                 $('#form1').submit();
                                 //window.location.href = '/assign_project_add_edit_to_home';
                             }
