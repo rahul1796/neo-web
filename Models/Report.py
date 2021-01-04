@@ -1539,7 +1539,7 @@ class Report:
             
             m_header = ["Log date","CANDIDATE ENROLLMENT NUMBER","CANDIDATE NAME","CANDIDATE EMAIL ID","BATCH CODE","BATCH START DATE","BATCH END DATE",
             "OJT START DATE","OJT END DATE","CUSTOMER NAME","SUBPROJECT NAME","SUBPROJECT CODE","CENTER NAME","CENTER TYPE","DISTRICT",
-            "STATE","REGION","BUISINESS UNIT","COURSE CODE","COURSE NAME"]
+            "STATE","REGION","BUISINESS UNIT","COURSE CODE","COURSE NAME", 'Company Name', 'Address', 'Rm Name', 'Rm Mobile Number', 'Rm Email Id']
             f_header = ["REACHED OFFICE","RECORDED TODAY'S WORK","LEFT OFFICE"]
             s_header = ["LOG DATE TIME","LOG IMAGE","LOG LOCATION","LOG DATE TIME","RECORDING","LOG LOCATION","LOG DATE TIME","LOG IMAGE","LOG LOCATION"]
             df.to_excel(writer, index=None, header=None, startrow=2 ,sheet_name='OJT Report')
@@ -1548,10 +1548,10 @@ class Report:
                 worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
 
             for col_num, value in enumerate(s_header):
-                worksheet.write(1, 20+col_num, value, header_format)
+                worksheet.write(1, 25+col_num, value, header_format)
 
             for col_num, value in enumerate(f_header):
-                worksheet.merge_range(0, 20+col_num*3, 0, 22+col_num*3, value, second_header_format)
+                worksheet.merge_range(0, 25+col_num*3, 0, 25+col_num*3, value, second_header_format)
 
             writer.save()
             return({'Description':'created excel', 'Status':True, 'filename':file_name})
