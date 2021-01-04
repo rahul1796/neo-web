@@ -1551,7 +1551,7 @@ class Report:
                 worksheet.write(1, 25+col_num, value, header_format)
 
             for col_num, value in enumerate(f_header):
-                worksheet.merge_range(0, 25+col_num*3, 0, 25+col_num*3, value, second_header_format)
+                worksheet.merge_range(0, 25+col_num*3, 0, 27+col_num*3, value, second_header_format)
 
             writer.save()
             return({'Description':'created excel', 'Status':True, 'filename':file_name})
