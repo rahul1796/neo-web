@@ -182,7 +182,6 @@ class Report:
             temp_batch={"data":df1,"columns":columns}
             
             res=Report.CreateExcel(temp_qp,temp_region,temp_batch,path)
-            print(res)
             if res['success']:
                 return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
             else:
@@ -267,7 +266,7 @@ class Report:
                 temp={"data":df,"columns":columns} 
                 
                 res=Report.CreateExcelFun(temp,path,'Batch Status')
-                print(res)
+                #print(res)
                 if res:
                     return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
                 else:
@@ -830,6 +829,7 @@ class Report:
                 os.remove( DownloadPath + i)
             path = '{}{}'.format(DownloadPath,report_name)
             res={}
+            #print("test")
             res=Report.CreateExcelSubProjectReport(data,path)
             os.chmod(DownloadPath+report_name, 0o777)
             if res['success']:
@@ -837,6 +837,7 @@ class Report:
             else:
                 return {"success":False,"msg":res['msg']}
         except Exception as e:
+            print(str(e))
             return {"success":False,"msg":str(e)}
     def CreateExcelSubProjectReport(data,path):
         try:
@@ -851,7 +852,7 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Sub-Projects') 
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Sub-Projects')
             df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Sub-Project-Center') 
             df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
@@ -1854,7 +1855,7 @@ class Report:
                 os.remove( DownloadPath + i)
             path = '{}{}'.format(DownloadPath,report_name)
             res={}
-            res=Report.CreateExcelSubProjectReport(data,path)       
+            res=Report.CreateExcelTrainerReport(data,path)       
             os.chmod(DownloadPath+report_name, 0o777)
             if res['success']:
                 return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
@@ -1862,7 +1863,7 @@ class Report:
                 return {"success":False,"msg":res['msg']}
         except Exception as e:
             return {"success":False,"msg":str(e)}
-    def CreateExcelSubProjectReport(data,path):
+    def CreateExcelTrainerReport(data,path):
         try:
             writer = pd.ExcelWriter(path, engine='xlsxwriter')
             workbook  = writer.book

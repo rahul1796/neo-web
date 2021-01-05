@@ -1299,6 +1299,24 @@ class Database:
         else:
             msg={"message":"Error in tagging"}
         return msg
+    def assign_batch_candidates(candidates,batch_id,tagged_by):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[batches].[assign_batch_candidates] ?, ?, ?'
+        values = (candidates,batch_id,tagged_by)
+        print(values)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[0]
+        cur.commit()
+        cur.close()
+        con.close()
+        print(pop)
+        if pop >0:
+            msg={"message":"Batch Assigned"}
+        else:
+            msg={"message":"Error in tagging"}
+        return msg
     def cancel_planned_batch(user_id,planned_batch_code,cancel_reason):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -1582,15 +1600,15 @@ class Database:
         con.close()
         return content
     
-    def enrolled_list(candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def enrolled_list(candidate_id,region_ids, state_ids, Pincode, created_by,project_type,candidate_stage, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
         h={}
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_E] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_E] ?, ?, ?, ?, ?, ?, ?,?,?, ?, ?, ?, ?, ?, ?, ?'
+        values = (candidate_id,region_ids, state_ids, Pincode, created_by, project_type,candidate_stage,FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -4035,7 +4053,22 @@ SELECT					cb.name as candidate_name,
         con.close()
         #print(Batches)
         return Batches
+    def get_batches_based_on_project_type(user_id,user_role_id,project_type):
+        Batches = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
 
+        sql = 'exec [masters].[sp_get_batches_based_on_project_type] ?,?,?'
+        values=(user_id,user_role_id,project_type)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for r in cur2:
+            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            Batches.append(h)
+        cur2.close()
+        con.close()
+        #print(Batches)
+        return Batches
 
     def Get_all_industry_db():
         response=[]
@@ -7424,7 +7457,6 @@ SELECT					cb.name as candidate_name,
         sheet1_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
         sheet1 = list(map(lambda x:list(x), data))        
-
         curs.execute(sql1,(values))
         sheet2_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()

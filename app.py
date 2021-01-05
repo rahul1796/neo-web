@@ -1212,6 +1212,13 @@ class tag_users_from_sub_project(Resource):
         sub_project_id=request.form['sub_project_id']
         tagged_by= session['user_id']
         return Master.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)
+class assign_batch_candidates(Resource):
+    @staticmethod
+    def post():
+        candidates=request.form['candidate_id']
+        batch_id=request.form['batch_id']
+        tagged_by= session['user_id']
+        return Master.assign_batch_candidates(candidates,batch_id,tagged_by)
 class tag_user_roles(Resource):
     @staticmethod
     def post():
@@ -1255,6 +1262,7 @@ api.add_resource(drop_edit_map_candidate_batch,'/drop_edit_candidate_batch')
 api.add_resource(tag_sponser_candidate,'/tag_sponser_candidate')
 api.add_resource(untag_users_from_sub_project,'/untag_users_from_sub_project')
 api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
+api.add_resource(assign_batch_candidates,'/assign_batch_candidates')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
 api.add_resource(tag_user_roles,'/tag_user_roles')
 api.add_resource(cancel_planned_batch,'/cancel_planned_batch')
@@ -4580,6 +4588,19 @@ class get_batches_basedon_sub_proj_multiple(Resource):
 api.add_resource(get_batches_basedon_sub_proj_multiple,'/get_batches_basedon_sub_proj_multiple')
 
 
+class get_batches_based_on_project_type(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            project_type=request.form['project_type']
+            user_id=0
+            if 'user_id' in request.form:
+                user_id=request.form['user_id']
+            user_role_id=0
+            if 'user_role_id' in request.form:
+                user_role_id=request.form['user_role_id']
+            return {"Batches": Database.get_batches_based_on_project_type(user_id,user_role_id,project_type)} 
+api.add_resource(get_batches_based_on_project_type,'/get_batches_based_on_project_type')
 #QP_API's
 @app.route("/sales_dashboard_page")
 def sales_dashboard_page():
@@ -6673,7 +6694,8 @@ class enrolled_list_updated(Resource):
             ToDate = request.form["ToDate"]
             FromDate = request.form["FromDate"]
             created_by = request.form["created_by"]
-            
+            project_type = request.form["project_type"]
+            candidate_stage = request.form["candidate_stage"]
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
             
@@ -6684,7 +6706,7 @@ class enrolled_list_updated(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             
-            return Candidate.enrolled_list(candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Candidate.enrolled_list(candidate_id,region_ids, state_ids, Pincode, created_by,project_type,candidate_stage, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 api.add_resource(enrolled_list_updated, '/enrolled_list_updated')
 
 class DownloadEnrTemplate(Resource):
