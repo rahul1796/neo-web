@@ -48,7 +48,8 @@
             var Course=0,Batch=0;
             $("#tbl_batchs").dataTable().fnDestroy();
             $(".date-picker").flatpickr({
-                dateFormat : "d-M-yy"
+                dateFormat:'d-M-Y',
+                minDate: '01.Apr.2019'
             });
             $('.dropdown-search-filter').select2({
                 placeholder:''
