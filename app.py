@@ -8361,9 +8361,11 @@ class updated_new_SL4Report(Resource):
                 from_date = request.form["from_date"]
                 to_date = request.form["to_date"]
                 Customers = request.form["Customers"]
+                projects = request.form["projects"]
+                sub_projects = request.form["sub_projects"]
                 
                 report_name = "Customer_wise_MIS_report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
-                resp = SL4Report_filter_new.create_report(from_date, to_date, Customers, user_id, user_role_id, report_name)
+                resp = SL4Report_filter_new.create_report(from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, report_name)
                 return resp
                 
             except Exception as e:

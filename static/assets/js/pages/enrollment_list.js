@@ -628,7 +628,15 @@ function CandidateContactDetails(primary_contact,SecondaryContact,Email,PresnetA
 function DownloadEnrTemplate(ProjectType){
     $("#imgSpinner").show();
     $('#mdl_project_type').modal('hide');
-    var cands=check_list.toString();
+    var candidates='';
+    $('[name=checkcase]').each(function () {
+        if($(this).prop('checked') == true)
+        {
+            candidates+= $(this).val()+',';
+        }
+        
+    });
+    cands=candidates.toString();
     //cands=cands.substring(0,cands.length-1)
     if ((cands.toString().length)==0)
     {

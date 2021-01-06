@@ -1,4 +1,4 @@
-def create_report(from_date, to_date, Customers, user_id, user_role_id, report_name):
+def create_report(from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, report_name):
     '''
     from datetime import datetime
     start_time = datetime.now()
@@ -21,10 +21,18 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
     try:
         conn_str = config.conn_str
         name_withpath = config.neo_report_file_path + 'report file/'+ report_name
-        
+        project_type=1
         writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
         workbook  = writer.book
-
+        if sub_projects != '':
+            cnxn=pyodbc.connect(conn_str)
+            curs = cnxn.cursor()            
+            quer = "select mobilization_type from masters.tbl_sub_projects where sub_project_id="+str(sub_projects)
+            curs.execute(quer)
+            data=curs.fetchall()
+            data = 0 if data==[] else data[0][0]
+            project_type=int(data)
+           
         header_format = workbook.add_format({
             'bold': True,
             'text_wrap': True,
@@ -47,8 +55,8 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
         def trainee_fxn():
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [reports].[sp_sl4_trainee_report] ?, ?, ?, ?, ?'
-            values = (from_date, to_date, Customers, user_id, user_role_id)
+            sql = 'exec [reports].[sp_sl4_trainee_report] ?, ?, ?, ?, ?,?,?'
+            values = (from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id)
             curs.execute(sql,(values))
             data = curs.fetchall()
             data = list(map(lambda x:list(x), data))
@@ -86,8 +94,8 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
         def trainee_assesment_fxn():
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [reports].sp_sl4_trainee_assesment_report ?, ?, ?, ?, ?'
-            values = (from_date, to_date, Customers, user_id, user_role_id)
+            sql = 'exec [reports].sp_sl4_trainee_assesment_report ?, ?, ?, ?, ?,?,?'
+            values = (from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id)
             curs.execute(sql,(values))
             data = curs.fetchall()
             data = list(map(lambda x:list(x), data))
@@ -126,8 +134,8 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
         def trainee_placemnet_fxn():
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [reports].sp_sl4_trainee_placement_report ?, ?, ?, ?, ?'
-            values = (from_date, to_date, Customers, user_id, user_role_id)
+            sql = 'exec [reports].sp_sl4_trainee_placement_report ?, ?, ?, ?, ?,?,?'
+            values = (from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id)
             curs.execute(sql,(values))
             data = curs.fetchall()
             data = list(map(lambda x:list(x), data))
@@ -169,8 +177,8 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
         def trainee_dell_tracker_fxn():
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [reports].sp_dell_tracker_report ?, ?, ?, ?, ?'
-            values = (from_date, to_date, Customers, user_id, user_role_id)
+            sql = 'exec [reports].sp_dell_tracker_report ?, ?, ?, ?, ?,?,?'
+            values = (from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id)
             curs.execute(sql,(values))
             columns = [column[0].title() for column in curs.description]
             data = curs.fetchall()
@@ -190,8 +198,8 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
         def trainee_dell_tracker2_fxn():
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [reports].sp_dell_tracker2_report ?, ?, ?, ?, ?'
-            values = (from_date, to_date, Customers, user_id, user_role_id)
+            sql = 'exec [reports].sp_dell_tracker2_report ?, ?, ?, ?, ?,?,?'
+            values = (from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id)
             curs.execute(sql,(values))
             columns = [column[0].title() for column in curs.description]
             data = curs.fetchall()
@@ -224,34 +232,57 @@ def create_report(from_date, to_date, Customers, user_id, user_role_id, report_n
             for col_num, value in enumerate(header):
                 worksheet.write(0, col_num, value, header_format)
         
-        
-        if  set(config.dell_type_customer.split(',')) >= set(Customers.split(',')):
-            #print('dell')
-            t4 = threading.Thread(target=trainee_dell_tracker_fxn)
-            t5 = threading.Thread(target=trainee_dell_tracker2_fxn)
+        if sub_projects=='':
 
-            t4.start()
-            t5.start()
-            
-            t4.join()
-            t5.join()
-            
-        else:
+            if  set(config.dell_type_customer.split(',')) >= set(Customers.split(',')):
+                #print('dell')
+                t4 = threading.Thread(target=trainee_dell_tracker_fxn)
+                t5 = threading.Thread(target=trainee_dell_tracker2_fxn)
+
+                t4.start()
+                t5.start()
+                
+                t4.join()
+                t5.join()
+                
+            else:
             #print('others')
-            t1 = threading.Thread(target=trainee_fxn) 
-            t2 = threading.Thread(target=trainee_assesment_fxn)
-            t3 = threading.Thread(target=trainee_placemnet_fxn)
+                t1 = threading.Thread(target=trainee_fxn) 
+                t2 = threading.Thread(target=trainee_assesment_fxn)
+                t3 = threading.Thread(target=trainee_placemnet_fxn)
 
-            t1.start()
-            t2.start()
-            t3.start()
+                t1.start()
+                t2.start()
+                t3.start()
 
-            t1.join() 
-            t2.join()
-            t3.join()
-  
+                t1.join() 
+                t2.join()
+                t3.join()
+        else:
+            if project_type==4:
+                t4 = threading.Thread(target=trainee_dell_tracker_fxn)
+                t5 = threading.Thread(target=trainee_dell_tracker2_fxn)
+
+                t4.start()
+                t5.start()
+                
+                t4.join()
+                t5.join()
+            else:
+                t1 = threading.Thread(target=trainee_fxn) 
+                t2 = threading.Thread(target=trainee_assesment_fxn)
+                t3 = threading.Thread(target=trainee_placemnet_fxn)
+
+                t1.start()
+                t2.start()
+                t3.start()
+
+                t1.join() 
+                t2.join()
+                t3.join()
         writer.save()
         return({'Description':'created excel', 'Status':True, 'filename':report_name})
         
     except Exception as e:
+        print(str(e))
         return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})

@@ -1,8 +1,17 @@
-<link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+ <!-- Plugins css -->
+ <link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
         
-<!-- third party css -->
-<link href="static/assets/libs/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+ <!-- third party css -->
+ <link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" />
+ <!-- third party css end -->
+
+ <!-- App css -->
+<link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+
 
 <script type="text/javascript">
     var Candidates = {};
@@ -14,6 +23,7 @@
             });
             LoadCustomerdl();
         });
+
         function LoadCustomerdl(){
         var URL=$('#hdn_web_url').val()+ "/GetALLClient"
             $.ajax({
@@ -52,6 +62,84 @@
         });
         return false;
     }
+    function LoadProject(){
+    var URL=$('#hdn_web_url').val()+ "/GetALLProject_multiple"  //"/GetALLProject_multiple"
+    $.ajax({
+        type:"POST",
+        url:URL,
+        async:false,
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "ClientId":$('#ddlCustomer').val().toString(),
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
+        },
+        success: function (data){
+            if(data.Projects != null)
+            {
+                $('#ddlProject').empty();
+                var count=data.Projects.length;
+                if( count> 0)
+                {
+                    //$('#ddlProject').append(new Option('ALL','-1'));  , 
+                    for(var i=0;i<count;i++)
+                        $('#ddlProject').append(new Option(data.Projects[i].Project_Name,data.Projects[i].Project_Id));
+                }
+                else
+                {
+                   // $('#ddlProject').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(request, err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+function LoadSubProject(){
+    //alert($('#ddlProject').val().toString())
+    var URL=$('#hdn_web_url').val()+ "/get_subproject_basedon_proj_multiple"
+    $.ajax({
+        type:"POST",
+        url:URL,
+        async:false,
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "ProjectId":$('#ddlProject').val().toString(),
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
+        },
+        success: function (data){
+            if(data.Sub_Project != null)
+            {
+                $('#ddlSubProject').empty();
+                var count=data.Sub_Project.length;
+                if( count> 0)
+                {
+                    //$('#ddlCourse').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlSubProject').append(new Option(data.Sub_Project[i].Sub_Project_Name,data.Sub_Project[i].Sub_Project_Id));
+                }
+                else
+                {
+                    $('#ddlSubProject').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
+
     function DownloadTableBasedOnSearch(){
         // if($('#FromDate').val()=='' || $('#ToDate').val()==''){
 		// alert('Please Select both Dates');
@@ -73,7 +161,9 @@
                         'user_role_id':$('#hdn_home_user_role_id').val(),
 						'from_date':$('#FromDate').val(),
 						'to_date':$('#ToDate').val(),
-						'Customers':$('#ddlCustomer').val().toString()
+                        'Customers':$('#ddlCustomer').val().toString(),
+                        'projects':$('#ddlProject').val().toString(),
+                        'sub_projects':$('#ddlSubProject').val().toString()
 						},
                         success: function(resp) 
                         {
@@ -147,28 +237,41 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <label for="ddlCustomer" class="mr-2">Customer*</label>
-                        <select class="form-control dropdown-search-filter" id="ddlCustomer" multiple >
+                        <select class="form-control dropdown-search-filter" id="ddlCustomer" onchange="LoadProject();" multiple >
                             <option value="">All</option>
                         </select>
                     </div>
                     <div class="col-lg-4">
+                        <label for="ddlProject" class="mr-2">Project</label>
+                        <select class="form-control dropdown-search-filter" onchange="LoadSubProject();" id="ddlProject" multiple>
+                            <option selected="" value="">All</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="ddlSubProject" class="mr-2">Sub Project</label>
+                        <select class="form-control dropdown-search-filter" id="ddlSubProject" >  <!-- onchange="LoadCenter();"-->>
+                            <option selected="" value="">All</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3">
                         <label for="FromDate" class="mr-2">From Date</label>
                         <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
                         ClientIdMode="static" placeholder="From Date">
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <label for="ToDate" class="mr-2">To Date</label>
                         <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
                         ClientIdMode="static" placeholder="To Date">
                     </div>
-                </div>
-				
-                <div class="row">  
-                    <div class="form-group col-lg-4">                                         
+                    <div class="form-group col-lg-3">                                         
                         <a class="btn btn-primary" style="margin-right: 20px;color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
                         <a id="lnkDownload" style="display:none;"></a>
                     </div>
                 </div>
+				
+                
 				<div class="row">  
 					<div class="form-group col-lg-4">
                         <div id="imgSpinner">
