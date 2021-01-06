@@ -501,7 +501,7 @@ function LoadTable()
     $('#divCandidateList').show();
     vartable = $("#tbl_candidate").DataTable({
         "serverSide": true,
-        "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
+        "aLengthMenu": [[10, 50, 100], [10, 50, 100]],
         "paging": true,
         "pageLength": 50,
         "sPaginationType": "full_numbers",
