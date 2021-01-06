@@ -7913,6 +7913,35 @@ class DownloadOpsProductivityReport(Resource):
 
 api.add_resource(DownloadOpsProductivityReport,'/DownloadOpsProductivityReport')
 
+@app.route("/Employee_wise_report_page")
+def Employee_wise_report_page():
+    if g.user:
+        return render_template("Reports/employee_wise_report_page.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/Employee_wise_report")
+def Employee_wise_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="Employee_wise_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class DownloadEmployeeWiseReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            month = request.form["month"]
+            role_id = request.form["role_id"]
+            customer_ids = request.form["customer_ids"]
+            contract_ids = request.form["contract_ids"]
+            user_id =  session['user_id']
+            user_role_id =  session['user_role_id']
+            #DownloadEmployeeWiseReport
+            resp = Report.DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id)
+            return resp
+api.add_resource(DownloadEmployeeWiseReport,'/DownloadEmployeeWiseReport')
+
 class DownloadAssessmentProductivityReport(Resource):
     @staticmethod
     def post():
