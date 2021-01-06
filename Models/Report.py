@@ -954,6 +954,73 @@ class Report:
         except Exception as e:
             print(str(e))
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+    def download_courses_list(user_id, user_role_id, course_id, sectors, qps, status):
+        try:
+            data=Database.download_courses_list(user_id, user_role_id, course_id, sectors, qps, status)
+            DownloadPath=config.neo_report_file_path+'report file/'
+            report_name = 'Content_Report_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
+            r=re.compile('Content_Report_.*')
+            lst=os.listdir(DownloadPath)
+            newlist = list(filter(r.match, lst))
+            for i in newlist:
+                os.remove( DownloadPath + i)
+            path = '{}{}'.format(DownloadPath,report_name)
+            res={}
+            res=Report.CreateExcelContentReport(data,path)
+            os.chmod(DownloadPath+report_name, 0o777)
+            if res['success']:
+                return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
+            else:
+                return {"success":False,"msg":res['msg']}
+        except Exception as e:
+            print(str(e))
+            return {"success":False,"msg":str(e)}
+    def CreateExcelContentReport(data,path):
+        try:
+            writer = pd.ExcelWriter(path, engine='xlsxwriter')
+            workbook  = writer.book
+
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'valign': 'center',
+                'align' : 'left',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+            df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Course-QP') 
+            df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='QPs')  
+            df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Sectors')  
+            df = pd.DataFrame(data['sheet4'], columns=data['sheet4_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Course-Session')             
+            
+            first_row = ['s_no','course_code','course_name','qp_code','qp_name','course_duration_days','course_duration_hours','created by','created on','last modified by','last modified on']
+            worksheet = writer.sheets['Course-QP']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format)           
+            
+            first_row = ['S No','QP name','QP Code','sector_name','created by','created on','last modified by','last modified on']
+            worksheet = writer.sheets['QPs']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format) 
+
+            first_row = ['S No','sector_name','sector_code','created by','created on']
+            worksheet = writer.sheets['Sectors']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format) 
+            first_row = ['S No','session_plan_name','module_name','session_name','session_order','duration','created by','created on']
+            worksheet = writer.sheets['Course-Session']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format) 
+            writer.save()
+
+            return({'msg':'created excel', 'success':True, 'filename':path})
+        except Exception as e:
+            print(str(e))
+            return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+    
     def download_users_list(user_id,filter_role_id,user_region_id,user_role_id, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids):
         try:
             data=Database.download_users_list(user_id,filter_role_id,user_region_id,user_role_id, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids)

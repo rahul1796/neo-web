@@ -7279,6 +7279,22 @@ class download_centers_list(Resource):
             return resp
 api.add_resource(download_centers_list,'/download_centers_list')
 
+
+class download_courses_list(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            user_id=request.form['user_id']
+            user_role_id=request.form['user_role_id']
+            course_id = request.form['course_id'] 
+            sectors = request.form['sectors']
+            qps = request.form['qps']
+            status = request.form['status'] 
+            resp = Report.download_courses_list(user_id, user_role_id, course_id, sectors, qps, status)
+            
+            return resp
+api.add_resource(download_courses_list,'/download_courses_list')
+
 class download_users_list(Resource):
     @staticmethod
     def post():
