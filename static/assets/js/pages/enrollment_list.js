@@ -579,6 +579,7 @@ function LoadTable()
 function LoadTableBasedOnSearch(){
     //alert($('#ddlRegion').val().toString() + $('#ddlState').val().toString() + $('#MinAge').val() + $('#MaxAge').val())
     $("#tbl_candidate").dataTable().fnDestroy();
+    $("#addedchkall").prop("checked", false);
     LoadTable(); 
 }
 function CandidateBasicDetails(FirstName,MiddleName,LastName,Salutation,Dob,Age,gender,MaritalStatus,Caste,Disability,religion)
