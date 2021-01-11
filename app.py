@@ -5739,6 +5739,8 @@ class mobilized_list_updated(Resource):
             created_by = request.form["created_by"]
             ToDate = request.form["ToDate"]
             FromDate = request.form["FromDate"]
+            search_type = request.form["search_type"]
+            search_keyword = request.form["search_keyword"]
             
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
@@ -5750,7 +5752,7 @@ class mobilized_list_updated(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             
-            return Candidate.mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,created_by,FromDate, ToDate)
+            return Candidate.mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge,search_type,search_keyword, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,created_by,FromDate, ToDate)
 api.add_resource(mobilized_list_updated, '/mobilized_list_updated')
 
 class DownloadMobTemplate(Resource):
@@ -6502,7 +6504,8 @@ class registered_list_updated(Resource):
             
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
-            
+            search_type = request.form["search_type"]
+            search_keyword = request.form["search_keyword"]
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
@@ -6510,7 +6513,7 @@ class registered_list_updated(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             print(FromDate, ToDate)
-            return Candidate.registered_list(candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Candidate.registered_list(candidate_id,region_ids, state_ids, Pincode,search_type,search_keyword, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 api.add_resource(registered_list_updated, '/registered_list_updated')
 
 

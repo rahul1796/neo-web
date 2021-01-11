@@ -124,6 +124,22 @@
                                         <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
                                         ClientIdMode="static" placeholder="To Date">
                                     </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddlSearchType" class="mr-2">Search Type:</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlSearchType" onchange="ShowHideSearchValue();" >
+                                           
+                                            <option value="0">Select Search Type</option>
+                                            <option  value="1">Email</option>
+                                            <option  value="2">Mobile Number</option>
+                                            <!--<option value="3">RPL</option>-->
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3" id="divSearch" style="display:none;">
+                                        <label for="txtSearchKeyword">Search Keyword:</label>
+                                        <input type="text" class="form-control" name="txtSearchKeyword" id="txtSearchKeyword"  placeholder=""> <!--required-- step="1"  --> 
+                                    </div>
+                                </div>
+                                <div class="row">
                                     <div class="col-lg-1" style="float: center; margin-top: 30px">
                                         <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
                                     </div>

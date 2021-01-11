@@ -148,6 +148,19 @@ function Uploadfile(project_type){
     $('#mdl_project_type').modal('hide');
     $('#mdl_bulkupload_candidate').modal('show');
 }
+function ShowHideSearchValue()
+{   
+    if($('#ddlSearchType').val().toString()!="0")
+    {
+        $('#divSearch').show();
+    }
+    else{
+        $('#divSearch').hide();
+    }
+   
+    
+    //console.log(check_list)
+}
 function Loadcreatedbyddl(){
     var URL=$('#hdn_web_url').val()+ "/AllCreatedByBasedOnUser"
         $.ajax({
@@ -297,6 +310,8 @@ function LoadTable()
                 d.created_by  = $('#ddlcreated_by').val().toString();
                 d.FromDate  = $('#FromDate').val();
                 d.ToDate  = $('#ToDate').val();
+                d.search_type = $('#ddlSearchType').val().toString();
+                d.search_keyword = $('#txtSearchKeyword').val();
             },
             error: function (e) {
                 $("#tbl_candidate tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
