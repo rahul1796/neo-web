@@ -1600,15 +1600,15 @@ class Database:
         con.close()
         return content
     
-    def enrolled_list(candidate_id,region_ids, state_ids, Pincode, created_by,project_type,candidate_stage, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def enrolled_list(candidate_id,region_ids, state_ids, Pincode,search_type,search_keyword, created_by,project_type,candidate_stage, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
         h={}
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_E] ?, ?, ?, ?, ?, ?, ?,?,?, ?, ?, ?, ?, ?, ?, ?'
-        values = (candidate_id,region_ids, state_ids, Pincode, created_by, project_type,candidate_stage,FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_E] ?, ?, ?,?,?, ?, ?, ?, ?,?,?, ?, ?, ?, ?, ?, ?, ?'
+        values = (candidate_id,region_ids, state_ids, Pincode,search_type,search_keyword, created_by, project_type,candidate_stage,FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
