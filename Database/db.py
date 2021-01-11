@@ -6155,12 +6155,12 @@ SELECT					cb.name as candidate_name,
             out = df.values.tolist()
             
             for row in out:
-                quer = "({},'{}','{}','{}','{}','{}',{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},1,'w',{},'{}',{},'{}',{}),".format(1 if row[0]=='Fresher' else 0,row[2],row[3],row[4],row[5],row[6],
+                quer = "({},'{}','{}','{}','{}','{}',{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},1,'w',{},{},{},{}),".format(1 if row[0]=='Fresher' else 0,row[2],row[3],row[4],row[5],row[6],
                 1 if row[7]=='' else 0,row[7] if row[7]!='' else 0,row[8],row[10],row[11],row[12],row[13],row[14],row[15],row[16],row[17],row[25],row[23],row[32],row[34],quer_user.format(row[36],row[36]),
                 "(select state_id from masters.tbl_states where state_name like trim('{}'))".format(row[24]),'1',"(select state_id from masters.tbl_states where state_name like trim('{}'))".format(row[33]),'1')
                 quer1 += '\n'+quer
             quer1 = quer1[:-1]+';'
-            #print(quer1)
+            print(quer1)
             cur.execute(quer1)
             d = list(map(lambda x:x[0],cur.fetchall()))
             cur.commit()
