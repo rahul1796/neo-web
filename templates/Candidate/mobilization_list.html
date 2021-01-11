@@ -141,11 +141,11 @@
                                         <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
                                     </div>
                                     <div class="form-group col-lg-2">                                         
-                                        <a class="btn btn-success waves-effect waves-light" style="float: right; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="select_Project_Type(0)">Download Template</a>
+                                        <a class="btn btn-success waves-effect waves-light" style="float: right; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="LoadProjectPage(0)">Download Template</a> <!--select_Project_Type-->
                                         <a id="lnkDownload" style="display:none;"></a>
                                     </div>
                                     <div class="form-group col-lg-1">   
-                                        <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="select_Project_Type(1)" id="btnUpload">Upload</button> 
+                                        <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="LoadProjectPage(1)" id="btnUpload">Upload</button> 
                                     </div>
                                     <div class="form-group col-lg-3">
                                             <div id="imgSpinner" style="display: none">
@@ -593,4 +593,3 @@
                 </div>
             </div>
         </div><!--/.modal-->
-        
