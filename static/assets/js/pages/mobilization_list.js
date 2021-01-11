@@ -2,7 +2,7 @@ var varTable;
 var varTable1;
 var flag = "";
 var role_id;
-var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_'
+var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_';
 
 function uploadFileToS3(file, s3Data, url){
     var xhr = new XMLHttpRequest();

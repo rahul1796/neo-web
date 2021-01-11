@@ -3,7 +3,8 @@ var varTable1;
 var flag = "";
 var role_id;
 var check_list = [];
-var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_'
+var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_';
+var cands='';
 
 function UploadFileData_s3(file,file_name)
 {
@@ -219,6 +220,23 @@ function Uploadfile(project_type){
     $('#mdl_project_type').modal('hide');
     $('#mdl_bulkupload_candidate').modal('show');
 }
+function SelectDeSelectAll(e)
+{
+    var temp=e.target.getAttribute('value');
+    if($('#'+e.target.getAttribute('id')).is(':checked'))
+    {
+        $('[name=checkcase]').each(function () {
+                $(this).prop("checked", true);
+        });
+    }
+    else
+    {
+        $('[name=checkcase]').each(function () {
+            $(this).prop("checked", false);
+        });
+    }
+    //console.log(check_list)
+}
 function Loadcreatedbyddl(){
     var URL=$('#hdn_web_url').val()+ "/AllCreatedByBasedOnUser"
         $.ajax({
@@ -410,6 +428,8 @@ function LoadTable()
 function LoadTableBasedOnSearch(){
     //alert($('#ddlRegion').val().toString() + $('#ddlState').val().toString() + $('#MinAge').val() + $('#MaxAge').val())
     $("#tbl_candidate").dataTable().fnDestroy();
+    $("#addedchkall").prop("checked", false);
+    
     LoadTable();
 }
 function CandidateBasicDetails(FirstName,MiddleName,LastName,Salutation,Dob,Age,gender,MaritalStatus,Caste,Disability,religion)
@@ -459,7 +479,16 @@ function CandidateContactDetails(primary_contact,SecondaryContact,Email,PresnetA
 function DownloadRegTemplate(Project_Type){
     $("#imgSpinner").show();
     $('#mdl_project_type').modal('hide');
-    var cands=check_list.toString();
+    var candidates='';
+    $('[name=checkcase]').each(function () {
+        if($(this).prop('checked') == true)
+        {
+            candidates+= $(this).val()+',';
+        }
+        
+    });
+    cands=candidates.toString();
+    //cands=check_list.toString();
 
     if ((cands.toString().length)==0)
     {

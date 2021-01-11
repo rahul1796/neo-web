@@ -6698,6 +6698,8 @@ class enrolled_list_updated(Resource):
             candidate_stage = request.form["candidate_stage"]
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
+            search_type = request.form["search_type"]
+            search_keyword = request.form["search_keyword"]
             
             start_index = request.form['start']
             page_length = request.form['length']
@@ -6706,7 +6708,7 @@ class enrolled_list_updated(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             
-            return Candidate.enrolled_list(candidate_id,region_ids, state_ids, Pincode, created_by,project_type,candidate_stage, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Candidate.enrolled_list(candidate_id,region_ids, state_ids, Pincode,search_type,search_keyword, created_by,project_type,candidate_stage, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 api.add_resource(enrolled_list_updated, '/enrolled_list_updated')
 
 class DownloadEnrTemplate(Resource):
