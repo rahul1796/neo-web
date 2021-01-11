@@ -5322,6 +5322,29 @@ SELECT					cb.name as candidate_name,
             conn.close()
             out = {'success': False, 'description': "Lower App Version", 'app_status':False}
             return out
+        
+        #url = candidate_xml_weburl + xml
+        url = download_aws_url+aws_location+'neo_app/xml_files/'+'mobilization/' +xml
+
+        r = requests.get(url)
+        data = r.text
+        root = ET.fromstring(data)
+        out = []
+        json_array_cont = []
+        for child in root:
+            temp_data = child.attrib
+            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
+
+        sql = 'exec	[masters].[sp_validate_upload_mobh_contact_info] ?'
+        values = (json.dumps(json_array_cont),)
+        curs.execute(sql,(values))
+        vali = curs.fetchall()
+
+        if vali!=[]:
+            vali = [i[0] for i in vali]
+            out = {'success': False, 'description': '\n'.join(vali), 'app_status':True}
+            return out
+
         try:
             '''
             insert into candidate_details.tbl_candidate_interventions
@@ -5345,13 +5368,6 @@ SELECT					cb.name as candidate_name,
             (candidate_id,present_address_line2,present_village,present_panchayat,present_taluk_block,permanent_address_line2,permanent_village,permanent_panchayat,permanent_taluk_block,created_on,created_by,is_active)
             values
             '''
-            #url = candidate_xml_weburl + xml
-            url = download_aws_url+aws_location+'neo_app/xml_files/'+'mobilization/' +xml
-
-            r = requests.get(url)
-            data = r.text
-            root = ET.fromstring(data)
-            out = []
             
             for child in root:
                 data = child.attrib
@@ -5737,8 +5753,8 @@ SELECT					cb.name as candidate_name,
         r = requests.get(url)
         data = r.text
         root = ET.fromstring(data)
-
         json_array = []
+        json_array_cont = []
         mobilization_type = 1
         for child in root:
             temp_data = child.attrib
@@ -5746,6 +5762,17 @@ SELECT					cb.name as candidate_name,
                 mobilization_type = temp_data['mobilization_type']
             if 'assign_batch' in temp_data:
                 json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
+            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
+
+        sql = 'exec	[masters].[sp_validate_upload_mobh_contact_info] ?'
+        values = (json.dumps(json_array_cont),)
+        curs.execute(sql,(values))
+        vali = curs.fetchall()
+
+        if vali!=[]:
+            vali = [i[0] for i in vali]
+            out = {'success': False, 'description': '\n'.join(vali), 'app_status':True}
+            return out
         
         if int(mobilization_type)==1:
             if json_array!=[]:
