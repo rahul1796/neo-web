@@ -121,7 +121,7 @@ function LoadSubProject(){
                 var count=data.Sub_Project.length;
                 if( count> 0)
                 {
-                    //$('#ddlCourse').append(new Option('ALL','-1'));
+                    $('#ddlSubProject').append(new Option('ALL',''));
                     for(var i=0;i<count;i++)
                         $('#ddlSubProject').append(new Option(data.Sub_Project[i].Sub_Project_Name,data.Sub_Project[i].Sub_Project_Id));
                 }
@@ -250,8 +250,7 @@ function LoadSubProject(){
                     <div class="col-lg-4">
                         <label for="ddlSubProject" class="mr-2">Sub Project</label>
                         <select class="form-control dropdown-search-filter" id="ddlSubProject" >  <!-- onchange="LoadCenter();"-->>
-                            <option selected="" value="">All</option>
-                        </select>
+                            </select>
                     </div>
                 </div>
                 <div class="row">
