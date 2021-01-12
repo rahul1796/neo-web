@@ -123,6 +123,55 @@ function LoadTable(sectors, qps, status)
 
     });
 }
+function DownloadTableBasedOnSearch()
+{                   
+    $("#imgSpinner").show();
+    // from candidate
+    if(0==1)
+        {
+            
+            $("#imgSpinner").hide();
+        }
+    else{
+        var URL=$('#hdn_web_url').val()+ "/download_courses_list"
+        $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: URL, 
+                    data: {
+                        "course_id":0,
+                        "user_id":$('#hdn_home_user_id').val(),
+                        "user_role_id":$('#hdn_home_user_role_id').val(),
+                        "status":$('#ddlStatus').val().toString(),
+                        "sectors":$('#ddlSector').val().toString(),
+                        "qps":$('#ddlQP').val().toString()
+                                                
+                    },
+                   
+                    success:function(data){
+                        if(data!=null)
+                        {         
+                            if(data.success)
+                            {
+                                $("#imgSpinner").hide();        
+                                window.location=data.FilePath+data.FileName;
+                            }    
+                            else
+                            {
+                                $("#imgSpinner").hide(); 
+                                alert(data.msg);
+                                return false;
+                            }  
+                        }                    
+                    },
+                    error:function()
+                    {
+                        //$("#imgSpinner").hide();
+                    }
+                });
+        
+    }
+}
 function EditCourseDetail(Course_Id)
 {
     $('#hdn_course_id').val(Course_Id);

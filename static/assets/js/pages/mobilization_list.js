@@ -2,12 +2,11 @@ var varTable;
 var varTable1;
 var flag = "";
 var role_id;
-var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_'
+var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_';
 
 function uploadFileToS3(file, s3Data, url){
     var xhr = new XMLHttpRequest();
     xhr.open("POST", s3Data.url);
-
     var postData = new FormData();
     for(key in s3Data.fields){
         postData.append(key, s3Data.fields[key]);
@@ -81,7 +80,7 @@ form_data.append('filename',xls_file);
 form_data.append('cand_stage',1);
 form_data.append('user_id',$('#hdn_home_user_id_modal').val());
 form_data.append('user_role_id',$('#hdn_home_user_role_id_modal').val());
-form_data.append('ProjectType',$('#hdn_ProjectType_modal').val());
+form_data.append('ProjectType',0); // $('#hdn_ProjectType_modal').val()
 form_data.append('All_Filenames',all_file_names.toString());
 form_data.append('filename_prefix',filename_prefix.toString());
 $.ajax({
@@ -121,9 +120,7 @@ $.ajax({
                     confirmButtonClass:"btn btn-confirm mt-2"
                     }).then(function(){
                         window.location.href = '/mobilization';
-                    }); 
-    
-            
+                    });
     },
     error:function(err)
     {
@@ -147,6 +144,19 @@ function Uploadfile(project_type){
 
     $('#mdl_project_type').modal('hide');
     $('#mdl_bulkupload_candidate').modal('show');
+}
+function ShowHideSearchValue()
+{   
+    if($('#ddlSearchType').val().toString()!="0")
+    {
+        $('#divSearch').show();
+    }
+    else{
+        $('#divSearch').hide();
+    }
+   
+    
+    //console.log(check_list)
 }
 function Loadcreatedbyddl(){
     var URL=$('#hdn_web_url').val()+ "/AllCreatedByBasedOnUser"
@@ -274,9 +284,9 @@ function LoadTable()
     $('#divCandidateList').show();
     vartable = $("#tbl_candidate").DataTable({
         "serverSide": true,
-        "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
+        "aLengthMenu": [[10, 50, 100], [10, 50, 100]],
         "paging": true,
-        "pageLength": 10,
+        "pageLength": 50,
         "sPaginationType": "full_numbers",
         "scrollX": true,
         "destroy": true,
@@ -297,6 +307,8 @@ function LoadTable()
                 d.created_by  = $('#ddlcreated_by').val().toString();
                 d.FromDate  = $('#FromDate').val();
                 d.ToDate  = $('#ToDate').val();
+                d.search_type = $('#ddlSearchType').val().toString();
+                d.search_keyword = $('#txtSearchKeyword').val();
             },
             error: function (e) {
                 $("#tbl_candidate tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -379,7 +391,7 @@ function CandidateContactDetails(primary_contact,SecondaryContact,Email,PresnetA
 
 function DownloadMobTemplate(Project_Tpye){
     $('#mdl_project_type').modal('hide');
-    console.log(Project_Tpye)
+    // console.log(Project_Tpye)
     $("#imgSpinner").show();
     if (0==9){
     console.log(false)
@@ -392,15 +404,13 @@ function DownloadMobTemplate(Project_Tpye){
                     dataType: "json",
                     url: URL, 
                     data: {
-                            //candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type
-                            
+                            //candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type                     
                             'user_id':$('#hdn_home_user_id').val(),
                             'user_role_id':$('#hdn_home_user_role_id').val(),
                             'Project_Tpye':Project_Tpye
                     },
                     success: function(resp) 
                     {
-
                         if (resp.Status){
                             var varAnchor = document.getElementById('lnkDownload');
                             varAnchor.href = $('#hdn_web_url').val() + '/Bulk Upload/' + resp.filename;
@@ -448,7 +458,6 @@ function DownloadMobTemplate(Project_Tpye){
                         //$("#imgSpinner").hide();
                     }
                 });
-        
     }
     //$("#imgSpinner").hide();
 }
@@ -470,12 +479,21 @@ function select_Project_Type(a){
     $('#hdn_upload_download_report').val(a)
     $('#mdl_project_type').modal('show');
 }
-function LoadProjectPage(){
-    if ($('#hdn_upload_download_report').val()==0){
-        DownloadMobTemplate($('#ddlProjectType').val())
+function LoadProjectPage(a){
+    if (a==0){
+        DownloadMobTemplate(0)
     }
     else{
-        Uploadfile($('#ddlProjectType').val())
-        //UploadFileData($('#ddlProjectType').val())
+        Uploadfile(0)
     }
 }
+
+// function LoadProjectPage(){
+//     if ($('#hdn_upload_download_report').val()==0){
+//         DownloadMobTemplate($('#ddlProjectType').val())
+//     }
+//     else{
+//         Uploadfile($('#ddlProjectType').val())
+//         //UploadFileData($('#ddlProjectType').val())
+//     }
+// }
