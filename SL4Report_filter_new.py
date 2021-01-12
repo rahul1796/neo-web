@@ -12,7 +12,7 @@ def create_report(from_date, to_date, Customers,projects,sub_projects, user_id, 
     try:
         import pandas as pd
         import pypyodbc as pyodbc
-        import xlsxwriter
+        import xlsxwriter,re,os
         import threading
         from Database import config
     except:
@@ -280,9 +280,12 @@ def create_report(from_date, to_date, Customers,projects,sub_projects, user_id, 
                 t1.join() 
                 t2.join()
                 t3.join()
+        
         writer.save()
+        os.chmod(name_withpath, 0o777)
+            
         return({'Description':'created excel', 'Status':True, 'filename':report_name})
         
     except Exception as e:
-        print(str(e))
+        print('EXCp:'+str(e))
         return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
