@@ -7941,6 +7941,7 @@ def customer_productivity_report():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+
 class DownloadOpsProductivityReport(Resource):
     @staticmethod
     def post():

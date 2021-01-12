@@ -314,6 +314,7 @@ class Report:
             return False
     def GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         return Database.GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw) 
+    
     def DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id):
         try:
             data=Database.DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id)
@@ -1136,7 +1137,7 @@ class Report:
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
-       
+
     def create_client_report(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids):
         try:
             data=Database.DownloadClientReport(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids)
