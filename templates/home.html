@@ -87,6 +87,7 @@
                             $('#OJT_report').show();
                                 $('#OJT_Monitoring_Report').show();
                             $('#ECP_report').show();
+                            $('#Employee_wise_report').show();
                             $('#Qp_wise_report').show();
                             $('#Batch_Status_report').show();
                             $('#ops_productivity_report').show();
@@ -97,7 +98,7 @@
                         $('#Productivity_Report').show();
                             $('#Employee_wise_report').show();
                             $('#certificate_distribution_Productivity_Report').show();
-                            $('#partner_productivity_report').show();
+                            $('#partner_productivity_report').hide();
                             $('#region_productivity_report').show();
                             $('#mobilizer_productivity_report').show();
                             $('#Ops_Productivity_Report').show();
@@ -287,8 +288,8 @@
                             $('#AnchorOperationDashboard').show();
                         $('#My_Projects_Menu').hide();
                         $('#Report_Menu').show();
-                            $('#OJT_report').hide();
-                                $('#OJT_Monitoring_Report').hide();
+                            $('#OJT_report').show();
+                                $('#OJT_Monitoring_Report').show();
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
                         $('#Productivity_Report').show();
@@ -297,7 +298,7 @@
                             $('#Batch_Status_report').show();
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
-                            $('#Assessment_Productivity_Report').hide();
+                            $('#Assessment_Productivity_Report').show();
                             $('#partner_productivity_report').hide();
                         
                         if(goto !="")
@@ -334,7 +335,7 @@
                                 $('#OJT_Monitoring_Report').show();
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
-                            $('#Assessment_Productivity_Report').hide();
+                            $('#Assessment_Productivity_Report').show();
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
@@ -356,6 +357,7 @@
                         $('#Enrollment_Menu').hide();
                         $('#Candidate_Menu').show();
                         $('#Assessment_Menu').show();
+                        $('#Certification_Menu').show(); 
                         $('#Content_Menu').show();
                             $('#AnchorSectors').show();
                             $('#AnchorQP').show();
@@ -379,7 +381,7 @@
                                 $('#OJT_Monitoring_Report').show();
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
-                            $('#Assessment_Productivity_Report').hide();
+                            $('#Assessment_Productivity_Report').show();
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
@@ -396,9 +398,9 @@
                         break;
                     case 14:            //Territory Manager / Cluster Manager
                         $('#Home').show();
-						$('#Mobilization_Menu').hide();
-                        $('#Registration_Menu').hide();
-                        $('#Enrollment_Menu').hide();
+						$('#Mobilization_Menu').show();
+                        $('#Registration_Menu').show();
+                        $('#Enrollment_Menu').show();
                         $('#Candidate_Menu').show();
                         $('#Assessment_Menu').show();
                         $('#Certification_Menu').show();   
@@ -425,8 +427,9 @@
                             $('#OJT_report').show();
                                 $('#OJT_Monitoring_Report').show();
                             $('#Assessment_report_Menu').show();
+                            $('#SL4Report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
-                            $('#Assessment_Productivity_Report').hide();
+                            $('#Assessment_Productivity_Report').show();
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
@@ -434,6 +437,9 @@
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
                             $('#partner_productivity_report').hide();
+                        $('#TMA_attendance_Menu').show();                        
+                        $('#TMA_content').show();
+                            $('#tma_report_filter').show();
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -468,11 +474,14 @@
                                 $('#OJT_Monitoring_Report').show();
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
-                            $('#Assessment_Productivity_Report').hide();
+                            $('#Assessment_Productivity_Report').show();
+                            
+                            $('#customer_reports').show();
+                            $('#SL4Report_Menu').show();
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
-                            $('#Batch_Status_report').show();
+                            $('#batch_reports').hide();
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
                             $('#partner_productivity_report').hide();
@@ -632,12 +641,15 @@
                         $('#Insight_Menu').hide();
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
-                        $('#Report_Menu').hide();
+                        $('#Report_Menu').show();
                             $('#OJT_report').hide();
                                 $('#OJT_Monitoring_Report').hide();
-                            $('#ECP_report').hide();
+                            $('#ECP_report').show();
                             $('#Qp_wise_report').hide();
-                            $('#Batch_Status_report').hide();
+                            $('#batch_reports').hide();
+                            $('#customer_reports').hide();
+                            $('#Candidate_Report').hide();
+                            $('#user_sp_report').hide();
                             $('#ops_productivity_report').hide();
                             $('#TrainerProductivityReport').hide();
                             $('#Assessment_report_Menu').hide();
@@ -773,10 +785,11 @@
                             $("#box").load(goto);
                         break;
                     case 38:             //Project Coordinator
-                        $('#Home').show();
+                    $('#Home').show();
 						$('#Mobilization_Menu').show();
                         $('#Registration_Menu').show();
                         $('#Enrollment_Menu').show();
+                        $('#Certification_Menu').show();   
                         $('#Candidate_Menu').show();
                         $('#Assessment_Menu').show();
                         $('#Content_Menu').show();
@@ -798,21 +811,23 @@
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
                         $('#Report_Menu').show();
-                            $('#OJT_report').hide();
-                                $('#OJT_Monitoring_Report').hide();
+                            $('#OJT_report').show();
+                                $('#OJT_Monitoring_Report').show();
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
+                            $('#Assessment_Productivity_Report').show();
                         $('#Productivity_Report').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
-                            $('#Batch_Status_report').show();
+                            $('#batch_reports').hide();
                             $('#ops_productivity_report').show();
                             $('#TrainerProductivityReport').show();
-                            $('# Assessment_Productivity_Report').hide();
                             $('#partner_productivity_report').hide();
-                        $('#TMA_attendance_Menu').hide();
-                        $('#TMA_content').hide();
+                        $('#TMA_attendance_Menu').show();
+                        $('#TMA_content').show();
+                        $('#SL4Report_Menu').show();
                             $('#tma_report_filter').show();
+
                         if(goto !="")
                             $("#box").load(goto);
                         break;
@@ -848,7 +863,7 @@
                                 $('#OJT_Monitoring_Report').hide();
                             $('#ECP_report').hide();
                             $('#Qp_wise_report').hide();
-                            $('#Batch_Status_report').hide();
+                            $('#batch_reports').hide();
                             $('#ops_productivity_report').hide();
                             $('#TrainerProductivityReport').hide(); 
                             $('#Assessment_report_Menu').hide();
@@ -1080,7 +1095,7 @@
                                                  <!--<li  id="TMA_batch_Menu">
                                                      <a href="/tma_batch" class="active"> Trainer Deployment <div class="button"></div></a>
                                                  </li-->
-                                                <li id="Employee_wise_report" style="display: none;"> 
+                                                 <li id="Employee_wise_report" style="display: none;">
                                                     <a href="/Employee_wise_report" id="Employee_wise_report_Menu" class="active">Employee wise Target Vs Actual Report<div class="button"></div></a>
                                                 </li>
                                                  <li id="Assessment_Productivity_Report">
@@ -1162,10 +1177,9 @@
                                                 </li>
                                             </ul>
                                     </li>
-                                    <li>
-                                        <a href="/user_sub_project" id="User_Sub+Project_Menu" class="active">User-Sub Project Report<div class="button"></div></a>
+                                    <li id="user_sp_report">
+                                        <a href="/user_sub_project" id="User_Sub_Project_Menu" class="active">User-Sub Project Report<div class="button"></div></a>
                                     </li>
-                                   
                                     
                                 	<li  id="MCL_report_Menu" style="display:none">
 										<a href="/mcl_report" id="MCL_report" class="active">MCL Response Report<div class="button"></div></a>
@@ -1209,29 +1223,7 @@
                                     </li>
                                 </ul>
                             </li>
-                            <li class="has-submenu active" id="Insight_Menu">
-                                <a href="#" class="active" > <i class="fe-bar-chart-line-"></i>Insight<div class="arrow-down"></div></a>
-                                <ul class="submenu">
-                                    <li id="Sales_Dashboard_Menu">
-                                        <a id="AnchorSalesDashboard"  href="/sales_dashboard" >Sales Dashboard</a>
-                                    </li>
-
-									<li id="Operation_dashboard_Menu">
-                                        <a id="AnchorOperationDashboard"  href="/operation_dashboard" >Operation Dashboard</a>
-                                  
-                                    </li>
-                                    <li id="jobs_Menu">
-                                        <a id="Anchorjobs"  href="/Placement_Dashboard" >Placement Dashboard</a>
-                                    </li>
-                                    <li id="Sector_Menu">
-                                        <a id="AnchorSectors"  href="/trainer_dashboard" >Trainer Dashboard</a>
-                                    </li>
-                                    <li id="Customer_Dashboard_Menu">
-                                        <a id="AnchorCustomers"  href="/Customer_Dashboard" >Customer Dashboard</a>
-                                    </li>
-                                </ul>
-                            </li>
-							<li class="has-submenu active" id="Master_Menu">
+                            <li class="has-submenu active" id="Master_Menu">
                                 <a href="#" class="active">
                                     <i class="fe-anchor"></i>Master <div class="arrow-down"></div></a>
                                 <ul class="submenu">
@@ -1241,9 +1233,9 @@
                                     <li id="Contract_Menu">
                                         <a id="AnchorContracts"  href="/contract" >Contracts</a>
                                     </li>                                    
-                                    <li class="has-submenu dropdown-menu-left " id="Project_Menu" >
+                                    <li class="has-submenu " id="Project_Menu" >
                                         <a href="#">Projects <div class="arrow-down"></div></a>
-                                        <ul class="submenu" style="right: 185px; left: auto; margin-right: 20px;">
+                                        <ul class="submenu" >
                                             <li >
                                                 <a href="/project" id="AnchorProjects" class="active">Main Projects<div class="button"></div></a>
                                             </li>
@@ -1260,7 +1252,7 @@
                                     </li>
                                     <li class="has-submenu" id="Content_Menu">
                                         <a href="#"> Content <div class="arrow-down"></div></a>
-                                        <ul class="submenu" style="right: 185px; left: auto; margin-right: 20px;">
+                                        <ul class="submenu" >
                                             <li id="Sector_Menu">
                                                 <a id="AnchorSectors"  href="/sector" >Sectors</a>
                                             </li>
@@ -1300,6 +1292,28 @@
                                     </li>
                                     <li id="Cluster_Menu"style="display: none">
                                         <a id="AnchorCluster" href="/cluster">Cluster</a>
+                                    </li>
+                                </ul>
+                            </li>
+							<li class="has-submenu active" id="Insight_Menu">
+                                <a href="#" class="active" > <i class="fe-bar-chart-line-"></i>Insight<div class="arrow-down"></div></a>
+                                <ul class="submenu">
+                                    <li id="Sales_Dashboard_Menu">
+                                        <a id="AnchorSalesDashboard"  href="/sales_dashboard" >Sales Dashboard</a>
+                                    </li>
+
+									<li id="Operation_dashboard_Menu">
+                                        <a id="AnchorOperationDashboard"  href="/operation_dashboard" >Operation Dashboard</a>
+                                  
+                                    </li>
+                                    <li id="jobs_Menu">
+                                        <a id="Anchorjobs"  href="/Placement_Dashboard" >Placement Dashboard</a>
+                                    </li>
+                                    <li id="Sector_Menu">
+                                        <a id="AnchorSectors"  href="/trainer_dashboard" >Trainer Dashboard</a>
+                                    </li>
+                                    <li id="Customer_Dashboard_Menu">
+                                        <a id="AnchorCustomers"  href="/Customer_Dashboard" >Customer Dashboard</a>
                                     </li>
                                 </ul>
                             </li>

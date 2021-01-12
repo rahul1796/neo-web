@@ -48,7 +48,8 @@
             var Course=0,Batch=0;
             $("#tbl_batchs").dataTable().fnDestroy();
             $(".date-picker").flatpickr({
-                dateFormat : "d-M-yy"
+                dateFormat:'d-M-Y',
+                minDate: '01.Apr.2019'
             });
             $('.dropdown-search-filter').select2({
                 placeholder:''
@@ -135,17 +136,32 @@
                                         <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
                                         ClientIdMode="static" placeholder="To Date">
                                     </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddlSearchType" class="mr-2">Search Type:</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlSearchType" onchange="ShowHideSearchValue();" >
+                                           
+                                            <option value="0">Select Search Type</option>
+                                            <option  value="1">Email</option>
+                                            <option  value="2">Mobile Number</option>
+                                            <!--<option value="3">RPL</option>-->
+                                        </select>
+                                    </div>
                                 </div>    
                                 <div class="row">
+                                   
+                                    <div class="col-lg-3" id="divSearch" style="display:none;">
+                                        <label for="txtSearchKeyword">Search Keyword:</label>
+                                        <input type="text" class="form-control" name="txtSearchKeyword" id="txtSearchKeyword"  placeholder=""> <!--required-- step="1"  --> 
+                                    </div>
                                     <div class="col-lg-1" style="float: center; margin-top: 30px">
                                         <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button>
                                     </div>
                                     <div class="form-group col-lg-2">                                         
-                                        <a class="btn btn-success waves-effect waves-light" style="float: right; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="select_Project_Type(0)">Download Template</a>
+                                        <a class="btn btn-success waves-effect waves-light" style="float: right; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="LoadProjectPage(0)">Download Template</a> <!--select_Project_Type-->
                                         <a id="lnkDownload" style="display:none;"></a>
                                     </div>
                                     <div class="form-group col-lg-1">   
-                                        <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="select_Project_Type(1)" id="btnUpload">Upload</button> 
+                                        <button  type="button" class="btn btn-success waves-effect waves-light" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="LoadProjectPage(1)" id="btnUpload">Upload</button> 
                                     </div>
                                     <div class="form-group col-lg-3">
                                             <div id="imgSpinner" style="display: none">
@@ -166,6 +182,7 @@
                                         <div class="col-lg-6">
                                             <h4 class="header-title">Candidate List</h4>
                                         </div>
+                                        
                                         <!-- <div class="col-lg-6" >                                        
                                                 <button style="float: right" type="submit" id="btn_create" class="btn btn-primary">Create Candidate</a>
                                         </div> -->
@@ -593,4 +610,3 @@
                 </div>
             </div>
         </div><!--/.modal-->
-        

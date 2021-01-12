@@ -3,7 +3,8 @@ var varTable1;
 var flag = "";
 var role_id;
 var check_list = [];
-var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_'
+var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_';
+var cands='';
 
 function UploadFileData_s3(file,file_name)
 {
@@ -219,6 +220,36 @@ function Uploadfile(project_type){
     $('#mdl_project_type').modal('hide');
     $('#mdl_bulkupload_candidate').modal('show');
 }
+function ShowHideSearchValue()
+{   
+    if($('#ddlSearchType').val().toString()!="0")
+    {
+        $('#divSearch').show();
+    }
+    else{
+        $('#divSearch').hide();
+    }
+   
+    
+    //console.log(check_list)
+}
+function SelectDeSelectAll(e)
+{
+    var temp=e.target.getAttribute('value');
+    if($('#'+e.target.getAttribute('id')).is(':checked'))
+    {
+        $('[name=checkcase]').each(function () {
+                $(this).prop("checked", true);
+        });
+    }
+    else
+    {
+        $('[name=checkcase]').each(function () {
+            $(this).prop("checked", false);
+        });
+    }
+    //console.log(check_list)
+}
 function Loadcreatedbyddl(){
     var URL=$('#hdn_web_url').val()+ "/AllCreatedByBasedOnUser"
         $.ajax({
@@ -345,9 +376,9 @@ function LoadTable()
     $('#divCandidateList').show();
     vartable = $("#tbl_candidate").DataTable({
         "serverSide": true,
-        "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
+        "aLengthMenu": [[10, 50, 100], [10, 50, 100]],
         "paging": true,
-        "pageLength": 10,
+        "pageLength": 50,
         "sPaginationType": "full_numbers",
         "scrollX": true,
         "destroy": true,
@@ -367,6 +398,8 @@ function LoadTable()
                 d.created_by  = $('#ddlcreated_by').val().toString();
                 d.FromDate  = $('#FromDate').val();
                 d.ToDate  = $('#ToDate').val();
+                d.search_type = $('#ddlSearchType').val().toString();
+                d.search_keyword = $('#txtSearchKeyword').val();
             },
             error: function (e) {
                 $("#tbl_candidate tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -410,6 +443,8 @@ function LoadTable()
 function LoadTableBasedOnSearch(){
     //alert($('#ddlRegion').val().toString() + $('#ddlState').val().toString() + $('#MinAge').val() + $('#MaxAge').val())
     $("#tbl_candidate").dataTable().fnDestroy();
+    $("#addedchkall").prop("checked", false);
+    
     LoadTable();
 }
 function CandidateBasicDetails(FirstName,MiddleName,LastName,Salutation,Dob,Age,gender,MaritalStatus,Caste,Disability,religion)
@@ -459,7 +494,16 @@ function CandidateContactDetails(primary_contact,SecondaryContact,Email,PresnetA
 function DownloadRegTemplate(Project_Type){
     $("#imgSpinner").show();
     $('#mdl_project_type').modal('hide');
-    var cands=check_list.toString();
+    var candidates='';
+    $('[name=checkcase]').each(function () {
+        if($(this).prop('checked') == true)
+        {
+            candidates+= $(this).val()+',';
+        }
+        
+    });
+    cands=candidates.toString();
+    //cands=check_list.toString();
 
     if ((cands.toString().length)==0)
     {

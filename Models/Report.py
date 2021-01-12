@@ -182,7 +182,6 @@ class Report:
             temp_batch={"data":df1,"columns":columns}
             
             res=Report.CreateExcel(temp_qp,temp_region,temp_batch,path)
-            print(res)
             if res['success']:
                 return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
             else:
@@ -267,7 +266,7 @@ class Report:
                 temp={"data":df,"columns":columns} 
                 
                 res=Report.CreateExcelFun(temp,path,'Batch Status')
-                print(res)
+                #print(res)
                 if res:
                     return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
                 else:
@@ -1138,7 +1137,7 @@ class Report:
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
-            
+
     def create_client_report(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids):
         try:
             data=Database.DownloadClientReport(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids)
@@ -1306,6 +1305,7 @@ class Report:
                 os.remove( DownloadPath + i)
             path = '{}{}'.format(DownloadPath,report_name)
             res={}
+            #print("test")
             res=Report.CreateExcelSubProjectReport(data,path)
             os.chmod(DownloadPath+report_name, 0o777)
             if res['success']:
@@ -1313,6 +1313,7 @@ class Report:
             else:
                 return {"success":False,"msg":res['msg']}
         except Exception as e:
+            print(str(e))
             return {"success":False,"msg":str(e)}
     def CreateExcelSubProjectReport(data,path):
         try:
@@ -1327,7 +1328,7 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Sub-Projects') 
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Sub-Projects')
             df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Sub-Project-Center') 
             df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
@@ -1429,6 +1430,73 @@ class Report:
         except Exception as e:
             print(str(e))
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+    def download_courses_list(user_id, user_role_id, course_id, sectors, qps, status):
+        try:
+            data=Database.download_courses_list(user_id, user_role_id, course_id, sectors, qps, status)
+            DownloadPath=config.neo_report_file_path+'report file/'
+            report_name = 'Content_Report_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
+            r=re.compile('Content_Report_.*')
+            lst=os.listdir(DownloadPath)
+            newlist = list(filter(r.match, lst))
+            for i in newlist:
+                os.remove( DownloadPath + i)
+            path = '{}{}'.format(DownloadPath,report_name)
+            res={}
+            res=Report.CreateExcelContentReport(data,path)
+            os.chmod(DownloadPath+report_name, 0o777)
+            if res['success']:
+                return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
+            else:
+                return {"success":False,"msg":res['msg']}
+        except Exception as e:
+            print(str(e))
+            return {"success":False,"msg":str(e)}
+    def CreateExcelContentReport(data,path):
+        try:
+            writer = pd.ExcelWriter(path, engine='xlsxwriter')
+            workbook  = writer.book
+
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'valign': 'center',
+                'align' : 'left',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+            df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Course-QP') 
+            df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='QPs')  
+            df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Sectors')  
+            df = pd.DataFrame(data['sheet4'], columns=data['sheet4_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Course-Session')             
+            
+            first_row = ['s_no','course_code','course_name','qp_code','qp_name','course_duration_days','course_duration_hours','created by','created on','last modified by','last modified on']
+            worksheet = writer.sheets['Course-QP']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format)           
+            
+            first_row = ['S No','QP name','QP Code','sector_name','created by','created on','last modified by','last modified on']
+            worksheet = writer.sheets['QPs']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format) 
+
+            first_row = ['S No','sector_name','sector_code','created by','created on']
+            worksheet = writer.sheets['Sectors']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format) 
+            first_row = ['S No','session_plan_name','module_name','session_name','session_order','duration','created by','created on']
+            worksheet = writer.sheets['Course-Session']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format) 
+            writer.save()
+
+            return({'msg':'created excel', 'success':True, 'filename':path})
+        except Exception as e:
+            print(str(e))
+            return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+    
     def download_users_list(user_id,filter_role_id,user_region_id,user_role_id, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids):
         try:
             data=Database.download_users_list(user_id,filter_role_id,user_region_id,user_role_id, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids)
@@ -2015,7 +2083,7 @@ class Report:
             
             m_header = ["Log date","CANDIDATE ENROLLMENT NUMBER","CANDIDATE NAME","CANDIDATE EMAIL ID","BATCH CODE","BATCH START DATE","BATCH END DATE",
             "OJT START DATE","OJT END DATE","CUSTOMER NAME","SUBPROJECT NAME","SUBPROJECT CODE","CENTER NAME","CENTER TYPE","DISTRICT",
-            "STATE","REGION","BUISINESS UNIT","COURSE CODE","COURSE NAME"]
+            "STATE","REGION","BUISINESS UNIT","COURSE CODE","COURSE NAME", 'Company Name', 'Address', 'Rm Name', 'Rm Mobile Number', 'Rm Email Id']
             f_header = ["REACHED OFFICE","RECORDED TODAY'S WORK","LEFT OFFICE"]
             s_header = ["LOG DATE TIME","LOG IMAGE","LOG LOCATION","LOG DATE TIME","RECORDING","LOG LOCATION","LOG DATE TIME","LOG IMAGE","LOG LOCATION"]
             df.to_excel(writer, index=None, header=None, startrow=2 ,sheet_name='OJT Report')
@@ -2024,10 +2092,10 @@ class Report:
                 worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
 
             for col_num, value in enumerate(s_header):
-                worksheet.write(1, 20+col_num, value, header_format)
+                worksheet.write(1, 25+col_num, value, header_format)
 
             for col_num, value in enumerate(f_header):
-                worksheet.merge_range(0, 20+col_num*3, 0, 22+col_num*3, value, second_header_format)
+                worksheet.merge_range(0, 25+col_num*3, 0, 27+col_num*3, value, second_header_format)
 
             writer.save()
             return({'Description':'created excel', 'Status':True, 'filename':file_name})
@@ -2317,4 +2385,52 @@ class Report:
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
-          
+    
+    def create_download_trainer_filter(user_id, user_role_id, centers, entity_ids, Dept, Region_id, Cluster_id, status, TrainerType, user_region_id, project_ids, sector_ids):
+        try:
+            data=Database.download_trainer_filter(user_id, user_role_id, centers, entity_ids, Dept, Region_id, Cluster_id, status, TrainerType, user_region_id, project_ids, sector_ids)
+            DownloadPath=config.neo_report_file_path+'report file/'
+            report_name = 'Trainer_Filtered_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
+            r=re.compile('Trainer_Filtered_.*')
+            lst=os.listdir(DownloadPath)
+            newlist = list(filter(r.match, lst))
+            for i in newlist:
+                os.remove( DownloadPath + i)
+            path = '{}{}'.format(DownloadPath,report_name)
+            res={}
+            res=Report.CreateExcelTrainerReport(data,path)       
+            os.chmod(DownloadPath+report_name, 0o777)
+            if res['success']:
+                return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
+            else:
+                return {"success":False,"msg":res['msg']}
+        except Exception as e:
+            return {"success":False,"msg":str(e)}
+    def CreateExcelTrainerReport(data,path):
+        try:
+            writer = pd.ExcelWriter(path, engine='xlsxwriter')
+            workbook  = writer.book
+            
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'valign': 'center',
+                'align' : 'left',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+            df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
+            default_column = ['User_Name', 'Email', 'Mobile_Number', 'Entity_Name', 'Employee_Department_Name', 'Region_Name',
+            'Project_Name', 'Sector_Name', 'Employment_Status', 'Created_By', 'Created_On', 'Modified_By', 'Modified_On']
+            #'User_Role_Name', 'Center_Name', , 'Center_Id', 'Is_Active', 
+            df = df[default_column]
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Trainer List')
+
+            first_row = ['Trainers Name', 'Email', 'Mobile Number', 'Entity', 'Business Unit', 'Region',
+            'Project', 'Sector', 'Employee Status', 'Created By', 'Created On', 'Modified By', 'Modified On']
+            worksheet = writer.sheets['Trainer List']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, col_num, value, header_format)
+            writer.save()
+            return({'msg':'created excel', 'success':True, 'filename':path})
+        except Exception as e:
+            return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})

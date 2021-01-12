@@ -927,7 +927,7 @@ function add_map_message(){
                                         txt+='<a onclick="DownloadAssessmentResult(\'' + data.Assessments[i].Assessment_Id + '\',\'' + data.Assessments[i].Batch_Code + '\')" class="user-btn" style="cursor:pointer" ><i title="Download Assessment Result" class="fe-download" ></i></a>';
                                     if (data.Assessments[i].Assessment_Stage_Id<3 && (data.Assessments[i].Mobilization_Type!=4)  )
                                     {
-                                        if( !(($("#hdn_home_user_role_id ").val() == "7" || $("#hdn_home_user_role_id ").val() == "5"||$("#hdn_home_user_role_id ").val() == "38"|| $("#hdn_home_user_role_id ").val() == "14") & (data.Assessments[i].Assessment_Types_Name=="Final Summative" || data.Assessments[i].Assessment_Types_Name=="Summative" )))  
+                                        if( !(($("#hdn_home_user_role_id ").val() == "7" ) & (data.Assessments[i].Assessment_Types_Name=="Final Summative" || data.Assessments[i].Assessment_Types_Name=="Summative" )))  
                                             txt+='<a onclick="EditAssessmentDetails(\'' + data.Assessments[i].Assessment_Id + '\',\''+ data.Assessments[i].Partner_Category_Id +'\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Edit Assessment Detail" class="fe-edit-1" ></i></a>';
                                     }
                                     if ((data.Assessments[i].Mobilization_Type==4 & ($("#hdn_home_user_role_id ").val() == "5" || $("#hdn_home_user_role_id ").val() == "1" ))||(data.Assessments[i].Assessment_Stage_Id==3 & ($('#hdn_home_user_role_id').val()!='5'||(data.Assessments[i].Assessment_Agency_Id==1 & ($('#hdn_home_user_role_id').val()=='5'||$('#hdn_home_user_role_id').val()=='38') ))  & $('#hdn_home_user_role_id').val()!='14'))
@@ -938,7 +938,7 @@ function add_map_message(){
                                                                       
                                     if (((data.Assessments[i].Assessment_Stage_Id>=3 || (data.Assessments[i].Mobilization_Type==4)) & $('#hdn_home_user_role_id').val()!='25')  )
                                         txt+='<a onclick="Reassessment(\'' + data.Assessments[i].Assessment_Id + '\',\''+ data.Assessments[i].Batch_Id +'\',\''+ data.Assessments[i].Partner_Category_Id +'\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\',\'' + data.Assessments[i].Mobilization_Type + '\')" class="user-btn" style="cursor:pointer" ><i title="Schedule Reassessment" class="fe-edit" ></i></a>';
-                                    if($('#hdn_home_user_role_id').val()!='37' & $('#hdn_home_user_role_id').val()!='28')
+                                    if($('#hdn_home_user_role_id').val()!='37' & $('#hdn_home_user_role_id').val()!='28'  & $('#hdn_home_user_role_id').val()!='11')
                                         varHtml+='  <td style="text-align:center;">'+ txt +'</td>';
                                     else
                                         varHtml+='  <td style="text-align:center;">'+ ''+'</td>';
@@ -1290,6 +1290,7 @@ function add_map_message(){
     }
     function ScheduleAssessment()
     {   console.log($('#ddlPartner').val());
+        var cur_date = new Date(); // toDateString
         var DateRequested = new Date($('#TxtRequestedDate').val());
         var DateScheduled = new Date($('#TxtScheduledDate').val());
         var DateAssessed = new Date($('#TxtAssessmentDate').val());
@@ -1309,6 +1310,12 @@ function add_map_message(){
         else if($('#TxtRequestedDate').val()=='')
         {
             alert("Please enter proposed date.");
+            return false;
+        }
+        else if(new Date(cur_date.toDateString())>=new Date(DateRequested.toDateString()))
+        {
+            //console.log($('#hdn_current_stage_id').val())
+            alert("Assessment cannot be scheduled for the same day. Please schedule the future dates.");
             return false;
         }
         else if(($('#hdn_mobilization_type').val().toString())=="4")

@@ -15,7 +15,7 @@ import os
 import xlsxwriter,re,os,zipfile,zlib 
 
 
-def to_xml(df, filename=None, mode='w'):
+def to_xml(df, filename=None, mode='wb'):
     if len(df)>0:
         if 'Candidate_Family_Details_Id' in df:
             df1=df[['Candidate_Id','Family_Salutation','Family_Name','Family_Date_Of_Birth','Family_Age','Family_Primary_Contact','Family_Email_Address','Family_Gender','Family_Education','Family_Relationship','Family_Current_Occupation','Candidate_Family_Details_Id']]
@@ -70,7 +70,7 @@ def to_xml(df, filename=None, mode='w'):
     if filename is None:
         return res
     with open(filename, mode) as f:
-        f.write(res)
+        f.write(bytes(res, 'utf-8'))
 
 pd.DataFrame.to_xml = to_xml
 
@@ -1299,6 +1299,24 @@ class Database:
         else:
             msg={"message":"Error in tagging"}
         return msg
+    def assign_batch_candidates(candidates,batch_id,tagged_by):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[batches].[assign_batch_candidates] ?, ?, ?'
+        values = (candidates,batch_id,tagged_by)
+        print(values)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[0]
+        cur.commit()
+        cur.close()
+        con.close()
+        print(pop)
+        if pop >0:
+            msg={"message":"Batch Assigned"}
+        else:
+            msg={"message":"Error in tagging"}
+        return msg
     def cancel_planned_batch(user_id,planned_batch_code,cancel_reason):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -1534,15 +1552,15 @@ class Database:
         con.close()
         return content
            
-    def mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,created_by,FromDate, ToDate):
+    def mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge,search_type,search_keyword, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,created_by,FromDate, ToDate):
         content = {}
         d = []
         h={}
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_M] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,created_by,FromDate, ToDate)
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_M] ?, ?,?,? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (candidate_id,region_ids, state_ids, MinAge, MaxAge,search_type,search_keyword, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,created_by,FromDate, ToDate)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -1558,15 +1576,15 @@ class Database:
         con.close()
         return content
 
-    def registered_list(candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def registered_list(candidate_id,region_ids, state_ids, Pincode,search_type,search_keyword, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
         h={}
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_R] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_R] ?, ?, ?, ?, ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (candidate_id,region_ids, state_ids, Pincode,search_type,search_keyword, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -1582,15 +1600,15 @@ class Database:
         con.close()
         return content
     
-    def enrolled_list(candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def enrolled_list(candidate_id,region_ids, state_ids, Pincode,search_type,search_keyword, created_by,project_type,candidate_stage, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
         h={}
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_E] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [candidate_details].[sp_get_candidate_web_list_new_E] ?, ?, ?,?,?, ?, ?, ?, ?,?,?, ?, ?, ?, ?, ?, ?, ?'
+        values = (candidate_id,region_ids, state_ids, Pincode,search_type,search_keyword, created_by, project_type,candidate_stage,FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -3502,36 +3520,22 @@ SELECT					cb.name as candidate_name,
         return response
 
     @classmethod
-    def download_trainer_filter(cls, user_id, user_role_id, centers, status, path):
+    def download_trainer_filter(cls, user_id, user_role_id, centers, entity_ids, Dept, Region_id, Cluster_id, status, TrainerType, user_region_id, project_ids, sector_ids):
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [users].[sp_get_trainer_list_download] ?, ?, ?, ?'
-        values = (user_id, user_role_id, centers, status)
+        sql = 'exec [users].[sp_get_trainer_list_download] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id, user_role_id, centers, entity_ids, Dept, Region_id, Cluster_id, status, TrainerType, user_region_id, project_ids, sector_ids)
         cur.execute(sql,(values))
 
-        columns = [column[0].title() for column in cur.description]
-        data=cur.fetchall()
+        sheet1_columns = [column[0].title() for column in cur.description]        
+        data = cur.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))   
 
-        writer = pd.ExcelWriter(path, engine='xlsxwriter')
-        workbook  = writer.book
-
-        header_format = workbook.add_format({
-            'bold': True,
-            'text_wrap': True,
-            'valign': 'center',
-            'fg_color': '#D7E4BC',
-            'border': 1})
-
-        df = pd.DataFrame(data)
-        df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Trainer List')
-        worksheet = writer.sheets['Trainer List']
-        for col_num, value in enumerate(columns):
-            worksheet.write(0, col_num, value, header_format)
-        writer.save()
         cur.close()
         con.close()
-        return True
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+        
     def GetAllContractStages():
         client = []
         con = pyodbc.connect(conn_str)
@@ -4049,7 +4053,22 @@ SELECT					cb.name as candidate_name,
         con.close()
         #print(Batches)
         return Batches
+    def get_batches_based_on_project_type(user_id,user_role_id,project_type):
+        Batches = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
 
+        sql = 'exec [masters].[sp_get_batches_based_on_project_type] ?,?,?'
+        values=(user_id,user_role_id,project_type)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for r in cur2:
+            h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            Batches.append(h)
+        cur2.close()
+        con.close()
+        #print(Batches)
+        return Batches
 
     def Get_all_industry_db():
         response=[]
@@ -5303,6 +5322,29 @@ SELECT					cb.name as candidate_name,
             conn.close()
             out = {'success': False, 'description': "Lower App Version", 'app_status':False}
             return out
+        
+        #url = candidate_xml_weburl + xml
+        url = download_aws_url+aws_location+'neo_app/xml_files/'+'mobilization/' +xml
+
+        r = requests.get(url)
+        data = r.text
+        root = ET.fromstring(data)
+        out = []
+        json_array_cont = []
+        for child in root:
+            temp_data = child.attrib
+            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
+
+        sql = 'exec	[masters].[sp_validate_upload_mobh_contact_info] ?'
+        values = (json.dumps(json_array_cont),)
+        curs.execute(sql,(values))
+        vali = curs.fetchall()
+
+        if vali!=[]:
+            vali = [i[0] for i in vali]
+            out = {'success': False, 'description': '\n'.join(vali), 'app_status':True}
+            return out
+
         try:
             '''
             insert into candidate_details.tbl_candidate_interventions
@@ -5326,13 +5368,6 @@ SELECT					cb.name as candidate_name,
             (candidate_id,present_address_line2,present_village,present_panchayat,present_taluk_block,permanent_address_line2,permanent_village,permanent_panchayat,permanent_taluk_block,created_on,created_by,is_active)
             values
             '''
-            #url = candidate_xml_weburl + xml
-            url = download_aws_url+aws_location+'neo_app/xml_files/'+'mobilization/' +xml
-
-            r = requests.get(url)
-            data = r.text
-            root = ET.fromstring(data)
-            out = []
             
             for child in root:
                 data = child.attrib
@@ -5718,8 +5753,8 @@ SELECT					cb.name as candidate_name,
         r = requests.get(url)
         data = r.text
         root = ET.fromstring(data)
-
         json_array = []
+        json_array_cont = []
         mobilization_type = 1
         for child in root:
             temp_data = child.attrib
@@ -5727,6 +5762,17 @@ SELECT					cb.name as candidate_name,
                 mobilization_type = temp_data['mobilization_type']
             if 'assign_batch' in temp_data:
                 json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
+            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
+
+        sql = 'exec	[masters].[sp_validate_upload_mobh_contact_info] ?'
+        values = (json.dumps(json_array_cont),)
+        curs.execute(sql,(values))
+        vali = curs.fetchall()
+
+        if vali!=[]:
+            vali = [i[0] for i in vali]
+            out = {'success': False, 'description': '\n'.join(vali), 'app_status':True}
+            return out
         
         if int(mobilization_type)==1:
             if json_array!=[]:
@@ -6102,12 +6148,11 @@ SELECT					cb.name as candidate_name,
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         try:
-
             quer_user  = "(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id left join users.tbl_partner_users as up on up.user_id=u.user_id where u.is_active=1 and ((ud.email like trim('{}')) OR (up.email like trim('{}'))))"
             
             quer1 = '''
             insert into candidate_details.tbl_candidates
-            (isFresher, salutation, first_name, middle_name, last_name, date_of_birth, isDob, age,primary_contact_no, secondary_contact_no, email_id, gender,marital_status, caste, disability_status, religion, source_of_information, present_pincode,present_district, permanent_district,permanent_pincode,candidate_stage_id, candidate_status_id, created_on, created_by, is_active, insert_from,present_state, present_country,permanent_state,permanent_country,project_type)
+            (isFresher, salutation, first_name, middle_name, last_name, date_of_birth, isDob, age,primary_contact_no, secondary_contact_no, email_id, gender,marital_status, caste, disability_status, religion, source_of_information, present_pincode,present_district, permanent_district,permanent_pincode,candidate_stage_id, candidate_status_id, created_on, created_by, is_active, insert_from,present_state, present_country,permanent_state,permanent_country)
             OUTPUT inserted.candidate_id
             values
             '''
@@ -6135,18 +6180,11 @@ SELECT					cb.name as candidate_name,
 
             df['Date of Birth*'] = df['Date of Birth*'].astype(str)
             out = df.values.tolist()
-            p=0
-            if ProjectType==1:#sell
-                p=4
-            elif ProjectType==2:#she
-                p=2
-            else:#regular 3
-                p=1
-
+            
             for row in out:
-                quer = "({},'{}','{}','{}','{}','{}',{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},1,'w',{},'{}',{},'{}',{}),".format(1 if row[0]=='Fresher' else 0,row[2],row[3],row[4],row[5],row[6],
+                quer = "({},'{}','{}','{}','{}','{}',{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',1,2,GETDATE(),{},1,'w',{},{},{},{}),".format(1 if row[0]=='Fresher' else 0,row[2],row[3],row[4],row[5],row[6],
                 1 if row[7]=='' else 0,row[7] if row[7]!='' else 0,row[8],row[10],row[11],row[12],row[13],row[14],row[15],row[16],row[17],row[25],row[23],row[32],row[34],quer_user.format(row[36],row[36]),
-                "(select state_id from masters.tbl_states where state_name like trim('{}'))".format(row[24]),'1',"(select state_id from masters.tbl_states where state_name like trim('{}'))".format(row[33]),'1',p)
+                "(select state_id from masters.tbl_states where state_name like trim('{}'))".format(row[24]),'1',"(select state_id from masters.tbl_states where state_name like trim('{}'))".format(row[33]),'1')
                 quer1 += '\n'+quer
             quer1 = quer1[:-1]+';'
             #print(quer1)
@@ -6157,21 +6195,21 @@ SELECT					cb.name as candidate_name,
             for i in range(len(d)):
                 quer2 += '\n' + "({},'{}','{}','{}',GETDATE(),{},1,'{}'),".format(d[i],out[i][1],out[i][18],out[i][27],quer_user.format(out[i][36],out[i][36]),out[i][9])
                 quer3 += '\n' + "({},'{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(d[i],out[i][19],out[i][20],out[i][21],out[i][22],out[i][28],out[i][29],out[i][30],out[i][31],quer_user.format(out[i][36],out[i][36]))
-                quer4 += '\n' + "({},4,'','','',GETDATE(),{},1),".format(d[i],quer_user.format(out[i][36],out[i][36]))
-                quer5 +=  '\n' + "({},3,{},GETDATE(),1),".format(d[i],quer_user.format(out[i][36],out[i][36]))
+                # quer4 += '\n' + "({},4,'','','',GETDATE(),{},1),".format(d[i],quer_user.format(out[i][36],out[i][36]))
+                # quer5 +=  '\n' + "({},3,{},GETDATE(),1),".format(d[i],quer_user.format(out[i][36],out[i][36]))
 
             quer2 = quer2[:-1]+';'
             quer3 = quer3[:-1]+';'
-            quer4 = quer4[:-1]+';'
-            quer5 = quer5[:-1]+';'
+            # quer4 = quer4[:-1]+';'
+            # quer5 = quer5[:-1]+';'
 
-            if ProjectType==1:
-                quer =  quer2 + '\n' + quer3 + '\n' + quer4
-            elif ProjectType==2:
-                quer =  quer2 + '\n' + quer3 + '\n' + quer5
-            else:
-                quer =  quer2 + '\n' + quer3
-            #print(quer)
+            # if ProjectType==1:
+            #     quer =  quer2 + '\n' + quer3 + '\n' + quer4
+            # elif ProjectType==2:
+            #     quer =  quer2 + '\n' + quer3 + '\n' + quer5
+            # else:
+            #     quer =  quer2 + '\n' + quer3
+            quer =  quer2 + '\n' + quer3
             cur.execute(quer)
             cur.commit()
             out = {'Status': True, 'message': "Submitted Successfully"}
@@ -6226,8 +6264,15 @@ SELECT					cb.name as candidate_name,
 
             quer_user  = "(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id left join users.tbl_partner_users as up on up.user_id=u.user_id where u.is_active=1 and ((ud.email like trim('{}')) OR (up.email like trim('{}'))))"
             #  quer_user.format(row[36],row[36])
+            p=0
+            if ProjectType==1:#sell
+                p=4
+            elif ProjectType==2:#she
+                p=2
+            else:#regular 3
+                p=1
             quer1 = '''
-            update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',secondary_contact_no='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=2,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1 where candidate_id='{}';
+            update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',secondary_contact_no='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=2,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1,project_type={} where candidate_id='{}';
             '''
             quer2='''
             update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where UPPER(identification_name)=UPPER('{}')),identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',present_address_line1='{}',permanaet_address_line1='{}',created_by={},created_on=GETDATE(),is_active=1 ,whatsapp_number='{}',aadhar_image_name='{}' where candidate_id='{}';
@@ -6235,9 +6280,36 @@ SELECT					cb.name as candidate_name,
             quer3='''
             update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set present_address_line2='{}',present_village='{}',present_panchayat='{}',present_taluk_block='{}',permanent_address_line2='{}',permanent_village='{}',permanent_panchayat='{}',permanent_taluk_block='{}',created_by={},created_on=GETDATE(),is_active=1 where candidate_id='{}';
             '''
+            
+            # quer4 = '''
+            # update candidate_details.tbl_candidate_dell_details set	[Educational Marksheet]='{}', [Aspirational District]='{}', [Income Certificate]='{}', created_by={}, created_on=GETDATE(), is_active=1 where	candidate_id='{}' 
+            # '''
+
             quer4 = '''
-            update candidate_details.tbl_candidate_dell_details set	[Educational Marksheet]='{}', [Aspirational District]='{}', [Income Certificate]='{}', created_by={}, created_on=GETDATE(), is_active=1 where	candidate_id='{}' 
+            insert into candidate_details.tbl_candidate_dell_details
+            (candidate_id, mobilization_type, [Educational Marksheet], [Aspirational District], [Income Certificate],created_on,created_by,is_active)
+            values
             '''
+
+            quer5 = '''
+            insert into candidate_details.tbl_candidate_she_details
+            (candidate_id,mobilization_type,created_by,created_on,is_active)
+            values
+            '''
+            for row in out:
+                quer4 += '\n' + "({},4,'{}','{}','{}',GETDATE(),{},1),".format(row[0],row[58],row[59],row[60],quer_user.format(row[56],row[56]))
+                quer5 +=  '\n' + "({},3,{},GETDATE(),1),".format(d[i],quer_user.format(out[i][36],out[i][36]))
+
+            quer4 = quer4[:-1]+';'
+            quer5 = quer5[:-1]+';'
+
+            if ProjectType==1:
+                cur.execute(quer4)
+                cur.commit()
+            elif ProjectType==2:
+                cur.execute(quer5)
+                cur.commit()
+                
             quer7_res=''
             if (ProjectType==2):
                 out_she = df_she.values.tolist()
@@ -6255,24 +6327,24 @@ SELECT					cb.name as candidate_name,
             query = ""
             if (ProjectType==1):
                 for row in out:
-                    query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[10],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],quer_user.format(row[56],row[56]),row[0])
+                    query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[10],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],quer_user.format(row[56],row[56]),p,row[0])
                     query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[23],row[32],quer_user.format(row[56],row[56]),row[57],row[55],row[0])
                     query += '\n' + quer3.format(row[24],row[25],row[26],row[27],row[33],row[34],row[35],row[36],quer_user.format(row[56],row[56]),row[0])
 
-                    query += '\n' + quer4.format(row[58],row[59],row[60],quer_user.format(row[56],row[56]),row[0])
+                    # query += '\n' + quer4.format(row[58],row[59],row[60],quer_user.format(row[56],row[56]),row[0])
             else:
                 quer2='''
                 update candidate_details.tbl_candidate_reg_enroll_details set mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where UPPER(identification_name)=UPPER('{}')),identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',present_address_line1='{}',permanaet_address_line1='{}',created_by={},created_on=GETDATE(),is_active=1 ,whatsapp_number='{}',aadhar_image_name='{}' where candidate_id='{}';
                 '''
                 for row in out:
-                    query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[7]=='' else 0,row[46],row[2],row[3],row[4],row[5],row[6],row[7],row[9],row[11],row[12],row[13],row[14],row[15],row[19],row[27],row[28],row[29],row[30],row[36],row[37],row[38],row[39],quer_user.format(row[55],row[55]),row[0])
+                    query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[7]=='' else 0,row[46],row[2],row[3],row[4],row[5],row[6],row[7],row[9],row[11],row[12],row[13],row[14],row[15],row[19],row[27],row[28],row[29],row[30],row[36],row[37],row[38],row[39],quer_user.format(row[55],row[55]),p,row[0])
                     query += '\n' + quer2.format(row[16],row[17],row[18],row[20],row[21],row[40],row[41],row[42],row[43],row[44],row[45],row[47],row[48],row[49],row[50],row[51],row[52],row[53],row[22],row[31],quer_user.format(row[55],row[55]),row[56],row[54],row[0])
                     query += '\n' + quer3.format(row[23],row[24],row[25],row[26],row[32],row[33],row[34],row[37],quer_user.format(row[55],row[55]),row[0])
                     
                 if ProjectType==2:
                     query += quer7_res
                
-            #print(query)
+            
             cur.execute(query)
             cur.commit()
             out = {'Status': True, 'message': "Submitted Successfully"}
@@ -7494,7 +7566,6 @@ SELECT					cb.name as candidate_name,
         sheet1_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
         sheet1 = list(map(lambda x:list(x), data))        
-
         curs.execute(sql1,(values))
         sheet2_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
@@ -8046,6 +8117,43 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns,'sheet2':sheet2,'sheet2_columns':sheet2_columns,'sheet3':sheet3,'sheet3_columns':sheet3_columns,'sheet4':sheet4,'sheet4_columns':sheet4_columns}
+    def download_courses_list(user_id, user_role_id, course_id, sectors, qps, status):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        sheet2=[]
+        sheet2_columns=[]
+        sheet3=[]
+        sheet3_columns=[]
+        sheet4=[]
+        sheet4_columns=[]
+        sql = 'exec [reports].[sp_get_course_download] ?, ?, ?,?, ?, ?'
+        sql1 = 'exec [reports].[sp_get_qp_download]?, ?, ?,?, ?, ?'
+        sql2 = 'exec [reports].[sp_get_sector_download] ?, ?, ?,?, ?, ?'
+        sql3 = 'exec [reports].[sp_get_course_session_download]?, ?, ?,?, ?, ?'
+        values = (user_id, user_role_id, course_id, sectors, qps, status)
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))
+        curs.execute(sql1,(values))
+        sheet2_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet2 = list(map(lambda x:list(x), data))  
+        curs.execute(sql2,(values))
+        sheet3_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet3 = list(map(lambda x:list(x), data))
+        curs.execute(sql3,(values))
+        sheet4_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet4 = list(map(lambda x:list(x), data)) 
+         
+        curs.close()
+        cnxn.close()
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns,'sheet2':sheet2,'sheet2_columns':sheet2_columns,'sheet3':sheet3,'sheet3_columns':sheet3_columns,'sheet4':sheet4,'sheet4_columns':sheet4_columns}
+    
     def download_users_list(user_id,filter_role_id,user_region_id,user_role_id, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
@@ -8205,3 +8313,56 @@ SELECT					cb.name as candidate_name,
         curs.close()
         con.close()
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+
+    def SaveRmInfo(user_id, batch_id, CompanyName, Address, RMName, RMmobilenumber, RMemailid):
+        conn = pyodbc.connect(conn_str)
+        curs = conn.cursor()
+        # quer = "SELECT TOP (1) version_code FROM [masters].[tbl_mclg_app_version_history] order by id desc"
+        # curs.execute(quer)
+        # data=curs.fetchall()
+        # data = '' if data==[] else data[0][0]
+        # if int(app_version) < int(data):
+        #     curs.close()
+        #     conn.close()
+        #     out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+        #     return out
+        try:
+            quer = '''
+            INSERT INTO candidate_details.[tbl_map_candidate_rm_info]
+            ([candidate_id], [batch_id], [Company_Name], [Address], [RM_Name], [RM_mobile_number], [RM_email_id], [created_on], [created_by], [is_active])
+            VALUES
+            '''
+            quer += "({},{},'{}','{}','{}','{}','{}',GETDATE(),{},1)".format(user_id, batch_id, CompanyName, Address, RMName, RMmobilenumber, RMemailid, user_id)
+            
+            curs.execute(quer)
+            curs.commit()
+            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
+        except Exception as e:
+            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+        finally:
+            curs.close()
+            conn.close()
+            return out
+
+    def get_OJT_History(user_id, batch_id):
+        response = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        try:
+            sql = 'exec [masters].[sp_get_OJT_History] ?, ?'
+            values = (user_id, batch_id)
+            cur2.execute(sql,(values))
+            #cur2.commit()
+            data = list(map(lambda x:list(x), cur2.fetchall()))
+            if len(data)==0:
+                out = {'success': True, 'description': "No data found", 'app_status':True, 'data':[]}
+            else:
+                for temp in data:
+                    response.append({'date':temp[2], 'stage1':temp[3], 'stage2':temp[4], 'stage3':temp[5]})
+                out = {'success': True, 'description': "No data found", 'app_status':True, 'data':response}
+        except Exception as e:
+            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+        finally:
+            cur2.close()
+            con.close()
+            return out
