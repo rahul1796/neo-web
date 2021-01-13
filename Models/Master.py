@@ -262,7 +262,9 @@ class Master:
     def tag_users_from_sub_project(user_id,sub_project_id,tagged_by):
         popupMessage = {"PopupMessage": Database.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)}
         return popupMessage
-
+    def assign_batch_candidates(candidates,batch_id,tagged_by):
+        popupMessage = {"PopupMessage": Database.assign_batch_candidates(candidates,batch_id,tagged_by)}
+        return popupMessage
     def GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id):
         return Database.GetSubProjectPlannedBatches(sub_project_id,course_id,is_assigned,planned_batch_id)
 

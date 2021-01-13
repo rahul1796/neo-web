@@ -90,8 +90,18 @@
                                                 <option selected="" value="">All</option>
                                             </select>
                                         </div>
-                                        <div class="col-lg-3">
+                                        <div class="col-lg-1">
                                                 <button  type="button" style="margin-top: 30px;" class="btn btn-success waves-effect waves-light" onclick="LoadTableBasedOnSearch()">Search</button> <!--float: right;   -->
+                                        </div>
+                                        <div class="col-lg-2" >                                        
+                                            <button style="float: left;margin-top: 30px" type="button" id="btn_download" class="btn btn-primary waves-effect waves-light submit" 
+                                            onclick="DownloadTableBasedOnSearch()">Download</button></div>
+                                       
+                                        <div class="form-group col-lg-3">
+                                            <div id="imgSpinner" style="display: none;">
+                                                <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-none;"/>
+                                                <label style="display:inline-block;">Please wait while downloading report...</label>
+                                            </div> 
                                         </div><!-- end col-->
                                     </div> <!-- end row -->
                                 </div> <!-- end card-box -->

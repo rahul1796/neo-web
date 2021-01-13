@@ -2,7 +2,7 @@ var varTable;
 var varTable1;
 var flag = "";
 var role_id;
-var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_'
+var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_';
 
 function uploadFileToS3(file, s3Data, url){
     var xhr = new XMLHttpRequest();
@@ -145,6 +145,19 @@ function Uploadfile(project_type){
     $('#mdl_project_type').modal('hide');
     $('#mdl_bulkupload_candidate').modal('show');
 }
+function ShowHideSearchValue()
+{   
+    if($('#ddlSearchType').val().toString()!="0")
+    {
+        $('#divSearch').show();
+    }
+    else{
+        $('#divSearch').hide();
+    }
+   
+    
+    //console.log(check_list)
+}
 function Loadcreatedbyddl(){
     var URL=$('#hdn_web_url').val()+ "/AllCreatedByBasedOnUser"
         $.ajax({
@@ -271,9 +284,9 @@ function LoadTable()
     $('#divCandidateList').show();
     vartable = $("#tbl_candidate").DataTable({
         "serverSide": true,
-        "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
+        "aLengthMenu": [[10, 50, 100], [10, 50, 100]],
         "paging": true,
-        "pageLength": 10,
+        "pageLength": 50,
         "sPaginationType": "full_numbers",
         "scrollX": true,
         "destroy": true,
@@ -294,6 +307,8 @@ function LoadTable()
                 d.created_by  = $('#ddlcreated_by').val().toString();
                 d.FromDate  = $('#FromDate').val();
                 d.ToDate  = $('#ToDate').val();
+                d.search_type = $('#ddlSearchType').val().toString();
+                d.search_keyword = $('#txtSearchKeyword').val();
             },
             error: function (e) {
                 $("#tbl_candidate tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');

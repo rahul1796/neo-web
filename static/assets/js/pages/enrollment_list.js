@@ -4,6 +4,7 @@ var flag = "";
 var role_id;
 var check_list = [];
 var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_';
+var cands='';
 
 function UploadFileData_s3(file,file_name)
 {
@@ -68,7 +69,141 @@ function toggleCheckbox(e)
         }
         //console.log(check_list)
     }
+function Loadcandidatestatusddl(){
+    
+        $('#ddlcandidateStage').empty();
+        $('#ddlcandidateStage').append(new Option('Registered','2'));
+        $('#ddlcandidateStage').append(new Option('Enrolled','3'));
+        
+     
+}
+function ShowHideEnrolmentButton(){
+    if(($('#ddlProjectTypes').val().toString()=="2") || ($('#ddlProjectTypes').val().toString()=="4"))
+    {
+        $("#btnAssignBatch").show();
+    }
+    else{
+        $("#btnAssignBatch").hide();
+    }
+}
+function LoadBatchesForSelectedType(){
+    var candidates='';
+    $('[name=checkcase]').each(function () {
+        if($(this).prop('checked') == true)
+        {
+            candidates+= $(this).val()+',';
+        }
+        
+    });
+    //candidates=candidates.substring(0,candidates.length-1);
+    if(candidates=='')
+    {
+        alert("Please select atleast one candidate!" );
+        return false;
+    }
 
+    cands=candidates.toString();
+    //alert(cands);
+    LoadBatchesBasedOnProjectType($("#ddlProjectTypes").val());
+    $("#ddlProjectTypeAssignBatch").val(($("#ddlProjectTypes").val()));
+    if(($("#ddlcandidateStage").val().toString()=="3"))
+    {
+        $("#lblAssignBatchTitle").text('Select Batch for re-enrolment:');
+    
+    }
+    $('#mdl_assign_batch').modal('show');
+
+}
+function AssignBatch()
+{
+    if ($('#ddlBatches').val()=='')
+    {
+        alert('Select a batch to assign candidates.');
+    }
+    else
+    {
+       var URL=$('#hdn_web_url').val()+ "/assign_batch_candidates";
+            $.ajax({
+                type:"POST",
+                url:URL,
+                data:{
+                    "batch_id": $('#ddlBatches').val().toString(),
+                    "candidate_id": cands,
+                    "user_id": $('#hdn_home_user_id').val()
+
+                },
+                success:function(data){
+                    if(data.PopupMessage.message =="Batch Assigned")
+                    {
+                        swal({   
+                            title:data.PopupMessage.message,
+                            text:data.PopupMessage.message+"!!",
+                            icon:"success",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                window.location.href = '/enrollment';                          
+                            });
+
+                    }
+                    else{
+                        swal({   
+                            title:data.PopupMessage.message,
+                            text:data.PopupMessage.message+"!!",
+                            icon:"error",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                 window.location.href = '/enrollment';                          
+                            });
+                    }
+                        
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+    }
+}
+function LoadBatchesBasedOnProjectType(project_type){
+    //alert($('#ddlProject').val().toString())
+    var URL=$('#hdn_web_url').val()+ "/get_batches_based_on_project_type"
+    $.ajax({
+        type:"POST",
+        url:URL,
+        async:false,
+        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        datatype:"json",
+        data:{
+            "project_type":project_type,
+            "user_id": $('#hdn_home_user_id').val(),
+            "user_role_id": $('#hdn_home_user_role_id').val()
+        },
+        success: function (data){
+            if(data.Batches != null)
+            {
+                $('#ddlBatches').empty();
+                var count=data.Batches.length;
+                if( count> 0)
+                {
+                    //$('#ddlCourse').append(new Option('ALL','-1'));
+                    for(var i=0;i<count;i++)
+                        $('#ddlBatches').append(new Option(data.Batches[i].Batch_Code,data.Batches[i].Batch_Id));
+                }
+                else
+                {
+                    $('#ddlBatches').append(new Option('ALL','-1'));
+                }
+            }
+        },
+        error:function(err)
+        {
+            alert('Error! Please try again');
+            return false;
+        }
+    });
+    return false;
+}
     function UploadFileData()
     {
     var ins = document.getElementById('myFile').files.length;
@@ -342,15 +477,46 @@ function BatchModal(QpCode,QpName,CourseCode,CourseName,BatchCode,StartDate,EndD
     $('#txtBatchActiveStatus').val(BatchActiveStatus);
     $('#con_close_modal').modal('show');
     }
+
+function SelectDeSelectAll(e)
+{
+    var temp=e.target.getAttribute('value');
+    if($('#'+e.target.getAttribute('id')).is(':checked'))
+    {
+        $('[name=checkcase]').each(function () {
+                $(this).prop("checked", true);
+        });
+    }
+    else
+    {
+        $('[name=checkcase]').each(function () {
+            $(this).prop("checked", false);
+        });
+    }
+    //console.log(check_list)
+}
+function ShowHideSearchValue()
+{   
+    if($('#ddlSearchType').val().toString()!="0")
+    {
+        $('#divSearch').show();
+    }
+    else{
+        $('#divSearch').hide();
+    }
+   
+    
+    //console.log(check_list)
+}
 function LoadTable()
 {   //console.log($("#ddlRegion").val().toString(),$("#ddlState").val().toString(),$("#MinAge").val().toString(),$("#MaxAge").val().toString())
     var user_role_id = $('#hdn_home_user_role_id').val();
     $('#divCandidateList').show();
     vartable = $("#tbl_candidate").DataTable({
         "serverSide": true,
-        "aLengthMenu": [[10, 25, 50], [10, 25, 50]],
+        "aLengthMenu": [[10, 50, 100], [10, 50, 100]],
         "paging": true,
-        "pageLength": 10,
+        "pageLength": 50,
         "sPaginationType": "full_numbers",
         "scrollX": true,
         "destroy": true,
@@ -368,8 +534,13 @@ function LoadTable()
                 d.state_ids = $('#ddlState').val().toString();
                 d.Pincode = $('#Pincode').val().toString();
                 d.created_by  = $('#ddlcreated_by').val().toString();
+                d.project_type  = $('#ddlProjectTypes').val();
+                d.candidate_stage  = $('#ddlcandidateStage').val();
                 d.FromDate  = $('#FromDate').val();
                 d.ToDate  = $('#ToDate').val();
+                d.search_type = $('#ddlSearchType').val().toString();
+                d.search_keyword = $('#txtSearchKeyword').val();
+                
             },
             error: function (e) {
                 $("#tbl_candidate tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
@@ -381,10 +552,12 @@ function LoadTable()
                 "data": function (row, type, val, meta) {
                     var varButtons = "";
                     if(row.Is_Check)
-                        varButtons += '<input id="addedchk_' + row.S_No + '" name="checkcase" type="checkbox" value="'+row.Candidate_Id+'" onclick="toggleCheckbox(event)">';      
+                       {} 
                     else if((user_role_id==1)||(user_role_id==5)||(user_role_id==24)||(user_role_id==38)){
                         varButtons += '<a onclick="ReuploadImages(\'' + row.Candidate_Id + '\')" class="btn" style="cursor:pointer" ><i title="View/Reupload Images" class="fas fa-edit" ></i></a>';
                     }
+                    varButtons += '<input id="addedchk_' + row.S_No + '" name="checkcase" type="checkbox" value="'+row.Candidate_Id+'" onclick="toggleCheckbox(event)">';      
+                    
                     return varButtons;
                 }
             },
@@ -422,6 +595,7 @@ function LoadTable()
 function LoadTableBasedOnSearch(){
     //alert($('#ddlRegion').val().toString() + $('#ddlState').val().toString() + $('#MinAge').val() + $('#MaxAge').val())
     $("#tbl_candidate").dataTable().fnDestroy();
+    $("#addedchkall").prop("checked", false);
     LoadTable(); 
 }
 function CandidateBasicDetails(FirstName,MiddleName,LastName,Salutation,Dob,Age,gender,MaritalStatus,Caste,Disability,religion)
@@ -471,7 +645,15 @@ function CandidateContactDetails(primary_contact,SecondaryContact,Email,PresnetA
 function DownloadEnrTemplate(ProjectType){
     $("#imgSpinner").show();
     $('#mdl_project_type').modal('hide');
-    var cands=check_list.toString();
+    var candidates='';
+    $('[name=checkcase]').each(function () {
+        if($(this).prop('checked') == true)
+        {
+            candidates+= $(this).val()+',';
+        }
+        
+    });
+    cands=candidates.toString();
     //cands=cands.substring(0,cands.length-1)
     if ((cands.toString().length)==0)
     {

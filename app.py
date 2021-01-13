@@ -1212,6 +1212,13 @@ class tag_users_from_sub_project(Resource):
         sub_project_id=request.form['sub_project_id']
         tagged_by= session['user_id']
         return Master.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)
+class assign_batch_candidates(Resource):
+    @staticmethod
+    def post():
+        candidates=request.form['candidate_id']
+        batch_id=request.form['batch_id']
+        tagged_by= session['user_id']
+        return Master.assign_batch_candidates(candidates,batch_id,tagged_by)
 class tag_user_roles(Resource):
     @staticmethod
     def post():
@@ -1255,6 +1262,7 @@ api.add_resource(drop_edit_map_candidate_batch,'/drop_edit_candidate_batch')
 api.add_resource(tag_sponser_candidate,'/tag_sponser_candidate')
 api.add_resource(untag_users_from_sub_project,'/untag_users_from_sub_project')
 api.add_resource(tag_users_from_sub_project,'/tag_users_from_sub_project')
+api.add_resource(assign_batch_candidates,'/assign_batch_candidates')
 api.add_resource(sub_center_based_on_center, '/SubCenterBasedOnCenter')
 api.add_resource(tag_user_roles,'/tag_user_roles')
 api.add_resource(cancel_planned_batch,'/cancel_planned_batch')
@@ -4580,6 +4588,19 @@ class get_batches_basedon_sub_proj_multiple(Resource):
 api.add_resource(get_batches_basedon_sub_proj_multiple,'/get_batches_basedon_sub_proj_multiple')
 
 
+class get_batches_based_on_project_type(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            project_type=request.form['project_type']
+            user_id=0
+            if 'user_id' in request.form:
+                user_id=request.form['user_id']
+            user_role_id=0
+            if 'user_role_id' in request.form:
+                user_role_id=request.form['user_role_id']
+            return {"Batches": Database.get_batches_based_on_project_type(user_id,user_role_id,project_type)} 
+api.add_resource(get_batches_based_on_project_type,'/get_batches_based_on_project_type')
 #QP_API's
 @app.route("/sales_dashboard_page")
 def sales_dashboard_page():
@@ -5718,6 +5739,8 @@ class mobilized_list_updated(Resource):
             created_by = request.form["created_by"]
             ToDate = request.form["ToDate"]
             FromDate = request.form["FromDate"]
+            search_type = request.form["search_type"]
+            search_keyword = request.form["search_keyword"]
             
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
@@ -5729,7 +5752,7 @@ class mobilized_list_updated(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             
-            return Candidate.mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,created_by,FromDate, ToDate)
+            return Candidate.mobilized_list(candidate_id,region_ids, state_ids, MinAge, MaxAge,search_type,search_keyword, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,created_by,FromDate, ToDate)
 api.add_resource(mobilized_list_updated, '/mobilized_list_updated')
 
 class DownloadMobTemplate(Resource):
@@ -6481,7 +6504,8 @@ class registered_list_updated(Resource):
             
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
-            
+            search_type = request.form["search_type"]
+            search_keyword = request.form["search_keyword"]
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
@@ -6489,7 +6513,7 @@ class registered_list_updated(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             print(FromDate, ToDate)
-            return Candidate.registered_list(candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Candidate.registered_list(candidate_id,region_ids, state_ids, Pincode,search_type,search_keyword, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 api.add_resource(registered_list_updated, '/registered_list_updated')
 
 
@@ -6673,9 +6697,12 @@ class enrolled_list_updated(Resource):
             ToDate = request.form["ToDate"]
             FromDate = request.form["FromDate"]
             created_by = request.form["created_by"]
-            
+            project_type = request.form["project_type"]
+            candidate_stage = request.form["candidate_stage"]
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
+            search_type = request.form["search_type"]
+            search_keyword = request.form["search_keyword"]
             
             start_index = request.form['start']
             page_length = request.form['length']
@@ -6684,7 +6711,7 @@ class enrolled_list_updated(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             
-            return Candidate.enrolled_list(candidate_id,region_ids, state_ids, Pincode, created_by, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Candidate.enrolled_list(candidate_id,region_ids, state_ids, Pincode,search_type,search_keyword, created_by,project_type,candidate_stage, FromDate, ToDate, user_id, user_role_id, start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 api.add_resource(enrolled_list_updated, '/enrolled_list_updated')
 
 class DownloadEnrTemplate(Resource):
@@ -7256,6 +7283,22 @@ class download_centers_list(Resource):
             
             return resp
 api.add_resource(download_centers_list,'/download_centers_list')
+
+
+class download_courses_list(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            user_id=request.form['user_id']
+            user_role_id=request.form['user_role_id']
+            course_id = request.form['course_id'] 
+            sectors = request.form['sectors']
+            qps = request.form['qps']
+            status = request.form['status'] 
+            resp = Report.download_courses_list(user_id, user_role_id, course_id, sectors, qps, status)
+            
+            return resp
+api.add_resource(download_courses_list,'/download_courses_list')
 
 class download_users_list(Resource):
     @staticmethod
@@ -7898,6 +7941,7 @@ def customer_productivity_report():
     else:
         return render_template("login.html",error="Session Time Out!!")
 
+
 class DownloadOpsProductivityReport(Resource):
     @staticmethod
     def post():
@@ -8352,9 +8396,11 @@ class updated_new_SL4Report(Resource):
                 from_date = request.form["from_date"]
                 to_date = request.form["to_date"]
                 Customers = request.form["Customers"]
+                projects = request.form["projects"]
+                sub_projects = request.form["sub_projects"]
                 
                 report_name = "Customer_wise_MIS_report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
-                resp = SL4Report_filter_new.create_report(from_date, to_date, Customers, user_id, user_role_id, report_name)
+                resp = SL4Report_filter_new.create_report(from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, report_name)
                 return resp
                 
             except Exception as e:
