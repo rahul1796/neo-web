@@ -314,6 +314,7 @@ class Report:
             return False
     def GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         return Database.GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw) 
+    
     def DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id):
         try:
             data=Database.DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id)
@@ -662,6 +663,481 @@ class Report:
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+    
+    def DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id):
+        try:
+            data=Database.DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id)
+            DownloadPath=config.neo_report_file_path+'report file/'
+            report_name = config.EmployeeWiseFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
+            r=re.compile(config.EmployeeWiseFileName + ".*")
+            lst=os.listdir(DownloadPath)
+            newlist = list(filter(r.match, lst))
+            for i in newlist:
+                os.remove( DownloadPath + i)
+            path = '{}{}'.format(DownloadPath,report_name)
+            res={}
+            if int(role_id)==11:
+                res=Report.CreateExcelForEmployeeWiseCOO(data,role_id,path)
+            if int(role_id)==14:
+                res=Report.CreateExcelForEmployeeWiseTM(data,role_id,path)
+            if int(role_id)==5:
+                res=Report.CreateExcelForEmployeeWiseCM(data,role_id,path)
+            if int(role_id)==2:
+                res=Report.CreateExcelForEmployeeWiseMobilizer(data,role_id,path)
+            if res['success']:
+                return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
+            else:
+                return {"success":False,"msg":res['msg']}
+        except Exception as e:
+            return {"success":False,"msg":str(e)}
+    def CreateExcelForEmployeeWiseCOO(data,role_id,path):
+        try:
+            writer = pd.ExcelWriter(path, engine='xlsxwriter')
+            workbook  = writer.book
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+            df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Userwise') 
+
+            df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Sub Project') 
+
+            # df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
+            # df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Course') 
+
+            worksheet = writer.sheets['Userwise']
+            default_column = ['COO']
+            first_row = ['Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement'] # 'Registration', 
+            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual'] # 'Target', 'Actual',
+            third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%', 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%'] #'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%'
+            first_row_sp = ['Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
+            second_row_sp = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
+            third_row_sp = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
+                            'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+            
+            for col_num, value in enumerate(default_column):
+                worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
+            col=1
+            for col_num, value in enumerate(first_row):
+                # if col_num==3:
+                #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+                #     col=col+5                    
+                # else:
+                worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+                col=col+11
+            col=1
+            for col_num, value in enumerate(second_row):
+                # if col_num==6:
+                #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                #     col=col+5
+                if value=='Target':
+                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                    col=col+5
+                elif value=='Actual':
+                    worksheet.merge_range(1, col, 1, 5+col, value, header_format)
+                    col=col+6
+                
+            for col_num, value in enumerate(third_row):
+                worksheet.write(2, 1+col_num, value, header_format)
+            
+            # first_row_sp,second_row_sp,third_row_sp
+            worksheet = writer.sheets['User-Sub Project']
+            default_column = ['COO','Sub Project']
+            for col_num, value in enumerate(default_column):
+                worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
+            col=2
+            for col_num, value in enumerate(first_row_sp):
+                # if col_num==3:
+                #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+                #     col=col+5                    
+                # else:
+                worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+                col=col+11
+            col=2
+            for col_num, value in enumerate(second_row_sp):
+                # if col_num==6:
+                #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                #     col=col+5
+                if value=='Target':
+                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                    col=col+5
+                elif value=='Actual':
+                    worksheet.merge_range(1, col, 1, 5+col, value, header_format)
+                    col=col+6                
+            for col_num, value in enumerate(third_row_sp):
+                worksheet.write(2, 2+col_num, value, header_format)
+
+            # worksheet = writer.sheets['User-Course']            
+            # default_column = ['COO','Course']
+            # for col_num, value in enumerate(default_column):
+            #     worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
+            # col=2
+            # for col_num, value in enumerate(first_row):
+            #     if col_num==2:
+            #         worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+            #         col=col+5                    
+            #     else:
+            #         worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+            #         col=col+11
+            # col=2
+            # for col_num, value in enumerate(second_row):
+            #     if col_num==4:
+            #         worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+            #         col=col+5
+            #     elif value=='Target':
+            #         worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+            #         col=col+5
+            #     elif value=='Actual':
+            #         worksheet.merge_range(1, col, 1, 5+col, value, header_format)
+            #         col=col+6
+            # for col_num, value in enumerate(third_row):
+            #     worksheet.write(2, 2+col_num, value, header_format)
+
+            writer.save()
+            return({'msg':'created excel', 'success':True, 'filename':path})
+        except Exception as e:
+            return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+
+    def CreateExcelForEmployeeWiseTM(data,role_id,path):
+        try:
+            writer = pd.ExcelWriter(path, engine='xlsxwriter')
+            workbook  = writer.book
+
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+            df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Userwise') 
+
+            df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Sub Project') 
+
+            # df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
+            # df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Course') 
+
+            worksheet = writer.sheets['Userwise']
+            default_column = ['COO','TM']
+            first_row = ['Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement'] #'Registration', 
+            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual'] #'Target', 'Actual',
+            third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%', 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%'] # 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%'
+            first_row_sp = ['Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
+            second_row_sp = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
+            third_row_sp = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
+                            'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+            
+            for col_num, value in enumerate(default_column):
+                worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
+            col=2
+            for col_num, value in enumerate(first_row):
+                # if col_num==3:
+                #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+                #     col=col+5                    
+                # else:
+                worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+                col=col+11
+            col=2
+            for col_num, value in enumerate(second_row):
+                # if col_num==6:
+                #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                #     col=col+5
+                if value=='Target':
+                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                    col=col+5
+                elif value=='Actual':
+                    worksheet.merge_range(1, col, 1, 5+col, value, header_format)
+                    col=col+6
+            for col_num, value in enumerate(third_row):
+                worksheet.write(2, 2+col_num, value, header_format)
+
+            worksheet = writer.sheets['User-Sub Project']
+            # first_row_sp,second_row_sp,third_row_sp
+            default_column = ['COO','TM','Sub Project']
+            for col_num, value in enumerate(default_column):
+                worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
+            col=3
+            for col_num, value in enumerate(first_row_sp):
+                # if col_num==3:
+                #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+                #     col=col+5                    
+                # else:
+                worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+                col=col+11
+            col=3
+            for col_num, value in enumerate(second_row_sp):
+                # if col_num==6:
+                #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                #     col=col+5
+                if value=='Target':
+                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                    col=col+5
+                elif value=='Actual':
+                    worksheet.merge_range(1, col, 1, 5+col, value, header_format)
+                    col=col+6                
+            for col_num, value in enumerate(third_row_sp):
+                worksheet.write(2, 3+col_num, value, header_format)
+
+            # worksheet = writer.sheets['User-Course']            
+            # default_column = ['COO','TM','Course']
+            # for col_num, value in enumerate(default_column):
+            #     worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
+            # col=3
+            # for col_num, value in enumerate(first_row):
+            #     if col_num==2:
+            #         worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+            #         col=col+5                    
+            #     else:
+            #         worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+            #         col=col+11
+            # col=3
+            # for col_num, value in enumerate(second_row):
+            #     if col_num==4:
+            #         worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+            #         col=col+5
+            #     elif value=='Target':
+            #         worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+            #         col=col+5
+            #     elif value=='Actual':
+            #         worksheet.merge_range(1, col, 1, 5+col, value, header_format)
+            #         col=col+6
+            # for col_num, value in enumerate(third_row):
+            #     worksheet.write(2, 3+col_num, value, header_format)
+            writer.save()
+            return({'msg':'created excel', 'success':True, 'filename':path})
+        except Exception as e:
+            return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+
+    def CreateExcelForEmployeeWiseCM(data,role_id,path):
+        try:
+            writer = pd.ExcelWriter(path, engine='xlsxwriter')
+            workbook  = writer.book
+
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+            df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Userwise') 
+
+            df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Sub Project') 
+
+            # df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
+            # df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Course') 
+
+            worksheet = writer.sheets['Userwise']
+            default_column = ['COO','TM','CM/PC']
+            first_row = ['Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement'] #'Registration', 
+            second_row = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual'] #'Target', 'Actual',
+            third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%', 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%'] # 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%'
+            first_row_sp = ['Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement']
+            second_row_sp = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
+            third_row_sp = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
+                            'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+            
+            for col_num, value in enumerate(default_column):
+                worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
+            col=3
+            for col_num, value in enumerate(first_row):
+                # if col_num==3:
+                #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+                #     col=col+5                    
+                # else:
+                worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+                col=col+11
+            col=3
+            for col_num, value in enumerate(second_row):
+                # if col_num==6:
+                #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                #     col=col+5
+                if value=='Target':
+                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                    col=col+5
+                elif value=='Actual':
+                    worksheet.merge_range(1, col, 1, 5+col, value, header_format)
+                    col=col+6
+                
+            for col_num, value in enumerate(third_row):
+                worksheet.write(2, 3+col_num, value, header_format)
+            # first_row_sp,second_row_sp,third_row_sp
+            worksheet = writer.sheets['User-Sub Project']
+            default_column = ['COO','TM','CM/PC','Sub Project']
+            for col_num, value in enumerate(default_column):
+                worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
+            col=4
+            for col_num, value in enumerate(first_row_sp):
+                # if col_num==3:
+                #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+                #     col=col+5                    
+                # else:
+                worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+                col=col+11
+            col=4
+            for col_num, value in enumerate(second_row_sp):
+                # if col_num==6:
+                #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                #     col=col+5
+                if value=='Target':
+                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                    col=col+5
+                elif value=='Actual':
+                    worksheet.merge_range(1, col, 1, 5+col, value, header_format)
+                    col=col+6                
+            for col_num, value in enumerate(third_row_sp):
+                worksheet.write(2, 4+col_num, value, header_format)
+
+            # worksheet = writer.sheets['User-Course']            
+            # default_column = ['COO','TM','CM/PC','Course']
+            # for col_num, value in enumerate(default_column):
+            #     worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
+            # col=4
+            # for col_num, value in enumerate(first_row):
+            #     if col_num==2:
+            #         worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+            #         col=col+5                    
+            #     else:
+            #         worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+            #         col=col+11
+            # col=4
+            # for col_num, value in enumerate(second_row):
+            #     if col_num==4:
+            #         worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+            #         col=col+5
+            #     elif value=='Target':
+            #         worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+            #         col=col+5
+            #     elif value=='Actual':
+            #         worksheet.merge_range(1, col, 1, 5+col, value, header_format)
+            #         col=col+6
+            # for col_num, value in enumerate(third_row):
+            #     worksheet.write(2, 4+col_num, value, header_format)
+            writer.save()
+            return({'msg':'created excel', 'success':True, 'filename':path})
+        except Exception as e:
+            return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+
+    def CreateExcelForEmployeeWiseMobilizer(data,role_id,path):
+        try:
+            writer = pd.ExcelWriter(path, engine='xlsxwriter')
+            workbook  = writer.book
+
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+            df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Userwise') 
+
+            # df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
+            # df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Sub Project') 
+
+            # df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
+            # df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Course') 
+
+            worksheet = writer.sheets['Userwise']
+            default_column = ['COO','TM','CM/PC','Mobilizer']
+            first_row = ['Registration'] #, 'Enrolment', 'New Batch Start', 'Assessment', 'Certification', 'Certificate Distribution' ,'Placement'
+            second_row = ['Target', 'Actual'] # ,'Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual'
+            third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+            # , 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
+            #              'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
+            #              'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%'
+            
+            for col_num, value in enumerate(default_column):
+                worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
+            col=4
+            for col_num, value in enumerate(first_row):
+                # if col_num==3:
+                #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+                #     col=col+5                    
+                # else:
+                worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+                col=col+11
+            col=4
+            for col_num, value in enumerate(second_row):
+                # if col_num==6:
+                #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                #     col=col+5
+                if value=='Target':
+                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+                    col=col+5
+                elif value=='Actual':
+                    worksheet.merge_range(1, col, 1, 5+col, value, header_format)
+                    col=col+6
+                
+            for col_num, value in enumerate(third_row):
+                worksheet.write(2, 4+col_num, value, header_format)
+            # first_row_sp,second_row_sp,third_row_sp
+
+            # worksheet = writer.sheets['User-Sub Project']
+            # default_column = ['COO','TM','CM/PC','Sub Project']
+            # for col_num, value in enumerate(default_column):
+            #     worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
+            # col=4
+            # for col_num, value in enumerate(first_row_sp):
+            #     # if col_num==3:
+            #     #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+            #     #     col=col+5                    
+            #     # else:
+            #     worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+            #     col=col+11
+            # col=4
+            # for col_num, value in enumerate(second_row_sp):
+            #     # if col_num==6:
+            #     #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+            #     #     col=col+5
+            #     if value=='Target':
+            #         worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+            #         col=col+5
+            #     elif value=='Actual':
+            #         worksheet.merge_range(1, col, 1, 5+col, value, header_format)
+            #         col=col+6                
+            # for col_num, value in enumerate(third_row_sp):
+            #     worksheet.write(2, 4+col_num, value, header_format)
+
+            # worksheet = writer.sheets['User-Course']            
+            # default_column = ['COO','TM','CM/PC','Course']
+            # for col_num, value in enumerate(default_column):
+            #     worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
+            # col=4
+            # for col_num, value in enumerate(first_row):
+            #     if col_num==2:
+            #         worksheet.merge_range(0, col, 0, 4+col, value, header_format)
+            #         col=col+5                    
+            #     else:
+            #         worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+            #         col=col+11
+            # col=4
+            # for col_num, value in enumerate(second_row):
+            #     if col_num==4:
+            #         worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+            #         col=col+5
+            #     elif value=='Target':
+            #         worksheet.merge_range(1, col, 1, 4+col, value, header_format)
+            #         col=col+5
+            #     elif value=='Actual':
+            #         worksheet.merge_range(1, col, 1, 5+col, value, header_format)
+            #         col=col+6
+            # for col_num, value in enumerate(third_row):
+            #     worksheet.write(2, 4+col_num, value, header_format)
+            writer.save()
+            return({'msg':'created excel', 'success':True, 'filename':path})
+        except Exception as e:
+            return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+
     def create_client_report(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids):
         try:
             data=Database.DownloadClientReport(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids)
@@ -1607,7 +2083,7 @@ class Report:
             
             m_header = ["Log date","CANDIDATE ENROLLMENT NUMBER","CANDIDATE NAME","CANDIDATE EMAIL ID","BATCH CODE","BATCH START DATE","BATCH END DATE",
             "OJT START DATE","OJT END DATE","CUSTOMER NAME","SUBPROJECT NAME","SUBPROJECT CODE","CENTER NAME","CENTER TYPE","DISTRICT",
-            "STATE","REGION","BUISINESS UNIT","COURSE CODE","COURSE NAME"]
+            "STATE","REGION","BUISINESS UNIT","COURSE CODE","COURSE NAME", 'Company Name', 'Address', 'Rm Name', 'Rm Mobile Number', 'Rm Email Id']
             f_header = ["REACHED OFFICE","RECORDED TODAY'S WORK","LEFT OFFICE"]
             s_header = ["LOG DATE TIME","LOG IMAGE","LOG LOCATION","LOG DATE TIME","RECORDING","LOG LOCATION","LOG DATE TIME","LOG IMAGE","LOG LOCATION"]
             df.to_excel(writer, index=None, header=None, startrow=2 ,sheet_name='OJT Report')
@@ -1616,10 +2092,10 @@ class Report:
                 worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
 
             for col_num, value in enumerate(s_header):
-                worksheet.write(1, 20+col_num, value, header_format)
+                worksheet.write(1, 25+col_num, value, header_format)
 
             for col_num, value in enumerate(f_header):
-                worksheet.merge_range(0, 20+col_num*3, 0, 22+col_num*3, value, second_header_format)
+                worksheet.merge_range(0, 25+col_num*3, 0, 27+col_num*3, value, second_header_format)
 
             writer.save()
             return({'Description':'created excel', 'Status':True, 'filename':file_name})
