@@ -426,11 +426,11 @@ class Database:
                         msg={"message":"Customer with the Customer code already exists","client_flag":2}
         return msg
     
-    def add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req):
+    def add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req, mobilization_type):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_subproject] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req)
+        sql = 'exec	[masters].[sp_add_edit_subproject] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req, mobilization_type)
         #print(values)
         cur.execute(sql,(values))
         for row in cur:
@@ -6144,6 +6144,7 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return response
+        
     def mobilization_web_inser(df,user_id,ProjectType):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
