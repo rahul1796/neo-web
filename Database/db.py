@@ -6296,20 +6296,21 @@ SELECT					cb.name as candidate_name,
             (candidate_id,mobilization_type,created_by,created_on,is_active)
             values
             '''
-            for row in out:
-                quer4 += '\n' + "({},4,'{}','{}','{}',GETDATE(),{},1),".format(row[0],row[58],row[59],row[60],quer_user.format(row[56],row[56]))
-                quer5 +=  '\n' + "({},3,{},GETDATE(),1),".format(d[i],quer_user.format(out[i][36],out[i][36]))
-
-            quer4 = quer4[:-1]+';'
-            quer5 = quer5[:-1]+';'
-
+            quer_exp = ''
             if ProjectType==1:
-                cur.execute(quer4)
-                cur.commit()
+                for row in out:
+                    quer4 += '\n' + "({},4,'{}','{}','{}',GETDATE(),{},1),".format(row[0],row[58],row[59],row[60],quer_user.format(row[56],row[56]))
+                quer_exp = quer4
             elif ProjectType==2:
-                cur.execute(quer5)
+                for row in out:
+                    quer5 +=  '\n' + "({},3,{},GETDATE(),1),".format(row[0],quer_user.format(row[56],row[56]))
+                quer_exp = quer5
+
+            if quer_exp !='':
+                quer_exp = quer_exp[:-1]+';'
+                cur.execute(quer_exp)
                 cur.commit()
-                
+
             quer7_res=''
             if (ProjectType==2):
                 out_she = df_she.values.tolist()
@@ -7956,6 +7957,7 @@ SELECT					cb.name as candidate_name,
     def reupload_candidate_image_web_ui(user_id,user_role_id,filename,c_id,candidate_id):
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
+        print(c_id)
         quer = ""
         quer1 = "update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}' where candidate_id={}"
         quer2 = "update candidate_details.tbl_candidate_reg_enroll_details set aadhar_image_name='{}' where candidate_id = {}"
