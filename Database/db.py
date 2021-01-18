@@ -7807,6 +7807,55 @@ SELECT					cb.name as candidate_name,
             # print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
 
+    def SendShikshaCandidateEnrolmentMail():
+        try: 
+            # print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor() 
+            curs = con.cursor()             
+            sql = '''
+                     select TOP(100) cis.intervention_value,
+                            c.first_name,
+                            cr.course_name,
+                            c.email_id,
+                            c.primary_contact_no
+                from candidate_details.tbl_map_candidate_intervention_skilling as cis
+                left join candidate_details.tbl_candidate_interventions as ci on ci.candidate_intervention_id=cis.intervention_id
+                left join candidate_details.tbl_candidates as c on c.candidate_id=ci.candidate_id
+                left join batches.tbl_batches as b on b.batch_id=cis.batch_id
+                left join masters.tbl_courses as cr on cr.course_id=b.course_id
+                left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id
+                where sp.mobilization_type=4
+                AND  shiksha_sync_status=1
+                AND coalesce(cis.email_sent,0)=0;
+                  '''
+            cur.execute(sql)
+            mail_count=0
+            Status=False
+            for row in cur:
+                candidate_name=row[1]
+                enrolment_id=str(row[0])
+                course=row[2]
+                email_id=row[3]
+                mobile=row[4]
+                status_mail=sent_mail.ShikshaEnrolmentMail(candidate_name,enrolment_id,course,email_id,mobile)                 
+                if(status_mail['status']==True):                    
+                    sql = "update candidate_details.tbl_map_candidate_intervention_skilling set email_sent=1 where intervention_value='"+str(enrolment_id)+"';"     
+                    curs.execute(sql)            
+                    Status=True
+                    mail_count = mail_count+1
+                else:
+                    Status=False
+            cur.commit()
+            curs.commit()
+            cur.close()
+            con.close()
+            msg=str(mail_count)+' mail sent'
+            return {"Status":Status,'Message':msg}
+        except Exception as e:
+            print('exep'+str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+
 
     def app_get_release_date_msg():
         res = []
