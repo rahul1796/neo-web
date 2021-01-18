@@ -6149,6 +6149,11 @@ SELECT					cb.name as candidate_name,
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         try:
+            df['Permanent Address line1'] = df['Permanent Address line1'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line1'] = df['Present Address line1'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line2'] = df['Present Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Permanent Address line2'] = df['Permanent Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+
             quer_user  = "(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id left join users.tbl_partner_users as up on up.user_id=u.user_id where u.is_active=1 and ((ud.email like trim('{}')) OR (up.email like trim('{}'))))"
             
             quer1 = '''
@@ -6260,6 +6265,12 @@ SELECT					cb.name as candidate_name,
             cur = con.cursor()
             #print(df.columns)
             #try:
+            df['Permanent Address line1'] = df['Permanent Address line1'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Permanent Address line2'] = df['Permanent Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line1'] = df['Present Address line1'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line2'] = df['Present Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Interested Course*'] = df['Interested Course*'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+
             df['Date of Birth*'] = df['Date of Birth*'].astype(str)
             out = df.values.tolist()
 
@@ -6362,6 +6373,12 @@ SELECT					cb.name as candidate_name,
             conn = pyodbc.connect(conn_str)
             curs = conn.cursor()
             
+            df['Permanent Address line1*'] = df['Permanent Address line1*'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Permanent Address line2'] = df['Permanent Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line1*'] = df['Present Address line1*'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line2'] = df['Present Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Interested Course*'] = df['Interested Course*'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+
             df['Date of Birth*'] = df['Date of Birth*'].astype(str)
             out = df.values.tolist()
 
