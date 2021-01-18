@@ -121,6 +121,8 @@
                         $('#Candidate_Menu').show();
                         //$('#Batch_Menu').show();
                         $('#Assessment_Menu').show();
+                        $('#Certification_Menu').show();
+                        
                         $('#Content_Menu').show();
                             $('#AnchorSectors').show();
                             $('#AnchorQP').show();
@@ -141,16 +143,17 @@
                             $('#AnchorOperationDashboard').show();
                         $('#My_Projects_Menu').show();
                         $('#Report_Menu').show();
-                            $('#OJT_report').hide();
-                                $('#OJT_Monitoring_Report').hide();
+                            $('#OJT_report').show();
+                                $('#OJT_Monitoring_Report').show();
+                                $('#SL4Report_Menu').show();
                             $('#ECP_report').show();
                             $('#Qp_wise_report').show();
                             $('#Batch_Status_report').show();
                             $('#ops_productivity_report').show();
-                            $('#TrainerProductivityReport').hide();
-                            $('#Assessment_report_Menu').hide();
-                            $('#Assessment_Productivity_Report').hide();
-                            $('#Certification_Distribution_Report_Menu').hide();
+                            $('#TrainerProductivityReport').show();
+                            $('#Assessment_report_Menu').show();
+                            $('#Assessment_Productivity_Report').show();
+                            $('#Certification_Distribution_Report_Menu').show();
                         $('#TMA_content').show();
                             $('#tma_report_filter').show();
                         $('#Productivity_Report').show();
@@ -245,11 +248,15 @@
                             $('#AnchorSalesDashboard').show();
                             $('#AnchorOperationDashboard').show();
                         $('#My_Projects_Menu').hide();
-                        $('#Report_Menu').hide();
+                        $('#Report_Menu').show();
+                            $('#Candidate_Report').hide();
+                            $('#user_sp_report').hide();
+                            $('#batch_reports').hide();
                             $('#OJT_report').hide();
                                 $('#OJT_Monitoring_Report').hide();
-                            $('#ECP_report').hide();
-                            $('#Qp_wise_report').hide();
+                            $('#ECP_report').show();
+                            $('#Qp_wise_report').show();
+                            $('#SL4Report_Menu').show();
                             $('#Batch_Status_report').hide();
                             $('#ops_productivity_report').hide();
                             $('#TrainerProductivityReport').hide();
@@ -768,17 +775,27 @@
                             $('#AnchorSalesDashboard').hide();
                             $('#AnchorOperationDashboard').hide();
                         $('#My_Projects_Menu').hide();
-                        $('#Report_Menu').hide();
+                        $('#Report_Menu').show();
+                            $('#batch_reports').hide();
+                            $('#customer_reports').hide();
+                            $('#Productivity_Report').show();
+                            $('#region_productivity_report').hide();
+                            $('#mobilizer_productivity_report').hide();
+                            $('#customer_productivity_report').hide();
+                            $('#Ops_Productivity_Report').hide();
+                            $('#Candidate_Report').hide();
+                            $('#user_sp_report').hide();
                             $('#OJT_report').hide();
                                 $('#OJT_Monitoring_Report').hide();
                             $('#ECP_report').hide();
                             $('#Qp_wise_report').hide();
                             $('#Batch_Status_report').hide();
-                            $('#ops_productivity_report').hide();
+                            
                             $('#TrainerProductivityReport').hide();
                             $('#Assessment_report_Menu').show();
                             $('#Certification_Distribution_Report_Menu').show();
-                            $('#Assessment_Productivity_Report').hide();
+                            
+                            $('#Assessment_Productivity_Report').show();
                             $('#partner_productivity_report').hide();
                         console.log(goto);
                         if(goto !="" && goto!="dashboard")

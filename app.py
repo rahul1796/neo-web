@@ -8373,6 +8373,14 @@ class SyncShikshaCandidateData(Resource):
             return response
 api.add_resource(SyncShikshaCandidateData,'/SyncShikshaCandidateData')
 
+class SendShikshaCandidateEnrolmentMail(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=Master.SendShikshaCandidateEnrolmentMail()
+            return response
+api.add_resource(SendShikshaCandidateEnrolmentMail,'/SendShikshaCandidateEnrolmentMail')
+
 ################################### SL4 report
 @app.route("/SL4Report_page")
 def SL4Report_page():
