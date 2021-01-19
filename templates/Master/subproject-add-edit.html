@@ -54,6 +54,7 @@ var Centers;
                 type:"GET",
                 url:URL,
                 success:function(data){
+                    //console.log(data);
                     if(data!=null)
                     {   
                     $('#ProjectName').val(data.SubProjectDetail.Sub_Project_Name);
@@ -87,9 +88,9 @@ var Centers;
                     //         {
                     //             $('#is_ojt_req').prop('checked',false);
                     //         }
-                    
-                    $('input:radio[name=MOB_TYPE][value="'+data.SubProjectDetail.Mobilization_Type+'"]').click();    
-                    
+
+                    $('#MOB_TYPE').val(data.SubProjectDetail.Mobilization_Type).change();
+                    //$('input:radio[name=MOB_TYPE][value="'+data.SubProjectDetail.Mobilization_Type+'"]').click();
                     }
                     
                     $('#hdn_sub_project_id').val(data.SubProjectDetail.Sub_Project_Id);
@@ -335,7 +336,8 @@ var Centers;
                     "ActualEndDate" : $('#ActualEndDate').val(),
                     "isactive" : $('#isactive').prop('checked'),
                     "is_ojt_req" : $('input:radio[name=is_ojt_req]:checked').val(), //$('#is_ojt_req').prop('checked'),
-                    "mobilization_type" : $('input:radio[name=MOB_TYPE]:checked').val(), //$('#is_ojt_req').prop('checked'),
+                    "mobilization_type" : $('#MOB_TYPE').val(),
+                    //"mobilization_type" : $('input:radio[name=MOB_TYPE]:checked').val(), //$('#is_ojt_req').prop('checked'),
                     "project_id" : $('#ddlProject').val()
                 },
                 success:function(data){
@@ -996,6 +998,21 @@ var Centers;
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-lg-6">
+                                                <label for="MOB_TYPE">Select Mobilization Type : </label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select class="form-control dropdown-search-filter" id="MOB_TYPE" name="MOB_TYPE" required>
+                                                    <option  value="1">Regular</option>  <!--selected-->>
+                                                    <option  value="2">SHE</option>
+                                                    <option  value="4">Dell</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+<!-- 
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
                                                 <label>Select Mobilization Type : </label>
                                             </div>
                                             <div class="col-lg-6">
@@ -1011,6 +1028,7 @@ var Centers;
                                             </div>   
                                         </div>                                     
                                     </div>
+ -->
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-lg-6">
