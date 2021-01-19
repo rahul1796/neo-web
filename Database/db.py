@@ -6315,10 +6315,11 @@ SELECT					cb.name as candidate_name,
                 quer_exp = quer4
             elif ProjectType==2:
                 for row in out:
-                    quer5 +=  '\n' + "({},3,{},GETDATE(),1),".format(row[0],quer_user.format(row[56],row[56]))
+                    quer5 +=  '\n' + "({},3,{},GETDATE(),1),".format(row[0],quer_user.format(row[55],row[55]))
                 quer_exp = quer5
 
             if quer_exp !='':
+                #print(quer_exp)
                 quer_exp = quer_exp[:-1]+';'
                 cur.execute(quer_exp)
                 cur.commit()
@@ -6357,7 +6358,7 @@ SELECT					cb.name as candidate_name,
                 if ProjectType==2:
                     query += quer7_res
                
-            
+            #print(query)
             cur.execute(query)
             cur.commit()
             out = {'Status': True, 'message': "Submitted Successfully"}
