@@ -108,7 +108,7 @@ def ShikshaEnrolmentMail(candidate_name,enrolment_id,course,email_id,mobile):
                         <div>
             <p style="font-size:12pt;font-family:Times New Roman,serif;margin:0;">Dear <b>{},</b><br>
             <br>
-            Congratulations on being enrolled in the DELL CSR learning program to help you build a successful career. An account has been created for you at the LabourNet Academy, from where you could access the <b>{}</b> material.
+            Congratulations on being enrolled in the DELL CSR learning program to help you build a successful career. An account has been created for you at the LabourNet Academy, from where you could access the <b>{}</b> course material.
             <br><br>
         
             This is an <u>8-week learning program</u> providing you access to extensive learning material, engaging with peers, participate in weekly quizzes, win prizes and much more. 
@@ -117,11 +117,11 @@ def ShikshaEnrolmentMail(candidate_name,enrolment_id,course,email_id,mobile):
             <br><br>
             Kindly click on the below mentioned URL and login into your account to access the course material. 
             <br><br>
-            URL :  <b> https://shiksha.ai/</b>
+            URL  &emsp; &emsp; &emsp;  &emsp; &ensp;&nbsp;        : &emsp;  <b>https://shiksha.ai/</b>
             <br>
-            USENAME : <b>{}</b>
+            USERNAME  &emsp; &emsp;    : &emsp; <b>{}</b>
             <br>
-            PASSWORD : <b> Pass#123 </b>
+            PASSWORD   &emsp; &emsp;    : &emsp;  <b>Pass#123 </b>
             <br>
             </p>
             </div>
