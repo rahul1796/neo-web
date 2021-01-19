@@ -1,4 +1,5 @@
 def create_report(from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, report_name):
+    print(from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, report_name)
     '''
     from datetime import datetime
     start_time = datetime.now()
@@ -20,7 +21,13 @@ def create_report(from_date, to_date, Customers,projects,sub_projects, user_id, 
 
     try:
         conn_str = config.conn_str
+        DownloadPath=config.neo_report_file_path+'report file/'            
         name_withpath = config.neo_report_file_path + 'report file/'+ report_name
+        r=re.compile('Customer_wise_MIS_report_' + ".*")
+        lst=os.listdir(DownloadPath)
+        newlist = list(filter(r.match, lst))
+        for i in newlist:
+            os.remove( DownloadPath + i)
         project_type=1
         writer = pd.ExcelWriter(name_withpath, engine='xlsxwriter')
         workbook  = writer.book
@@ -231,9 +238,7 @@ def create_report(from_date, to_date, Customers,projects,sub_projects, user_id, 
             worksheet = writer.sheets['Daily Tracker Report']
             for col_num, value in enumerate(header):
                 worksheet.write(0, col_num, value, header_format)
-        
         if sub_projects=='':
-
             if  set(config.dell_type_customer.split(',')) >= set(Customers.split(',')):
                 #print('dell')
                 t4 = threading.Thread(target=trainee_dell_tracker_fxn)

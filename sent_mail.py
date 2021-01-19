@@ -7,6 +7,7 @@ from email.mime.text import MIMEText
 from email.utils import COMMASPACE, formatdate
 from email import encoders
 from Database import *
+from Database import config
 
 def forget_password(email, password, name):
     try:
@@ -85,6 +86,81 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
     except Exception as e:
         print(e)
         return {'status':False,'description':'Unable to sent email'}
+def ShikshaEnrolmentMail(candidate_name,enrolment_id,course,email_id,mobile):
+    #print(NewStageId,emailTo,emailToName,EmailCC,Batch_Code)
+    try:
+        server = smtplib.SMTP('smtp.office365.com','587')
+        #server = smtplib.SMTP(host='smtp.office365.com')
+        #server.connect('smtp.office365.com','587')
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login("do-not-reply@labournet.in","Donotreply@123")
+        dell_logo=config.dell_logo_path
+        files=config.dell_attachment_path
+
+        msg = MIMEMultipart()
+        
+        msg['From'] = "do-not-reply@labournet.in"
+        msg['To'] = email_id
+        msg['Subject'] = "DELL CSR [LabourNet Academy] Confirmation of Account Creation"
+        html_msg='''
+                        <div>
+            <p style="font-size:12pt;font-family:Times New Roman,serif;margin:0;">Dear <b>{},</b><br>
+            <br>
+            Congratulations on being enrolled in the DELL CSR learning program to help you build a successful career. An account has been created for you at the LabourNet Academy, from where you could access the <b>{}</b> course material.
+            <br><br>
+        
+            This is an <u>8-week learning program</u> providing you access to extensive learning material, engaging with peers, participate in weekly quizzes, win prizes and much more. 
+            <br>
+            <u>Read complete course information in PDF attached</u>.
+            <br><br>
+            Kindly click on the below mentioned URL and login into your account to access the course material. 
+            <br><br>
+            URL  &emsp; &emsp; &emsp;  &emsp; &ensp;&nbsp;        : &emsp;  <b>https://shiksha.ai/</b>
+            <br>
+            USERNAME  &emsp; &emsp;    : &emsp; <b>{}</b>
+            <br>
+            PASSWORD   &emsp; &emsp;    : &emsp;  <b>Pass#123 </b>
+            <br>
+            </p>
+            </div>
+            <br>
+
+            <div align="left" style="font-size:12pt;font-family:Times New Roman,serif;text-align:left;margin:0;">
+           
+
+            <p style="font-size:12pt;font-family:Times New Roman,serif;margin:0;">
+            Best Regards,<br>
+            <b>Dell Team</b>
+            </p>       
+            
+            
+            <br>
+            </div>
+            
+        '''
+        #<img src="{}"  width="42" height="42" style="float:left"> 
+            
+        html_msg = html_msg.format(candidate_name,course,email_id,dell_logo)
+        msg.attach(MIMEText(html_msg, 'html'))
+        if files != '':
+            for path in [files]:
+                part = MIMEText('application', "octet-stream")
+                with open(path, 'rb') as file:
+                    part.set_payload(file.read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition',
+                                'attachment; filename="{}"'.format(Path(path).name))
+                msg.attach(part)
+        res = server.sendmail(msg['From'], msg['To'] , msg.as_string())
+        server.quit()
+
+        return {'status':True,'description':'Email sent'}
+    except Exception as e:
+        print('exc='+str(e))
+        return {'status':False,'description':'Unable to sent email'}
+
 def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails,files):
     try:
         server = smtplib.SMTP('smtp.office365.com','587')

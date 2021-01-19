@@ -1312,7 +1312,7 @@ function add_map_message(){
             alert("Please enter proposed date.");
             return false;
         }
-        else if(new Date(cur_date.toDateString())>=new Date(DateRequested.toDateString()))
+        else if(new Date(cur_date.toDateString())==new Date(DateRequested.toDateString()))
         {
             //console.log($('#hdn_current_stage_id').val())
             alert("Assessment cannot be scheduled for the same day. Please schedule the future dates.");
