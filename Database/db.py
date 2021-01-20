@@ -426,11 +426,11 @@ class Database:
                         msg={"message":"Customer with the Customer code already exists","client_flag":2}
         return msg
     
-    def add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req):
+    def add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req, mobilization_type):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_subproject] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req)
+        sql = 'exec	[masters].[sp_add_edit_subproject] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req, mobilization_type)
         #print(values)
         cur.execute(sql,(values))
         for row in cur:
@@ -6144,10 +6144,16 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return response
+        
     def mobilization_web_inser(df,user_id,ProjectType):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         try:
+            df['Permanent Address line1'] = df['Permanent Address line1'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line1'] = df['Present Address line1'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line2'] = df['Present Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Permanent Address line2'] = df['Permanent Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+
             quer_user  = "(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id left join users.tbl_partner_users as up on up.user_id=u.user_id where u.is_active=1 and ((ud.email like trim('{}')) OR (up.email like trim('{}'))))"
             
             quer1 = '''
@@ -6259,6 +6265,12 @@ SELECT					cb.name as candidate_name,
             cur = con.cursor()
             #print(df.columns)
             #try:
+            df['Permanent Address line1'] = df['Permanent Address line1'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Permanent Address line2'] = df['Permanent Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line1'] = df['Present Address line1'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line2'] = df['Present Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Interested Course*'] = df['Interested Course*'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+
             df['Date of Birth*'] = df['Date of Birth*'].astype(str)
             out = df.values.tolist()
 
@@ -6303,10 +6315,11 @@ SELECT					cb.name as candidate_name,
                 quer_exp = quer4
             elif ProjectType==2:
                 for row in out:
-                    quer5 +=  '\n' + "({},3,{},GETDATE(),1),".format(row[0],quer_user.format(row[56],row[56]))
+                    quer5 +=  '\n' + "({},3,{},GETDATE(),1),".format(row[0],quer_user.format(row[55],row[55]))
                 quer_exp = quer5
 
             if quer_exp !='':
+                #print(quer_exp)
                 quer_exp = quer_exp[:-1]+';'
                 cur.execute(quer_exp)
                 cur.commit()
@@ -6345,7 +6358,7 @@ SELECT					cb.name as candidate_name,
                 if ProjectType==2:
                     query += quer7_res
                
-            
+            #print(query)
             cur.execute(query)
             cur.commit()
             out = {'Status': True, 'message': "Submitted Successfully"}
@@ -6361,6 +6374,12 @@ SELECT					cb.name as candidate_name,
             conn = pyodbc.connect(conn_str)
             curs = conn.cursor()
             
+            df['Permanent Address line1*'] = df['Permanent Address line1*'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Permanent Address line2'] = df['Permanent Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line1*'] = df['Present Address line1*'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line2'] = df['Present Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Interested Course*'] = df['Interested Course*'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+
             df['Date of Birth*'] = df['Date of Birth*'].astype(str)
             out = df.values.tolist()
 
@@ -7806,6 +7825,65 @@ SELECT					cb.name as candidate_name,
             return {"Status":Status,'Message':msg}
         except Exception as e:
             # print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+
+    def SendShikshaCandidateEnrolmentMail():
+        try: 
+            # print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor() 
+            #curs = con.cursor() 
+            success_enrollids = ''         
+            sql = '''
+                     select TOP(50) cis.intervention_value,
+                            c.first_name,
+                            cr.course_name,
+                            c.email_id,
+                            c.primary_contact_no,
+                            cis.intervention_id
+                from candidate_details.tbl_map_candidate_intervention_skilling as cis
+                left join candidate_details.tbl_candidate_interventions as ci on ci.candidate_intervention_id=cis.intervention_id
+                left join candidate_details.tbl_candidates as c on c.candidate_id=ci.candidate_id
+                left join batches.tbl_batches as b on b.batch_id=cis.batch_id
+                left join masters.tbl_courses as cr on cr.course_id=b.course_id
+                left join masters.tbl_sub_projects as sp on sp.sub_project_id=b.sub_project_id
+                where (sp.mobilization_type=4 or c.project_type=4)
+                AND  shiksha_sync_status=1
+                AND coalesce(cis.email_sent,0)=0;
+                '''
+            cur.execute(sql)
+            mail_count=0
+            Status=False
+            temp=cur
+            for row in temp:
+                candidate_name=row[1]
+                enrolment_id=str(row[0])
+                course=row[2]
+                email_id=row[3]
+                mobile=row[4]
+                interventions=row[5]
+                status_mail=sent_mail.ShikshaEnrolmentMail(candidate_name,enrolment_id,course,email_id,mobile)                 
+                if(status_mail['status']==True): 
+                    success_enrollids=success_enrollids+str(interventions)+','           
+                     #curs.commit()         
+                    Status=True
+                    mail_count = mail_count+1
+                else:
+                    Status=False
+
+            if success_enrollids != '':
+                success_enrollids=success_enrollids.rstrip(',')
+                sql2 = "update candidate_details.tbl_map_candidate_intervention_skilling set email_sent=1 where intervention_id in ("+success_enrollids+");"     
+                cur.execute(sql2)   
+                   
+            cur.commit()
+            
+            cur.close()
+            con.close()
+            msg=str(mail_count)+' Email sent'
+            return {"Status":Status,'Message':msg}
+        except Exception as e:
+            #print('exep'+str(e))
             return {"Status":False,'message': "error: "+str(e)}
 
 

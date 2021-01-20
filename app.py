@@ -3963,7 +3963,7 @@ def get_download_file(path):
     """Download a file."""
     #print(path)
     filename = r"{}{}".format(config.DownloadPathLocal_download,path)
-    #print(filename)
+    print(filename)
     if not(os.path.exists(filename)):
         filename = r"{}No-image-found.jpg".format(config.DownloadPathWeb)
     return send_file(filename)
@@ -4085,8 +4085,9 @@ api.add_resource(get_me_category,'/get_me_category')
 def get_tma_file(path):
     """Download a file."""
     filename = r"{}{}".format(config.neo_report_file_path,path)
+    #print(filename)
     if not(os.path.exists(filename)):
-        print(filename)
+        
         filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathWeb)
     return send_file(filename)
 
@@ -5130,7 +5131,7 @@ class sub_project_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            print(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+            #print(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
             return Master.sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project)
 api.add_resource(sub_project_list, '/sub_project_list')
 
@@ -5155,7 +5156,9 @@ class add_subproject_details(Resource):
             project_code = request.form['project_id']      
             isactive=request.form['isactive']
             is_ojt_req=request.form['is_ojt_req']
-            return Master.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req)
+            mobilization_type=request.form['mobilization_type']
+            
+            return Master.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req, mobilization_type)
 api.add_resource(add_subproject_details,'/add_subproject_details')
 
 #############################################################################
@@ -5889,6 +5892,7 @@ class upload_bulk_upload(Resource):
                 df['ids']=df['Aadhar No'].astype(str)+df['Identity number'].astype(str)
                 #print(df.columns.to_list())
                 if ProjectType==1:
+                    #print(df['Candidate Photo*'])
                     img_column ='Candidate Photo*,Aadhar Image,Document copy,Educational Marksheet*,Income Certificate'
                     schema = Schema([
                         #nan check column non mandate
@@ -5912,7 +5916,7 @@ class upload_bulk_upload(Resource):
                         Column('Whatsapp Number',mob_validation + null_validation),
                         Column('Aadhar Image',null_validation),
                         #str+null check
-                        Column('Candidate Photo*',str_validation + null_validation),
+                        Column('Candidate Photo*', null_validation),
                         Column('Fresher/Experienced?*',str_validation + null_validation),
                         Column('Salutation*',str_validation + null_validation),
                         Column('First Name*',str_validation + null_validation),
@@ -8370,6 +8374,14 @@ class SyncShikshaCandidateData(Resource):
             response=Master.SyncShikshaCandidateData()
             return response
 api.add_resource(SyncShikshaCandidateData,'/SyncShikshaCandidateData')
+
+class SendShikshaCandidateEnrolmentMail(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=Master.SendShikshaCandidateEnrolmentMail()
+            return response
+api.add_resource(SendShikshaCandidateEnrolmentMail,'/SendShikshaCandidateEnrolmentMail')
 
 ################################### SL4 report
 @app.route("/SL4Report_page")
