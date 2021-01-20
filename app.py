@@ -5891,6 +5891,7 @@ class upload_bulk_upload(Resource):
                 df['ids']=df['Aadhar No'].astype(str)+df['Identity number'].astype(str)
                 #print(df.columns.to_list())
                 if ProjectType==1:
+                    #print(df['Candidate Photo*'])
                     img_column ='Candidate Photo*,Aadhar Image,Document copy,Educational Marksheet*,Income Certificate'
                     schema = Schema([
                         #nan check column non mandate
@@ -5914,7 +5915,7 @@ class upload_bulk_upload(Resource):
                         Column('Whatsapp Number',mob_validation + null_validation),
                         Column('Aadhar Image',null_validation),
                         #str+null check
-                        Column('Candidate Photo*',str_validation + null_validation),
+                        Column('Candidate Photo*', null_validation),
                         Column('Fresher/Experienced?*',str_validation + null_validation),
                         Column('Salutation*',str_validation + null_validation),
                         Column('First Name*',str_validation + null_validation),
