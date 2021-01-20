@@ -7868,10 +7868,11 @@ SELECT					cb.name as candidate_name,
                      #curs.commit()         
                     Status=True
                     mail_count = mail_count+1
+                    msg = status_mail['description']
                 else:
                     Status=False
+                    msg = status_mail['description']
             if success_enrollids != '':
-
                 success_enrollids=success_enrollids.rstrip(',')
                 sql2 = "update candidate_details.tbl_map_candidate_intervention_skilling set email_sent=1 where intervention_id in ("+success_enrollids+");"     
                 cur.execute(sql2)   
@@ -7880,7 +7881,7 @@ SELECT					cb.name as candidate_name,
             
             cur.close()
             con.close()
-            msg=str(mail_count)+' mail sent'
+            msg=str(mail_count)+msg
             return {"Status":Status,'Message':msg}
         except Exception as e:
             print('exep'+str(e))
