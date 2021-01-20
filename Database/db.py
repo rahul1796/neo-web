@@ -426,11 +426,11 @@ class Database:
                         msg={"message":"Customer with the Customer code already exists","client_flag":2}
         return msg
     
-    def add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req):
+    def add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req, mobilization_type):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[sp_add_edit_subproject] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req)
+        sql = 'exec	[masters].[sp_add_edit_subproject] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req, mobilization_type)
         #print(values)
         cur.execute(sql,(values))
         for row in cur:
@@ -6144,10 +6144,16 @@ SELECT					cb.name as candidate_name,
         cur.close()
         con.close()
         return response
+        
     def mobilization_web_inser(df,user_id,ProjectType):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         try:
+            df['Permanent Address line1'] = df['Permanent Address line1'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line1'] = df['Present Address line1'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line2'] = df['Present Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Permanent Address line2'] = df['Permanent Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+
             quer_user  = "(select u.user_id from users.tbl_users as u left join users.tbl_user_details as ud on ud.user_id=u.user_id left join users.tbl_partner_users as up on up.user_id=u.user_id where u.is_active=1 and ((ud.email like trim('{}')) OR (up.email like trim('{}'))))"
             
             quer1 = '''
@@ -6259,6 +6265,12 @@ SELECT					cb.name as candidate_name,
             cur = con.cursor()
             #print(df.columns)
             #try:
+            df['Permanent Address line1'] = df['Permanent Address line1'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Permanent Address line2'] = df['Permanent Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line1'] = df['Present Address line1'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line2'] = df['Present Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Interested Course*'] = df['Interested Course*'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+
             df['Date of Birth*'] = df['Date of Birth*'].astype(str)
             out = df.values.tolist()
 
@@ -6296,20 +6308,22 @@ SELECT					cb.name as candidate_name,
             (candidate_id,mobilization_type,created_by,created_on,is_active)
             values
             '''
-            for row in out:
-                quer4 += '\n' + "({},4,'{}','{}','{}',GETDATE(),{},1),".format(row[0],row[58],row[59],row[60],quer_user.format(row[56],row[56]))
-                quer5 +=  '\n' + "({},3,{},GETDATE(),1),".format(d[i],quer_user.format(out[i][36],out[i][36]))
-
-            quer4 = quer4[:-1]+';'
-            quer5 = quer5[:-1]+';'
-
+            quer_exp = ''
             if ProjectType==1:
-                cur.execute(quer4)
-                cur.commit()
+                for row in out:
+                    quer4 += '\n' + "({},4,'{}','{}','{}',GETDATE(),{},1),".format(row[0],row[58],row[59],row[60],quer_user.format(row[56],row[56]))
+                quer_exp = quer4
             elif ProjectType==2:
-                cur.execute(quer5)
+                for row in out:
+                    quer5 +=  '\n' + "({},3,{},GETDATE(),1),".format(row[0],quer_user.format(row[55],row[55]))
+                quer_exp = quer5
+
+            if quer_exp !='':
+                #print(quer_exp)
+                quer_exp = quer_exp[:-1]+';'
+                cur.execute(quer_exp)
                 cur.commit()
-                
+
             quer7_res=''
             if (ProjectType==2):
                 out_she = df_she.values.tolist()
@@ -6344,7 +6358,7 @@ SELECT					cb.name as candidate_name,
                 if ProjectType==2:
                     query += quer7_res
                
-            
+            #print(query)
             cur.execute(query)
             cur.commit()
             out = {'Status': True, 'message': "Submitted Successfully"}
@@ -6360,6 +6374,12 @@ SELECT					cb.name as candidate_name,
             conn = pyodbc.connect(conn_str)
             curs = conn.cursor()
             
+            df['Permanent Address line1*'] = df['Permanent Address line1*'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Permanent Address line2'] = df['Permanent Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line1*'] = df['Present Address line1*'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Present Address line2'] = df['Present Address line2'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+            df['Interested Course*'] = df['Interested Course*'].map(lambda x: str(x).replace('<','_').replace('>','_').replace('&','and'))
+
             df['Date of Birth*'] = df['Date of Birth*'].astype(str)
             out = df.values.tolist()
 
@@ -8015,6 +8035,7 @@ SELECT					cb.name as candidate_name,
     def reupload_candidate_image_web_ui(user_id,user_role_id,filename,c_id,candidate_id):
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
+        print(c_id)
         quer = ""
         quer1 = "update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}' where candidate_id={}"
         quer2 = "update candidate_details.tbl_candidate_reg_enroll_details set aadhar_image_name='{}' where candidate_id = {}"

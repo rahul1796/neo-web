@@ -5130,7 +5130,7 @@ class sub_project_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            print(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+            #print(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
             return Master.sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project)
 api.add_resource(sub_project_list, '/sub_project_list')
 
@@ -5155,7 +5155,9 @@ class add_subproject_details(Resource):
             project_code = request.form['project_id']      
             isactive=request.form['isactive']
             is_ojt_req=request.form['is_ojt_req']
-            return Master.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req)
+            mobilization_type=request.form['mobilization_type']
+            
+            return Master.add_subproject_details(SubProjectName, SubProjectCode, Region, State, Centers, Course, PlannedStartDate, PlannedEndDate, ActualStartDate, ActualEndDate, user_id, subproject_id, project_code, isactive, is_ojt_req, mobilization_type)
 api.add_resource(add_subproject_details,'/add_subproject_details')
 
 #############################################################################

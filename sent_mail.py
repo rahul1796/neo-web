@@ -131,15 +131,17 @@ def ShikshaEnrolmentMail(candidate_name,enrolment_id,course,email_id,mobile):
            
 
             <p style="font-size:12pt;font-family:Times New Roman,serif;margin:0;">
-            Best Regards,<br>
-            <b>Dell Team</b>
-            </p>       
-            
+            <b>  Best Regards,  </b>
+            <br>
+            Dell Team
+            <br>
+            <img src="{}"  width="80" height="80" style="float:left">
+            </p>
             
             <br>
             </div>
             
-        '''
+        '''   
         #<img src="{}"  width="42" height="42" style="float:left"> 
             
         html_msg = html_msg.format(candidate_name,course,email_id,dell_logo)

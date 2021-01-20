@@ -11,6 +11,7 @@ var Centers;
     $(document).ready(function(){
         var $radio = $('input:radio[name="is_ojt_req"]');
         $radio.addClass("validate[required]");
+        $('input:radio[name=MOB_TYPE][value="1"]').click();
 
         $(".date-picker").flatpickr();
         $('.dropdown-search-filter').select2();
@@ -53,6 +54,7 @@ var Centers;
                 type:"GET",
                 url:URL,
                 success:function(data){
+                    //console.log(data);
                     if(data!=null)
                     {   
                     $('#ProjectName').val(data.SubProjectDetail.Sub_Project_Name);
@@ -86,9 +88,11 @@ var Centers;
                     //         {
                     //             $('#is_ojt_req').prop('checked',false);
                     //         }
+
+                    $('#MOB_TYPE').val(data.SubProjectDetail.Mobilization_Type).change();
+                    //$('input:radio[name=MOB_TYPE][value="'+data.SubProjectDetail.Mobilization_Type+'"]').click();
+                    }
                     
-                        
-                    } 
                     $('#hdn_sub_project_id').val(data.SubProjectDetail.Sub_Project_Id);
                     $('#hdn_sub_project_name').val(data.SubProjectDetail.Sub_Project_Name);
                     $('#hdn_sub_project_code').val(data.SubProjectDetail.Sub_Project_Code);
@@ -332,6 +336,8 @@ var Centers;
                     "ActualEndDate" : $('#ActualEndDate').val(),
                     "isactive" : $('#isactive').prop('checked'),
                     "is_ojt_req" : $('input:radio[name=is_ojt_req]:checked').val(), //$('#is_ojt_req').prop('checked'),
+                    "mobilization_type" : $('#MOB_TYPE').val(),
+                    //"mobilization_type" : $('input:radio[name=MOB_TYPE]:checked').val(), //$('#is_ojt_req').prop('checked'),
                     "project_id" : $('#ddlProject').val()
                 },
                 success:function(data){
@@ -972,7 +978,7 @@ var Centers;
                                                 <label class="radio-inline" for="OJT_yes">
                                                     <input type="radio" id="OJT_yes" name="is_ojt_req" value="1" required>  Yes        
                                                 </label>
-                                                <label class="radio-inline;" for="OJT_no" style="margin-left: 20px;">
+                                                <label class="radio-inline;" for="OJT_no" style="margin-left: 49px;">
                                                     <input type="radio" id="OJT_no" name="is_ojt_req" value="0">  No 
                                                 </label>
                                                 <!-- <input type="radio" id="OJT_yes" name="is_ojt_req" value="1" required>
@@ -986,9 +992,43 @@ var Centers;
                                                     <label for="is_ojt_req"> Is OJT required? </label>
                                                 </div> 
                                                 -->
+                                            </div>
+                                        </div>                                     
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="MOB_TYPE">Select Mobilization Type : </label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select class="form-control dropdown-search-filter" id="MOB_TYPE" name="MOB_TYPE" required>
+                                                    <option  value="1">Regular</option>  <!--selected-->>
+                                                    <option  value="2">SHE</option>
+                                                    <option  value="4">Dell</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+<!-- 
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label>Select Mobilization Type : </label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <label class="radio-inline" for="MOB_TYPE_REG">
+                                                    <input type="radio" id="MOB_TYPE_REG" name="MOB_TYPE" value="1" required>  Regular        
+                                                </label>
+                                                <label class="radio-inline;" for="MOB_TYPE_SHE" style="margin-left: 20px;">
+                                                    <input type="radio" id="MOB_TYPE_SHE" name="MOB_TYPE" value="2">  SHE 
+                                                </label>
+                                                <label class="radio-inline;" for="MOB_TYPE_DELL" style="margin-left: 40px;">
+                                                    <input type="radio" id="MOB_TYPE_DELL" name="MOB_TYPE" value="4">  DELL 
+                                                </label>
                                             </div>   
                                         </div>                                     
                                     </div>
+ -->
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-lg-6">

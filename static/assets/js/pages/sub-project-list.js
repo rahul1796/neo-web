@@ -496,11 +496,11 @@ function LoadTable()
             { "data": "Practice_Name"},
             { "data": "Bu_Name"},
             { "data": "Product_Name"},
+            { "data": "Mobilization_Type"},
             { "data": "Project_Manager"},
             { "data": "Start_Date"},
             { "data": "End_Date"},
             { "data": "Status"}
-            
         ],
         drawCallback: function(){
             $('#tbl_projects_paginate ul.pagination').addClass("pagination-rounded");
