@@ -7850,7 +7850,7 @@ SELECT					cb.name as candidate_name,
                 where (sp.mobilization_type=4 or c.project_type=4)
                 AND  shiksha_sync_status=1
                 AND coalesce(cis.email_sent,0)=0;
-                  '''
+                '''
             cur.execute(sql)
             mail_count=0
             Status=False
@@ -7868,10 +7868,9 @@ SELECT					cb.name as candidate_name,
                      #curs.commit()         
                     Status=True
                     mail_count = mail_count+1
-                    msg = status_mail['description']
                 else:
                     Status=False
-                    msg = status_mail['description']
+
             if success_enrollids != '':
                 success_enrollids=success_enrollids.rstrip(',')
                 sql2 = "update candidate_details.tbl_map_candidate_intervention_skilling set email_sent=1 where intervention_id in ("+success_enrollids+");"     
@@ -7881,10 +7880,10 @@ SELECT					cb.name as candidate_name,
             
             cur.close()
             con.close()
-            msg=str(mail_count)+msg
+            msg=str(mail_count)+' Email sent'
             return {"Status":Status,'Message':msg}
         except Exception as e:
-            print('exep'+str(e))
+            #print('exep'+str(e))
             return {"Status":False,'message': "error: "+str(e)}
 
 

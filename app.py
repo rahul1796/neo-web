@@ -3963,7 +3963,7 @@ def get_download_file(path):
     """Download a file."""
     #print(path)
     filename = r"{}{}".format(config.DownloadPathLocal_download,path)
-    #print(filename)
+    print(filename)
     if not(os.path.exists(filename)):
         filename = r"{}No-image-found.jpg".format(config.DownloadPathWeb)
     return send_file(filename)
@@ -4085,8 +4085,9 @@ api.add_resource(get_me_category,'/get_me_category')
 def get_tma_file(path):
     """Download a file."""
     filename = r"{}{}".format(config.neo_report_file_path,path)
+    #print(filename)
     if not(os.path.exists(filename)):
-        print(filename)
+        
         filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathWeb)
     return send_file(filename)
 
