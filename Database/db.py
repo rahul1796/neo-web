@@ -8246,6 +8246,18 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()
         return {'sheet1':data,'sheet1_columns':columns}
+    def shiksha_attandance_report(user_id, user_role_id, Customers, from_date, to_date):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec [reports].[sp_get_shiksha_attendance_download] ?, ?, ?,?, ?'
+        values = ((user_id, user_role_id, Customers, from_date, to_date))
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        curs.close()
+        cnxn.close()
+        return {'sheet1':data,'sheet1_columns':columns}
 
     def download_emp_target_template(user_id, user_role_id, date):
         cnxn=pyodbc.connect(conn_str)
