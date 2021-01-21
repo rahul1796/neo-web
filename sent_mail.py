@@ -103,6 +103,7 @@ def ShikshaEnrolmentMail(candidate_name,enrolment_id,course,email_id,mobile):
         
         msg['From'] = "do-not-reply@labournet.in"
         msg['To'] = email_id
+        msg['Bcc'] = 'sunil.k@labournet.in,soukhya.h@labournet.in,neo.helpdesk@labournet.in'
         msg['Subject'] = "DELL CSR [LabourNet Academy] Confirmation of Account Creation"
         html_msg='''
                         <div>
@@ -155,7 +156,7 @@ def ShikshaEnrolmentMail(candidate_name,enrolment_id,course,email_id,mobile):
                 part.add_header('Content-Disposition',
                                 'attachment; filename="{}"'.format(Path(path).name))
                 msg.attach(part)
-        res = server.sendmail(msg['From'], msg['To'] , msg.as_string())
+        res = server.sendmail(msg['From'], [msg['To']]+[msg['Bcc']] , msg.as_string())
         server.quit()
 
         return {'status':True,'description':'Email sent'}
