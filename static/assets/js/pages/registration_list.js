@@ -96,7 +96,7 @@ function toggleCheckbox(e)
 //}     
         var all_file_names=[];
         var fileExtension = ['xlsx']
-        var validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
+        var validImageTypes = ['image/gif', 'image/jpeg', 'image/png','application/msword','application/pdf','application/vnd.rar'];
         var imstatus=1;
         var xlsxstatus=0;
         var sizestatus=1;
@@ -116,7 +116,12 @@ function toggleCheckbox(e)
                 if (file.size > 5*1024*1024) { 
                     sizestatus=0;
                 }
+                else if((file.name=='NA') || (file.name=='na'))
+                {
+
+                }
                 else{
+
                     all_file_names.push(file.name)
                 }
             }
@@ -139,7 +144,7 @@ function toggleCheckbox(e)
     function UploadFileToProcess(xls_file,all_file_names)
     {
         UploadFileData_s3(xls_file,xls_file.name)
-        var validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
+        var validImageTypes = ['image/gif', 'image/jpeg', 'image/png','application/msword','application/pdf','application/vnd.rar'];
         var ins = document.getElementById('myFile').files.length;
         
         var form_data = new FormData(); //$('#formUpload')[0]
@@ -376,7 +381,7 @@ function LoadTable()
     $('#divCandidateList').show();
     vartable = $("#tbl_candidate").DataTable({
         "serverSide": true,
-        "aLengthMenu": [[10, 50, 100], [10, 50, 100]],
+        "aLengthMenu": [[10, 50, 100,500], [10, 50, 100,500]],
         "paging": true,
         "pageLength": 50,
         "sPaginationType": "full_numbers",

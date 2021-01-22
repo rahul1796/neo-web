@@ -5892,6 +5892,7 @@ class upload_bulk_upload(Resource):
                 df['ids']=df['Aadhar No'].astype(str)+df['Identity number'].astype(str)
                 #print(df.columns.to_list())
                 if ProjectType==1:
+                    #print(df['Candidate Photo*'])
                     img_column ='Candidate Photo*,Aadhar Image,Document copy,Educational Marksheet*,Income Certificate'
                     schema = Schema([
                         #nan check column non mandate
@@ -5915,7 +5916,7 @@ class upload_bulk_upload(Resource):
                         Column('Whatsapp Number',mob_validation + null_validation),
                         Column('Aadhar Image',null_validation),
                         #str+null check
-                        Column('Candidate Photo*',str_validation + null_validation),
+                        Column('Candidate Photo*', null_validation),
                         Column('Fresher/Experienced?*',str_validation + null_validation),
                         Column('Salutation*',str_validation + null_validation),
                         Column('First Name*',str_validation + null_validation),
@@ -7303,6 +7304,19 @@ class download_courses_list(Resource):
             return resp
 api.add_resource(download_courses_list,'/download_courses_list')
 
+class shiksha_attandance_report(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            user_id=request.args.get('user_id',0,type=int)
+            user_role_id=request.args.get('user_role_id',0,type=int)
+            Customers = request.args.get('Customers','',type=str)
+            from_date = request.args.get('from_date','',type=str)
+            to_date = request.args.get('to_date','',type=str)
+            resp = Report.shiksha_attandance_report(user_id, user_role_id, Customers, from_date, to_date)            
+            return resp
+api.add_resource(shiksha_attandance_report,'/shiksha_attandance_report')
+
 class download_users_list(Resource):
     @staticmethod
     def post():
@@ -8430,6 +8444,21 @@ def candidate_data_page():
 def candidate_data():
     if g.user:
         return render_template("home.html",values=g.User_detail_with_ids,html="candidate_data_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
+@app.route("/shiksha_attendance_page")
+def shiksha_attendance_page():
+    if g.user:
+        return render_template("Reports/shiksha_attendance.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/shiksha_attendance")
+def shiksha_attendance():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="shiksha_attendance_page")
     else:
         return render_template("login.html",error="Session Time Out!!")
 

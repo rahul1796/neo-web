@@ -1,0 +1,240 @@
+<link href="static/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+        
+<!-- third party css -->
+<link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
+<!-- third party css end -->
+
+<!-- App css -->
+<link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+    var Candidates = {};
+        $(document).ready(function(){  
+			$("#imgSpinner").hide();
+            $('.dropdown-search-filter').select2();
+            $(".date-picker").flatpickr({
+                dateFormat:'d-M-Y'
+            });
+            LoadCustomerdl();
+        });
+
+        function LoadCustomerdl(){
+        var URL=$('#hdn_web_url').val()+ "/GetALLClient"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "user_id": $('#hdn_home_user_id').val(),
+                "user_role_id": $('#hdn_home_user_role_id').val()
+            },
+            success: function (data){
+                if(data.Clients != null)
+                {
+                    $('#ddlClient').empty();
+                    var count=data.Clients.length;
+                    if( count> 0)
+                    {
+                        $('#ddlClient').append(new Option('ALL','0'));
+                        for(var i=0;i<count;i++)
+                            $('#ddlClient').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
+                        //$('#ddlCourse').val('0');
+                    }
+                    else
+                    {
+                    // $('#ddlCustomer').append(new Option('No Customer','-1'));
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error while loading BU! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function syncShikshaAttandanceData(){
+        $("#imgSpinner").show();
+        var URL=$('#hdn_web_url').val()+ "/SyncShikshaAttendanceData"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:true,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{             
+            },
+            success: function (data){
+                
+            },
+            error:function(err)
+            {
+                alert('Error while syncing data! Please try again');
+                return false;
+            }
+        });
+        return ;
+    }
+    function DownloadTableBasedOnSearch(){
+        syncShikshaAttandanceData();
+        //alert("downloading");
+        $("#imgSpinner").show();        
+       
+        if(1!=1){
+		alert('Please Select Customer');
+		}
+		else{            
+            
+			var URL=$('#hdn_web_url').val()+ "/shiksha_attandance_report"
+			$.ajax({
+                        type:"GET",
+                        url:URL,
+                        async:true,        
+                        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                        datatype:"json",            
+                        data: { 
+                        'user_id':$('#hdn_home_user_id').val(),
+                        'user_role_id':$('#hdn_home_user_role_id').val(),
+                        'Customers':$('#ddlClient').val(),
+						'from_date':$('#FromDate').val(),
+						'to_date':$('#ToDate').val()                       
+                       
+						},
+                        success:function(data){
+                        if(data!=null)
+                        {         
+                            if(data.success)
+                            {
+                                $("#imgSpinner").hide();        
+                                window.location=data.FilePath+data.FileName;
+                            }    
+                            else
+                            {
+                                $("#imgSpinner").hide(); 
+                                alert(data.msg);
+                                return false;
+                            }  
+                        }                    
+                    },
+                    error:function()
+                        {
+                            $("#imgSpinner").hide();
+                        }
+                    });
+        }
+    }
+	
+	/*function ForceDownload(varUrl, varFileName)
+            {
+                var link = document.createElement('a');
+                link.setAttribute('href', varUrl);
+                link.setAttribute('download', varFileName);
+                link.setAttribute('target', '_blank');
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } */
+</script>
+    <input type="hidden" id="hdn_candidate_id" name="hdn_candidate_id" value="0">
+       <div class="container-fluid">
+
+           <!-- start page title -->
+           <div class="row">
+               <div class="col-12">
+                   <div class="page-title-box">
+                       <div class="page-title-right">
+                           <ol class="breadcrumb m-0">
+                               <li class="breadcrumb-item"><a href="javascript: void(0);">LN</a></li>
+                               <li class="breadcrumb-item active">Candidate Attandance</li>
+                           </ol>
+                       </div>
+                       <h4 class="page-title">Candidate Attandance</h4>
+                   </div>
+               </div>
+           </div>     
+           <!-- end page title -->
+           <div class="row">
+            <div class="col-12">
+                <div class="card-box">
+                   
+                    
+                    <div class="row" >
+                        
+                        <div class="col-lg-3" >
+                            <label for="ddlClient" class="mr-2">Customer</label>
+                            <select class="form-control dropdown-search-filter"  id="ddlClient" multiple>
+                                <!-- <option selected="" value="">All</option> -->
+                            </select>
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="FromDate" class="mr-2">Attandance Date From*</label>
+                            <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
+                             ClientIdMode="static" placeholder="From Date">
+                        </div> 
+                         <div class="col-lg-3">
+                            <label for="ToDate" class="mr-2">Attandance Date To*</label>
+                            <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
+                             ClientIdMode="static" placeholder="To Date">
+                        </div>
+                       
+                       
+                    </div>
+                    
+                   
+                    <div class="row"> 
+                        <!-- <div class="col-lg-1" style="float: center; margin-top: 30px">
+                            <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTable()">Search</button>
+                        </div> -->
+                        
+                        
+                        <div class="col-lg-2">                                         
+                            <button style="float: left;margin-top: 30px" type="button" id="btn_download" class="btn btn-primary waves-effect waves-light submit" 
+                            onclick="DownloadTableBasedOnSearch()">Download</button></div>
+                       
+                        </div> 
+                        <div class="col-lg-4">
+                            <div id="imgSpinner" >
+                                <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                                <label style="display:inline-block;">Please wait while downloading report...</label>
+                            </div> 
+                        </div>
+                    </div>
+                   
+                  
+                </div> <!-- end card-box -->
+            </div><!-- end col-->
+        </div>
+          
+       </div> <!-- end container -->
+   
+   <!-- end wrapper -->
+
+<!-- ============================================================== -->
+<!-- End Page content -->
+<!-- ============================================================== -->
+
+<!-- Footer Start -->
+
+
+<!-- third party js -->
+<script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<!-- third party js ends -->
+
+<!-- datatables init js-->
