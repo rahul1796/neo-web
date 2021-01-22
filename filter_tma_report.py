@@ -42,7 +42,7 @@ def create_report(start_date, end_date, customername, centername, coursename, na
         def stage_log_fxn():
             stagelog_default_column = ['LOG DATE', 'TRAINER NAME', 'TRAINER EMAIL',  'BATCH CODE', 'BATCH START DATE',
                           'BATCH END DATE', 'CUSTOMER NAME', 'CENTER NAME', 'CENTER TYPE', 'DISTRICT', 'STATE' , 'REGION',
-                          'BUSSINESS UNIT', 'COURSE CODE', 'COURSE NAME', 'SESSION NAME']
+                          'BUSSINESS UNIT', 'COURSE CODE', 'COURSE NAME', 'SESSION NAME', 'SESSION DURATION']
             second_row = ['LOG DATE TIME', 'LOG IMAGE', 'LOG LOCATION', 'LOG DATE TIME', 'LOG IMAGE', 'LOG LOCATION',
                       'LOG DATE TIME', 'LOG IMAGE', 'LOG LOCATION', 'LOG DATE TIME', 'LOG IMAGE', 'LOG LOCATION']
             first_row = ['SESSION START', 'ONGOING SESSION', 'MARK ATTENDANCE', 'SESSION COMPLETED']
@@ -56,14 +56,14 @@ def create_report(start_date, end_date, customername, centername, coursename, na
             data = curs.fetchall()
             data = list(map(lambda x:list(x), data))
             df = pd.DataFrame(data)
-            df.iloc[:,17] = df.iloc[:,17].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + log_url + x + '","View Image")')
-            df.iloc[:,18] = df.iloc[:,18].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
-            df.iloc[:,20] = df.iloc[:,20].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + log_url + x + '","View Image")')
-            df.iloc[:,21] = df.iloc[:,21].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
-            df.iloc[:,23] = df.iloc[:,23].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + log_url + x + '","View Image")')
-            df.iloc[:,24] = df.iloc[:,24].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
-            df.iloc[:,26] = df.iloc[:,26].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + log_url + x + '","View Image")')
-            df.iloc[:,27] = df.iloc[:,27].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
+            df.iloc[:,18] = df.iloc[:,18].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + log_url + x + '","View Image")')
+            df.iloc[:,19] = df.iloc[:,19].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
+            df.iloc[:,21] = df.iloc[:,21].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + log_url + x + '","View Image")')
+            df.iloc[:,22] = df.iloc[:,22].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
+            df.iloc[:,24] = df.iloc[:,24].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + log_url + x + '","View Image")')
+            df.iloc[:,25] = df.iloc[:,25].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
+            df.iloc[:,27] = df.iloc[:,27].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + log_url + x + '","View Image")')
+            df.iloc[:,28] = df.iloc[:,28].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
             #17,18,20,21
 
             
@@ -75,10 +75,10 @@ def create_report(start_date, end_date, customername, centername, coursename, na
 
             # Write the column headers with the defined format.
             for col_num, value in enumerate(second_row):
-                worksheet.write(1, 16+col_num, value, header_format)
+                worksheet.write(1, 17+col_num, value, header_format)
 
             for col_num, value in enumerate(first_row):
-                worksheet.merge_range(0, 16+col_num*3, 0, 18+col_num*3, value, header_format)
+                worksheet.merge_range(0, 17+col_num*3, 0, 19+col_num*3, value, header_format)
 
             
         def group_images_fxn():

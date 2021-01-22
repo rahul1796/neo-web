@@ -42,7 +42,7 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
         def stage_log_fxn():
             stagelog_default_column = ['LOG DATE', 'TRAINER NAME', 'TRAINER EMAIL',  'BATCH CODE', 'BATCH START DATE',
                           'BATCH END DATE', 'CUSTOMER NAME', 'CENTER NAME', 'CENTER TYPE', 'DISTRICT', 'STATE' , 'REGION',
-                          'BUSSINESS UNIT', 'COURSE CODE', 'COURSE NAME', 'Session Plan', 'Session_Module Name', 'SESSION NAME']
+                          'BUSSINESS UNIT', 'COURSE CODE', 'COURSE NAME', 'Session Plan', 'Session_Module Name', 'SESSION NAME', 'SESSION DURATION']
             second_row = ['LOG DATE TIME', 'LOG IMAGE', 'LOG LOCATION', 'LOG DATE TIME', 'LOG IMAGE', 'LOG LOCATION',
                       'LOG DATE TIME', 'LOG IMAGE', 'LOG LOCATION', 'LOG DATE TIME', 'LOG IMAGE', 'LOG LOCATION']
             first_row = ['SESSION START', 'ONGOING SESSION', 'MARK ATTENDANCE', 'SESSION COMPLETED']
@@ -56,14 +56,14 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
             data = curs.fetchall()
             data = list(map(lambda x:list(x), data))
             df = pd.DataFrame(data)
-            df.iloc[:,19] = df.iloc[:,19].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + base_url + '/GetDocumentForExcel?image_name=' + x +'&image_path=trainer_stage_images' + '","View Image")')
-            df.iloc[:,20] = df.iloc[:,20].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
-            df.iloc[:,22] = df.iloc[:,22].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + base_url + '/GetDocumentForExcel?image_name=' + x +'&image_path=trainer_stage_images' + '","View Image")')
-            df.iloc[:,23] = df.iloc[:,23].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
-            df.iloc[:,25] = df.iloc[:,25].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + base_url + '/GetDocumentForExcel?image_name=' + x +'&image_path=trainer_stage_images' + '","View Image")')
-            df.iloc[:,26] = df.iloc[:,26].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
-            df.iloc[:,28] = df.iloc[:,28].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + base_url + '/GetDocumentForExcel?image_name=' + x +'&image_path=trainer_stage_images' + '","View Image")')
-            df.iloc[:,29] = df.iloc[:,29].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
+            df.iloc[:,20] = df.iloc[:,20].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + base_url + '/GetDocumentForExcel?image_name=' + x +'&image_path=trainer_stage_images' + '","View Image")')
+            df.iloc[:,21] = df.iloc[:,21].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
+            df.iloc[:,23] = df.iloc[:,23].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + base_url + '/GetDocumentForExcel?image_name=' + x +'&image_path=trainer_stage_images' + '","View Image")')
+            df.iloc[:,24] = df.iloc[:,24].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
+            df.iloc[:,26] = df.iloc[:,26].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + base_url + '/GetDocumentForExcel?image_name=' + x +'&image_path=trainer_stage_images' + '","View Image")')
+            df.iloc[:,27] = df.iloc[:,27].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
+            df.iloc[:,29] = df.iloc[:,29].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + base_url + '/GetDocumentForExcel?image_name=' + x +'&image_path=trainer_stage_images' + '","View Image")')
+            df.iloc[:,30] = df.iloc[:,30].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + x + '","View Location")')
             
             df.to_excel(writer, index=None, header=None, startrow=2 ,sheet_name='Stage-Log')
 
@@ -73,10 +73,10 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
 
             # Write the column headers with the defined format.
             for col_num, value in enumerate(second_row):
-                worksheet.write(1, 18+col_num, value, header_format)
+                worksheet.write(1, 19+col_num, value, header_format)
 
             for col_num, value in enumerate(first_row):
-                worksheet.merge_range(0, 18+col_num*3, 0, 20+col_num*3, value, header_format)
+                worksheet.merge_range(0, 19+col_num*3, 0, 21+col_num*3, value, header_format)
 
         def group_images_fxn():
             groupimage_default_column = ['LOG DATE', 'TRAINER NAME', 'TRAINER EMAIL', 'BATCH CODE', 'BATCH START DATE',
@@ -109,7 +109,7 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
             attendance_default_column = ['ATTENDANCE DATE', 'TRAINER NAME', 'TRAINER EMAIL', 'BATCH CODE', 'BATCH START DATE',
                             'BATCH END DATE', 'CUSTOMER NAME', 'CENTER NAME', 'CENTER TYPE', 'DISTRICT', 'STATE' , 'REGION', 'BUSSINESS UNIT',
                             'COURSE CODE', 'COURSE NAME', 'Session Plan', 'Session_Module Name','SESSION NAME', 'CANDIDATE NAME', 'ENROLLMENT ID', 'ATTENDANCE',
-                            'ATTENDANCE IMAGE']
+                            'ATTENDANCE IMAGE', 'SESSION DURATION']
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
             sql = 'exec [masters].[sp_candidate_tmareport_new] ?, ?, ?, ?, ?,?,?'
