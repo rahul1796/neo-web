@@ -9382,5 +9382,22 @@ class get_OJT_History(Resource):
                 return {'success': False, 'description': "Error : "+str(e), 'app_status':True}
 api.add_resource(get_OJT_History,'/get_OJT_History')
 
+class Sync_UserSubProjectCF_TargetData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            now = datetime.now()
+            y = int(now.strftime('%Y'))
+            m = int(now.strftime('%m'))
+
+            mon = ['DEC','JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV']
+            date = lambda m,y : mon[m%12]+'-'+str(y)
+            c_my = date(m,y)
+            p_my = date(m-1,y-1 if m==1 else y)
+
+            response=Master.Sync_UserSubProjectCF_TargetData(c_my, p_my)
+            return response
+api.add_resource(Sync_UserSubProjectCF_TargetData,'/Sync_UserSubProjectCF_TargetData')
+
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
