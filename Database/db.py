@@ -8458,3 +8458,28 @@ SELECT					cb.name as candidate_name,
             cur2.close()
             con.close()
             return out
+    
+    def Sync_UserSubProjectCF_TargetData(c_my, p_my):
+        try: 
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            sql = 'exec	[masters].[Sync_UserSubProjectCF_TargetData]  ?, ?'
+            values = (c_my, p_my)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop >0:
+                Status=True
+                msg=str(pop) + " - Synced Successfully"
+            # elif pop==0:
+            #     Status=True
+            #     msg=str(pop) + " - Synced Successfully"
+            else:
+                msg="Already Synced OR Error in Syncing"
+                Status=False
+            return {"Status":Status,'Message':msg}
+        except Exception as e:
+            return {"Status":False,'message': "error: "+str(e)}

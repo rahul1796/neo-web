@@ -42,7 +42,7 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
         def stage_log_fxn():
             stagelog_default_column = ['LOG DATE', 'TRAINER NAME', 'TRAINER EMAIL',  'BATCH CODE', 'BATCH START DATE',
                           'BATCH END DATE', 'CUSTOMER NAME', 'CENTER NAME', 'CENTER TYPE', 'DISTRICT', 'STATE' , 'REGION',
-                          'BUSSINESS UNIT', 'COURSE CODE', 'COURSE NAME', 'Session Plan', 'Session_Module Name', 'SESSION NAME', 'SESSION DURATION']
+                          'BUSSINESS UNIT', 'COURSE CODE', 'COURSE NAME', 'Session Plan', 'Session_Module Name', 'SESSION NAME', 'SESSION DURATION (MIN)']
             second_row = ['LOG DATE TIME', 'LOG IMAGE', 'LOG LOCATION', 'LOG DATE TIME', 'LOG IMAGE', 'LOG LOCATION',
                       'LOG DATE TIME', 'LOG IMAGE', 'LOG LOCATION', 'LOG DATE TIME', 'LOG IMAGE', 'LOG LOCATION']
             first_row = ['SESSION START', 'ONGOING SESSION', 'MARK ATTENDANCE', 'SESSION COMPLETED']
@@ -109,7 +109,7 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
             attendance_default_column = ['ATTENDANCE DATE', 'TRAINER NAME', 'TRAINER EMAIL', 'BATCH CODE', 'BATCH START DATE',
                             'BATCH END DATE', 'CUSTOMER NAME', 'CENTER NAME', 'CENTER TYPE', 'DISTRICT', 'STATE' , 'REGION', 'BUSSINESS UNIT',
                             'COURSE CODE', 'COURSE NAME', 'Session Plan', 'Session_Module Name','SESSION NAME', 'CANDIDATE NAME', 'ENROLLMENT ID', 'ATTENDANCE',
-                            'ATTENDANCE IMAGE', 'SESSION DURATION']
+                            'ATTENDANCE IMAGE', 'SESSION DURATION (MIN)']
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
             sql = 'exec [masters].[sp_candidate_tmareport_new] ?, ?, ?, ?, ?,?,?'
