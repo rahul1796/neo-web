@@ -136,6 +136,10 @@ class Report:
             print(str(e))
             
         return path
+    def GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+        return Database.GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+    def GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date):
+        return Database.GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date)
     
     def GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date):
         return Database.GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date)

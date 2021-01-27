@@ -4891,6 +4891,41 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
+    def GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [reports].[sp_get_placement_ageing_report_data ]  ?,?,?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+        #print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return {"Data":response}
+    def GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec  [reports].[sp_get_candidate_based_on_placement_stage]  ?,?,?,?,?,?,?,?'
+        values = (user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date)
+        cur2.execute(sql,(values))
+        #   print(cur2.fetchall())
+        #print(cur2)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return {"Targets":response}
 
     def GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date):
         response = []
@@ -4909,6 +4944,7 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return {"Data":response}
+    
     def GetContractsBasedOnCustomer(user_id,user_role_id,customer_id):
         response = []
         h={}
@@ -8251,6 +8287,7 @@ SELECT					cb.name as candidate_name,
         curs = cnxn.cursor()
         sql = 'exec [reports].[sp_get_shiksha_attendance_download] ?, ?, ?,?, ?'
         values = ((user_id, user_role_id, Customers, from_date, to_date))
+        print(values)
         curs.execute(sql,(values))
         columns = [column[0].title() for column in curs.description]
         data = curs.fetchall()
