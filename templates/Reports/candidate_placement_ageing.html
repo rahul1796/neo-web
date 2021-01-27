@@ -1,0 +1,621 @@
+
+<link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
+         
+
+<script type="text/javascript">
+    var Candidates = {};
+        $(document).ready(function(){  
+            $("#imgSpinner").hide();
+            const months = ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];     
+            $("#tbl_list").dataTable().fnDestroy();                
+            $('.dropdown-search-filter').select2();
+            $(".date-picker").flatpickr({
+                dateFormat:'d-M-Y',
+                minDate: '01.Apr.2019'
+            }); 
+            var date = new Date();
+            var firstDay =  new Date(date.getFullYear(), date.getMonth(), 1); 
+            var lastDay =   new Date(date.getFullYear(), date.getMonth() + 1, 0); 
+            var first= firstDay.getDate()+"-"+ months[firstDay.getMonth()] +"-"+firstDay.getFullYear();
+            var last= lastDay.getDate()+"-"+ months[lastDay.getMonth()] +"-"+lastDay.getFullYear();
+           // $('#FromDate').val(first);
+              $('#ToDate').val(last);
+            //alert(first);
+            LoadCustomerdl();
+            LoadRegionddl();  
+            //LoadTableBasedOnSearch();
+        });
+        function LoadCustomerdl(){
+            var URL=$('#hdn_web_url').val()+ "/GetALLClient"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id": $('#hdn_home_user_role_id').val()
+                },
+                success: function (data){
+                    if(data.Clients != null)
+                    {
+                        $('#ddlCustomer').empty();
+                        var count=data.Clients.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlRegion').append(new Option('ALL','-1'));
+                            for(var i=0;i<count;i++)
+                                $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                        // $('#ddlCustomer').append(new Option('No Customer','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+        function LoadRegionddl(){
+            var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
+                $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id" : $('#hdn_home_user_role_id').val(),
+                    "user_region_id" : $('#hdn_user_region_id').val()
+                },
+
+                success: function (data){
+                    if(data.Regions != null)
+                    {
+                        $('#ddlRegion').empty();
+                        var count=data.Regions.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlRegion').append(new Option('ALL','-1'));
+                            for(var i=0;i<count;i++)
+                                $('#ddlRegion').append(new Option(data.Regions[i].Region_Name,data.Regions[i].Region_Id));
+                            //$('#ddlCourse').val('-1');
+                        }
+                        else
+                        {
+                            $('#ddlRegion').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(err)
+                {
+                    alert('Error while loading BU! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+        function LoadContract(){
+            var URL=$('#hdn_web_url').val()+ "/GetContractsBasedOnCustomer"  //"/GetALLProject_multiple"
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                    "customer_id":$('#ddlCustomer').val().toString(),
+                    "user_id": $('#hdn_home_user_id').val(),
+                    "user_role_id": $('#hdn_home_user_role_id').val()
+                },
+                success: function (data){
+                    if(data.Contracts != null)
+                    {
+                        $('#ddlContract').empty();
+                        var count=data.Contracts.length;
+                        if( count> 0)
+                        {
+                            //$('#ddlProject').append(new Option('ALL','-1'));  , 
+                            for(var i=0;i<count;i++)
+                                $('#ddlContract').append(new Option(data.Contracts[i].Contract_Name,data.Contracts[i].Contract_Id));
+                        }
+                        else
+                        {
+                        // $('#ddlContract').append(new Option('ALL','-1'));
+                        }
+                    }
+                },
+                error:function(request, err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+            return false;
+        }
+        function LoadTableBasedOnSearch()
+        {
+            if($('#FromDate').val()=='' || $('#ToDate').val()=='')
+            {
+                alert("Please selct from and to dates.");
+                return false;
+            }
+
+            var URL=$('#hdn_web_url').val()+ "/GetPlacementAgeingReportData";
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                overflow:true,        
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                        "user_id": $('#hdn_home_user_id').val(),
+                        "user_role_id" : $('#hdn_home_user_role_id').val(),
+                        
+                        "customer_ids":$('#ddlCustomer').val().toString(),
+                        "contract_ids":$('#ddlContract').val().toString(),
+                        "from_date" : $('#FromDate').val(),
+                        "to_date" : $('#ToDate').val()
+                    },
+                success: function (data){
+                    varHtml='';
+                    let varTxt='';
+                    $("#tbl_list").dataTable().fnDestroy();
+                    $("#tbl_list tbody").empty();
+                    if(!jQuery.isEmptyObject(data))
+                    {   
+                        if (data.Data != null){
+                            var count=data.Data.length;
+                            if( count> 0)
+                            {
+                                for(var i=0;i<count;i++)
+                                {
+                                
+                                    varHtml+='<tr>';
+                                   varHtml+='  <td style="text-align:center;">'+ data.Data[i].Coo_Name +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Reporting_Mngr_Name +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].User_Name +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Sub_Project_Code +'</td>';
+                                  
+                                   varHtml+='  <td style="text-align:center;">'+ data.Data[i].Enr_Act +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Pla_Trg +'</td>';
+                                    let varLink='<a onclick="GetCandidatesBasedOnPlacementStage(\'' + data.Data[i].Sub_Project_Code + '\',\'' + '0' + '\')"  style="color:blue;cursor:pointer" >' + data.Data[i].Pla_Actual + '</a>';
+                                    let varLink1='<a onclick="GetCandidatesBasedOnPlacementStage(\'' + data.Data[i].Sub_Project_Code + '\',\'' + '1' + '\')"  style="color:blue;cursor:pointer" >' + data.Data[i].Pla_Filtered_1 + '</a>';
+                                    let varLink2='<a onclick="GetCandidatesBasedOnPlacementStage(\'' + data.Data[i].Sub_Project_Code + '\',\'' + '2' + '\')"  style="color:blue;cursor:pointer" >' + data.Data[i].Pla_Filtered_2 + '</a>';
+                                    let varLink3='<a onclick="GetCandidatesBasedOnPlacementStage(\'' + data.Data[i].Sub_Project_Code + '\',\'' + '3' + '\')"  style="color:blue;cursor:pointer" >' + data.Data[i].Pla_Filtered_3 + '</a>';
+                                    let varLink4='<a onclick="GetCandidatesBasedOnPlacementStage(\'' + data.Data[i].Sub_Project_Code + '\',\'' + '4' + '\')"  style="color:blue;cursor:pointer" >' + data.Data[i].Pla_Filtered_4 + '</a>';
+                                    let varLink5='<a onclick="GetCandidatesBasedOnPlacementStage(\'' + data.Data[i].Sub_Project_Code + '\',\'' + '5' + '\')"  style="color:blue;cursor:pointer" >' + data.Data[i].Pla_Filtered_5 + '</a>';
+                                    let varLink6='<a onclick="GetCandidatesBasedOnPlacementStage(\'' + data.Data[i].Sub_Project_Code + '\',\'' + '6' + '\')"  style="color:blue;cursor:pointer" >' + data.Data[i].Pla_Filtered_6 + '</a>';
+                                    if (data.Data[i].Pla_Actual.toString()=="0")
+                                    {
+                                        varHtml+='  <td style="text-align:center;">'+ data.Data[i].Pla_Actual +'</td>';
+                                    }
+                                    else
+                                    {   
+                                        varHtml+='  <td style="text-align:center;">'+ varLink +'</td>';                          
+
+                                    }
+                                    
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Pla_Diff +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+varLink1 +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ varLink2 +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+varLink3 +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ varLink4 +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ varLink5 +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ varLink6 +'</td>';
+                                    
+                                    varHtml+='</tr>';
+                                }
+                            }
+                            $("#tbl_list tbody").append(varHtml);
+                            $("#tbl_list").DataTable({
+                                "scrollX": true,
+                                drawCallback: function(){
+                                            $('#tbl_list_paginate ul.pagination').addClass("pagination-rounded");
+                                        }
+                            });
+                        }
+                        else
+                        {
+                            varHtml='<tr><td colspan="7" style="text-align:center;">No records found</td></tr>'
+                            $("#tbl_list tbody").append(varHtml);
+                        }
+                    }
+                    else
+                    {
+                        varHtml='<tr><td colspan="7" style="text-align:center;">No records found</td></tr>'
+                        $("#tbl_list tbody").append(varHtml);
+                    }   
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+        }
+        function GetCandidatesBasedOnPlacementStage(SubProjectCode,PlacementStage){
+            $('#head').text(SubProjectCode);
+            var URL=$('#hdn_web_url').val()+ "/GetCandidatesBasedOnPlacementStage";
+
+             $("#tbl_candidates").dataTable().fnDestroy();
+             $("#tbl_candidates tbody").empty();
+
+            $.ajax({
+                type:"GET",
+                url:URL,
+                async:false,
+                'overflow-x': scroll,
+                overflow:true,  
+                "scrollX": true,  
+                drawCallback: function(){
+                                            $('#tbl_candidates_paginate ul.pagination').addClass("pagination-rounded");
+                                        },    
+                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+                datatype:"json",
+                data:{
+                        "user_id": $('#hdn_home_user_id').val(),
+                        "user_role_id" : $('#hdn_home_user_role_id').val(),
+                        "placement_stage" : PlacementStage,
+                        "sub_project_code":SubProjectCode,
+                        "customer_ids":$('#ddlCustomer').val().toString(),
+                        "contract_ids":$('#ddlContract').val().toString(),
+                        
+                        "from_date" : $('#FromDate').val(),
+                        "to_date" : $('#ToDate').val()
+
+                },
+                success: function (data){
+                    varHtml='';
+                    var varButton='';
+                   
+                    if(!jQuery.isEmptyObject(data.Targets))
+                    {                          
+                        var count=data.Targets.length;
+                        if( count> 0)
+                        {
+                            for(var i=0;i<count;i++)
+                            {
+                                varHtml+='<tr>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Region_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].State_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Customer_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Center_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Center_Type_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Course_Code +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Batch_Code +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Actual_Start_Date +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Actual_End_Date +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].First_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Primary_Contact_No +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Assessed +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Certified +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Joined +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Employer_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Spoc_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Spoc_Number +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Offered +'</td>';
+                                
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Trainer_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Trainer_Email +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Po_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Po_Email +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Po_Mobile +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.Targets[i].Age_Days +'</td>';
+                                varHtml+='</tr>';
+                            }
+                        }
+                        $("#tbl_candidates tbody").append(varHtml);
+                        //$('#mdl_SubProjects').modal('show');
+                        var varTable = $("#tbl_candidates").DataTable({
+                                 "scrollX": true,
+                                 drawCallback: function(){
+                                             $('#tbl_candidates_paginate ul.pagination').addClass("pagination-rounded");
+                                 }
+                        });
+                        //$('#tbl_targets_paginate ul.pagination').addClass("pagination-rounded");
+                        //varTable.order.listener('#sorter', 1);
+
+                        
+                        $('#mdl_Candidates').modal('show');  
+                        //$('#tbl_candidates').find('th:nth-child(2)').click();                      
+                    }
+                    else
+                    {
+                        varHtml='<tr><td style="text-align:center;">No records found</td></tr>'
+                        $("#tbl_candidates tbody").append(varHtml);
+                        $('#mdl_Candidates').modal('show');
+                    }   
+                },
+                error:function(err)
+                {
+                    alert('Error! Please try again');
+                    return false;
+                }
+            });
+
+            return false;
+        }
+    function back()
+    {
+        $('#mdl_Candidates').modal('hide');  
+                       
+        LoadTableBasedOnSearch();
+        
+    }    
+    function DownloadTableBasedOnSearch(){
+        $("#imgSpinner").show();
+        // from candidate
+        if (0==9){
+        console.log(false)
+        }
+        else{
+            var URL=$('#hdn_web_url').val()+ "/GetECPReportDonload"
+            $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: URL, 
+                        data: {
+                            "user_id": $('#hdn_home_user_id').val(),
+                            "user_role_id" : $('#hdn_home_user_role_id').val(),
+                            "customer_ids":$('#ddlCustomer').val().toString(),
+                            "contract_ids":$('#ddlContract').val().toString(),
+                            "region_ids":$('#ddlRegion').val().toString(),
+                            "from_date" : $('#FromDate').val(),
+                            "to_date" : $('#ToDate').val()
+                        },
+                        success: function(resp) 
+                        {
+    
+                            if (resp.Status){
+                                var varAnchor = document.getElementById('lnkDownload');
+                                varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
+                                $("#imgSpinner").hide();
+                                try 
+                                    { 
+                                        //in firefox
+                                        varAnchor.click();
+                                        return;
+                                    } catch(ex) {}
+                                    
+                                    try 
+                                    { 
+                                        // in chrome
+                                        if(document.createEvent) 
+                                        {
+                                            var e = document.createEvent('MouseEvents');
+                                            e.initEvent( 'click', true, true );
+                                            varAnchor.dispatchEvent(e);
+                                            return;
+                                        }
+                                    } catch(ex) {}
+                                    
+                                    try 
+                                    { 
+                                        // in IE
+                                        if(document.createEventObject) 
+                                        {
+                                             var evObj = document.createEventObject();
+                                             varAnchor.fireEvent("onclick", evObj);
+                                             return;
+                                        }
+                                    } catch(ex) {}
+                                
+                            }
+                            else{
+                                console.log(resp)
+                                //alert('Not success')
+                                $("#imgSpinner").hide();
+                                
+                            }
+                        },
+                        error:function()
+                        {
+                            //$("#imgSpinner").hide();
+                        }
+                    });
+            
+        }
+        //$("#imgSpinner").hide();
+    }
+    
+    function ForceDownload(varUrl, varFileName)
+            {
+                var link = document.createElement('a');
+                link.setAttribute('href', varUrl);
+                link.setAttribute('download', varFileName);
+                link.setAttribute('target', '_blank');
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+</script>
+   
+</br>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">NEO</a></li>
+                        <li class="breadcrumb-item active">Candidate Placement Tracker Report</li>
+                    </ol>
+                </div>
+                <h4 class="page-title">Candidate Placement Tracker Report</h4>
+            </div>
+        </div>
+    </div>     
+   
+    <div class="row">
+        <div class="col-12">
+            <div class="card-box">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label for="ddlCustomer" class="mr-2">Customer</label>
+                        <select class="form-control dropdown-search-filter" onchange="LoadContract();" id="ddlCustomer" multiple>
+                            <option selected="" value="">All</option>                            
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="ddlContract" class="mr-2">Contract</label>
+                        <select class="form-control dropdown-search-filter" id="ddlContract" multiple>
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="FromDate" class="mr-2">Batch End Date From*</label>
+                        <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
+                        ClientIdMode="static" placeholder="From Date">
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="ToDate" class="mr-2">Batch End Date To*</label>
+                        <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
+                        ClientIdMode="static" placeholder="To Date">
+                    </div>
+                </div>
+                <div class="row">
+                    
+                    <div class="col-lg-1" >
+                        <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" 
+                                onclick="LoadTableBasedOnSearch()">Search</button>
+                    </div>
+                    <div class="form-group col-lg-2">                                         
+                        <a class="btn btn-primary" style="float: right; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
+                        <a id="lnkDownload" style="display:none;"></a>
+                    </div>
+                    <div class="form-group col-lg-3">
+                        <div id="imgSpinner">
+                            <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-block;"/>
+                            <label style="display:inline-block;">Please wait while downloading report...</label>
+                        </div> 
+                    </div>
+                </div>
+            
+                
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <h4 class="header-title"></h4>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="col-lg-12">
+                        <table id="tbl_list" class="table w-100 wrap dataTable no-footer">
+                            <thead>
+                                <tr >
+                                    <th  style="text-align:center;">COO</th>
+                                    <th style="text-align:center;">TM</th>
+                                    <th  style="text-align:center;">CM</th>
+                                    <th  style="text-align:center;">Sub Project Code</th>
+                                    <th  style="text-align:center;">Ongoing Training  </th>
+                                    <th  style="text-align:center;">Placement Target</th>
+                                    <th  style="text-align:center;">Placement Actual</th>
+                                    <th  style="text-align:center;">Unplaced Total </th>
+                                    <th  style="text-align:center;">Less than 31 days  </th>
+                                    <th  style="text-align:center;">31-45 days  </th>
+                                    <th  style="text-align:center;">46-60 days </th>
+                                    <th  style="text-align:center;">61-75 days  </th>
+                                    <th  style="text-align:center;">76-90 days  </th>
+                                    <th  style="text-align:center;">More than 90 days  </th>
+                                   
+                                </tr>
+                                
+                            </thead>                        
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div> <!-- end card body-->                
+            </div> <!-- end card -->
+        </div><!-- end col-->
+    </div>
+</div>
+
+<div id="mdl_Candidates" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title" ><span id="head"></span></h4>
+                <button type="button" class="close" data-dismiss="modal" onclick="back()" aria-hidden="true">×</button>
+            </div>                    
+            <div class="modal-body">
+                <table id="tbl_candidates" class="table table-bordered wrap dataTable no-footer" style="margin-left: 0px !important; margin-right: 10px !important;"> <!-- table-bordered dt-responsive wrap style="border-color: lightgray;width:100% !important;font-size: 12px;"   cellpadding="0" cellspacing="0" width="100%" -->
+                    <thead>
+                        <tr style="background-color: #f5f6f8;">
+
+                            <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Region</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">State</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Customer</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Name</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Center Type</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Course Name</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch Code</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch Start Date</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Batch End Date</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Name Of Candidate</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Mobile Number</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Completed</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Certificate Received</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Placement Status(Joined)</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Name of Company</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Company SPOC Name</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Comapny SPOC Contact</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Placement Status(Offered)</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Trainer Name</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Trainer Email</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Placement Officer Name</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Placement Officer Email</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Placement Officer Contact</th>
+                            <th   style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Placement Ageing(Days)</th>
+                        
+                        </tr>
+                        
+
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect"  onclick="back()" data-dismiss="modal"> Close</button>
+                <!-- <button type="button" class="btn btn-info waves-effect waves-light">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+
+</div><!--/.modal-->
+
+
+<!-- third party js -->
+<script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>
+<script src="static/assets/libs/datatables/dataTables.responsive.min.js"></script>
+<script src="static/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.buttons.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.html5.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.flash.min.js"></script>
+<script src="static/assets/libs/datatables/buttons.print.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.keyTable.min.js"></script>
+<script src="static/assets/libs/datatables/dataTables.select.min.js"></script>
+<script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>  
+<!-- third party js ends -->

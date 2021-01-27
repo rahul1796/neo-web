@@ -5256,6 +5256,60 @@ class candidate_download_report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(candidate_download_report,'/candidate_download_report')
 
+#PLACEMENT AGEING
+
+@app.route("/candidate_placement_ageing_page")
+def candidate_placement_ageing_page():
+    if g.user:
+        return render_template("Reports/candidate_placement_ageing.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/candidate_placement_ageing")
+def candidate_placement_ageing():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="candidate_placement_ageing_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class GetPlacementAgeingReportData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                customer_ids=request.args.get('customer_ids','',type=str)
+                contract_ids=request.args.get('contract_ids','',type=str)
+                from_date=request.args.get('from_date','',type=str)
+                to_date=request.args.get('to_date','',type=str)
+                response = Report.GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetPlacementAgeingReportData,'/GetPlacementAgeingReportData')
+
+
+class GetCandidatesBasedOnPlacementStage(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                placement_stage=request.args.get('placement_stage',0,type=int)
+                sub_project_code=request.args.get('sub_project_code','',type=str)
+                customer_ids=request.args.get('customer_ids','',type=str)
+                contract_ids=request.args.get('contract_ids','',type=str)                
+                from_date=request.args.get('from_date','',type=str)
+                to_date=request.args.get('to_date','',type=str)
+                   
+                response = Report.GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetCandidatesBasedOnPlacementStage,'/GetCandidatesBasedOnPlacementStage')
+
 #################################################################################################################################
 #ECP REPORT PAGE
 @app.route("/ecp_report_page")
