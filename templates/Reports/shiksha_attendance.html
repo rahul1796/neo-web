@@ -83,15 +83,16 @@
     function DownloadTableBasedOnSearch(){
         syncShikshaAttandanceData();
         //alert("downloading");
-        $("#imgSpinner").show();        
-       
+        
         if($('#FromDate').val()=='' || $('#ToDate').val()=='')
             {
                 alert("Please select from and to dates.");
+                $("#imgSpinner").hide();
                 return false;
             }
 		else{            
-            
+            $("#imgSpinner").show();        
+       
 			var URL=$('#hdn_web_url').val()+ "/shiksha_attandance_report"
 			$.ajax({
                         type:"GET",
