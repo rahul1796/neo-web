@@ -207,12 +207,54 @@
                                     }
                                     
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].Pla_Diff +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+varLink1 +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ varLink2 +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+varLink3 +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ varLink4 +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ varLink5 +'</td>';
-                                    varHtml+='  <td style="text-align:center;">'+ varLink6 +'</td>';
+                                    if (data.Data[i].Pla_Filtered_1.toString()=="0")
+                                    {
+                                        varHtml+='  <td style="text-align:center;">'+ data.Data[i].Pla_Filtered_1 +'</td>';
+                                    }
+                                    else
+                                    {   
+                                        varHtml+='  <td style="text-align:center;">'+ varLink1 +'</td>';                          
+                                    }
+                                    if (data.Data[i].Pla_Filtered_2.toString()=="0")
+                                    {
+                                        varHtml+='  <td style="text-align:center;">'+ data.Data[i].Pla_Filtered_2 +'</td>';
+                                    }
+                                    else
+                                    {   
+                                        varHtml+='  <td style="text-align:center;">'+ varLink2 +'</td>';                          
+                                    }
+                                    if (data.Data[i].Pla_Filtered_3.toString()=="0")
+                                    {
+                                        varHtml+='  <td style="text-align:center;">'+ data.Data[i].Pla_Filtered_3 +'</td>';
+                                    }
+                                    else
+                                    {   
+                                        varHtml+='  <td style="text-align:center;">'+ varLink3 +'</td>';                          
+                                    }
+                                    if (data.Data[i].Pla_Filtered_4.toString()=="0")
+                                    {
+                                        varHtml+='  <td style="text-align:center;">'+ data.Data[i].Pla_Filtered_4 +'</td>';
+                                    }
+                                    else
+                                    {   
+                                        varHtml+='  <td style="text-align:center;">'+ varLink4 +'</td>';                          
+                                    }
+                                    if (data.Data[i].Pla_Filtered_5.toString()=="0")
+                                    {
+                                        varHtml+='  <td style="text-align:center;">'+ data.Data[i].Pla_Filtered_5 +'</td>';
+                                    }
+                                    else
+                                    {   
+                                        varHtml+='  <td style="text-align:center;">'+ varLink5 +'</td>';                          
+                                    }
+                                    if (data.Data[i].Pla_Filtered_6.toString()=="0")
+                                    {
+                                        varHtml+='  <td style="text-align:center;">'+ data.Data[i].Pla_Filtered_6 +'</td>';
+                                    }
+                                    else
+                                    {   
+                                        varHtml+='  <td style="text-align:center;">'+ varLink6 +'</td>';                          
+                                    }
                                     
                                     varHtml+='</tr>';
                                 }
@@ -348,8 +390,7 @@
         }
     function back()
     {
-        $('#mdl_Candidates').modal('hide');  
-                       
+        $('#mdl_Candidates').modal('hide');                         
         LoadTableBasedOnSearch();
         
     }    
