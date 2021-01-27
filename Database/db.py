@@ -7452,11 +7452,11 @@ SELECT					cb.name as candidate_name,
         data = curs.fetchall()
         sheet2 = list(map(lambda x:list(x), data))
 
-        curs.execute(sql2,(values))
-        sheet3_columns = [column[0].title() for column in curs.description]        
-        data = curs.fetchall()
-        sheet3 = list(map(lambda x:list(x), data))
-        return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
+        # curs.execute(sql2,(values))
+        # sheet3_columns = [column[0].title() for column in curs.description]        
+        # data = curs.fetchall()
+        # sheet3 = list(map(lambda x:list(x), data))
+        return {'sheet1':sheet1,'sheet2':sheet2,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns} #,'sheet3_columns':sheet3_columns  'sheet3':sheet3,
         cur2.close()
         con.close()
 
