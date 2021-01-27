@@ -1584,7 +1584,7 @@ class Report:
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Attendance')            
             
-            first_row = ['Attendance Date','Region','Customer','Center','Trainer Name','Trainer Email','Course Code','Course Name','Batch Code','Batch Start Date','Batch End Date','Enrollment Id','Candidate Name','Candidate Email','Role','Start Time','End Time','Time Duration of Class(Actual)']
+            first_row = ['Attendance Date','Region','Customer','Center','Trainer Name','Trainer Email','Course Code','Course Name','Batch Code','Batch Start Date','Batch End Date','Enrollment Id','Candidate Name','Candidate Email','Role','Start Time','End Time','Time Duration of Class(Minutes)']
             worksheet = writer.sheets['Attendance']
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format)           
