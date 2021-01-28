@@ -395,23 +395,26 @@
         
     }    
     function DownloadTableBasedOnSearch(){
-        $("#imgSpinner").show();
         // from candidate
-        if (0==9){
-        console.log(false)
-        }
+        if($('#FromDate').val()=='' || $('#ToDate').val()=='')
+            {
+                alert("Please selct from and to dates.");
+                return false;
+            }
         else{
-            var URL=$('#hdn_web_url').val()+ "/GetECPReportDonload"
+            $("#imgSpinner").show();
+        
+            var URL=$('#hdn_web_url').val()+ "/GetPlacementAgeingReportDonload"
             $.ajax({
-                        type: "POST",
+                        type: "GET",
                         dataType: "json",
                         url: URL, 
                         data: {
                             "user_id": $('#hdn_home_user_id').val(),
                             "user_role_id" : $('#hdn_home_user_role_id').val(),
+                            
                             "customer_ids":$('#ddlCustomer').val().toString(),
                             "contract_ids":$('#ddlContract').val().toString(),
-                            "region_ids":$('#ddlRegion').val().toString(),
                             "from_date" : $('#FromDate').val(),
                             "to_date" : $('#ToDate').val()
                         },

@@ -1595,6 +1595,60 @@ class Report:
         except Exception as e:
             print(str(e))
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+    def GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+        try:
+            data=Database.GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+            DownloadPath=config.neo_report_file_path+'report file/'
+            report_name = 'Placement_Ageing_Report_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
+            r=re.compile('Placement_Ageing_Report_.*')
+            lst=os.listdir(DownloadPath)
+            newlist = list(filter(r.match, lst))
+            for i in newlist:
+                os.remove( DownloadPath + i)
+            path = '{}{}'.format(DownloadPath,report_name)
+            res={}
+            res=Report.CreateExcelPlacementAgeingReport(data,path)
+            os.chmod(DownloadPath+report_name, 0o777)
+            if res['success']:
+                return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
+            else:
+                return {"success":False,"msg":res['msg']}
+        except Exception as e:
+            print(str(e))
+            return {"success":False,"msg":str(e)}
+    def CreateExcelPlacementAgeingReport(data,path):
+        try:
+            writer = pd.ExcelWriter(path, engine='xlsxwriter')
+            workbook  = writer.book
+
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'valign': 'center',
+                'align' : 'left',
+                'fg_color': '#D7E4BC',
+                'border': 1})
+            df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Placement Ageing')            
+            df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Detailed Report')            
+            
+            first_row = ['COO','TM','CM','Sub_Project_Code','Ongoing Training','Placement Target','Placement Actual','Unplaced Total','<31days','32-45 days','46-60 days','61-75 days','76-90 days','>90 days']
+            worksheet = writer.sheets['Placement Ageing']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format) 
+
+            first_row = ['Region','State','Customer','Center','Center Type','Course Code','Batch Code','Batch Start Date','Batch End Date','Candidate Name','Candidate Mobile','Assessed','Certified','Placement Status(Joined)','Company Name','Company SPOC Name','Company SPOC Number','Placement Status(OPffered)','Trainer Name','Trainer Email','Placement Officer Name','Placement Officer Email','Placement Officer Number','Ageing days']
+            worksheet = writer.sheets['Detailed Report']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format)           
+            
+            writer.save()
+
+            return({'msg':'created excel', 'success':True, 'filename':path})
+        except Exception as e:
+            print(str(e))
+            return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
     
     def DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id):
         try:
