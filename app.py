@@ -5257,6 +5257,74 @@ class candidate_download_report(Resource):
                 return {"exceptione":str(e)}
 api.add_resource(candidate_download_report,'/candidate_download_report')
 
+#PLACEMENT AGEING
+
+@app.route("/candidate_placement_ageing_page")
+def candidate_placement_ageing_page():
+    if g.user:
+        return render_template("Reports/candidate_placement_ageing.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/candidate_placement_ageing")
+def candidate_placement_ageing():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="candidate_placement_ageing_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+class GetPlacementAgeingReportData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                customer_ids=request.args.get('customer_ids','',type=str)
+                contract_ids=request.args.get('contract_ids','',type=str)
+                from_date=request.args.get('from_date','',type=str)
+                to_date=request.args.get('to_date','',type=str)
+                response = Report.GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetPlacementAgeingReportData,'/GetPlacementAgeingReportData')
+
+
+class GetCandidatesBasedOnPlacementStage(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                placement_stage=request.args.get('placement_stage',0,type=int)
+                sub_project_code=request.args.get('sub_project_code','',type=str)
+                customer_ids=request.args.get('customer_ids','',type=str)
+                contract_ids=request.args.get('contract_ids','',type=str)                
+                from_date=request.args.get('from_date','',type=str)
+                to_date=request.args.get('to_date','',type=str)
+                   
+                response = Report.GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetCandidatesBasedOnPlacementStage,'/GetCandidatesBasedOnPlacementStage')
+
+class GetPlacementAgeingReportDonload(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            user_id=request.args.get('user_id',0,type=int)
+            user_role_id=request.args.get('user_role_id',0,type=int)
+            customer_ids=request.args.get('customer_ids','',type=str)
+            contract_ids=request.args.get('contract_ids','',type=str)
+            from_date=request.args.get('from_date','',type=str)
+            to_date=request.args.get('to_date','',type=str)
+            resp = Report.GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)            
+            return resp
+api.add_resource(GetPlacementAgeingReportDonload,'/GetPlacementAgeingReportDonload')
+
 #################################################################################################################################
 #ECP REPORT PAGE
 @app.route("/ecp_report_page")
@@ -7304,6 +7372,19 @@ class download_courses_list(Resource):
             return resp
 api.add_resource(download_courses_list,'/download_courses_list')
 
+class shiksha_attandance_report(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            user_id=request.args.get('user_id',0,type=int)
+            user_role_id=request.args.get('user_role_id',0,type=int)
+            Customers = request.args.get('Customers','',type=str)
+            from_date = request.args.get('from_date','',type=str)
+            to_date = request.args.get('to_date','',type=str)
+            resp = Report.shiksha_attandance_report(user_id, user_role_id, Customers, from_date, to_date)            
+            return resp
+api.add_resource(shiksha_attandance_report,'/shiksha_attandance_report')
+
 class download_users_list(Resource):
     @staticmethod
     def post():
@@ -8435,6 +8516,21 @@ def candidate_data():
         return render_template("login.html",error="Session Time Out!!")
 
 
+@app.route("/shiksha_attendance_page")
+def shiksha_attendance_page():
+    if g.user:
+        return render_template("Reports/shiksha_attendance.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/shiksha_attendance")
+def shiksha_attendance():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="shiksha_attendance_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
 ############################## nation wise report 
 @app.route("/NationalReport_page")
 def NationalReport_page():
@@ -9353,6 +9449,23 @@ class get_OJT_History(Resource):
             except Exception as e:
                 return {'success': False, 'description': "Error : "+str(e), 'app_status':True}
 api.add_resource(get_OJT_History,'/get_OJT_History')
+
+class Sync_UserSubProjectCF_TargetData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            now = datetime.now()
+            y = int(now.strftime('%Y'))
+            m = int(now.strftime('%m'))
+
+            mon = ['DEC','JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV']
+            date = lambda m,y : mon[m%12]+'-'+str(y)
+            c_my = date(m,y)
+            p_my = date(m-1,y-1 if m==1 else y)
+
+            response=Master.Sync_UserSubProjectCF_TargetData(c_my, p_my)
+            return response
+api.add_resource(Sync_UserSubProjectCF_TargetData,'/Sync_UserSubProjectCF_TargetData')
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)

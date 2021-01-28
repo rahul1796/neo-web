@@ -4891,6 +4891,41 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
+    def GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [reports].[sp_get_placement_ageing_report_data ]  ?,?,?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+        #print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return {"Data":response}
+    def GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec  [reports].[sp_get_candidate_based_on_placement_stage]  ?,?,?,?,?,?,?,?'
+        values = (user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date)
+        cur2.execute(sql,(values))
+        #   print(cur2.fetchall())
+        #print(cur2)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return {"Targets":response}
 
     def GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date):
         response = []
@@ -4909,6 +4944,7 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return {"Data":response}
+    
     def GetContractsBasedOnCustomer(user_id,user_role_id,customer_id):
         response = []
         h={}
@@ -7416,11 +7452,11 @@ SELECT					cb.name as candidate_name,
         data = curs.fetchall()
         sheet2 = list(map(lambda x:list(x), data))
 
-        curs.execute(sql2,(values))
-        sheet3_columns = [column[0].title() for column in curs.description]        
-        data = curs.fetchall()
-        sheet3 = list(map(lambda x:list(x), data))
-        return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
+        # curs.execute(sql2,(values))
+        # sheet3_columns = [column[0].title() for column in curs.description]        
+        # data = curs.fetchall()
+        # sheet3 = list(map(lambda x:list(x), data))
+        return {'sheet1':sheet1,'sheet2':sheet2,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns} #,'sheet3_columns':sheet3_columns  'sheet3':sheet3,
         cur2.close()
         con.close()
 
@@ -8246,6 +8282,45 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()
         return {'sheet1':data,'sheet1_columns':columns}
+    def shiksha_attandance_report(user_id, user_role_id, Customers, from_date, to_date):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec [reports].[sp_get_shiksha_attendance_download] ?, ?, ?,?, ?'
+        values = ((user_id, user_role_id, Customers, from_date, to_date))
+        print(values)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        curs.close()
+        cnxn.close()
+        return {'sheet1':data,'sheet1_columns':columns}
+    def GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        sheet2=[]
+        sheet2_columns=[]
+        placement_stage=-1
+        sub_project_code=''
+        sql = 'exec [reports].[sp_get_placement_ageing_report_data] ?, ?, ?,?, ?, ?'
+        sql1 = 'exec [reports].[sp_get_candidate_based_on_placement_stage]?, ?, ?,?, ?, ?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))
+        values = (user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date)        
+        curs.execute(sql1,(values))
+        sheet2_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet2 = list(map(lambda x:list(x), data))  
+         
+        curs.close()
+        cnxn.close()
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns,'sheet2':sheet2,'sheet2_columns':sheet2_columns}
+    
 
     def download_emp_target_template(user_id, user_role_id, date):
         cnxn=pyodbc.connect(conn_str)
@@ -8446,3 +8521,28 @@ SELECT					cb.name as candidate_name,
             cur2.close()
             con.close()
             return out
+    
+    def Sync_UserSubProjectCF_TargetData(c_my, p_my):
+        try: 
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            sql = 'exec	[masters].[Sync_UserSubProjectCF_TargetData]  ?, ?'
+            values = (c_my, p_my)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop >0:
+                Status=True
+                msg=str(pop) + " - Synced Successfully"
+            # elif pop==0:
+            #     Status=True
+            #     msg=str(pop) + " - Synced Successfully"
+            else:
+                msg="Already Synced OR Error in Syncing"
+                Status=False
+            return {"Status":Status,'Message':msg}
+        except Exception as e:
+            return {"Status":False,'message': "error: "+str(e)}
