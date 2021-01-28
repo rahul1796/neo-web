@@ -8,7 +8,8 @@
         $(document).ready(function(){  
             $("#imgSpinner").hide();
             const months = ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];     
-            $("#tbl_list").dataTable().fnDestroy();                
+            $("#tbl_list").dataTable().fnDestroy(); 
+            $("#tbl_candidates").dataTable().fnDestroy();                
             $('.dropdown-search-filter').select2();
             $(".date-picker").flatpickr({
                 dateFormat:'d-M-Y',
@@ -142,19 +143,20 @@
             });
             return false;
         }
-        function LoadTableBasedOnSearch()
+    function LoadTableBasedOnSearch()
         {
+            $('#mdl_Candidates').modal('hide');                         
+            
             if($('#FromDate').val()=='' || $('#ToDate').val()=='')
             {
                 alert("Please selct from and to dates.");
                 return false;
             }
-
+            $("#imgSpinner").show();
             var URL=$('#hdn_web_url').val()+ "/GetPlacementAgeingReportData";
             $.ajax({
                 type:"GET",
                 url:URL,
-                async:false,
                 overflow:true,        
                 beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
                 datatype:"json",
@@ -261,11 +263,13 @@
                             }
                             $("#tbl_list tbody").append(varHtml);
                             $("#tbl_list").DataTable({
+                                
                                 "scrollX": true,
                                 drawCallback: function(){
                                             $('#tbl_list_paginate ul.pagination').addClass("pagination-rounded");
                                         }
                             });
+                            $("#imgSpinner").hide();
                         }
                         else
                         {
@@ -286,19 +290,18 @@
                 }
             });
         }
-        function GetCandidatesBasedOnPlacementStage(SubProjectCode,PlacementStage){
+    function GetCandidatesBasedOnPlacementStage(SubProjectCode,PlacementStage){
             $('#head').text(SubProjectCode);
             var URL=$('#hdn_web_url').val()+ "/GetCandidatesBasedOnPlacementStage";
 
-             $("#tbl_candidates").dataTable().fnDestroy();
-             $("#tbl_candidates tbody").empty();
-
+            $("#tbl_candidates").dataTable().fnDestroy();
+            
             $.ajax({
                 type:"GET",
                 url:URL,
-                async:false,
                 'overflow-x': scroll,
                 overflow:true,  
+                async:false,
                 "scrollX": true,  
                 drawCallback: function(){
                                             $('#tbl_candidates_paginate ul.pagination').addClass("pagination-rounded");
@@ -357,6 +360,8 @@
                                 varHtml+='</tr>';
                             }
                         }
+                        $("#tbl_candidates tbody").empty();
+
                         $("#tbl_candidates tbody").append(varHtml);
                         //$('#mdl_SubProjects').modal('show');
                         var varTable = $("#tbl_candidates").DataTable({
@@ -391,7 +396,8 @@
     function back()
     {
         $('#mdl_Candidates').modal('hide');                         
-        LoadTableBasedOnSearch();
+            
+        //LoadTableBasedOnSearch();
         
     }    
     function DownloadTableBasedOnSearch(){
@@ -540,8 +546,8 @@
                     </div>
                     <div class="form-group col-lg-3">
                         <div id="imgSpinner">
-                            <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-block;"/>
-                            <label style="display:inline-block;">Please wait while downloading report...</label>
+                            <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-block;margin-top:30px;"/>
+                            <label style="display:inline-block;">Please wait while loading report...</label>
                         </div> 
                     </div>
                 </div>
