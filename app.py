@@ -5311,6 +5311,20 @@ class GetCandidatesBasedOnPlacementStage(Resource):
                 return {'exception':str(e)}
 api.add_resource(GetCandidatesBasedOnPlacementStage,'/GetCandidatesBasedOnPlacementStage')
 
+class GetPlacementAgeingReportDonload(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            user_id=request.args.get('user_id',0,type=int)
+            user_role_id=request.args.get('user_role_id',0,type=int)
+            customer_ids=request.args.get('customer_ids','',type=str)
+            contract_ids=request.args.get('contract_ids','',type=str)
+            from_date=request.args.get('from_date','',type=str)
+            to_date=request.args.get('to_date','',type=str)
+            resp = Report.GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)            
+            return resp
+api.add_resource(GetPlacementAgeingReportDonload,'/GetPlacementAgeingReportDonload')
+
 #################################################################################################################################
 #ECP REPORT PAGE
 @app.route("/ecp_report_page")
