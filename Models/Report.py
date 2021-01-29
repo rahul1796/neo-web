@@ -395,7 +395,7 @@ class Report:
                 elif value=='Actual':
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6
-                elif (value=='C/F') or (value=='Gap'):
+                elif (value=='C/F From Last Month') or (value=='Gap_Selected Month'):
                     worksheet.merge_range(1, col, 2, col, value, header_format)
                     col=col+1
 
@@ -430,7 +430,7 @@ class Report:
                 elif value=='Actual':
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6
-                elif (value=='C/F') or (value=='Gap'):
+                elif (value=='C/F From Last Month') or (value=='Gap_Selected Month'):
                     worksheet.merge_range(1, col, 2, col, value, header_format)
                     col=col+1
             cf_gap=0
@@ -521,7 +521,7 @@ class Report:
                 elif value=='Actual':
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6
-                elif (value=='C/F') or (value=='Gap'):
+                elif (value=='C/F From Last Month') or (value=='Gap_Selected Month'):
                     worksheet.merge_range(1, col, 2, col, value, header_format)
                     col=col+1
             cf_gap=0
@@ -555,7 +555,7 @@ class Report:
                 elif value=='Actual':
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6
-                elif (value=='C/F') or (value=='Gap'):
+                elif (value=='C/F From Last Month') or (value=='Gap_Selected Month'):
                     worksheet.merge_range(1, col, 2, col, value, header_format)
                     col=col+1
             cf_gap=0
@@ -649,7 +649,7 @@ class Report:
                 elif value=='Actual':
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6
-                elif (value=='C/F') or (value=='Gap'):
+                elif (value=='C/F From Last Month') or (value=='Gap_Selected Month'):
                     worksheet.merge_range(1, col, 2, col, value, header_format)
                     col=col+1
             cf_gap=0
@@ -684,15 +684,15 @@ class Report:
                 elif value=='Actual':
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6
-                elif (value=='C/F') or (value=='Gap'):
+                elif (value=='C/F From Last Month') or (value=='Gap_Selected Month'):
                     worksheet.merge_range(1, col, 2, col, value, header_format)
                     col=col+1
             cf_gap=0
             for col_num, value in enumerate(third_row):
                 if col_num in (0,22,27):
-                    cf_gap +=1
+                    cf_gap += 1
                 if col_num in (11,38,):
-                    cf_gap +=2
+                    cf_gap += 2
                 worksheet.write(2, 4+cf_gap+col_num, value, header_format)
     
             # worksheet = writer.sheets['User-Course']            
