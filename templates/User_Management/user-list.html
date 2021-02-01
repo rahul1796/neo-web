@@ -44,20 +44,28 @@
             LoadProjectddl();
             LoadStatusddl();
             LoadTable('{{role}}'); 
+            $("#imgSpinner1").hide();
+            $("#imgSpinner2").hide();
+            $("#imgSpinner3").hide();
             role_id=parseInt($('#hdn_home_user_role_id').val());
             if(role_id == 5)
                 $('#btn_create').hide();                
             if(role_id == 1){
                 $('#btn_upload').show();
+                $('#btn_upload_emp').show();
                 $('#btn_download').show();}
             else {
                 $('#btn_upload').hide();
+                $('#btn_upload_emp').hide();
                 $('#btn_download').hide();}
         });
         </script>
        <form id='form1' method="POST" action="/assign_user_add_edit_to_home">
             
                 <input type="hidden" id="hdn_neo_user_id" name="hdn_neo_user_id" value="0">
+                <input type="hidden" id="hdn_upl_user_id" name="hdn_upl_user_id" value="0">
+                <input type="hidden" id="hdn_upl_user_name" name="hdn_upl_user_name" value="">
+               
                 <div class="container-fluid">
     
                     <!-- start page title -->
@@ -138,11 +146,15 @@
                                     <div class="col-lg-2" >                                        
                                         <button style="float: left;margin-top: 30px" type="button" id="btn_download" class="btn btn-primary waves-effect waves-light submit" 
                                         onclick="DownloadTableBasedOnSearch()">Download</button></div>
-                                   
+                                         
+                               
                                    
                                     
                                     <div class="col-lg-3" >                                        
                                         <button style="float: left; margin-top: 30px; display: none;"  id="btn_upload" onclick="UploadUserMdl()" type="button" class="btn btn-info waves-effect waves-light">Add/Modify Employees</a>
+                                    </div>
+                                    <div class="col-lg-3" > 
+                                    <button style="float: left; margin-top: 30px; margin-right:8px; display:none;"  id="btn_upload_emp" onclick="uploadEmployeeAllocation()" type="button" class="btn btn-info waves-effect waves-light">Upload Employee Allocation</a>
                                     </div>
                                     <div class="form-group col-lg-3">
                                         <div id="imgSpinner" style="display: none;">
@@ -218,6 +230,13 @@
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                     </div>
                     <div class="modal-body">
+                        <!--<div class="row">
+                            <div class="col-md-12">
+                                <button style="float: right;" type="button" id="btnShowUploadTimeModal" onclick="showUploadEmployeeTimeModal()" class="btn btn-primary">Upload Employee Sub-Project Allocation</a>
+                            </div>
+                        </div>
+                        <br>
+                        <br>-->
                         <table id="tblSubProject" class="table table-bordered dt-responsive wrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
                             <thead>                        
                                 <tr style="background-color: #f5f6f8;">
@@ -228,7 +247,7 @@
                                     <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Code</th>
                                     <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Name</th>
                                     <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Business Unit</th>
-                                </tr>
+                                   </tr>
                             </thead>
                             <tbody>
         
@@ -319,7 +338,51 @@
                 </div>
             </div>
         </div><!--/.modal-->
-        
+        <div id="mdl_employee_allocation_upload" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content ">
+                    <form id="formAllocationUpload" action="javascript:UploadUserSubProjectAlloctaionFile()">
+                    <div class="modal-header">
+                        <h4 class="modal-title"><span id="HduploadFileEmp"></span></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <label for="myFileemp">Upload File* :</label>
+                                </div>
+                                <div class="col-lg-3">
+                                    <input type="month" class="form-control" name="Month_Year" id="Month_Year" placeholder="Month Year" ClientIdMode="static" required>
+                                </div>
+                                <div class="col-lg-3">
+                                    <input type="file" id="myFileemp" name="myFileemp">
+                                </div>
+                                <div class="col-lg-3">
+                                    <button class="btn btn-info btn-sm waves-effect waves-light" type="button" onclick="DownloadEmployeeTimeTemplate()">Download Template</button>
+                                    <a id="lnkDownload" style="display:none;"></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div id="imgSpinner2">
+                            <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                            <label style="display:inline-block;">Please wait while downloading template...</label>
+                        </div>
+                        <div id="imgSpinner3">
+                            <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                            <label style="display:inline-block;">Please wait while uploading...</label>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary waves-effect" type="submit" >Upload</button>
+                            <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Close</button>
+                        </div>
+                    </div>
+                </form>
+                </div>
+            </div>
+        </div><!--/.modal-->
 <div id="mdl_user_target" class="modal fade" role="dialog">
     <div class="modal-dialog modal-xl">
         <div class="modal-content ">

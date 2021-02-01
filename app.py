@@ -7385,6 +7385,26 @@ class shiksha_attandance_report(Resource):
             return resp
 api.add_resource(shiksha_attandance_report,'/shiksha_attandance_report')
 
+
+class DownloadEmpTimeAllocationTemplate(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                user_id = request.form['user_id']
+                user_role_id  = request.form['user_role_id']
+                date = request.form["date"]
+                
+                file_name='Employee_allocation_template_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
+            
+                resp = Report.DownloadEmpTimeAllocationTemplate(file_name, user_id, user_role_id, date)
+                return resp
+                
+            except Exception as e:
+                print({"exceptione":str(e)})
+api.add_resource(DownloadEmpTimeAllocationTemplate,'/DownloadEmpTimeAllocationTemplate')
+
+
 class download_users_list(Resource):
     @staticmethod
     def post():
@@ -9179,6 +9199,67 @@ class upload_employee_target_plan(Resource):
                  return {"Status":False, "message":"Unable to upload " + str(e)}            
 api.add_resource(upload_employee_target_plan,'/upload_employee_target_plan')
 
+class upload_employee_allocation_plan(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:
+                f = request.files['myFileemp']
+                user_id = request.form["user_id"]
+                user_role_id = request.form["user_role_id"]
+                Month_Year = request.form["month_year"]
+                time_regex='^([0-1]?[0-9]|2[0-3])::[0-5][0-9]$'
+                Month_Year_excel = datetime.strptime(Month_Year, '%Y-%m-%d').strftime('%b-%Y').upper()
+                month_year_validation = [CustomElementValidation(lambda d: datetime.strptime(d, '%b-%Y').strftime('%Y-%m-%d')==Month_Year, "only '{}' date allowed".format(Month_Year_excel))]
+                time_validation = [CustomElementValidation(lambda d: (re.search(time_regex,d)!=None), 'Inavalid time format. Please provide correct allocation time')]
+
+                file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
+                f.save(file_name)
+                df= pd.read_excel(file_name,sheet_name='Employee Allocation') #,dtype={'E Planned Start Date': str, 'E Planned End Date': str,'C Planned Date': str,'P Planned Start Date': str, 'P Planned End Date': str}
+                df = df.fillna('')
+
+                schema = Schema([
+                        Column('Employee Code(NE)',str_validation+null_validation),
+                        Column('Employee name(NE)',str_validation+null_validation),
+                        Column('NEO Role(NE)',str_validation+null_validation),
+                        Column('Sub Project Code(NE)',str_validation+null_validation),
+                        Column('Sub Project Name(NE)',null_validation),
+                        Column('Month & Year*',month_year_validation+str_validation+null_validation),
+
+                        Column('Week 1 Allocation(HH::MM)',time_validation+null_validation),
+                        Column('Week 2 Allocation(HH::MM)',time_validation+null_validation),
+                        Column('Week 3 Allocation(HH::MM)',time_validation+null_validation),
+                        Column('Week 4 Allocation(HH::MM)',time_validation+null_validation),
+                       
+                        ])
+                errors = schema.validate(df)
+                errors_index_rows = [e.row for e in errors]
+                len_error = len(errors_index_rows)
+                os.remove(file_name)
+                if len_error>0:
+                    file_name = 'Error_'+str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.csv'
+                    pd.DataFrame({'col':errors}).to_csv(config.bulk_upload_path + 'Error/' + file_name)
+                    return {"Status":False, "message":"Validation_Error", "error":"Validation Error <a href='/Bulk Upload/Error/{}' >Download error log</a>".format(file_name) }
+                else:
+                    df.columns = df.columns.str.replace(" ", "_")
+                    df.columns = df.columns.str.replace("*", "")
+                    df.columns = df.columns.str.replace("(", "_")
+                    df.columns = df.columns.str.replace(")", "")
+                    df.columns = df.columns.str.replace("&", "")
+                    df.columns = df.columns.str.replace("::", "_")
+                    df = df.drop_duplicates()
+                    df.insert(0, 'row_index', range(len(df)))
+
+                    col = ['row_index', 'Employee_Code_NE', 'Employee_name_NE', 'NEO_Role_NE', 'Sub_Project_Code_NE', 'Month__Year', 'Week_1_Allocation_HH_MM', 'Week_2_Allocation_HH_MM', 'Week_3_Allocation_HH_MM',
+                            'Week_4_Allocation_HH_MM']
+                    df = df[col]
+                    
+                    out = Database.upload_employee_allocation_plan(df,user_id,user_role_id)
+                    return out
+            except Exception as e:
+                print('Exc'+str(e))
+                return {"Status":False, "message":"Unable to upload " + str(e)}            
+api.add_resource(upload_employee_allocation_plan,'/upload_employee_allocation_plan')
 @app.route("/Assessment_report_page")
 def Assessment_report_page():
     if g.user:
