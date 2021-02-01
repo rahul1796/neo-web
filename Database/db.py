@@ -8320,7 +8320,19 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns,'sheet2':sheet2,'sheet2_columns':sheet2_columns}
-    
+    def DownloadEmpTimeAllocationTemplate(user_id, user_role_id, date):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec [reports].[sp_get_emp_allocation_download] ?, ?, ?'
+        values = (user_id, user_role_id, date)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        curs.close()
+        cnxn.close()
+        return (data,columns)
+
 
     def download_emp_target_template(user_id, user_role_id, date):
         cnxn=pyodbc.connect(conn_str)
@@ -8351,6 +8363,24 @@ SELECT					cb.name as candidate_name,
             con.close()
             return {"Status":True,'message': "Uploaded successfully"}
         except Exception as e:
+            return {"Status":False,'message': "error: "+str(e)}
+    def upload_employee_allocation_plan(df,user_id,user_role_id):
+        try:            
+            #print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            #print(len(df))
+            json_str=df.to_json(orient='records')
+            sql = 'exec	[masters].[sp_upload_employee_sub_project_allocation] ?,?,?'
+            values = (json_str,user_id,user_role_id)
+            cur.execute(sql,(values))
+            
+            cur.commit()
+            cur.close()
+            con.close()
+            return {"Status":True,'message': "Uploaded successfully"}
+        except Exception as e:
+            print('Ex'+str(e))
             return {"Status":False,'message': "error: "+str(e)}
 
     def download_Assessment_report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
