@@ -1633,7 +1633,7 @@ class Report:
             df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Detailed Report')            
             
-            first_row = ['COO','TM','CM','Sub_Project_Code','Ongoing Training','Placement Target','Placement Actual','Unplaced Total','<31days','32-45 days','46-60 days','61-75 days','76-90 days','>90 days']
+            first_row = ['COO','TM','CM','Sub_Project_Code','Sub_Project_Name','Ongoing Training','Placement Target','Placement Actual','Unplaced Total','<31days','32-45 days','46-60 days','61-75 days','76-90 days','>90 days']
             worksheet = writer.sheets['Placement Ageing']
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format) 
