@@ -8483,6 +8483,15 @@ class SendShikshaCandidateEnrolmentMail(Resource):
             return response
 api.add_resource(SendShikshaCandidateEnrolmentMail,'/SendShikshaCandidateEnrolmentMail')
 
+class SendPulishAssessmentMailEACP(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            print("x")
+            #response=Master.SendPulishAssessmentMailEACP()
+            
+api.add_resource(SendPulishAssessmentMailEACP,'/SendPulishAssessmentMailEACP')
+
 ################################### SL4 report
 @app.route("/SL4Report_page")
 def SL4Report_page():

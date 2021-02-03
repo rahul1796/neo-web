@@ -7921,8 +7921,8 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             print('exep'+str(e))
             return {"Status":False,'message': "error: "+str(e)}
-
-
+    
+    
     def app_get_release_date_msg():
         res = []
         h={}
