@@ -527,13 +527,183 @@ function UpdateRole()
         });
     
 }
+
+function uploadEmployeeAllocation()
+{
+    $('#HduploadFileEmp').text('Upload Employee Allocation Plan');
+    $('#imgSpinner2').hide();
+    $('#mdl_employee_allocation_upload').modal('show');
+    
+    $('#myFileemp').val('');
+}
+
+
+function DownloadEmployeeTimeTemplate(){
+    var date = $('#Month_Year').val()+'-01';
+    //console.log(date);
+    if(date=='-01'){
+        alert('please search date');
+        return 
+    }
+    else{
+        $("#imgSpinner2").show();
+        var URL=$('#hdn_web_url').val()+ "/DownloadEmpTimeAllocationTemplate"
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: URL,
+            data: {
+                'user_id':$('#hdn_home_user_id').val(),
+                'user_role_id':$('#hdn_home_user_role_id').val(),
+                'date':date
+            },
+            success: function(resp) 
+            {
+                console.log(resp)
+                if (resp.Status){
+                    var varAnchor = document.getElementById('lnkDownload');
+                    varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.filename;
+                    $("#imgSpinner2").hide();
+                    try 
+                        { 
+                            //in firefox
+                            varAnchor.click();
+                            return;
+                        } catch(ex) {}
+                        
+                        try 
+                        { 
+                            // in chrome
+                            if(document.createEvent) 
+                            {
+                                var e = document.createEvent('MouseEvents');
+                                e.initEvent( 'click', true, true );
+                                varAnchor.dispatchEvent(e);
+                                return;
+                            }
+                        } catch(ex) {}
+                        
+                        try 
+                        { 
+                            // in IE
+                            if(document.createEventObject) 
+                            {
+                                    var evObj = document.createEventObject();
+                                    varAnchor.fireEvent("onclick", evObj);
+                                    return;
+                            }
+                        } catch(ex) {}
+                }
+                else{
+                    alert(resp.Description)
+                    $("#imgSpinner2").hide();
+                    
+                }
+            },
+            error:function()
+            {
+                //console.log(resp)
+                $("#imgSpinner2").hide();
+            }
+        });
+    }
+ 
+}
+
+function UploadUserSubProjectAlloctaionFile(){
+    if ($('#myFileemp').get(0).files.length === 0) {
+        alert("No files selected.");
+    }
+    else if ($('#Month_Year').val()==''){
+        alert('No date selected.');
+    }
+    else
+    {
+        var fileExtension = ['xlsx']
+        if ($.inArray($('#myFileemp').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            alert("Formats allowed are : "+fileExtension.join(', '));
+            return false;
+        }
+        else
+        {          
+            $("#imgSpinner3").show();
+            var files=document.getElementById("myFileemp").files;
+            var file=files[0];
+            var status;
+            /*status = UploadFileData(file);
+            if(status==0){
+                alert('not able to upload to s3');
+                return;
+            }*/
+        }
+        
+        var form_data = new FormData($('#formAllocationUpload')[0]);
+        form_data.append('user_id',$('#hdn_home_user_id').val());
+        form_data.append('user_role_id',$('#hdn_home_user_role_id').val());
+        form_data.append('month_year',$('#Month_Year').val()+'-01');
+        $.ajax({
+            type: 'POST',
+            url: $('#hdn_web_url').val()+ "/upload_employee_allocation_plan",
+            enctype: 'multipart/form-data',
+            data: form_data,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function(data) 
+            {
+                var message="",title="",icon="";
+                if(data.Status){
+                    message=data.message;
+                    title="Success";
+                    icon="success";
+                }
+                else{
+                    if (data.message=="Validation_Error"){
+                        message=data.error;
+                        title="Error";
+                        icon="error";
+                    }
+                    else {
+                        message=data.message;
+                        title="Error";
+                        icon="error";
+                    }
+                }
+                var span = document.createElement("span");
+                span.innerHTML = message;
+                swal({   
+                            title:title,
+                            content: span,
+                            //text:message,
+                            icon:icon,
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                window.location.href = '/user';
+                            }); 
+            },
+            error:function(err)
+            {
+                swal({   
+                    title:"Error",
+                    text:'Error! Please try again',
+                    icon:"error",
+                    confirmButtonClass:"btn btn-confirm mt-2"
+                    }).then(function(){
+                        window.location.href = '/user';
+                });
+            }
+        });        
+    }
+}
+
 function GetProjectDetails(User_Id,User_Name)
 {
+    $('#hdn_upl_user_id').val(User_Id);
+    $('#hdn_upl_user_name').val(User_Name);
     var URL=$('#hdn_web_url').val()+ "/GetSubProjectsForUser?user_id="+User_Id;
     $.ajax({
         type:"GET",
         url:URL,
-        async:false,
         overflow:true,        
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
@@ -558,7 +728,9 @@ function GetProjectDetails(User_Id,User_Name)
                             varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Sub_Project_Name +'</td>';                    
                             varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Code +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Name +'</td>';  
-                            varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Bu +'</td>';         
+                            varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Bu +'</td>';  
+                            //varHtml+='  <td style="text-align:center;">2h20m</td>';         
+                                   
                             varHtml+='</tr>';
                             
                         }
@@ -896,6 +1068,7 @@ function Getusertarget(UserId,UserName)
             }
         });
     }
+
     function DownloadTableBasedOnSearch()
 {                   
     $("#imgSpinner").show();

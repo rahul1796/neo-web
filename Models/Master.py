@@ -292,6 +292,16 @@ class Master:
         return Database.SyncShikshaCandidateData(data)
     def SendShikshaCandidateEnrolmentMail():
         return Database.SendShikshaCandidateEnrolmentMail()
+    
+    #def SendPulishAssessmentMailEACP():
+        #batches = Database.GetBatchesForAssessmentPublishedTAT()
+        #if batches== '':
+            #return 
+        #else:
+            #batch_list=batches.split(',')
+            #for batch_id in batch_list:
+                #Database.SendPulishAssessmentMailEACP(batch_list)
+            #return 
     def cancel_planned_batch(user_id,planned_batch_code,cancel_reason):
         popupMessage = {"PopupMessage": Database.cancel_planned_batch(user_id,planned_batch_code,cancel_reason)}
         return popupMessage
@@ -307,7 +317,6 @@ class Master:
         return Database.GetPOCForCustomer(customer_id)
     def GetSessionsForCourse(CourseId):
         return Database.GetSessionsForCourse(CourseId)
-
     def GetPartnerCenters(partner_id):
         return {"PartnerCenters":Database.GetPartnerCenters(partner_id)}
 

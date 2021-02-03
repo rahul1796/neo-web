@@ -103,7 +103,7 @@ def ShikshaEnrolmentMail(candidate_name,enrolment_id,course,email_id,mobile):
         
         msg['From'] = "do-not-reply@labournet.in"
         msg['To'] = email_id
-        msg['Bcc'] = 'sunil.k@labournet.in,neo.helpdesk@labournet.in,soukhya.h@labournet.in'
+        msg['Bcc'] = 'sunil.k@labournet.in'
         rec_list=  msg['To']+','+ msg['Bcc']
         msg['Subject'] = "DELL CSR [LabourNet Academy] Confirmation of Account Creation"
         html_msg='''

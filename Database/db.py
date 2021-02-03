@@ -4891,6 +4891,41 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
+    def GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [reports].[sp_get_placement_ageing_report_data ]  ?,?,?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+        #print(values)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return {"Data":response}
+    def GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec  [reports].[sp_get_candidate_based_on_placement_stage]  ?,?,?,?,?,?,?,?'
+        values = (user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date)
+        cur2.execute(sql,(values))
+        #   print(cur2.fetchall())
+        #print(cur2)
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]           
+            response.append(h.copy())
+        cur2.close()
+        con.close()
+        return {"Targets":response}
 
     def GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date):
         response = []
@@ -4909,6 +4944,7 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return {"Data":response}
+    
     def GetContractsBasedOnCustomer(user_id,user_role_id,customer_id):
         response = []
         h={}
@@ -7885,8 +7921,8 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             #print('exep'+str(e))
             return {"Status":False,'message': "error: "+str(e)}
-
-
+    
+    
     def app_get_release_date_msg():
         res = []
         h={}
@@ -8246,6 +8282,57 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()
         return {'sheet1':data,'sheet1_columns':columns}
+    def shiksha_attandance_report(user_id, user_role_id, Customers, from_date, to_date):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec [reports].[sp_get_shiksha_attendance_download] ?, ?, ?,?, ?'
+        values = ((user_id, user_role_id, Customers, from_date, to_date))
+        print(values)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        curs.close()
+        cnxn.close()
+        return {'sheet1':data,'sheet1_columns':columns}
+    def GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sheet1=[]
+        sheet1_columns=[]
+        sheet2=[]
+        sheet2_columns=[]
+        placement_stage=-1
+        sub_project_code=''
+        sql = 'exec [reports].[sp_get_placement_ageing_report_data] ?, ?, ?,?, ?, ?'
+        sql1 = 'exec [reports].[sp_get_candidate_based_on_placement_stage]?, ?, ?,?, ?, ?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+        curs.execute(sql,(values))
+        sheet1_columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        sheet1 = list(map(lambda x:list(x), data))
+        values = (user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date)        
+        curs.execute(sql1,(values))
+        sheet2_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet2 = list(map(lambda x:list(x), data))  
+         
+        curs.close()
+        cnxn.close()
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns,'sheet2':sheet2,'sheet2_columns':sheet2_columns}
+    def DownloadEmpTimeAllocationTemplate(user_id, user_role_id, date):
+        cnxn=pyodbc.connect(conn_str)
+        curs = cnxn.cursor()
+        sql = 'exec [reports].[sp_get_emp_allocation_download] ?, ?, ?'
+        values = (user_id, user_role_id, date)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        data = curs.fetchall()
+        data = list(map(lambda x:list(x), data))
+        curs.close()
+        cnxn.close()
+        return (data,columns)
+
 
     def download_emp_target_template(user_id, user_role_id, date):
         cnxn=pyodbc.connect(conn_str)
@@ -8276,6 +8363,24 @@ SELECT					cb.name as candidate_name,
             con.close()
             return {"Status":True,'message': "Uploaded successfully"}
         except Exception as e:
+            return {"Status":False,'message': "error: "+str(e)}
+    def upload_employee_allocation_plan(df,user_id,user_role_id):
+        try:            
+            #print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()
+            #print(len(df))
+            json_str=df.to_json(orient='records')
+            sql = 'exec	[masters].[sp_upload_employee_sub_project_allocation] ?,?,?'
+            values = (json_str,user_id,user_role_id)
+            cur.execute(sql,(values))
+            
+            cur.commit()
+            cur.close()
+            con.close()
+            return {"Status":True,'message': "Uploaded successfully"}
+        except Exception as e:
+            print('Ex'+str(e))
             return {"Status":False,'message': "error: "+str(e)}
 
     def download_Assessment_report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
@@ -8446,7 +8551,7 @@ SELECT					cb.name as candidate_name,
             cur2.close()
             con.close()
             return out
-
+          
     def Sync_UserSubProjectCF_TargetData(c_my, p_my):
         try: 
             con = pyodbc.connect(conn_str)
