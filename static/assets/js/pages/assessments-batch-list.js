@@ -287,7 +287,7 @@ function LoadTable()
                     if($('#hdn_home_user_role_id').val()!='25' & $('#hdn_home_user_role_id').val()!='28'  & row.Summative_Count==0)
                     {
                         if($('#hdn_home_user_role_id').val()!='37')
-                            varButtons+='<a onclick="ScheduleAssessmentModal(\'' + row.Batch_Id + '\',\'' + row.Batch_Code + '\',\'' + row.Mobilization_Type + '\')" class="btn" style="cursor:pointer" ><i title="Schedule Assessment" class="fe-edit" ></i></a>';
+                            varButtons+='<a onclick="ScheduleAssessmentModal(\'' + row.Batch_Id + '\',\'' + row.Batch_Code + '\',\'' + row.Mobilization_Type + '\')" class="btn" style="cursor:pointer" ><i title="Schedule/Publish Assessment" class="fe-edit" ></i></a>';
                     
                     }
                         //varButtons+='<a onclick="GetAssessments(\'' + row.Batch_Id + '\',\'' + row.Batch_Code + '\')" class="btn" style="cursor:pointer" ><i title="Assessment List" class="fas fa-list" ></i></a>';
