@@ -8551,7 +8551,7 @@ SELECT					cb.name as candidate_name,
             cur2.close()
             con.close()
             return out
-    
+          
     def Sync_UserSubProjectCF_TargetData(c_my, p_my):
         try: 
             con = pyodbc.connect(conn_str)
