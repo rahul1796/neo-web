@@ -7862,6 +7862,28 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             # print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
+    def SyncWeeklyUserSubProjectAllocation():
+        try: 
+            # print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            sql = 'exec	[masters].[sp_sync_weekly_user_sp_allocation] '
+            cur.execute(sql)
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop >0 :
+                Status=True
+                msg="Synced Successfully"
+            else:
+                msg="Error in Syncing"
+                Status=False
+            return {"Status":Status,'Message':msg}
+        except Exception as e:
+            # print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
 
     def SendShikshaCandidateEnrolmentMail():
         try: 
@@ -8320,11 +8342,11 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns,'sheet2':sheet2,'sheet2_columns':sheet2_columns}
-    def DownloadEmpTimeAllocationTemplate(user_id, user_role_id, date):
+    def DownloadEmpTimeAllocationTemplate(user_id, user_role_id):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
-        sql = 'exec [reports].[sp_get_emp_allocation_download] ?, ?, ?'
-        values = (user_id, user_role_id, date)
+        sql = 'exec [reports].[sp_get_emp_allocation_template_download] ?, ?'
+        values = (user_id, user_role_id)
         curs.execute(sql,(values))
         columns = [column[0].title() for column in curs.description]
         data = curs.fetchall()
@@ -8371,7 +8393,7 @@ SELECT					cb.name as candidate_name,
             cur = con.cursor()
             #print(len(df))
             json_str=df.to_json(orient='records')
-            sql = 'exec	[masters].[sp_upload_employee_sub_project_allocation] ?,?,?'
+            sql = 'exec	[masters].[sp_upload_employee_sub_project_base_allocation] ?,?,?'
             values = (json_str,user_id,user_role_id)
             cur.execute(sql,(values))
             

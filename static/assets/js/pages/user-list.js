@@ -539,9 +539,9 @@ function uploadEmployeeAllocation()
 
 
 function DownloadEmployeeTimeTemplate(){
-    var date = $('#Month_Year').val()+'-01';
+    //var date = $('#Month_Year').val()+'-01';
     //console.log(date);
-    if(date=='-01'){
+    if(1==0){
         alert('please search date');
         return 
     }
@@ -554,8 +554,7 @@ function DownloadEmployeeTimeTemplate(){
             url: URL,
             data: {
                 'user_id':$('#hdn_home_user_id').val(),
-                'user_role_id':$('#hdn_home_user_role_id').val(),
-                'date':date
+                'user_role_id':$('#hdn_home_user_role_id').val()
             },
             success: function(resp) 
             {
@@ -614,9 +613,6 @@ function UploadUserSubProjectAlloctaionFile(){
     if ($('#myFileemp').get(0).files.length === 0) {
         alert("No files selected.");
     }
-    else if ($('#Month_Year').val()==''){
-        alert('No date selected.');
-    }
     else
     {
         var fileExtension = ['xlsx']
@@ -640,7 +636,6 @@ function UploadUserSubProjectAlloctaionFile(){
         var form_data = new FormData($('#formAllocationUpload')[0]);
         form_data.append('user_id',$('#hdn_home_user_id').val());
         form_data.append('user_role_id',$('#hdn_home_user_role_id').val());
-        form_data.append('month_year',$('#Month_Year').val()+'-01');
         $.ajax({
             type: 'POST',
             url: $('#hdn_web_url').val()+ "/upload_employee_allocation_plan",
