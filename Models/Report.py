@@ -1649,7 +1649,7 @@ class Report:
         except Exception as e:
             print(str(e))
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
-    def DownloadEmpTimeAllocationTemplate(file_name, user_id, user_role_id, date):
+    def DownloadEmpTimeAllocationTemplate(file_name, user_id, user_role_id):
         try:
             name_withpath = config.neo_report_file_path + 'report file/'+ file_name
             DownloadPath=config.neo_report_file_path+'report file/'
@@ -1666,17 +1666,16 @@ class Report:
                 'bold': True,
                 'text_wrap': True,
                 'valign': 'center',
+                'align' : 'left',
                 'fg_color': '#D7E4BC',
                 'border': 1})
                 
-            resp = Database.DownloadEmpTimeAllocationTemplate(user_id, user_role_id, date)
+            resp = Database.DownloadEmpTimeAllocationTemplate(user_id, user_role_id)
 
-            if len(resp[0])==0:
-                return({'Description':'No data available for the selected items', 'Status':False})
             df = pd.DataFrame(resp[0],columns=resp[1])
             df=df.fillna('')
             
-            Header = ["Employee Code(NE)", "Employee name(NE)", "NEO Role(NE)", "Sub Project Code(NE)", "Sub Project Name(NE)", "Month & Year*", "Week 1 Allocation(HH::MM)", "Week 2 Allocation(HH::MM)", "Week 3 Allocation(HH::MM)", "Week 4 Allocation(HH::MM)"]
+            Header = ["Employee Code", "Employee Name", "Sub Project Code", "Sub Project Name", "Allocation(HH::MM)"]
             
             df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Employee Allocation')
             worksheet = writer.sheets['Employee Allocation']

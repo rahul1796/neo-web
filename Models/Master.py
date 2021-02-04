@@ -290,6 +290,9 @@ class Master:
         data=shiksha_response.json()
         data=json.dumps(data)
         return Database.SyncShikshaCandidateData(data)
+    def SyncWeeklyUserSubProjectAllocation():
+        return Database.SyncWeeklyUserSubProjectAllocation()
+    
     def SendShikshaCandidateEnrolmentMail():
         return Database.SendShikshaCandidateEnrolmentMail()
     

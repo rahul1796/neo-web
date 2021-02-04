@@ -7392,11 +7392,10 @@ class DownloadEmpTimeAllocationTemplate(Resource):
             try:
                 user_id = request.form['user_id']
                 user_role_id  = request.form['user_role_id']
-                date = request.form["date"]
                 
                 file_name='Employee_allocation_template_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
             
-                resp = Report.DownloadEmpTimeAllocationTemplate(file_name, user_id, user_role_id, date)
+                resp = Report.DownloadEmpTimeAllocationTemplate(file_name, user_id, user_role_id)
                 return resp
                 
             except Exception as e:
@@ -8475,6 +8474,14 @@ class SyncShikshaCandidateData(Resource):
             return response
 api.add_resource(SyncShikshaCandidateData,'/SyncShikshaCandidateData')
 
+class SyncWeeklyUserSubProjectAllocation(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=Master.SyncWeeklyUserSubProjectAllocation()
+            return response
+api.add_resource(SyncWeeklyUserSubProjectAllocation,'/SyncWeeklyUserSubProjectAllocation')
+
 class SendShikshaCandidateEnrolmentMail(Resource):
     @staticmethod
     def get():
@@ -9215,10 +9222,9 @@ class upload_employee_allocation_plan(Resource):
                 f = request.files['myFileemp']
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
-                Month_Year = request.form["month_year"]
                 time_regex='^([0-1]?[0-9]|2[0-3])::[0-5][0-9]$'
-                Month_Year_excel = datetime.strptime(Month_Year, '%Y-%m-%d').strftime('%b-%Y').upper()
-                month_year_validation = [CustomElementValidation(lambda d: datetime.strptime(d, '%b-%Y').strftime('%Y-%m-%d')==Month_Year, "only '{}' date allowed".format(Month_Year_excel))]
+                #Month_Year_excel = datetime.strptime(Month_Year, '%Y-%m-%d').strftime('%b-%Y').upper()
+                #month_year_validation = [CustomElementValidation(lambda d: datetime.strptime(d, '%b-%Y').strftime('%Y-%m-%d')==Month_Year, "only '{}' date allowed".format(Month_Year_excel))]
                 time_validation = [CustomElementValidation(lambda d: (re.search(time_regex,d)!=None), 'Inavalid time format. Please provide correct allocation time')]
 
                 file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
@@ -9227,17 +9233,12 @@ class upload_employee_allocation_plan(Resource):
                 df = df.fillna('')
 
                 schema = Schema([
-                        Column('Employee Code(NE)',str_validation+null_validation),
-                        Column('Employee name(NE)',str_validation+null_validation),
-                        Column('NEO Role(NE)',str_validation+null_validation),
-                        Column('Sub Project Code(NE)',str_validation+null_validation),
-                        Column('Sub Project Name(NE)',null_validation),
-                        Column('Month & Year*',month_year_validation+str_validation+null_validation),
-
-                        Column('Week 1 Allocation(HH::MM)',time_validation+null_validation),
-                        Column('Week 2 Allocation(HH::MM)',time_validation+null_validation),
-                        Column('Week 3 Allocation(HH::MM)',time_validation+null_validation),
-                        Column('Week 4 Allocation(HH::MM)',time_validation+null_validation),
+                        Column('Employee Code',str_validation+null_validation),
+                        Column('Employee Name',str_validation+null_validation),
+                        Column('Sub Project Code',str_validation+null_validation),
+                        Column('Sub Project Name',null_validation),
+                        
+                        Column('Allocation(HH::MM)',time_validation+null_validation),
                        
                         ])
                 errors = schema.validate(df)
@@ -9258,8 +9259,7 @@ class upload_employee_allocation_plan(Resource):
                     df = df.drop_duplicates()
                     df.insert(0, 'row_index', range(len(df)))
 
-                    col = ['row_index', 'Employee_Code_NE', 'Employee_name_NE', 'NEO_Role_NE', 'Sub_Project_Code_NE', 'Month__Year', 'Week_1_Allocation_HH_MM', 'Week_2_Allocation_HH_MM', 'Week_3_Allocation_HH_MM',
-                            'Week_4_Allocation_HH_MM']
+                    col = ['Employee_Code', 'Employee_Name', 'Sub_Project_Code','Sub_Project_Name', 'Allocation_HH_MM']
                     df = df[col]
                     
                     out = Database.upload_employee_allocation_plan(df,user_id,user_role_id)
