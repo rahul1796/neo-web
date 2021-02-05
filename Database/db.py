@@ -7882,7 +7882,7 @@ SELECT					cb.name as candidate_name,
                 Status=False
             return {"Status":Status,'Message':msg}
         except Exception as e:
-            # print(str(e))
+            print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
 
     def SendShikshaCandidateEnrolmentMail():

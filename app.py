@@ -9223,10 +9223,10 @@ class upload_employee_allocation_plan(Resource):
                 f = request.files['myFileemp']
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
-                time_regex='^([0-1]?[0-9]|2[0-3])::[0-5][0-9]$'
+                #time_regex='/^(100(\.00?)?|[1-9]?\d(\.\d\d?)?)$/'
                 #Month_Year_excel = datetime.strptime(Month_Year, '%Y-%m-%d').strftime('%b-%Y').upper()
                 #month_year_validation = [CustomElementValidation(lambda d: datetime.strptime(d, '%b-%Y').strftime('%Y-%m-%d')==Month_Year, "only '{}' date allowed".format(Month_Year_excel))]
-                time_validation = [CustomElementValidation(lambda d: (re.search(time_regex,d)!=None), 'Inavalid time format. Please provide correct allocation time')]
+                #time_validation = [CustomElementValidation(lambda d: (re.search(time_regex,d)!=None), 'Inavalid time format. Please provide correct allocation time')]
 
                 file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
                 f.save(file_name)
@@ -9239,7 +9239,7 @@ class upload_employee_allocation_plan(Resource):
                         Column('Sub Project Code',str_validation+null_validation),
                         Column('Sub Project Name',null_validation),
                         
-                        Column('Allocation(HH::MM)',time_validation+null_validation),
+                        Column('Allocation(In Percentage)',null_validation),
                        
                         ])
                 errors = schema.validate(df)
@@ -9256,11 +9256,11 @@ class upload_employee_allocation_plan(Resource):
                     df.columns = df.columns.str.replace("(", "_")
                     df.columns = df.columns.str.replace(")", "")
                     df.columns = df.columns.str.replace("&", "")
-                    df.columns = df.columns.str.replace("::", "_")
+                    #df.columns = df.columns.str.replace("::", "_")
                     df = df.drop_duplicates()
                     df.insert(0, 'row_index', range(len(df)))
 
-                    col = ['Employee_Code', 'Employee_Name', 'Sub_Project_Code','Sub_Project_Name', 'Allocation_HH_MM']
+                    col = ['Employee_Code', 'Employee_Name', 'Sub_Project_Code','Sub_Project_Name', 'Allocation_In_Percentage']
                     df = df[col]
                     
                     out = Database.upload_employee_allocation_plan(df,user_id,user_role_id)
