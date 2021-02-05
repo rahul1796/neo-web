@@ -55,11 +55,11 @@ def create_report(sub_project,project,region,customer,user_id,user_role_id,emplo
         data = curs.fetchall()
         data = list(map(lambda x:list(x), data))
         df = pd.DataFrame(data, columns=columns)
-        df= df[['Employee_Code', 'Employee_Name','Employee_Email','Sub_Project_Code', 'Sub_Project_Name','Month_Year', 'W1_Allocation', 'W2_Allocation','W3_Allocation','W4_Allocation']]
+        df= df[['Employee_Code', 'Employee_Name','Employee_Email','Sub_Project_Code', 'Sub_Project_Name','Month_Year','W1_Allocation_Percentage', 'W2_Allocation_Percentage','W3_Allocation_Percentage','W4_Allocation_Percentage', 'W1_Allocation', 'W2_Allocation','W3_Allocation','W4_Allocation']]
         
         df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Allocation') 
         worksheet = writer.sheets['Allocation']
-        Column = ['Employee_Code', 'Employee_Name','Employee_Email','Sub_Project_Code', 'Sub_Project_Name','Month_Year',  'W1_Allocation', 'W2_Allocation','W3_Allocation','W4_Allocation']
+        Column = ['Employee_Code', 'Employee_Name','Employee_Email','Sub_Project_Code', 'Sub_Project_Name','Month_Year', 'W1_Allocation_Percentage', 'W2_Allocation_Percentage','W3_Allocation_Percentage','W4_Allocation_Percentage', 'W1_Allocation', 'W2_Allocation','W3_Allocation','W4_Allocation']
         for col_num, value in enumerate(Column):
             worksheet.write(0, col_num, value, header_format)     
                     

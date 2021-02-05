@@ -1675,7 +1675,7 @@ class Report:
             df = pd.DataFrame(resp[0],columns=resp[1])
             df=df.fillna('')
             
-            Header = ["Employee Code", "Employee Name", "Sub Project Code", "Sub Project Name", "Allocation(HH::MM)"]
+            Header = ["Employee Code", "Employee Name", "Sub Project Code", "Sub Project Name", "Allocation(In Percentage)"]
             
             df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Employee Allocation')
             worksheet = writer.sheets['Employee Allocation']
