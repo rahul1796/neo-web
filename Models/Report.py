@@ -1466,8 +1466,15 @@ class Report:
             df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Centers-Sub Projects')  
             df = pd.DataFrame(data['sheet4'], columns=data['sheet4_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Centers-Room')             
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Centers-Room')
+            df = pd.DataFrame(data['sheet5'], columns=data['sheet5_columns'])
             
+            def create_image(x):
+                ext = str(x).split('.')[-1]
+                return (x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3?image_path=bulk_upload/Center_Attachment&image_name=' + x + '","View Image")')
+            df.loc[:,'Attachment_Name'] = df.loc[:,'Attachment_Name'].map(create_image)
+
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Centers-Attachment')
             first_row = ['center_name','center_type_name','partner_name','center_category_name','bu_name','region_name','cluster_name','country_name','state_name','district_name','location','active_status','center_code','created by','created on','last modified by','last modified on']
             worksheet = writer.sheets['Centers']
             for col_num, value in enumerate(first_row):
@@ -1486,8 +1493,13 @@ class Report:
             worksheet = writer.sheets['Centers-Room']
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format) 
+            
+            first_row = ['Center Code','Center Name','Center Type','Agreement Type','Agreement Category','From date','To Date','Agreement Value(amount)','Attachment','Remark( if others)']
+            worksheet = writer.sheets['Centers-Attachment']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format)
+                
             writer.save()
-
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             print(str(e))
