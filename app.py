@@ -9557,5 +9557,104 @@ class Sync_UserSubProjectCF_TargetData(Resource):
             return response
 api.add_resource(Sync_UserSubProjectCF_TargetData,'/Sync_UserSubProjectCF_TargetData')
 
+
+class add_center_attachment_session(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            #UserId, UserRoleId, CenterId, FromDate, ToDate, Agreement_Type, Commercial_Agreement_Type, OtherRemark
+            UserId = int(request.form['UserId'])
+            UserRoleId = int(request.form['UserRoleId'])
+            CenterId = int(request.form['CenterId'])
+            FromDate = str(request.form['FromDate'])
+            ToDate = str(request.form['ToDate'])
+            Agreement_Type = int(request.form['Agreement_Type'])
+            Commercial_Agreement_Type = int(request.form['Commercial_Agreement_Type'])
+            OtherRemark = str(request.form['OtherRemark'])
+            value = str(request.form['value'])
+
+            try:
+                out = Database.add_center_attachment_session(UserId, UserRoleId, CenterId, FromDate, ToDate, Agreement_Type, Commercial_Agreement_Type, OtherRemark, value)
+            except Exception as e:
+                out = {'Status': False, 'Message': "Error : "+str(e)}
+            finally:
+                return jsonify(out)
+api.add_resource(add_center_attachment_session, '/add_center_attachment_session')
+
+class get_center_attachment_session(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                CenterId=request.args.get('CenterId','',type=str)
+                res = Database.get_center_attachment_session(CenterId)
+                return jsonify(res)
+            except Exception as e:
+                return jsonify({"Status":False,'Message':"Error : "+str(e)})
+api.add_resource(get_center_attachment_session,'/get_center_attachment_session')
+
+class get_map_attachment_session(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                SessionId=request.args.get('SessionId','',type=str)
+                res = Database.get_map_attachment_session(SessionId)
+                return jsonify(res)
+            except Exception as e:
+                return jsonify({"Status":False,'Message':"Error : "+str(e)})
+api.add_resource(get_map_attachment_session,'/get_map_attachment_session')
+
+class remove_map_attachment_session(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                session_attachment_id=request.args.get('session_attachment_id','',type=str)
+                #print('session_attachment_id' + session_attachment_id)
+                out = Database.remove_map_attachment_session(session_attachment_id)   
+            except Exception as e:
+                out = {'Status': False, 'Message': "Error : "+str(e)}
+            finally:
+                return jsonify(out)
+api.add_resource(remove_map_attachment_session,'/remove_map_attachment_session')
+
+class upload_center_attachment(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:  
+                user_id = request.form['user_id']
+                user_role_id = request.form['user_role_id'] 
+                filename = request.form['filename']
+                session_id = request.form['session_id']
+                return Master.upload_center_attachment(user_id,user_role_id,filename,session_id)
+            except Exception as e:
+                out = {'Status': False, 'message': "Error : "+str(e)}
+                return out
+api.add_resource(upload_center_attachment,'/upload_center_attachment')
+
+class GetDocumentForExcel_S3(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            image_name=request.args.get('image_name','',type=str)
+            image_path=request.args.get('image_path','',type=str)
+
+            path = config.aws_location + image_path + '/'+image_name
+            URL = config.COL_URL + 's3_signed_url_for_file_updated'
+            PARAMS = {'file_path':path} 
+            r = requests.get(url = URL, params = PARAMS)
+            if r.text !='':
+                filename = r.text
+            else:
+                filename = ''
+
+            if filename =='':
+                filename= config.Base_URL + '/data/No-image-found.jpg'
+            
+            return redirect(filename)
+api.add_resource(GetDocumentForExcel_S3,'/GetDocumentForExcel_S3')
+
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
