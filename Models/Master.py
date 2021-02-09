@@ -323,6 +323,11 @@ class Master:
         return Database.GetPOCForCustomer(customer_id)
     def GetSessionsForCourse(CourseId):
         return Database.GetSessionsForCourse(CourseId)
-
     def GetPartnerCenters(partner_id):
         return {"PartnerCenters":Database.GetPartnerCenters(partner_id)}
+
+    def Sync_UserSubProjectCF_TargetData(c_my, p_my):
+        return Database.Sync_UserSubProjectCF_TargetData(c_my, p_my)
+    def upload_center_attachment(user_id,user_role_id,filename,session_id):
+        Candidate =Database.upload_center_attachment(user_id,user_role_id,filename,session_id)
+        return Candidate

@@ -2,10 +2,16 @@
     <link href="static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
     <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="static/assets/libs/jquery/jquery.min.js"></script>
+
+    <!-- <script type="text/javascript" src="static/assets/libs/jquery/jquery.min.js"></script> -->
+
     <script type="text/javascript">
     var ddlregioncount,ddlclustercount;
         $(document).ready(function(){
+            $(".date-picker").flatpickr({
+                dateFormat:'d-M-Y',
+                minDate: '01.Apr.2019'
+            });
             LoadCenterTypeddl();
             LoadCountyrddl();
             if('{{center_id}}' !=0)
@@ -254,6 +260,15 @@
                 alert('Enter a valid Pin Code.');
                 return false;
             }
+            if (($('#ddlCenterType').val()==3)&('{{center_id}}'!=0)){
+                GetAgreementUpload('{{center_id}}',$('#CenterName').val());
+            }
+            else{
+                add_popup_message_old();
+            }
+        }
+
+        function add_popup_message_old(){
             var URL=$('#hdn_web_url').val()+ "/add_center_details";
                 $.ajax({
                     type:"POST",
@@ -289,6 +304,7 @@
                     }
                 });
         }
+
         function CenterTypeOnChange(CentertypeId)
         {
             if(parseInt(CentertypeId)==4)
@@ -337,6 +353,462 @@
                 }
             });
         }
+
+        function GetAgreementUpload(Center_id,Center_Name){
+
+        // $('#hdn_batch_assessment_id').val(BatchId);
+        // var URL=$('#hdn_web_url').val()+ "/GetBatchAssessments?BatchId="+BatchId+"&Stage="+Stage;
+        // $.ajax({
+        //     type:"GET",
+        //     url:URL,
+        //     async:false,
+        //     overflow:true,        
+        //     beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+        //     datatype:"json",
+        //     success: function (data){
+        //         varHtml='';
+        //         let varTxt='';
+        //         $("#tbl_batch_assessment tbody").empty();
+        //         if(!jQuery.isEmptyObject(data))
+        //         {   
+        //             if (data.Assessments != null){
+        //                 var count=data.Assessments.length;
+        //                 if( count> 0)
+        //                 {
+        //                     for(var i=0;i<count;i++)
+        //                     {   var txt=''
+        //                         var attempt=''
+        //                         if(!($("#hdn_home_user_role_id ").val() == "25"  & data.Assessments[i].Assessment_Agency_Id==1))
+        //                         {
+        //                             varHtml+='<tr>';
+        //                             varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].S_No +'</td>';
+        //                             if(data.Assessments[i].Assessment_Stage_Id==4) // Assessment Result Uploaded
+        //                                 txt+='<a onclick="DownloadAssessmentResult(\'' + data.Assessments[i].Assessment_Id + '\',\'' + data.Assessments[i].Batch_Code + '\')" class="user-btn" style="cursor:pointer" ><i title="Download Assessment Result" class="fe-download" ></i></a>';
+        //                             if (data.Assessments[i].Assessment_Stage_Id<3 && (data.Assessments[i].Mobilization_Type!=4)  )
+        //                             {
+        //                                 if( !(($("#hdn_home_user_role_id ").val() == "7" ) & (data.Assessments[i].Assessment_Types_Name=="Final Summative" || data.Assessments[i].Assessment_Types_Name=="Summative" )))  
+        //                                     txt+='<a onclick="EditAssessmentDetails(\'' + data.Assessments[i].Assessment_Id + '\',\''+ data.Assessments[i].Partner_Category_Id +'\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Edit Assessment Detail" class="fe-edit-1" ></i></a>';
+        //                             }
+        //                             if ((data.Assessments[i].Mobilization_Type==4 & ($("#hdn_home_user_role_id ").val() == "5" || $("#hdn_home_user_role_id ").val() == "1" ))||(data.Assessments[i].Assessment_Stage_Id==3 & ($('#hdn_home_user_role_id').val()!='5'||(data.Assessments[i].Assessment_Agency_Id==1 & ($('#hdn_home_user_role_id').val()=='5'||$('#hdn_home_user_role_id').val()=='38') ))  & $('#hdn_home_user_role_id').val()!='14'))
+        //                             {
+        //                                 if( !($("#hdn_home_user_role_id ").val() == "7"  & (data.Assessments[i].Assessment_Types_Name=="Final Summative" || data.Assessments[i].Assessment_Types_Name=="Summative") ))
+        //                                     txt+='<a onclick="UploadResult(\'' + data.Assessments[i].Assessment_Id + '\',\'' + data.Assessments[i].Batch_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Batch_Code + '\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Date + '\')" class="user-btn" style="cursor:pointer" ><i title="Upload Result" class="fe-upload" ></i></a>';
+        //                             }   
+                                                                      
+        //                             if (((data.Assessments[i].Assessment_Stage_Id>=3 || (data.Assessments[i].Mobilization_Type==4)) & $('#hdn_home_user_role_id').val()!='25')  )
+        //                                 txt+='<a onclick="Reassessment(\'' + data.Assessments[i].Assessment_Id + '\',\''+ data.Assessments[i].Batch_Id +'\',\''+ data.Assessments[i].Partner_Category_Id +'\',\'' + data.Assessments[i].Requested_Date + '\',\'' + data.Assessments[i].Scheduled_Date + '\',\'' + data.Assessments[i].Assessment_Types_Id + '\',\'' + data.Assessments[i].Assessment_Agency_Id + '\',\'' + data.Assessments[i].Assessment_Stage_Id + '\',\'' + data.Assessments[i].Partner_Id + '\',\'' + data.Assessments[i].Assessment_Date + '\',\'' + data.Assessments[i].Mobilization_Type + '\')" class="user-btn" style="cursor:pointer" ><i title="Schedule Reassessment" class="fe-edit" ></i></a>';
+        //                             if($('#hdn_home_user_role_id').val()!='37' & $('#hdn_home_user_role_id').val()!='28'  & $('#hdn_home_user_role_id').val()!='11')
+        //                                 varHtml+='  <td style="text-align:center;">'+ txt +'</td>';
+        //                             else
+        //                                 varHtml+='  <td style="text-align:center;">'+ ''+'</td>';
+        //                             varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Batch_Code +'</td>';
+        //                             varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Requested_Date +'</td>';
+        //                             varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Requested_On +'</td>';
+        //                             varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Scheduled_Date +'</td>';
+        //                             varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Date +'</td>';
+        //                             varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Types_Name +'</td>';
+        //                             varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Agency_Name +'</td>';
+        //                             varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Partner_Name +'</td>';
+        //                             varHtml+='  <td style="text-align:center;">'+ data.Assessments[i].Assessment_Stage_Name +'</td>';
+        //                             if(data.Assessments[i].Attempt >1)
+        //                                 attempt+=  '<a onclick="AssessmentListHistory(\'' + data.Assessments[i].Assessment_Id + '\')" style="color:blue;cursor:pointer" >'+data.Assessments[i].Attempt+'</a>';
+        //                             else
+        //                                 attempt+= data.Assessments[i].Attempt
+        //                             varHtml+='  <td style="text-align:center;">'+ attempt +'</td>';
+        //                             varHtml+='</tr>';
+        //                         }
+        //                     }                        
+        //                 }
+        //                 $("#tbl_batch_assessment tbody").append(varHtml);
+        //                 $('#mdl_batch_assessments').modal('show');
+        //             }
+        //             else
+        //             {
+        //                 varHtml='<tr><td colspan="8" style="text-align:center;">No records found</td></tr>'
+        //                 $("#tbl_batch_assessment tbody").append(varHtml);
+        //                 $('#mdl_batch_assessments').modal('show');
+        //             }
+        //         }
+        //         else
+        //         {
+        //             varHtml='<tr><td colspan="8" style="text-align:center;">No records found</td></tr>'
+        //             $("#tbl_batch_assessment tbody").append(varHtml);
+        //             $('#mdl_batch_assessments').modal('show');
+        //         }   
+        //     },
+        //     error:function(err)
+        //     {
+        //         alert('Error! Please try again');
+        //         return false;
+        //     }
+        // });
+        
+        $('#HduploadFile_Page').text(Center_Name)
+        $('#hdn_upl_center_id').val(Center_id)
+        $('#hdn_home_user_id_modal').val($('#hdn_home_user_id').val());
+        $('#hdn_home_user_role_id_modal').val($('#hdn_home_user_role_id').val());
+        
+        $('#ddl_Agreement_type').empty();
+        $('#ddl_Agreement_type').append(new Option('Rental agreement','1'));
+        $('#ddl_Agreement_type').append(new Option('Commercial Agreement','2'));
+        $('#ddl_Agreement_type').append(new Option('Others','3'));
+
+        $('#ddl_Commercial_Agreement_type').empty();
+        $('#ddl_Commercial_Agreement_type').append(new Option('Elec Bill','4'));
+        $('#ddl_Commercial_Agreement_type').append(new Option('Security Guard','5'));
+        $('#ddl_Commercial_Agreement_type').append(new Option('Water Bill','6'));
+        $('#ddl_Commercial_Agreement_type').append(new Option('Internet Cost','7'));
+        
+        $('#div_Agreement_type').hide();
+        $('#div_other').hide();
+        
+        Create_Session_Html(Center_id);
+
+        $('#mdl_agreement_upload').modal('show');
+        $('#mdl_agreement_upload_remove').modal('hide');
+        return false; 
+    }
+
+    function Loadcommercial_agreement_type(){
+        if($('#ddl_Agreement_type').val()=='2'){
+            $('#div_Agreement_type').show();
+            $('#div_other').hide();
+        }
+        else if ($('#ddl_Agreement_type').val()=='3'){
+            $('#div_Agreement_type').hide();
+            $('#div_other').show();
+        }
+        else{
+            $('#div_Agreement_type').hide();
+            $('#div_other').hide();
+        }
+    }
+
+    function GetAgreementUpload_Remove(session_id){
+        //$('#Hdupload_reomve_File').text(Center_Name)
+
+        $('#hdn_upl_session_id').val(session_id)
+        $('#hdn_home_user_id_modal2').val($('#hdn_home_user_id').val());
+        $('#hdn_home_user_role_id_modal2').val($('#hdn_home_user_role_id').val());
+        
+        $('#div_Agreement_type').hide();
+        $('#div_other').hide();
+        
+        Create_add_Remove_attachment_Html(session_id);
+        $('#imgSpinner1').hide();
+        
+        $('#mdl_agreement_upload').modal('hide');
+        $('#mdl_agreement_upload_remove').modal('show');
+        return false; 
+    }
+    function Create_Session(){
+        var URL=$('#hdn_web_url').val()+ "/add_center_attachment_session";
+        //console.log($('#hdn_home_user_id_modal').val()+','+$('#hdn_home_user_role_id_modal').val()+','+$('#hdn_upl_center_id').val()+','+$('#ddl_from_date').val()+','+
+        // $('#ddl_to_date').val()+','+$('#ddl_Agreement_type').val()+','+$('#ddl_others').val()+','+$('#ddl_Commercial_Agreement_type').val()
+        // )
+        $.ajax({
+            type:"POST",
+            url:URL,
+            data:{
+                "UserId"  :$('#hdn_home_user_id_modal').val(),
+                "UserRoleId"    :$('#hdn_home_user_role_id_modal').val(),
+
+                "CenterId"  :$('#hdn_upl_center_id').val(),
+                "FromDate"  :$('#ddl_from_date').val(),
+                "ToDate"    :$('#ddl_to_date').val(),
+                "Agreement_Type"    :$('#ddl_Agreement_type').val(),
+                "OtherRemark"    :$('#ddl_others').val(),
+                "Commercial_Agreement_Type"    :$('#ddl_Commercial_Agreement_type').val(),
+                
+                "value"    :$('#ddl_value').val()
+            },
+            success:function(data){
+                //console.log(data);
+                if(data.Status)
+                    {
+                        swal({   
+                            title:data.Message,
+                            text:data.Message+"!!",
+                            icon:"success",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                Create_Session_Html($('#hdn_upl_center_id').val());
+                                //window.location.href = '/enrollment';                          
+                            });
+                    }
+                    else{
+                        swal({   
+                            title:data.Message,
+                            text:data.Message+"!!",
+                            icon:"error",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                Create_Session_Html($('#hdn_upl_center_id').val());
+                                //window.location.href = '/enrollment';                          
+                            });
+                    }
+            },
+            error:function(x){
+                alert('error');
+            }
+        });
+    }
+    function Create_Session_Html(center_id){
+        var URL=$('#hdn_web_url').val()+ "/get_center_attachment_session?CenterId="+center_id;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            // data:{
+            //     // "UserId"  :$('#hdn_home_user_id_modal').val(),
+            //     // "UserRoleId"    :$('#hdn_home_user_role_id_modal').val(),
+            //     "CenterId"  :center_id
+            // },
+            success:function(data){
+                console.log(data)
+                if(data.Status)
+                    {   
+                        $('#attachment_type1').empty();
+                        data_length = data.data1.length;
+                        varHtml = '<h4 class="modal-title"><span id="HduploadFile"></span>Rental Agreement</h4>';
+                        for(var i=0;i<data_length;i++){
+                            varHtml+='<a href="javascript: GetAgreementUpload_Remove('+data.data1[i].session_id+');;">'+data.data1[i].sessio_name+'</a>';
+                            varHtml+='<br>';
+                        }
+                        $('#attachment_type1').append(varHtml);
+                        
+                        $('#attachment_type3').empty();
+                        data_length = data.data3.length;
+                        varHtml = '<h4 class="modal-title"><span id="HduploadFile"></span>Others</h4>';
+                        for(var i=0;i<data_length;i++){
+                            varHtml+='<a href="javascript: GetAgreementUpload_Remove('+data.data3[i].session_id+');;">'+data.data3[i].sessio_name+'</a>';
+                            varHtml+='<br>';
+                        }
+                        $('#attachment_type3').append(varHtml);
+
+                        $('#attachment_type2').empty();
+                        varHtml = '<h4 class="modal-title"><span id="HduploadFile">Commercial Agreement</span></h4>'
+                        
+                        data_length = data.data2.temp4.length;
+                        varHtml+='<h6 class="modal-title"><span id="HduploadFile">Electric Bill</span></h6>';
+                        for(var i=0;i<data_length;i++){
+                            varHtml+='<a href="javascript: GetAgreementUpload_Remove('+data.data2.temp4[i].session_id+');;">'+data.data2.temp4[i].sessio_name+'</a>';
+                            varHtml+='<br>';
+                        }
+                        
+                        data_length = data.data2.temp5.length;
+                        varHtml+='<h6 class="modal-title"><span id="HduploadFile">Security Guard</span></h6>';
+                        for(var i=0;i<data_length;i++){
+                            varHtml+='<a href="javascript: GetAgreementUpload_Remove('+data.data2.temp5[i].session_id+');;">'+data.data2.temp5[i].sessio_name+'</a>';
+                            varHtml+='<br>';
+                        }
+                        
+                        data_length = data.data2.temp6.length;
+                        varHtml+='<h6 class="modal-title"><span id="HduploadFile">Water Bill</span></h6>';
+                        for(var i=0;i<data_length;i++){
+                            varHtml+='<a href="javascript: GetAgreementUpload_Remove('+data.data2.temp6[i].session_id+');;">'+data.data2.temp6[i].sessio_name+'</a>';
+                            varHtml+='<br>';
+                        }
+                        
+                        data_length = data.data2.temp7.length;
+                        varHtml+='<h6 class="modal-title"><span id="HduploadFile">Internet Cost</span></h6>';
+                        for(var i=0;i<data_length;i++){
+                            varHtml+='<a href="javascript: GetAgreementUpload_Remove('+data.data2.temp7[i].session_id+');;">'+data.data2.temp7[i].sessio_name+'</a>';
+                            varHtml+='<br>';
+                        }
+                        $('#attachment_type2').append(varHtml);
+                    }
+            }
+        });
+    }
+    function Create_add_Remove_attachment_Html(session_id){
+        var URL=$('#hdn_web_url').val()+ "/get_map_attachment_session?SessionId="+session_id;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            // data:{
+            //     // "UserId"  :$('#hdn_home_user_id_modal').val(),
+            //     // "UserRoleId"    :$('#hdn_home_user_role_id_modal').val(),
+            //     "CenterId"  :center_id
+            // },
+            success:function(data){
+                //console.log(data)
+                if(data.Status)
+                    {   
+                        $('#agreement_upload_remove_id').empty();    
+                        console.log(data)                    
+                        data_length = data.data.length;
+                        varHtml = '<h4 class="modal-title"><span id="HduploadFile"></span>'+data.attachment_name+'</h4>';
+                        for(var i=0;i<data_length;i++){
+                            varHtml+='<div class="row">'
+                                varHtml+='<div class="col-lg-4">'
+                                    varHtml+='<a href="'+data.URL+data.data[i].attachment_name+'" target="_blank">'+data.data[i].attachment_name+'</a>'
+                                varHtml+='</div>'
+                                varHtml+='<div class="col-lg-4">'
+                                    varHtml+='<button type="button" class="close" aria-hidden="true" onclick="Remove_attachment('+data.data[i].session_attachment_id+');">×</button> <!-- data-dismiss="modal" -->'
+                                varHtml+='</div>'
+                            varHtml+='</div>'
+                            varHtml+='<br>';
+                        }
+                        $('#agreement_upload_remove_id').append(varHtml);
+                    }
+            }
+        });
+    }
+    function Remove_attachment(session_attachment_id){
+        var URL=$('#hdn_web_url').val()+ "/remove_map_attachment_session?session_attachment_id="+session_attachment_id;
+        $.ajax({
+            type:"GET",
+            url:URL,
+            success:function(data){
+                //console.log(data);
+                if(data.Status)
+                    {
+                        swal({   
+                            title:data.Message,
+                            text:data.Message+"!!",
+                            icon:"success",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                Create_add_Remove_attachment_Html($('#hdn_upl_session_id').val());
+                                //window.location.href = '/enrollment';                          
+                            });
+                    }
+                    else{
+                        swal({   
+                            title:data.Message,
+                            text:data.Message+"!!",
+                            icon:"error",
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                Create_add_Remove_attachment_Html($('#hdn_upl_session_id').val());
+                                //window.location.href = '/enrollment';                          
+                            });
+                    }
+            },
+            error:function(x){
+                alert('error');
+            }
+        });
+    }
+    function UploadFileData_s3(file,file_name)
+    {
+        //console.log(file_name)
+        var fileExtension = ['xlsx'];
+        var fileExtentionDoc = ['pdf','doc','docx']
+        var s3_path="bulk_upload/Center_Attachment/";
+        
+        var file_path=$('#hdn_AWS_S3_path').val()+ s3_path + file_name;
+        var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
+        
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET",api_url,false);
+        xhr.send();
+    
+        if(xhr.status === 200){
+            var response = JSON.parse(xhr.responseText);
+            uploadFileToS3(file, response.data, response.url);
+        }
+        else{
+            alert("Could not get signed URL.");
+        }
+    }
+    function uploadFileToS3(file, s3Data, url){
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", s3Data.url, false);
+
+        var postData = new FormData();
+        for(key in s3Data.fields){
+            postData.append(key, s3Data.fields[key]);
+        }
+        postData.append('file', file);
+
+        xhr.send(postData);
+        if(xhr.status === 200 || xhr.status === 204){
+            var response = xhr;
+        }
+        else{
+            alert("Could not upload file to s3.");
+        }
+    }
+    function Upload_Attachment(id){
+        var validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        var filename_prefix = $('#hdn_home_user_id_modal2').val() + '_' + Date.now() + '_'
+        var filename = ''
+        //hdn_home_user_id_modal2 hdn_home_user_role_id_modal2 hdn_upl_session_id myFile
+        var file = document.getElementById('myFile').files[0]
+        filename = filename_prefix + file.name
+        if (!validImageTypes.includes(file['type'])){
+            alert('allowed format are : '+validImageTypes.toString());
+            return
+        }
+        else if(file.size > 5*1024*1024){
+            alert('Image size is not valid');
+            return
+        }
+        else{
+            var form_data = new FormData(); //$('#formUpload')[0]
+            form_data.append('user_id',$('#hdn_home_user_id_modal2').val());
+            form_data.append('user_role_id',$('#hdn_home_user_role_id_modal2').val());
+            form_data.append('filename',filename);
+            form_data.append('session_id',$('#hdn_upl_session_id').val());
+            $.ajax({
+                type: 'POST',
+                url: $('#hdn_web_url').val()+ "/upload_center_attachment",
+                enctype: 'multipart/form-data',
+                data: form_data,
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function(data) 
+                {   
+                    var status;
+                    file = document.getElementById('myFile').files[0]
+                    UploadFileData_s3(file,filename);
+                    status = true;
+                    
+                    var message="",title="",icon="";
+                    if(data.Status){
+                        message=data.message;
+                        title="Success";
+                        icon="success";
+                    }
+                    else{
+                        if (data.message=="Validation_Error"){
+                            message=data.error;
+                            title="Error";
+                            icon="error";
+                        }
+                        else {
+                            message=data.message;
+                            title="Error";
+                            icon="error";
+                        }
+                    }
+                    var span = document.createElement("span");
+                    span.innerHTML = message;
+                    swal({   
+                                title:title,
+                                content: span,
+                                icon:icon,
+                                confirmButtonClass:"btn btn-confirm mt-2"
+                                }).then(function(){
+                                    Create_add_Remove_attachment_Html($('#hdn_upl_session_id').val());
+                                });
+                },
+                error:function(err)
+                {
+                    swal({   
+                        title:"Error",
+                        text:'Error! Please try again',
+                        icon:"error",
+                        confirmButtonClass:"btn btn-confirm mt-2"
+                        }).then(function(){
+                            Create_add_Remove_attachment_Html($('#hdn_upl_session_id').val());
+                    });
+                }
+            });
+        }
+    }
     </script>
     <div class="container-fluid">
         <form action="javascript:add_popup_message();">
@@ -514,8 +986,136 @@
         <!-- end row-->
 
     </form>
-
     </div> <!-- end container -->
+    
+    <div id="mdl_agreement_upload" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content ">
+                <form id="formUpload_attahmentmodal" action="javascript:UploadFileData()">
+                    <input type="hidden" id="hdn_home_user_id_modal" name="hdn_home_user_id_modal" value="0">
+                    <input type="hidden" id="hdn_home_user_role_id_modal" name="hdn_home_user_role_id_modal" value="0">
+                    <input type="hidden" id="hdn_upl_center_id" name="hdn_assessment_id" value="0">
+
+                <div class="modal-header">
+                    <h4 class="modal-title"><span id="HduploadFile_Page"></span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-3" id='div_rental_Agreement'>
+                                <label for="ddl_Agreement_type" class="mr-2">Agreement type</label>
+                                <select class="form-control dropdown-search-filter" id="ddl_Agreement_type" onchange="Loadcommercial_agreement_type()">
+                                    <option selected="" value="">All</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3" id='div_Agreement_type'>
+                                <label for="ddl_Commercial_Agreement_type" class="mr-2">Commercial Agreement type</label>
+                                <select class="form-control dropdown-search-filter" id="ddl_Commercial_Agreement_type" onchange="Loadcommercial_agreement_type()">
+                                    <option selected="" value="">All</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3" id='div_other'>
+                                <label for="ddl_others" class="mr-2">Other Remark</label>
+                                <input type="text" class="form-control" name="ddl_others" id="ddl_others" placeholder="Remark">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <label for="ddl_from_date" class="mr-2">From Date</label>
+                                <input type="text" id="ddl_from_date" name="ddl_from_date" class="form-control date-picker" ClientIdMode="static" placeholder="From Date">
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="ddl_to_date" class="mr-2">To Date</label>
+                                <input type="text" id="ddl_to_date" name="ddl_to_date" class="form-control date-picker" ClientIdMode="static" placeholder="To Date">
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="ddl_value" class="mr-2">Value/Amount</label>
+                                <input type="number" id="ddl_value" name="ddl_value" class="form-control" placeholder="Value/Amount">
+                            </div>
+                            <div class="col-lg-3">
+                                <button type="button" class="btn btn-secondary btn-rounded" style="margin-top: 27px;"
+                                    id="btnAddDuration" onclick="Create_Session();">Add</button>
+                            </div>
+                        </div>
+                        <!-- 
+                        <div class="col-lg-3">
+                            <label for="MonthYear" class="mr-2">Month Year</label>
+                            <!-- <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" data-date-format="MM yyyy" 
+                            ClientIdMode="static" placeholder="From Date"> -->
+                            <!--
+                            <input type="month" id="MonthYear" name="MonthYear" class="form-control" ClientIdMode="static" />
+                        </div> 
+
+                         -->
+                    </div>
+
+                    <div class="form-group" id="attachment_type1">    <!--modal-header-->
+                    </div>
+                    <div class="form-group" id="attachment_type2">    <!--modal-header-->
+                    </div>
+                    <div class="form-group" id="attachment_type3">    <!--modal-header-->
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-primary waves-effect" type="button" onclick="add_popup_message_old()">Submit</button> 
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" >Back</button> <!--onclick="GetAgreementUpload_Remove()"-->
+                </div>
+                <!-- <div id="imgSpinner1">
+                    <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                    <label style="display:inline-block;">Please wait while uploading candidate...</label>
+                </div>  -->
+            </form>
+            </div>
+        </div>
+    </div><!--/.modal-->
+    
+    <div id="mdl_agreement_upload_remove" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content ">
+                <form id="formUpload" action="javascript:Upload_Attachment()">
+                    <input type="hidden" id="hdn_home_user_id_modal2" name="hdn_home_user_id_modal2" value="0">
+                    <input type="hidden" id="hdn_home_user_role_id_modal2" name="hdn_home_user_role_id_modal2" value="0">
+                    <input type="hidden" id="hdn_upl_session_id" name="hdn_upl_session_id" value="0">
+
+                <div class="modal-header">
+                    <h4 class="modal-title"><span id="Hdupload_reomve_File"></span>Add/Remove File</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label for="myFile">Upload File* :</label>
+                            </div>
+                            <div class="col-lg-4">
+                                <input type="file" id="myFile" name="filename">
+                            </div>
+                            <div class="col-lg-4">
+                                <button class="btn btn-primary waves-effect" type="submit" >Submit</button>
+                            </div>
+                        </div>
+                        <div id="imgSpinner1">
+                            <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                            <label style="display:inline-block;">Please wait while uploading candidate...</label>
+                        </div> 
+                    </div>
+
+                    <div class="form-group" id="agreement_upload_remove_id">
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <!-- <button class="btn btn-primary waves-effect" type="submit" >Submit</button> -->
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Back</button> <!--onclick="OpenAssessmentList()"-->
+                </div>
+            </form>
+            </div>
+        </div>
+    </div><!--/.modal-->
   
         <!-- Plugins js-->
         <script src="static/assets/libs/flatpickr/flatpickr.min.js"></script>
@@ -523,5 +1123,6 @@
         <script src="static/assets/libs/jquery-sparkline/jquery.sparkline.min.js"></script>
         <script src="static/assets/libs/parsleyjs/parsley.min.js"></script>
 
+        
         <!-- Validation init js-->
         <script src="static/ assets/js/pages/form-validation.init.js"></script>

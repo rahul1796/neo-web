@@ -3973,7 +3973,7 @@ def get_download_file(path):
     """Download a file."""
     #print(path)
     filename = r"{}{}".format(config.DownloadPathLocal_download,path)
-    #print(filename)
+    print(filename)
     if not(os.path.exists(filename)):
         filename = r"{}No-image-found.jpg".format(config.DownloadPathWeb)
     return send_file(filename)
@@ -4095,8 +4095,9 @@ api.add_resource(get_me_category,'/get_me_category')
 def get_tma_file(path):
     """Download a file."""
     filename = r"{}{}".format(config.neo_report_file_path,path)
+    #print(filename)
     if not(os.path.exists(filename)):
-        print(filename)
+        
         filename = r"{}No-image-found.jpg".format(config.ReportDownloadPathWeb)
     return send_file(filename)
 
@@ -9550,6 +9551,122 @@ class get_OJT_History(Resource):
             except Exception as e:
                 return {'success': False, 'description': "Error : "+str(e), 'app_status':True}
 api.add_resource(get_OJT_History,'/get_OJT_History')
+
+class Sync_UserSubProjectCF_TargetData(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            now = datetime.now()
+            y = int(now.strftime('%Y'))
+            m = int(now.strftime('%m'))
+
+            mon = ['DEC','JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV']
+            date = lambda m,y : mon[m%12]+'-'+str(y)
+            c_my = date(m,y)
+            p_my = date(m-1,y-1 if m==1 else y)
+
+            response=Master.Sync_UserSubProjectCF_TargetData(c_my, p_my)
+            return response
+api.add_resource(Sync_UserSubProjectCF_TargetData,'/Sync_UserSubProjectCF_TargetData')
+
+
+class add_center_attachment_session(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            #UserId, UserRoleId, CenterId, FromDate, ToDate, Agreement_Type, Commercial_Agreement_Type, OtherRemark
+            UserId = int(request.form['UserId'])
+            UserRoleId = int(request.form['UserRoleId'])
+            CenterId = int(request.form['CenterId'])
+            FromDate = str(request.form['FromDate'])
+            ToDate = str(request.form['ToDate'])
+            Agreement_Type = int(request.form['Agreement_Type'])
+            Commercial_Agreement_Type = int(request.form['Commercial_Agreement_Type'])
+            OtherRemark = str(request.form['OtherRemark'])
+            value = str(request.form['value'])
+
+            try:
+                out = Database.add_center_attachment_session(UserId, UserRoleId, CenterId, FromDate, ToDate, Agreement_Type, Commercial_Agreement_Type, OtherRemark, value)
+            except Exception as e:
+                out = {'Status': False, 'Message': "Error : "+str(e)}
+            finally:
+                return jsonify(out)
+api.add_resource(add_center_attachment_session, '/add_center_attachment_session')
+
+class get_center_attachment_session(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                CenterId=request.args.get('CenterId','',type=str)
+                res = Database.get_center_attachment_session(CenterId)
+                return jsonify(res)
+            except Exception as e:
+                return jsonify({"Status":False,'Message':"Error : "+str(e)})
+api.add_resource(get_center_attachment_session,'/get_center_attachment_session')
+
+class get_map_attachment_session(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                SessionId=request.args.get('SessionId','',type=str)
+                res = Database.get_map_attachment_session(SessionId)
+                return jsonify(res)
+            except Exception as e:
+                return jsonify({"Status":False,'Message':"Error : "+str(e)})
+api.add_resource(get_map_attachment_session,'/get_map_attachment_session')
+
+class remove_map_attachment_session(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                session_attachment_id=request.args.get('session_attachment_id','',type=str)
+                #print('session_attachment_id' + session_attachment_id)
+                out = Database.remove_map_attachment_session(session_attachment_id)   
+            except Exception as e:
+                out = {'Status': False, 'Message': "Error : "+str(e)}
+            finally:
+                return jsonify(out)
+api.add_resource(remove_map_attachment_session,'/remove_map_attachment_session')
+
+class upload_center_attachment(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            try:  
+                user_id = request.form['user_id']
+                user_role_id = request.form['user_role_id'] 
+                filename = request.form['filename']
+                session_id = request.form['session_id']
+                return Master.upload_center_attachment(user_id,user_role_id,filename,session_id)
+            except Exception as e:
+                out = {'Status': False, 'message': "Error : "+str(e)}
+                return out
+api.add_resource(upload_center_attachment,'/upload_center_attachment')
+
+class GetDocumentForExcel_S3(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            image_name=request.args.get('image_name','',type=str)
+            image_path=request.args.get('image_path','',type=str)
+
+            path = config.aws_location + image_path + '/'+image_name
+            URL = config.COL_URL + 's3_signed_url_for_file_updated'
+            PARAMS = {'file_path':path} 
+            r = requests.get(url = URL, params = PARAMS)
+            if r.text !='':
+                filename = r.text
+            else:
+                filename = ''
+
+            if filename =='':
+                filename= config.Base_URL + '/data/No-image-found.jpg'
+            
+            return redirect(filename)
+api.add_resource(GetDocumentForExcel_S3,'/GetDocumentForExcel_S3')
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
