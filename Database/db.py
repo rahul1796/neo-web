@@ -8601,6 +8601,7 @@ SELECT					cb.name as candidate_name,
             if pop >0:
                 Status=True
                 msg=str(pop) + " - Created Successfully"
+                msg='Agreement Details Added Successfully'
             else:
                 Status=False
                 msg="Already Synced OR Error in Syncing"
