@@ -7452,11 +7452,11 @@ SELECT					cb.name as candidate_name,
         data = curs.fetchall()
         sheet2 = list(map(lambda x:list(x), data))
 
-        curs.execute(sql2,(values))
-        sheet3_columns = [column[0].title() for column in curs.description]        
-        data = curs.fetchall()
-        sheet3 = list(map(lambda x:list(x), data))
-        return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
+        # curs.execute(sql2,(values))
+        # sheet3_columns = [column[0].title() for column in curs.description]        
+        # data = curs.fetchall()
+        # sheet3 = list(map(lambda x:list(x), data))
+        return {'sheet1':sheet1,'sheet2':sheet2,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns} #,'sheet3_columns':sheet3_columns  'sheet3':sheet3,
         cur2.close()
         con.close()
 
@@ -7908,7 +7908,7 @@ SELECT					cb.name as candidate_name,
                 where (sp.mobilization_type=4 or c.project_type=4)
                 AND  shiksha_sync_status=1
                 AND coalesce(cis.email_sent,0)=0;
-                  '''
+                '''
             cur.execute(sql)
             mail_count=0
             Status=False
@@ -7928,8 +7928,8 @@ SELECT					cb.name as candidate_name,
                     mail_count = mail_count+1
                 else:
                     Status=False
-            if success_enrollids != '':
 
+            if success_enrollids != '':
                 success_enrollids=success_enrollids.rstrip(',')
                 sql2 = "update candidate_details.tbl_map_candidate_intervention_skilling set email_sent=1 where intervention_id in ("+success_enrollids+");"     
                 cur.execute(sql2)   
@@ -7938,10 +7938,10 @@ SELECT					cb.name as candidate_name,
             
             cur.close()
             con.close()
-            msg=str(mail_count)+' mail sent'
+            msg=str(mail_count)+' Email sent'
             return {"Status":Status,'Message':msg}
         except Exception as e:
-            print('exep'+str(e))
+            #print('exep'+str(e))
             return {"Status":False,'message': "error: "+str(e)}
     
     
@@ -8230,10 +8230,14 @@ SELECT					cb.name as candidate_name,
         sheet3_columns=[]
         sheet4=[]
         sheet4_columns=[]
+        sheet5=[]
+        sheet5_columns=[]
         sql = 'exec [reports].[sp_get_centers_download] ?, ?, ?,?, ?, ?, ?, ?, ?, ?'
         sql1 = 'exec [reports].[sp_get_centers_course_download] ?, ?, ?,?, ?, ?, ?, ?, ?, ?'
         sql2 = 'exec [reports].[sp_get_centers_subproject_download] ?, ?, ?,?, ?, ?, ?, ?, ?, ?'
         sql3 = 'exec [reports].[sp_get_centers_room_download] ?, ?, ?,?, ?, ?, ?, ?, ?, ?'
+        sql4 = 'exec [reports].[sp_get_centers_attachment_download] ?, ?, ?,?, ?, ?, ?, ?, ?, ?'
+
         values = (center_id, user_id, user_role_id, user_region_id, center_type_ids, bu_ids, status, regions, clusters, courses)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]
@@ -8252,9 +8256,14 @@ SELECT					cb.name as candidate_name,
         sheet4_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
         sheet4 = list(map(lambda x:list(x), data)) 
+
+        curs.execute(sql4,(values))
+        sheet5_columns = [column[0].title() for column in curs.description]        
+        data = curs.fetchall()
+        sheet5 = list(map(lambda x:list(x), data)) 
         curs.close()
         cnxn.close()
-        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns,'sheet2':sheet2,'sheet2_columns':sheet2_columns,'sheet3':sheet3,'sheet3_columns':sheet3_columns,'sheet4':sheet4,'sheet4_columns':sheet4_columns}
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns,'sheet2':sheet2,'sheet2_columns':sheet2_columns,'sheet3':sheet3,'sheet3_columns':sheet3_columns,'sheet4':sheet4,'sheet4_columns':sheet4_columns,'sheet5':sheet5,'sheet5_columns':sheet5_columns}
     def download_courses_list(user_id, user_role_id, course_id, sectors, qps, status):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
@@ -8573,3 +8582,149 @@ SELECT					cb.name as candidate_name,
             cur2.close()
             con.close()
             return out
+          
+    def Sync_UserSubProjectCF_TargetData(c_my, p_my):
+        try: 
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            sql = 'exec	[masters].[Sync_UserSubProjectCF_TargetData]  ?, ?'
+            values = (c_my, p_my)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop >0:
+                Status=True
+                msg=str(pop) + " - Synced Successfully"
+            # elif pop==0:
+            #     Status=True
+            #     msg=str(pop) + " - Synced Successfully"
+            else:
+                msg="Already Synced OR Error in Syncing"
+                Status=False
+            return {"Status":Status,'Message':msg}
+        except Exception as e:
+            return {"Status":False,'message': "error: "+str(e)}
+    
+    def add_center_attachment_session(UserId, UserRoleId, CenterId, FromDate, ToDate, Agreement_Type, Commercial_Agreement_Type, OtherRemark, value):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        try:
+            sql = 'exec	[masters].[add_center_attachment_session]  ?, ?, ?, ?, ?, ?, ?, ?, ?'
+            values = (UserId, UserRoleId, CenterId, FromDate, ToDate, Agreement_Type, Commercial_Agreement_Type, OtherRemark, value)
+            cur.execute(sql,(values))
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop >0:
+                Status=True
+                msg=str(pop) + " - Created Successfully"
+            else:
+                Status=False
+                msg="Already Synced OR Error in Syncing"
+            out = {"Status":Status,'Message':msg}
+        except Exception as e:
+            out = {'Status': False, 'Message': "error: "+str(e)}
+        finally:
+            return out
+
+    def get_center_attachment_session(CenterId):
+        response = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        try:
+            sql = 'exec [masters].[get_center_attachment_session] ?'
+            values = (CenterId,)
+            cur2.execute(sql,(values))
+            data = list(map(lambda x:list(x), cur2.fetchall()))
+            
+            data1 = []
+            for i in filter(lambda x:x[0]==1,data):
+                data1.append({"session_id":i[4], "sessio_name":i[5]})
+            
+            data3 = []
+            for i in filter(lambda x:x[0]==3,data):
+                data3.append({"session_id":i[4], "sessio_name":i[5]})
+            
+            data2 = {"temp4":[],"temp5":[],"temp6":[],"temp7":[]}
+            for i in filter(lambda x:x[0]==2,data):
+                if i[2]==4:
+                    data2["temp4"].append({"session_id":i[4], "sessio_name":i[5]})
+                elif i[2]==5:
+                    data2["temp5"].append({"session_id":i[4], "sessio_name":i[5]})
+                elif i[2]==6:
+                    data2["temp6"].append({"session_id":i[4], "sessio_name":i[5]})
+                elif i[2]==7:
+                    data2["temp7"].append({"session_id":i[4], "sessio_name":i[5]})
+            
+            out = {'Status': True, 'Message': "Success", "data1":data1, "data2":data2, "data3":data3}
+        except Exception as e:
+            out = {'Status': False, 'Message': "error: "+str(e)}
+        finally:
+            cur2.close()
+            con.close()
+            return out
+
+    def get_map_attachment_session(SessionId):
+        response = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        try:
+            sql = 'exec [masters].[get_map_attachment_session] ?'
+            values = (SessionId,)
+            cur2.execute(sql,(values))
+            url = download_aws_url+aws_location+'bulk_upload/Center_Attachment/'
+            attachment_name = ''
+            for i in map(lambda x:list(x), cur2.fetchall()):
+                response.append({"session_attachment_id":i[0], "attachment_name":i[1]})
+                attachment_name = i[2]
+                        
+            out = {'Status': True, 'Message': "Success", "data":response, 'attachment_name':attachment_name,"URL":url}
+        except Exception as e:
+            out = {'Status': False, 'Message': "error: "+str(e)}
+        finally:
+            cur2.close()
+            con.close()
+            return out
+
+    def remove_map_attachment_session(session_attachment_id):
+        response = []
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        try:
+            sql = 'exec [masters].[remove_map_attachment_session] ?'
+            values = (session_attachment_id,)
+            cur2.execute(sql,(values))
+            cur2.commit()
+            out = {'Status': True, 'Message': "Successfully Removed"}
+        except Exception as e:
+            out = {'Status': False, 'Message': "Error : "+str(e)}
+        finally:
+            cur2.close()
+            con.close()
+            return out
+
+    def upload_center_attachment(user_id,user_role_id,filename,session_id):
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        query = """
+        insert into masters.tbl_map_session_attachment
+        (session_id,attachment_name,created_by,created_on,is_active)
+        values
+        ({},'{}',{},GETDATE(),1)
+        """
+
+        #query = eval('quer'+str(c_id))
+        query = query.format(session_id,filename,user_id)
+
+        cur2.execute(query)
+        cur2.commit()
+        cur2.close()
+        con.close()
+        out = {'Status': True, 'message': "Submitted Successfully"}
+        return out
+

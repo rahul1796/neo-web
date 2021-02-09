@@ -162,8 +162,8 @@ def ShikshaEnrolmentMail(candidate_name,enrolment_id,course,email_id,mobile):
 
         return {'status':True,'description':'Email sent'}
     except Exception as e:
-        print('exc='+str(e))
-        return {'status':False,'description':'Unable to sent email'}
+        #print('exc='+str(e))
+        return {'status':False,'description':'Unable to sent email '+ str(e)}
 
 def UAP_Batch_Creation_MAIL(RequestId,SDMSBatchId,requested_date,center_name,course_name,customer_name,cm_emails,files):
     try:
