@@ -2907,6 +2907,14 @@ class client_all(Resource):
             user_id=request.args.get('user_id',0,type=int)
             user_role_id=request.args.get('user_role_id',0,type=int)
             return Master.all_client(user_id,user_role_id)
+class client_all_based_on_status(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            user_id=request.args.get('user_id',0,type=int)
+            user_role_id=request.args.get('user_role_id',0,type=int)
+            status_id=request.args.get('status_id',0,type=int)
+            return Master.client_all_based_on_status(user_id,user_role_id,status_id)
 
 class get_project_details(Resource):
     @staticmethod
@@ -2923,6 +2931,7 @@ class get_subproject_details(Resource):
 
 api.add_resource(project_list, '/project_list')
 api.add_resource(client_all, '/GetALLClient')
+api.add_resource(client_all_based_on_status, '/GetALLClientBasedOnStatus')
 api.add_resource(add_project_details, '/add_project_details')
 api.add_resource(get_project_details, '/GetProjectDetails')
 api.add_resource(get_subproject_details, '/get_subproject_details')
