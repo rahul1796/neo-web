@@ -1200,9 +1200,9 @@ class Report:
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
 
-    def create_client_report(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids):
+    def create_client_report(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids,is_active):
         try:
-            data=Database.DownloadClientReport(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids)
+            data=Database.DownloadClientReport(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids,is_active)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = 'Customer_Report'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile('Customer_Report.*')
@@ -1239,7 +1239,7 @@ class Report:
             df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='POCs') 
 
-            first_row = ['Customer Name','Customer Code','Funding Source','Customer Group','Category Type','Industry Type','Created By','Created On','Last Modified By','Last Modified On']
+            first_row = ['Customer Name','Customer Code','Funding Source','Customer Group','Category Type','Industry Type','Customer Status','Created By','Created On','Last Modified By','Last Modified On']
             worksheet = writer.sheets['Customer']
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format)
@@ -1253,9 +1253,9 @@ class Report:
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
-    def create_contract_report(user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids):
+    def create_contract_report(user_id, user_role_id, contract_id, customer_ids, stage_ids,status_id, from_date,to_date,entity_ids,sales_category_ids):
         try:
-            data=Database.DownloadContractReport(user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids)
+            data=Database.DownloadContractReport(user_id, user_role_id, contract_id, customer_ids, stage_ids,status_id, from_date,to_date,entity_ids,sales_category_ids)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = 'Contract_Report_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile('Contract_Report_.*')
@@ -1289,7 +1289,7 @@ class Report:
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Contracts')            
 
-            first_row = ['Contract Name','Customer Name','From Date','To Date','Stage','Contract Code','Entity Name','Sales Category','Account Manager','Sales Manager','Created By','Created On','Last Modified By','Last Modified On']
+            first_row = ['Contract Name','Customer Name','Customer Status','From Date','To Date','Stage','Contract Code','Entity Name','Sales Category','Account Manager','Sales Manager','Created By','Created On','Last Modified By','Last Modified On']
             worksheet = writer.sheets['Contracts']
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format)           
@@ -1466,8 +1466,15 @@ class Report:
             df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Centers-Sub Projects')  
             df = pd.DataFrame(data['sheet4'], columns=data['sheet4_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Centers-Room')             
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Centers-Room')
+            df = pd.DataFrame(data['sheet5'], columns=data['sheet5_columns'])
             
+            def create_image(x):
+                ext = str(x).split('.')[-1]
+                return (x if ((x=='NR') or (x=='NA') or (x=='')) else '=HYPERLINK("' + config.Base_URL+'/GetDocumentForExcel_S3?image_path=bulk_upload/Center_Attachment&image_name=' + x + '","View Image")')
+            df.loc[:,'Attachment_Name'] = df.loc[:,'Attachment_Name'].map(create_image)
+
+            df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Centers-Attachment')
             first_row = ['center_name','center_type_name','partner_name','center_category_name','bu_name','region_name','cluster_name','country_name','state_name','district_name','location','active_status','center_code','created by','created on','last modified by','last modified on']
             worksheet = writer.sheets['Centers']
             for col_num, value in enumerate(first_row):
@@ -1486,8 +1493,13 @@ class Report:
             worksheet = writer.sheets['Centers-Room']
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format) 
+            
+            first_row = ['Center Code','Center Name','Center Type','Agreement Type','Agreement Category','From date','To Date','Agreement Value(amount)','Attachment','Remark( if others)']
+            worksheet = writer.sheets['Centers-Attachment']
+            for col_num, value in enumerate(first_row):
+                worksheet.write(0, 0+col_num, value, header_format)
+                
             writer.save()
-
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             print(str(e))
@@ -1707,7 +1719,7 @@ class Report:
         except Exception as e:
             print(str(e))
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
-    def DownloadEmpTimeAllocationTemplate(file_name, user_id, user_role_id, date):
+    def DownloadEmpTimeAllocationTemplate(file_name, user_id, user_role_id):
         try:
             name_withpath = config.neo_report_file_path + 'report file/'+ file_name
             DownloadPath=config.neo_report_file_path+'report file/'
@@ -1724,17 +1736,16 @@ class Report:
                 'bold': True,
                 'text_wrap': True,
                 'valign': 'center',
+                'align' : 'left',
                 'fg_color': '#D7E4BC',
                 'border': 1})
                 
-            resp = Database.DownloadEmpTimeAllocationTemplate(user_id, user_role_id, date)
+            resp = Database.DownloadEmpTimeAllocationTemplate(user_id, user_role_id)
 
-            if len(resp[0])==0:
-                return({'Description':'No data available for the selected items', 'Status':False})
             df = pd.DataFrame(resp[0],columns=resp[1])
             df=df.fillna('')
             
-            Header = ["Employee Code(NE)", "Employee name(NE)", "NEO Role(NE)", "Sub Project Code(NE)", "Sub Project Name(NE)", "Month & Year*", "Week 1 Allocation(HH::MM)", "Week 2 Allocation(HH::MM)", "Week 3 Allocation(HH::MM)", "Week 4 Allocation(HH::MM)"]
+            Header = ["Employee Code", "Employee Name", "Sub Project Code", "Sub Project Name", "Allocation(In Percentage)"]
             
             df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Employee Allocation')
             worksheet = writer.sheets['Employee Allocation']

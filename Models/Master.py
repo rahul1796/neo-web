@@ -38,6 +38,9 @@ class Master:
     def all_client(user_id,user_role_id):
         all_client={"Clients":Database.GetALLClient(user_id,user_role_id)}
         return all_client
+    def client_all_based_on_status(user_id,user_role_id,status_id):
+        all_client={"Clients":Database.all_client_based_on_status(user_id,user_role_id,status_id)}
+        return all_client
     def add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, ProjectManager, ActualEndDate, ActualStartDate, PlannedEndDate, PlannedStartDate, isactive, project_id, user_id,CourseIds):
         popupMessage = {"PopupMessage":  Database.add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, ProjectManager, ActualEndDate, ActualStartDate, PlannedEndDate, PlannedStartDate, isactive, project_id, user_id,CourseIds)}
         return popupMessage
@@ -137,8 +140,8 @@ class Master:
     def sector_list(sector_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         sector_l = Database.sector_list(sector_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
         return sector_l
-    def contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        contract_l = Database.contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,status_id,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        contract_l = Database.contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,status_id,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
         return contract_l
     def GetAllBusBasedOn_User(UserId,UserRoleId):
         return Database.GetAllBusBasedOn_User(UserId,UserRoleId)
@@ -290,6 +293,9 @@ class Master:
         data=shiksha_response.json()
         data=json.dumps(data)
         return Database.SyncShikshaCandidateData(data)
+    def SyncWeeklyUserSubProjectAllocation():
+        return Database.SyncWeeklyUserSubProjectAllocation()
+    
     def SendShikshaCandidateEnrolmentMail():
         return Database.SendShikshaCandidateEnrolmentMail()
     
@@ -322,3 +328,6 @@ class Master:
 
     def Sync_UserSubProjectCF_TargetData(c_my, p_my):
         return Database.Sync_UserSubProjectCF_TargetData(c_my, p_my)
+    def upload_center_attachment(user_id,user_role_id,filename,session_id):
+        Candidate =Database.upload_center_attachment(user_id,user_role_id,filename,session_id)
+        return Candidate
