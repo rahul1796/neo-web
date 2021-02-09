@@ -443,8 +443,9 @@
         //     }
         // });
         
-        $('#HduploadFile_Page').text(Center_Name)
+        $('#HduploadFile_Page').text(Center_Name+' - Agreement Details')
         $('#hdn_upl_center_id').val(Center_id)
+        $('#hdn_upl_center_name').val(Center_Name)
         $('#hdn_home_user_id_modal').val($('#hdn_home_user_id').val());
         $('#hdn_home_user_role_id_modal').val($('#hdn_home_user_role_id').val());
         
@@ -454,7 +455,7 @@
         $('#ddl_Agreement_type').append(new Option('Others','3'));
 
         $('#ddl_Commercial_Agreement_type').empty();
-        $('#ddl_Commercial_Agreement_type').append(new Option('Elec Bill','4'));
+        $('#ddl_Commercial_Agreement_type').append(new Option('Electric bill','4'));
         $('#ddl_Commercial_Agreement_type').append(new Option('Security Guard','5'));
         $('#ddl_Commercial_Agreement_type').append(new Option('Water Bill','6'));
         $('#ddl_Commercial_Agreement_type').append(new Option('Internet Cost','7'));
@@ -488,6 +489,9 @@
         //$('#Hdupload_reomve_File').text(Center_Name)
 
         $('#hdn_upl_session_id').val(session_id)
+        $('#hdn_upl_center_id_m2').val($('#hdn_upl_center_id').val())
+        $('#hdn_upl_center_name_m2').val($('#hdn_upl_center_name').val())
+        
         $('#hdn_home_user_id_modal2').val($('#hdn_home_user_id').val());
         $('#hdn_home_user_role_id_modal2').val($('#hdn_home_user_role_id').val());
         
@@ -589,32 +593,41 @@
                         varHtml = '<h4 class="modal-title"><span id="HduploadFile">Commercial Agreement</span></h4>'
                         
                         data_length = data.data2.temp4.length;
-                        varHtml+='<h6 class="modal-title"><span id="HduploadFile">Electric Bill</span></h6>';
-                        for(var i=0;i<data_length;i++){
-                            varHtml+='<a href="javascript: GetAgreementUpload_Remove('+data.data2.temp4[i].session_id+');;">'+data.data2.temp4[i].sessio_name+'</a>';
-                            varHtml+='<br>';
+                        if (data_length>0){
+                            varHtml+='<h6 class="modal-title"><span id="HduploadFile">Electric Bill</span></h6>';
+                            for(var i=0;i<data_length;i++){
+                                varHtml+='<a href="javascript: GetAgreementUpload_Remove('+data.data2.temp4[i].session_id+');;">'+data.data2.temp4[i].sessio_name+'</a>';
+                                varHtml+='<br>';
+                            }
                         }
                         
                         data_length = data.data2.temp5.length;
-                        varHtml+='<h6 class="modal-title"><span id="HduploadFile">Security Guard</span></h6>';
-                        for(var i=0;i<data_length;i++){
-                            varHtml+='<a href="javascript: GetAgreementUpload_Remove('+data.data2.temp5[i].session_id+');;">'+data.data2.temp5[i].sessio_name+'</a>';
-                            varHtml+='<br>';
+                        if (data_length>0){
+                            varHtml+='<h6 class="modal-title"><span id="HduploadFile">Security Guard</span></h6>';
+                            for(var i=0;i<data_length;i++){
+                                varHtml+='<a href="javascript: GetAgreementUpload_Remove('+data.data2.temp5[i].session_id+');;">'+data.data2.temp5[i].sessio_name+'</a>';
+                                varHtml+='<br>';
+                            }
                         }
-                        
+
                         data_length = data.data2.temp6.length;
-                        varHtml+='<h6 class="modal-title"><span id="HduploadFile">Water Bill</span></h6>';
-                        for(var i=0;i<data_length;i++){
-                            varHtml+='<a href="javascript: GetAgreementUpload_Remove('+data.data2.temp6[i].session_id+');;">'+data.data2.temp6[i].sessio_name+'</a>';
-                            varHtml+='<br>';
+                        if (data_length>0){
+                            varHtml+='<h6 class="modal-title"><span id="HduploadFile">Water Bill</span></h6>';
+                            for(var i=0;i<data_length;i++){
+                                varHtml+='<a href="javascript: GetAgreementUpload_Remove('+data.data2.temp6[i].session_id+');;">'+data.data2.temp6[i].sessio_name+'</a>';
+                                varHtml+='<br>';
+                            }
+                        }
+
+                        data_length = data.data2.temp7.length;
+                        if (data_length>0){
+                            varHtml+='<h6 class="modal-title"><span id="HduploadFile">Internet Cost</span></h6>';
+                            for(var i=0;i<data_length;i++){
+                                varHtml+='<a href="javascript: GetAgreementUpload_Remove('+data.data2.temp7[i].session_id+');;">'+data.data2.temp7[i].sessio_name+'</a>';
+                                varHtml+='<br>';
+                            }
                         }
                         
-                        data_length = data.data2.temp7.length;
-                        varHtml+='<h6 class="modal-title"><span id="HduploadFile">Internet Cost</span></h6>';
-                        for(var i=0;i<data_length;i++){
-                            varHtml+='<a href="javascript: GetAgreementUpload_Remove('+data.data2.temp7[i].session_id+');;">'+data.data2.temp7[i].sessio_name+'</a>';
-                            varHtml+='<br>';
-                        }
                         $('#attachment_type2').append(varHtml);
                     }
             }
@@ -994,8 +1007,8 @@
                 <form id="formUpload_attahmentmodal" action="javascript:UploadFileData()">
                     <input type="hidden" id="hdn_home_user_id_modal" name="hdn_home_user_id_modal" value="0">
                     <input type="hidden" id="hdn_home_user_role_id_modal" name="hdn_home_user_role_id_modal" value="0">
-                    <input type="hidden" id="hdn_upl_center_id" name="hdn_assessment_id" value="0">
-
+                    <input type="hidden" id="hdn_upl_center_id" name="hdn_upl_center_id" value="0">
+                    <input type="hidden" id="hdn_upl_center_name" name="hdn_upl_center_name" value="">
                 <div class="modal-header">
                     <h4 class="modal-title"><span id="HduploadFile_Page"></span></h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -1009,13 +1022,13 @@
                                     <option selected="" value="">All</option>
                                 </select>
                             </div>
-                            <div class="col-lg-3" id='div_Agreement_type'>
+                            <div class="col-lg-4" id='div_Agreement_type'>
                                 <label for="ddl_Commercial_Agreement_type" class="mr-2">Commercial Agreement type</label>
                                 <select class="form-control dropdown-search-filter" id="ddl_Commercial_Agreement_type" onchange="Loadcommercial_agreement_type()">
                                     <option selected="" value="">All</option>
                                 </select>
                             </div>
-                            <div class="col-lg-3" id='div_other'>
+                            <div class="col-lg-4" id='div_other'>
                                 <label for="ddl_others" class="mr-2">Other Remark</label>
                                 <input type="text" class="form-control" name="ddl_others" id="ddl_others" placeholder="Remark">
                             </div>
@@ -1078,10 +1091,13 @@
                     <input type="hidden" id="hdn_home_user_id_modal2" name="hdn_home_user_id_modal2" value="0">
                     <input type="hidden" id="hdn_home_user_role_id_modal2" name="hdn_home_user_role_id_modal2" value="0">
                     <input type="hidden" id="hdn_upl_session_id" name="hdn_upl_session_id" value="0">
+                    <input type="hidden" id="hdn_upl_center_id_m2" name="hdn_upl_center_id_m2" value="0">
+                    <input type="hidden" id="hdn_upl_center_name_m2" name="hdn_upl_center_name_m2" value="0">
+                    <!-- hdn_upl_center_name_m2, hdn_upl_center_id_m2 -->
 
                 <div class="modal-header">
                     <h4 class="modal-title"><span id="Hdupload_reomve_File"></span>Add/Remove File</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <button type="button" class="close" onclick="GetAgreementUpload($('#hdn_upl_center_id_m2').val(),$('#hdn_upl_center_name_m2').val())" aria-hidden="true">×</button> <!-- data-dismiss="modal"  -->
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -1110,7 +1126,7 @@
 
                 <div class="modal-footer">
                     <!-- <button class="btn btn-primary waves-effect" type="submit" >Submit</button> -->
-                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Back</button> <!--onclick="OpenAssessmentList()"-->
+                    <button type="button" class="btn btn-secondary waves-effect" onclick="GetAgreementUpload($('#hdn_upl_center_id_m2').val(),$('#hdn_upl_center_name_m2').val())">Back</button> <!--onclick="OpenAssessmentList()"  data-dismiss="modal"-->
                 </div>
             </form>
             </div>
