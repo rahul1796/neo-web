@@ -50,7 +50,7 @@
     });
 
     function LoadCustomers(){
-        var URL=$('#hdn_web_url').val()+ "/GetALLClient"
+        var URL=$('#hdn_web_url').val()+ "/GetALLClientBasedOnStatus"
         $.ajax({
             type:"GET",
             url:URL,
@@ -59,7 +59,9 @@
             datatype:"json",
             data:{
                 "user_id": $('#hdn_home_user_id').val(),
-                "user_role_id": $('#hdn_home_user_role_id').val()
+                "user_role_id": $('#hdn_home_user_role_id').val(),
+                "status_id": $('#ddlStatus').val()
+
             },
             success: function (data){
                 if(data.Clients != null)
@@ -359,7 +361,7 @@
                             </div>
                             <div class="col-lg-3">
                                 <label for="ddlStatus" class="mr-2">Customer Status</label>
-                                <select class="form-control dropdown-search-filter" id="ddlStatus" >
+                                <select class="form-control dropdown-search-filter" id="ddlStatus" onchange="LoadCustomers()">
                                     <option selected="" value="">All</option>
                                 </select>
                             </div>

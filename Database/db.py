@@ -404,6 +404,25 @@ class Database:
         cur2.close()
         con.close()
         return client
+    def all_client_based_on_status(user_id,user_role_id,status_id):
+        client = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        values=(user_id,user_role_id,status_id)
+        sql='exec [masters].[sp_get_all_clients_based_on_status] ?,?,?'
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]            
+            client.append(h.copy())
+            #h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            #client.append(h)
+        cur2.close()
+        con.close()
+        return client
+    
     def add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, ProjectManager, ActualEndDate, ActualStartDate, PlannedEndDate, PlannedStartDate, isactive, project_id, user_id,CourseIds):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
