@@ -3360,14 +3360,14 @@ SELECT					cb.name as candidate_name,
         con.close()
         return content
 
-    def contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,status_id,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_contract_list] ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (user_id,user_role_id,contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [masters].[sp_get_contract_list] ?,?,?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,contract_id,customer_ids,stage_ids,status_id,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -7516,7 +7516,7 @@ SELECT					cb.name as candidate_name,
         con.close()
         return  res
     
-    def DownloadClientReport(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids):
+    def DownloadClientReport(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids,is_active):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
@@ -7526,10 +7526,10 @@ SELECT					cb.name as candidate_name,
        
         sql=''
         sql1=''
-        sql = 'exec [reports].[sp_get_customer_download] ?, ?, ?,?,?,?'
-        sql1 = 'exec [reports].[sp_get_customer_poc_download] ?, ?, ?,?,?,?'
+        sql = 'exec [reports].[sp_get_customer_download] ?, ?, ?,?,?,?,?'
+        sql1 = 'exec [reports].[sp_get_customer_poc_download] ?, ?, ?,?,?,?,?'
         
-        values = (user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids)
+        values = (user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids,is_active)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
@@ -7543,15 +7543,15 @@ SELECT					cb.name as candidate_name,
         return {'sheet1':sheet1,'sheet2':sheet2,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns}
         curs.close()
         con.close()    
-    def DownloadContractReport(user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids):
+    def DownloadContractReport(user_id, user_role_id, contract_id, customer_ids, stage_ids,status_id, from_date,to_date,entity_ids,sales_category_ids):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
         sheet1_columns=[]
       
         sql=''
-        sql = 'exec [reports].[sp_get_contract_download] ?, ?, ?,?,?,?,?,?,?'
-        values = (user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids)
+        sql = 'exec [reports].[sp_get_contract_download] ?, ?, ?,?,?,?,?,?,?,?'
+        values = (user_id, user_role_id, contract_id, customer_ids, stage_ids,status_id, from_date,to_date,entity_ids,sales_category_ids)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()

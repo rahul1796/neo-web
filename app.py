@@ -3899,6 +3899,7 @@ class contract_list(Resource):
             contract_id = request.form['contract_id'] 
             customer_ids = request.form['customer_ids'] 
             stage_ids = request.form['stage_ids'] 
+            status_id = request.form['status_id'] 
             from_date = request.form['from_date'] 
             to_date = request.form['to_date'] 
             entity_ids = request.form['entity_ids'] 
@@ -3909,7 +3910,7 @@ class contract_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            return Master.contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Master.contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,status_id,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 
 class add_contract_details(Resource):
     @staticmethod
@@ -7257,7 +7258,8 @@ class client_download_report(Resource):
                 funding_sources = request.form['funding_sources']
                 customer_groups = request.form['customer_groups']
                 category_type_ids = request.form['category_type_ids']
-                resp = Report.create_client_report(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids)
+                is_active = request.form['is_active']
+                resp = Report.create_client_report(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids,is_active)
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:
@@ -7275,11 +7277,12 @@ class contract_download_report(Resource):
                 contract_id = request.form['contract_id']                
                 customer_ids = request.form['customer_ids']
                 stage_ids = request.form['stage_ids']
+                status_id = request.form['status_id']
                 from_date = request.form['from_date']
                 to_date = request.form['to_date']
                 entity_ids = request.form['entity_ids']
                 sales_category_ids = request.form['sales_category_ids']
-                resp = Report.create_contract_report(user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids)
+                resp = Report.create_contract_report(user_id, user_role_id, contract_id, customer_ids, stage_ids,status_id, from_date,to_date,entity_ids,sales_category_ids)
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:

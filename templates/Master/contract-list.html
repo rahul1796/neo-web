@@ -24,21 +24,27 @@
         $('#ddlStage').append(new Option('Yet To Start','0'));
         $('#ddlStage').append(new Option('Open','1'));
         $('#ddlStage').append(new Option('Expired','2'));
+        $('#ddlStatus').empty();
+        $('#ddlStatus').append(new Option('All','-1'));
+        $('#ddlStatus').append(new Option('Active','1'));
+        $('#ddlStatus').append(new Option('Inactive','0'));
+        
         LoadCustomers();
         //LoadStages();
         Loadentityddl();
         LoadSalesCategoryddl();
+        if ('{{status}}'==1)
+            $('#ddlStage').val("1");
+        role_id=parseInt($('#hdn_home_user_role_id').val());
+        if(role_id == 1)
+            $('#btn_create').show();
+        else 
+            $('#btn_create').hide();
         if(role_id == 1 )
             $('#btn_download').show();
         else 
             $('#btn_download').hide();
-        if ('{{status}}'==1)
-            $('#ddlStage').val("1");
-            role_id=parseInt($('#hdn_home_user_role_id').val());
-                if(role_id == 1)
-                    $('#btn_create').show();
-                else 
-                    $('#btn_create').hide();
+        
         LoadTable(); 
         
     });
@@ -201,6 +207,7 @@
                     d.contract_id = 0;
                     d.customer_ids= $('#ddlCustomer').val().toString();
                     d.stage_ids= $('#ddlStage').val().toString();
+                    d.status_id= $('#ddlStatus').val();
                     d.from_date= $('#FromDate').val().toString();
                     d.to_date= $('#ToDate').val().toString();
                     d.entity_ids= $('#ddlentity').val().toString();
@@ -228,6 +235,8 @@
                 },              
                 { "data": "Contract_Name" },
                 { "data": "Client_Name" },
+                { "data": "Customer_Status" },
+              
                 { "data": "From_Date" },
                 { "data": "To_Date" },
                 { "data": "Stage_Name" },
@@ -284,6 +293,7 @@
                             'contract_id':0,
                             'customer_ids':$('#ddlCustomer').val().toString(),
                             'stage_ids':$('#ddlStage').val().toString(),
+                            'status_id':$('#ddlStatus').val(),
                             'from_date':$('#FromDate').val().toString(),
                             'to_date':$('#ToDate').val().toString(),
                             'entity_ids':$('#ddlentity').val().toString(),
@@ -348,13 +358,20 @@
                                 </select>
                             </div>
                             <div class="col-lg-3">
+                                <label for="ddlStatus" class="mr-2">Customer Status</label>
+                                <select class="form-control dropdown-search-filter" id="ddlStatus" >
+                                    <option selected="" value="">All</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-lg-3">
                                 <label for="ddlCustomer" class="mr-2">Customer</label>
                                 <select class="form-control dropdown-search-filter" id="ddlCustomer" multiple>
                                     <!-- <option value="" disabled selected>Select Region</option> -->
                                 </select>
                             </div>
                             <div class="col-lg-3">
-                                <label for="ddlStage" class="mr-2">Stage</label>
+                                <label for="ddlStage" class="mr-2">Contract Stage</label>
                                 <select class="form-control dropdown-search-filter" id="ddlStage" multiple >
 
                                  </select>
@@ -365,6 +382,7 @@
                                     <!-- <option selected="" value="">All</option>                                     -->
                                 </select>
                             </div>
+                            
                             
                             <div class="col-lg-3" style="display: none;">
                                 <label for="FromDate" class="mr-2" >From Date</label>
@@ -412,17 +430,19 @@
                            
                            </div>
                            <br/>
-                           <div class="col-lg-12">
-                               <table id="tbl_contract" class="table dt-responsive wrap">
+                           <div class="col-lg-12" style="width: 1100px">
+                               <table id="tbl_contract" class="table dt-responsive wrap" >
                                    <thead>
                                        <tr>
                                            <th>S.No</th>
                                            <th>Actions</th>
                                            <th>Contract Name</th>
                                            <th>Customer Name</th>
+                                           <th>Customer Status</th>
+                                          
                                            <th>From Date</th>
                                            <th>To Date</th>
-                                           <th>Stage</th>
+                                           <th> Contract Stage</th>
                                            <th>Value</th>
                                            <th>Contract Code</th>
                                            <!-- <th>BU</th> -->
