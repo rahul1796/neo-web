@@ -137,8 +137,8 @@ class Master:
     def sector_list(sector_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         sector_l = Database.sector_list(sector_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
         return sector_l
-    def contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        contract_l = Database.contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,status_id,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+        contract_l = Database.contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,status_id,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
         return contract_l
     def GetAllBusBasedOn_User(UserId,UserRoleId):
         return Database.GetAllBusBasedOn_User(UserId,UserRoleId)
