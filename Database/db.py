@@ -404,6 +404,25 @@ class Database:
         cur2.close()
         con.close()
         return client
+    def all_client_based_on_status(user_id,user_role_id,status_id):
+        client = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        values=(user_id,user_role_id,status_id)
+        sql='exec [masters].[sp_get_all_clients_based_on_status] ?,?,?'
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        for row in cur2:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]            
+            client.append(h.copy())
+            #h = {""+columns[0]+"":r[0],""+columns[1]+"":r[1]}
+            #client.append(h)
+        cur2.close()
+        con.close()
+        return client
+    
     def add_project_details(ProjectName, ProjectCode, ClientName, ContractName, Practice, BU, projectgroup, ProjectType, Block, Product, ProjectManager, ActualEndDate, ActualStartDate, PlannedEndDate, PlannedStartDate, isactive, project_id, user_id,CourseIds):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
@@ -3360,14 +3379,14 @@ SELECT					cb.name as candidate_name,
         con.close()
         return content
 
-    def contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,status_id,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
         content = {}
         d = []
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_contract_list] ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (user_id,user_role_id,contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [masters].[sp_get_contract_list] ?,?,?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,contract_id,customer_ids,stage_ids,status_id,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -7516,7 +7535,7 @@ SELECT					cb.name as candidate_name,
         con.close()
         return  res
     
-    def DownloadClientReport(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids):
+    def DownloadClientReport(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids,is_active):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
@@ -7526,10 +7545,10 @@ SELECT					cb.name as candidate_name,
        
         sql=''
         sql1=''
-        sql = 'exec [reports].[sp_get_customer_download] ?, ?, ?,?,?,?'
-        sql1 = 'exec [reports].[sp_get_customer_poc_download] ?, ?, ?,?,?,?'
+        sql = 'exec [reports].[sp_get_customer_download] ?, ?, ?,?,?,?,?'
+        sql1 = 'exec [reports].[sp_get_customer_poc_download] ?, ?, ?,?,?,?,?'
         
-        values = (user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids)
+        values = (user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids,is_active)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
@@ -7543,15 +7562,15 @@ SELECT					cb.name as candidate_name,
         return {'sheet1':sheet1,'sheet2':sheet2,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns}
         curs.close()
         con.close()    
-    def DownloadContractReport(user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids):
+    def DownloadContractReport(user_id, user_role_id, contract_id, customer_ids, stage_ids,status_id, from_date,to_date,entity_ids,sales_category_ids):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
         sheet1_columns=[]
       
         sql=''
-        sql = 'exec [reports].[sp_get_contract_download] ?, ?, ?,?,?,?,?,?,?'
-        values = (user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids)
+        sql = 'exec [reports].[sp_get_contract_download] ?, ?, ?,?,?,?,?,?,?,?'
+        values = (user_id, user_role_id, contract_id, customer_ids, stage_ids,status_id, from_date,to_date,entity_ids,sales_category_ids)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
@@ -7861,6 +7880,28 @@ SELECT					cb.name as candidate_name,
             return {"Status":Status,'Message':msg}
         except Exception as e:
             # print(str(e))
+            return {"Status":False,'message': "error: "+str(e)}
+    def SyncWeeklyUserSubProjectAllocation():
+        try: 
+            # print(str(df.to_json(orient='records')))
+            con = pyodbc.connect(conn_str)
+            cur = con.cursor()            
+            sql = 'exec	[masters].[sp_sync_weekly_user_sp_allocation] '
+            cur.execute(sql)
+            for row in cur:
+                pop=row[0]
+            cur.commit()
+            cur.close()
+            con.close()
+            if pop >0 :
+                Status=True
+                msg="Synced Successfully"
+            else:
+                msg="Error in Syncing"
+                Status=False
+            return {"Status":Status,'Message':msg}
+        except Exception as e:
+            print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
 
     def SendShikshaCandidateEnrolmentMail():
@@ -8329,11 +8370,11 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns,'sheet2':sheet2,'sheet2_columns':sheet2_columns}
-    def DownloadEmpTimeAllocationTemplate(user_id, user_role_id, date):
+    def DownloadEmpTimeAllocationTemplate(user_id, user_role_id):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
-        sql = 'exec [reports].[sp_get_emp_allocation_download] ?, ?, ?'
-        values = (user_id, user_role_id, date)
+        sql = 'exec [reports].[sp_get_emp_allocation_template_download] ?, ?'
+        values = (user_id, user_role_id)
         curs.execute(sql,(values))
         columns = [column[0].title() for column in curs.description]
         data = curs.fetchall()
@@ -8380,7 +8421,7 @@ SELECT					cb.name as candidate_name,
             cur = con.cursor()
             #print(len(df))
             json_str=df.to_json(orient='records')
-            sql = 'exec	[masters].[sp_upload_employee_sub_project_allocation] ?,?,?'
+            sql = 'exec	[masters].[sp_upload_employee_sub_project_base_allocation] ?,?,?'
             values = (json_str,user_id,user_role_id)
             cur.execute(sql,(values))
             
