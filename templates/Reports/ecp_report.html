@@ -22,48 +22,63 @@
             $('#FromDate').val(first);
             $('#ToDate').val(last);
             //alert(first);
-            LoadCustomerdl();
+            LoadStageStausddl();
+            
+            LoadCustomers();
             LoadRegionddl();  
             //LoadTableBasedOnSearch();
         });
-        function LoadCustomerdl(){
-            var URL=$('#hdn_web_url').val()+ "/GetALLClient"
-                $.ajax({
-                type:"GET",
-                url:URL,
-                async:false,        
-                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                datatype:"json",
-                data:{
-                    "user_id": $('#hdn_home_user_id').val(),
-                    "user_role_id": $('#hdn_home_user_role_id').val()
-                },
-                success: function (data){
-                    if(data.Clients != null)
-                    {
-                        $('#ddlCustomer').empty();
-                        var count=data.Clients.length;
-                        if( count> 0)
-                        {
-                            //$('#ddlRegion').append(new Option('ALL','-1'));
-                            for(var i=0;i<count;i++)
-                                $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
-                            //$('#ddlCourse').val('-1');
-                        }
-                        else
-                        {
-                        // $('#ddlCustomer').append(new Option('No Customer','-1'));
-                        }
-                    }
-                },
-                error:function(err)
+        function LoadStageStausddl()
+    {
+        $('#ddlStage').empty();
+        $('#ddlStage').append(new Option('Yet To Start','0'));
+        $('#ddlStage').append(new Option('Open','1'));
+        $('#ddlStage').append(new Option('Expired','2'));
+        $('#ddlStatus').empty();
+        $('#ddlStatus').append(new Option('All','-1'));
+        $('#ddlStatus').append(new Option('Active','1'));
+        $('#ddlStatus').append(new Option('Inactive','0'));
+        
+    }
+    
+        function LoadCustomers(){
+        var URL=$('#hdn_web_url').val()+ "/GetALLClientBasedOnStatus"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "user_id": $('#hdn_home_user_id').val(),
+                "user_role_id": $('#hdn_home_user_role_id').val(),
+                "status_id": $('#ddlStatus').val()
+
+            },
+            success: function (data){
+                if(data.Clients != null)
                 {
-                    alert('Error while loading BU! Please try again');
-                    return false;
+                    $('#ddlCustomer').empty();
+                    var count=data.Clients.length;
+                    if( count> 0)
+                    {
+                        for(var i=0;i<count;i++)
+                            $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
+                    }
+                    else
+                    {
+                     //   $('#ddlCustomer').append(new Option('Choose Customer',''));
+                    }
                 }
-            });
-            return false;
-        }
+            },
+            error:function(err)
+            {
+                alert('Error loading customers! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    
         function LoadRegionddl(){
             var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
                 $.ajax({
@@ -105,43 +120,44 @@
             return false;
         }
         function LoadContract(){
-            var URL=$('#hdn_web_url').val()+ "/GetContractsBasedOnCustomer"  //"/GetALLProject_multiple"
-            $.ajax({
-                type:"GET",
-                url:URL,
-                async:false,
-                beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-                datatype:"json",
-                data:{
-                    "customer_id":$('#ddlCustomer').val().toString(),
-                    "user_id": $('#hdn_home_user_id').val(),
-                    "user_role_id": $('#hdn_home_user_role_id').val()
-                },
-                success: function (data){
-                    if(data.Contracts != null)
-                    {
-                        $('#ddlContract').empty();
-                        var count=data.Contracts.length;
-                        if( count> 0)
-                        {
-                            //$('#ddlProject').append(new Option('ALL','-1'));  , 
-                            for(var i=0;i<count;i++)
-                                $('#ddlContract').append(new Option(data.Contracts[i].Contract_Name,data.Contracts[i].Contract_Id));
-                        }
-                        else
-                        {
-                        // $('#ddlContract').append(new Option('ALL','-1'));
-                        }
-                    }
-                },
-                error:function(request, err)
+        var URL=$('#hdn_web_url').val()+ "/GetContractsBasedOnCustomerAndStage"  //"/GetALLProject_multiple"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "customer_id":$('#ddlCustomer').val().toString(),
+                "user_id": $('#hdn_home_user_id').val(),
+                "contract_stage_ids": $('#ddlStage').val().toString(),
+                "user_role_id": $('#hdn_home_user_role_id').val()
+                
+            },
+            success: function (data){
+                if(data.Contracts != null)
                 {
-                    alert('Error! Please try again');
-                    return false;
+                    $('#ddlContract').empty();
+                    var count=data.Contracts.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlProject').append(new Option('ALL','-1'));  , 
+                        for(var i=0;i<count;i++)
+                            $('#ddlContract').append(new Option(data.Contracts[i].Contract_Name,data.Contracts[i].Contract_Id));
+                    }
+                    else
+                    {
+                    // $('#ddlContract').append(new Option('ALL','-1'));
+                    }
                 }
-            });
-            return false;
-        }
+            },
+            error:function(request, err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
         function LoadTableBasedOnSearch()
         {
             if($('#FromDate').val()=='' || $('#ToDate').val()=='')
@@ -164,7 +180,9 @@
                         "contract_ids":$('#ddlContract').val().toString(),
                         "region_ids":$('#ddlRegion').val().toString(),
                         "from_date" : $('#FromDate').val(),
-                        "to_date" : $('#ToDate').val()
+                        "to_date" : $('#ToDate').val(),
+                        "stage_ids":$('#ddlStage').val().toString(),
+                        "status_id":$('#ddlStatus').val()
                     },
                 success: function (data){
                     varHtml='';
@@ -186,8 +204,11 @@
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].User_Name_Coo +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].User_Name_Tm +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].Customer_Name +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Customer_Status +'</td>';
                                     let varLink='<a onclick="GetContractProjectTargets(\'' + data.Data[i].Region_Id + '\',\'' + data.Data[i].Contract_Id + '\',\'' + data.Data[i].Contract_Name + '\')"  style="color:blue;cursor:pointer" >' + data.Data[i].Contract_Name + '</a>';
+                                    
                                     varHtml+='  <td style="text-align:center;">'+ varLink +'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ data.Data[i].Contract_Stage_Name +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].Target_Enrolment +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].Target_Certification +'</td>';
                                     varHtml+='  <td style="text-align:center;">'+ data.Data[i].Target_Placement +'</td>';
@@ -339,7 +360,9 @@
                             "contract_ids":$('#ddlContract').val().toString(),
                             "region_ids":$('#ddlRegion').val().toString(),
                             "from_date" : $('#FromDate').val(),
-                            "to_date" : $('#ToDate').val()
+                            "to_date" : $('#ToDate').val(),
+                            "stage_ids":$('#ddlStage').val().toString(),
+                            "status_id":$('#ddlStatus').val()
                         },
                         success: function(resp) 
                         {
@@ -416,24 +439,38 @@
             <div class="card-box">
                 <div class="row">
                     <div class="col-lg-3">
+                        <label for="ddlStatus" class="mr-2">Customer Status</label>
+                        <select class="form-control dropdown-search-filter" id="ddlStatus" onchange="LoadCustomers();">
+                            <option selected="" value="">All</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-lg-3">
                         <label for="ddlCustomer" class="mr-2">Customer</label>
                         <select class="form-control dropdown-search-filter" onchange="LoadContract();" id="ddlCustomer" multiple>
                             <option selected="" value="">All</option>                            
                         </select>
                     </div>
                     <div class="col-lg-3">
+                        <label for="ddlStage" class="mr-2">Contract Stage</label>
+                        <select class="form-control dropdown-search-filter" id="ddlStage" multiple  onchange="LoadContract();" >
+
+                         </select>
+                    </div>
+                    <div class="col-lg-3">
                         <label for="ddlContract" class="mr-2">Contract</label>
                         <select class="form-control dropdown-search-filter" id="ddlContract" multiple>
                         </select>
                     </div>
+                    
+                </div>
+                <div class="row">
                     <div class="col-lg-3">
                         <label for="ddlRegion" class="mr-2">Region</label>
                         <select class="form-control dropdown-search-filter" id="ddlRegion" multiple>
                             <option selected="" value="">All</option>
                         </select>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-3">
                         <label for="FromDate" class="mr-2">From Date</label>
                         <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
@@ -487,7 +524,9 @@
                                     <th rowspan="2" style="text-align:center;">COO</th>
                                     <th rowspan="2" style="text-align:center;">TM</th>
                                     <th rowspan="2" style="text-align:center;">Customer</th>
+                                    <th rowspan="2" style="text-align:center;">Customer Status</th>
                                     <th rowspan="2" style="text-align:center;">Contract</th>
+                                    <th rowspan="2" style="text-align:center;">Contract Stage</th>
                                     <th colspan="3" style="text-align:center;">Targets</th>
                                     <th colspan="3" style="text-align:center;">Actuals (Contract Till Date)</th>
                                     <th colspan="3" style="text-align:center;">Actuals</th>
