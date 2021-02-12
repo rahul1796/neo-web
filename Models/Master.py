@@ -253,6 +253,7 @@ class Master:
     def add_edit_partner_user(UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId):
         popupMessage = {"PopupMessage": Database.add_edit_partner_user(UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId)}
         return popupMessage
+    
     def GetPartners(PartnerTypeId):
         return {'Partners':Database.GetPartners(PartnerTypeId)}
 
@@ -305,23 +306,28 @@ class Master:
     def cancel_planned_batch(user_id,planned_batch_code,cancel_reason):
         popupMessage = {"PopupMessage": Database.cancel_planned_batch(user_id,planned_batch_code,cancel_reason)}
         return popupMessage
-
     def GetCustomerSpoc(customer_id):
         return Database.GetCustomerSpoc(customer_id)
-
     def cancel_actual_batch(user_id,actual_batch_id,cancel_reason):
         popupMessage = {"PopupMessage": Database.cancel_actual_batch(user_id,actual_batch_id,cancel_reason)}
         return popupMessage
-
     def GetPOCForCustomer(customer_id):
         return Database.GetPOCForCustomer(customer_id)
     def GetSessionsForCourse(CourseId):
         return Database.GetSessionsForCourse(CourseId)
     def GetPartnerCenters(partner_id):
         return {"PartnerCenters":Database.GetPartnerCenters(partner_id)}
-
     def Sync_UserSubProjectCF_TargetData(c_my, p_my):
         return Database.Sync_UserSubProjectCF_TargetData(c_my, p_my)
     def upload_center_attachment(user_id,user_role_id,filename,session_id):
         Candidate =Database.upload_center_attachment(user_id,user_role_id,filename,session_id)
         return Candidate
+
+    def GetPartnerContract(partner_id):
+        return {"PartnerContract":Database.GetPartnerContract(partner_id), "S3_Path":"https://labournet.s3.ap-south-1.amazonaws.com/neo_skills/qa/bulk_upload/Partner%20MOU/"}
+
+    def add_edit_partner_contract(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId):
+        popupMessage = {"PopupMessage": Database.add_edit_partner_contract(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId)}
+        return popupMessage
+
+        

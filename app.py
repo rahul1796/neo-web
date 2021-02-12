@@ -2540,7 +2540,6 @@ api.add_resource(get_section_details,'/GetSectionDetails')
 api.add_resource(all_section_types,'/AllSectionTypeList')
 api.add_resource(all_parent_section,'/AllP_SectionList')
 
-
 ############################################################################################################
 
 #State_and_District_API's
@@ -3845,7 +3844,6 @@ class get_sector_details(Resource):
 api.add_resource(sector_list,'/sector_list')
 api.add_resource(add_sector_details,'/add_sector_details')
 api.add_resource(get_sector_details,'/GetSectorDetails')
-
 
 ####################################################################################################
 #Contract_API's
@@ -9649,12 +9647,39 @@ class GetDocumentForExcel_S3(Resource):
                 filename = r.text
             else:
                 filename = ''
-
             if filename =='':
                 filename= config.Base_URL + '/data/No-image-found.jpg'
-            
             return redirect(filename)
 api.add_resource(GetDocumentForExcel_S3,'/GetDocumentForExcel_S3')
+
+class GetPartnerContract(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            partner_id=request.args.get('partner_id',0,type=int)
+            response=Master.GetPartnerContract(partner_id)
+            return response
+api.add_resource(GetPartnerContract,'/GetPartnerContract')
+
+class add_edit_partner_contract(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            #Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId
+
+            Contract_Name=request.form['Contract_Name']
+            ContractCode=request.form['ContractCode']
+            StartDate=request.form['StartDate']
+            EndDate=request.form['EndDate']
+            filename=request.form['filename']
+            PartnerId=request.form['PartnerId']
+            JSON=request.form['JSON']
+            is_active=request.form['is_active']
+            PartnerContractId=request.form['PartnerContractId']
+            user_id=g.user_id
+            
+            return Master.add_edit_partner_contract(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId)
+api.add_resource(add_edit_partner_contract,'/add_edit_partner_contract')
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
