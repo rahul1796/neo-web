@@ -2906,6 +2906,14 @@ class client_all(Resource):
             user_id=request.args.get('user_id',0,type=int)
             user_role_id=request.args.get('user_role_id',0,type=int)
             return Master.all_client(user_id,user_role_id)
+class client_all_based_on_status(Resource):
+    @staticmethod
+    def get():
+        if request.method == 'GET':
+            user_id=request.args.get('user_id',0,type=int)
+            user_role_id=request.args.get('user_role_id',0,type=int)
+            status_id=request.args.get('status_id',0,type=int)
+            return Master.client_all_based_on_status(user_id,user_role_id,status_id)
 
 class get_project_details(Resource):
     @staticmethod
@@ -2922,6 +2930,7 @@ class get_subproject_details(Resource):
 
 api.add_resource(project_list, '/project_list')
 api.add_resource(client_all, '/GetALLClient')
+api.add_resource(client_all_based_on_status, '/GetALLClientBasedOnStatus')
 api.add_resource(add_project_details, '/add_project_details')
 api.add_resource(get_project_details, '/GetProjectDetails')
 api.add_resource(get_subproject_details, '/get_subproject_details')
@@ -3897,6 +3906,7 @@ class contract_list(Resource):
             contract_id = request.form['contract_id'] 
             customer_ids = request.form['customer_ids'] 
             stage_ids = request.form['stage_ids'] 
+            status_id = request.form['status_id'] 
             from_date = request.form['from_date'] 
             to_date = request.form['to_date'] 
             entity_ids = request.form['entity_ids'] 
@@ -3907,7 +3917,7 @@ class contract_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            return Master.contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Master.contract_list(user_id,user_role_id,contract_id,customer_ids,stage_ids,status_id,from_date,to_date,entity_ids,sales_category_ids,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
 
 class add_contract_details(Resource):
     @staticmethod
@@ -7256,7 +7266,8 @@ class client_download_report(Resource):
                 funding_sources = request.form['funding_sources']
                 customer_groups = request.form['customer_groups']
                 category_type_ids = request.form['category_type_ids']
-                resp = Report.create_client_report(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids)
+                is_active = request.form['is_active']
+                resp = Report.create_client_report(user_id, user_role_id, client_id, funding_sources, customer_groups, category_type_ids,is_active)
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:
@@ -7274,11 +7285,12 @@ class contract_download_report(Resource):
                 contract_id = request.form['contract_id']                
                 customer_ids = request.form['customer_ids']
                 stage_ids = request.form['stage_ids']
+                status_id = request.form['status_id']
                 from_date = request.form['from_date']
                 to_date = request.form['to_date']
                 entity_ids = request.form['entity_ids']
                 sales_category_ids = request.form['sales_category_ids']
-                resp = Report.create_contract_report(user_id, user_role_id, contract_id, customer_ids, stage_ids, from_date,to_date,entity_ids,sales_category_ids)
+                resp = Report.create_contract_report(user_id, user_role_id, contract_id, customer_ids, stage_ids,status_id, from_date,to_date,entity_ids,sales_category_ids)
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:
@@ -7391,11 +7403,10 @@ class DownloadEmpTimeAllocationTemplate(Resource):
             try:
                 user_id = request.form['user_id']
                 user_role_id  = request.form['user_role_id']
-                date = request.form["date"]
                 
                 file_name='Employee_allocation_template_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
             
-                resp = Report.DownloadEmpTimeAllocationTemplate(file_name, user_id, user_role_id, date)
+                resp = Report.DownloadEmpTimeAllocationTemplate(file_name, user_id, user_role_id)
                 return resp
                 
             except Exception as e:
@@ -8474,6 +8485,14 @@ class SyncShikshaCandidateData(Resource):
             return response
 api.add_resource(SyncShikshaCandidateData,'/SyncShikshaCandidateData')
 
+class SyncWeeklyUserSubProjectAllocation(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            response=Master.SyncWeeklyUserSubProjectAllocation()
+            return response
+api.add_resource(SyncWeeklyUserSubProjectAllocation,'/SyncWeeklyUserSubProjectAllocation')
+
 class SendShikshaCandidateEnrolmentMail(Resource):
     @staticmethod
     def get():
@@ -9214,11 +9233,10 @@ class upload_employee_allocation_plan(Resource):
                 f = request.files['myFileemp']
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
-                Month_Year = request.form["month_year"]
-                time_regex='^([0-1]?[0-9]|2[0-3])::[0-5][0-9]$'
-                Month_Year_excel = datetime.strptime(Month_Year, '%Y-%m-%d').strftime('%b-%Y').upper()
-                month_year_validation = [CustomElementValidation(lambda d: datetime.strptime(d, '%b-%Y').strftime('%Y-%m-%d')==Month_Year, "only '{}' date allowed".format(Month_Year_excel))]
-                time_validation = [CustomElementValidation(lambda d: (re.search(time_regex,d)!=None), 'Inavalid time format. Please provide correct allocation time')]
+                #time_regex='/^(100(\.00?)?|[1-9]?\d(\.\d\d?)?)$/'
+                #Month_Year_excel = datetime.strptime(Month_Year, '%Y-%m-%d').strftime('%b-%Y').upper()
+                #month_year_validation = [CustomElementValidation(lambda d: datetime.strptime(d, '%b-%Y').strftime('%Y-%m-%d')==Month_Year, "only '{}' date allowed".format(Month_Year_excel))]
+                #time_validation = [CustomElementValidation(lambda d: (re.search(time_regex,d)!=None), 'Inavalid time format. Please provide correct allocation time')]
 
                 file_name = config.bulk_upload_path + str(user_id) + '_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'_'+f.filename
                 f.save(file_name)
@@ -9226,17 +9244,12 @@ class upload_employee_allocation_plan(Resource):
                 df = df.fillna('')
 
                 schema = Schema([
-                        Column('Employee Code(NE)',str_validation+null_validation),
-                        Column('Employee name(NE)',str_validation+null_validation),
-                        Column('NEO Role(NE)',str_validation+null_validation),
-                        Column('Sub Project Code(NE)',str_validation+null_validation),
-                        Column('Sub Project Name(NE)',null_validation),
-                        Column('Month & Year*',month_year_validation+str_validation+null_validation),
-
-                        Column('Week 1 Allocation(HH::MM)',time_validation+null_validation),
-                        Column('Week 2 Allocation(HH::MM)',time_validation+null_validation),
-                        Column('Week 3 Allocation(HH::MM)',time_validation+null_validation),
-                        Column('Week 4 Allocation(HH::MM)',time_validation+null_validation),
+                        Column('Employee Code',str_validation+null_validation),
+                        Column('Employee Name',str_validation+null_validation),
+                        Column('Sub Project Code',str_validation+null_validation),
+                        Column('Sub Project Name',null_validation),
+                        
+                        Column('Allocation(In Percentage)',null_validation),
                        
                         ])
                 errors = schema.validate(df)
@@ -9253,12 +9266,11 @@ class upload_employee_allocation_plan(Resource):
                     df.columns = df.columns.str.replace("(", "_")
                     df.columns = df.columns.str.replace(")", "")
                     df.columns = df.columns.str.replace("&", "")
-                    df.columns = df.columns.str.replace("::", "_")
+                    #df.columns = df.columns.str.replace("::", "_")
                     df = df.drop_duplicates()
                     df.insert(0, 'row_index', range(len(df)))
 
-                    col = ['row_index', 'Employee_Code_NE', 'Employee_name_NE', 'NEO_Role_NE', 'Sub_Project_Code_NE', 'Month__Year', 'Week_1_Allocation_HH_MM', 'Week_2_Allocation_HH_MM', 'Week_3_Allocation_HH_MM',
-                            'Week_4_Allocation_HH_MM']
+                    col = ['Employee_Code', 'Employee_Name', 'Sub_Project_Code','Sub_Project_Name', 'Allocation_In_Percentage']
                     df = df[col]
                     
                     out = Database.upload_employee_allocation_plan(df,user_id,user_role_id)
