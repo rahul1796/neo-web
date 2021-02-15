@@ -196,6 +196,8 @@ class Master:
         return Database.GetSubProjectsForuser(user_id)
     def GetContractsBasedOnCustomer(user_id,user_role_id,customer_id):
         return Database.GetContractsBasedOnCustomer(user_id,user_role_id,customer_id)
+    def GetContractsBasedOnCustomerAndStage(user_id,user_role_id,customer_id,contract_stage_ids):
+        return Database.GetContractsBasedOnCustomerAndStage(user_id,user_role_id,customer_id,contract_stage_ids)
     def GetBillingMilestones():
         return Database.GetBillingMilestones()
     def GetUnitTypes():

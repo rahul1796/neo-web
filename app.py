@@ -5361,7 +5361,9 @@ class GetECPReportData(Resource):
                 region_ids=request.args.get('region_ids','',type=str)
                 from_date=request.args.get('from_date','',type=str)
                 to_date=request.args.get('to_date','',type=str)
-                response = Report.GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date)
+                stage_ids=request.args.get('stage_ids','',type=str)
+                status_id=request.args.get('status_id',0,type=int)
+                response = Report.GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date,stage_ids,status_id)
                 return response 
             except Exception as e:
                 return {'exception':str(e)}
@@ -5381,6 +5383,21 @@ class GetContractsBasedOnCustomer(Resource):
             except Exception as e:
                 return {'exception':str(e)}
 api.add_resource(GetContractsBasedOnCustomer,'/GetContractsBasedOnCustomer')
+
+class GetContractsBasedOnCustomerAndStage(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            try:
+                user_id=request.args.get('user_id',0,type=int)
+                user_role_id=request.args.get('user_role_id',0,type=int)
+                customer_id=request.args.get('customer_id','',type=str)
+                contract_stage_ids=request.args.get('contract_stage_ids','',type=str)
+                response = Master.GetContractsBasedOnCustomerAndStage(user_id,user_role_id,customer_id,contract_stage_ids)
+                return response 
+            except Exception as e:
+                return {'exception':str(e)}
+api.add_resource(GetContractsBasedOnCustomerAndStage,'/GetContractsBasedOnCustomerAndStage')
 
 
 class GetBillingMilestones(Resource):
@@ -7449,9 +7466,11 @@ class GetECPReportDonload(Resource):
             region_ids = request.form["region_ids"]
             from_date = request.form["from_date"]
             to_date = request.form["to_date"]
+            stage_ids = request.form["stage_ids"]
+            status_id = request.form["status_id"]
             file_name='ecp_report_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
             #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
-            resp = ecp_report_down.create_report(user_id, user_role_id, customer_ids, contract_ids, region_ids, from_date, to_date, file_name)
+            resp = ecp_report_down.create_report(user_id, user_role_id, customer_ids, contract_ids, region_ids, from_date, to_date,stage_ids,status_id ,file_name)
             return resp
             #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             # except Exception as e:
@@ -8066,7 +8085,9 @@ class DownloadOpsProductivityReport(Resource):
             contract_ids = request.form["contract_ids"]
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            resp = Report.DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id)
+            stage_ids =  request.form['stage_ids']
+            status_id =  request.form['status_id']
+            resp = Report.DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids,status_id)
             return resp
 
 api.add_resource(DownloadOpsProductivityReport,'/DownloadOpsProductivityReport')
