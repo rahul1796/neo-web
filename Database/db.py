@@ -1365,6 +1365,8 @@ class Database:
         cur = con.cursor()
         sql = '''update assessments.tbl_map_certification_candidates_stages 
                 set certificate_copy=? ,
+                certification_stage_id=9,
+                soft_copy_uploaded_date=getdate(),
                 created_by=?
                 where intervention_value=? and assessment_id=(select TOP(1) assessment_id 
                                                             from assessments.tbl_batch_assessments
@@ -1387,6 +1389,9 @@ class Database:
         sql = '''update assessments.tbl_map_certification_candidates_stages 
                 set certificate_copy=? ,
                 created_by=?,
+                certification_stage_id=9,
+                soft_copy_uploaded_date=getdate(),
+                
                 created_on=getdate()
                 where intervention_value in  (	
 								select	value 
@@ -4427,14 +4432,14 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             print("Exc"+str(e))
             return(str(e))
-    def ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc):
+    def ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark):
         try:
             response=[]
             h={}
             con = pyodbc.connect(conn_str)
             cur = con.cursor()
-            sql = 'exec [assessments].[sp_change_certification_stage] ?,?,?,?,?,?,?,?,?,?,?,?,?,?'
-            values = (batch_id,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc)
+            sql = 'exec [assessments].[sp_change_certification_stage] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
+            values = (batch_id,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark)
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]
             for row in cur:
@@ -4614,6 +4619,146 @@ SELECT					cb.name as candidate_name,
                         response.append(h.copy())
                     attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
                     sent_mail.certification_stage_change_mail(6,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                if(pop==7):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    sql = '''
+                            select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id=
+                                                    (select top(1) created_by as amt_user 
+                                                    from assessments.tbl_map_certification_candidates_stages_revision_history 
+                                                    where assessment_id = (select TOP(1) assessment_id 
+                                                                            from assessments.tbl_batch_assessments
+                                                                            where batch_id='''+ str(batch_id)+''' and assessment_type_id=2
+                                                                            and assessment_stage_id=4
+                                                                            order by assessment_id desc
+                                                                            )
+                                                    AND certification_stage_id=1)
+                            AND is_active=1;
+                          '''
+                    cur.execute(sql)
+                    for row in cur:
+                        user_name_to=row[0]
+                        user_mail_id_to=row[1]
+                    sql = 'select top(1) email from users.tbl_user_details where user_id='+ str(user_id) +' and is_active=1'
+                    cur.execute(sql)
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail(7,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                if(pop==8):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    sql = '''
+                            select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id=
+                                                    (select top(1) created_by as amt_user 
+                                                    from assessments.tbl_map_certification_candidates_stages_revision_history 
+                                                    where assessment_id = (select TOP(1) assessment_id 
+                                                                            from assessments.tbl_batch_assessments
+                                                                            where batch_id='''+ str(batch_id)+''' and assessment_type_id=2
+                                                                            and assessment_stage_id=4
+                                                                            order by assessment_id desc
+                                                                            )
+                                                    AND certification_stage_id=1)
+                            AND is_active=1;
+                          '''
+                    cur.execute(sql)
+                    for row in cur:
+                        user_name_to=row[0]
+                        user_mail_id_to=row[1]
+                    sql = 'select top(1) email from users.tbl_user_details where user_id='+ str(user_id) +' and is_active=1'
+                    cur.execute(sql)
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail(8,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                if(pop==10):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    sql = '''
+                            select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id=
+                                                    (select top(1) created_by as amt_user 
+                                                    from assessments.tbl_map_certification_candidates_stages_revision_history 
+                                                    where assessment_id = (select TOP(1) assessment_id 
+                                                                            from assessments.tbl_batch_assessments
+                                                                            where batch_id='''+ str(batch_id)+''' and assessment_type_id=2
+                                                                            and assessment_stage_id=4
+                                                                            order by assessment_id desc
+                                                                            )
+                                                    AND certification_stage_id=1)
+                            AND is_active=1;
+                          '''
+                    cur.execute(sql)
+                    for row in cur:
+                        user_name_to=row[0]
+                        user_mail_id_to=row[1]
+                    sql = 'select top(1) email from users.tbl_user_details where user_id='+ str(user_id) +' and is_active=1'
+                    cur.execute(sql)
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail(10,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                if(pop==11):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    sql = '''
+                            select top(1) coalesce(first_name,'Team'),coalesce(email,'do-not-reply@labournet.in') from users.tbl_user_details where user_id=
+                                                    (select top(1) created_by as amt_user 
+                                                    from assessments.tbl_map_certification_candidates_stages_revision_history 
+                                                    where assessment_id = (select TOP(1) assessment_id 
+                                                                            from assessments.tbl_batch_assessments
+                                                                            where batch_id='''+ str(batch_id)+''' and assessment_type_id=2
+                                                                            and assessment_stage_id=4
+                                                                            order by assessment_id desc
+                                                                            )
+                                                    AND certification_stage_id=1)
+                            AND is_active=1;
+                          '''
+                    cur.execute(sql)
+                    for row in cur:
+                        user_name_to=row[0]
+                        user_mail_id_to=row[1]
+                    sql = 'select top(1) email from users.tbl_user_details where user_id='+ str(user_id) +' and is_active=1'
+                    cur.execute(sql)
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail(11,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
                 
                 
                 out={"message":msg,"success":1}

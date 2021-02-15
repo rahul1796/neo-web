@@ -4892,7 +4892,9 @@ class ChangeCertificationStage(Resource):
             cg_desig = request.form['cg_desig']
             cg_org = request.form['cg_org']
             cg_org_loc = request.form['cg_org_loc']
-            return Assessments.ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc)
+            remark = request.form['remark']
+            print(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark)
+            return Assessments.ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark)
 api.add_resource(ScheduleAssessment,'/ScheduleAssessment')
 api.add_resource(ChangeCertificationStage,'/ChangeCertificationStage')
 api.add_resource(ConfirmedAssessedAssessmentFromUAP,'/ConfirmedAssessedAssessmentFromUAP')

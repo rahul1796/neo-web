@@ -333,6 +333,91 @@ function LoadTable()
             {
                 "data": function (row, type, val, meta) {
                     var varButtons = ""; 
+                    if(row.Result_Verified==0)
+                        {
+                            //console.log(row.Center_Id);
+                            varButtons=row.Result_Verified;
+                        }
+                    
+                    else
+                    {   
+                        varButtons += '<a onclick="GetPassedCandidates(\'' + row.Batch_Id + '\',\'' + 7 + '\', \'' + row.Batch_Code + '\')"  style="color:blue;cursor:pointer" >' + row.Result_Verified + '</a>';
+                    }
+                    return varButtons;
+                   // return row.Result_Verified;
+                    }
+            },
+            {
+                "data": function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Rfm_Result==0)
+                        {
+                            //console.log(row.Center_Id);
+                            varButtons=row.Rfm_Result;
+                        }
+                    
+                    else
+                    {   
+                        varButtons += '<a onclick="GetPassedCandidates(\'' + row.Batch_Id + '\',\'' + 8 + '\', \'' + row.Batch_Code + '\')"  style="color:blue;cursor:pointer" >' + row.Rfm_Result + '</a>';
+                    }
+                    return varButtons;
+                    //return row.Result_Verified;
+                    }
+            },
+            {
+                "data": function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Soft_Copy_Upload==0)
+                        {
+                            //console.log(row.Center_Id);
+                            varButtons=row.Soft_Copy_Upload;
+                        }
+                    
+                    else
+                    {   
+                        varButtons += '<a onclick="GetPassedCandidates(\'' + row.Batch_Id + '\',\'' + 9 + '\', \'' + row.Batch_Code + '\')"  style="color:blue;cursor:pointer" >' + row.Soft_Copy_Upload + '</a>';
+                    }
+                    return varButtons;
+                    //return row.Result_Verified;
+                    }
+            },
+            {
+                "data": function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Soft_Copy_Approved==0)
+                        {
+                            //console.log(row.Center_Id);
+                            varButtons=row.Soft_Copy_Approved;
+                        }
+                    
+                    else
+                    {   
+                        varButtons += '<a onclick="GetPassedCandidates(\'' + row.Batch_Id + '\',\'' + 10 + '\', \'' + row.Batch_Code + '\')"  style="color:blue;cursor:pointer" >' + row.Soft_Copy_Approved + '</a>';
+                    }
+                    return varButtons;
+                   // return row.Result_Verified;
+                    }
+            },
+            {
+                "data": function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    if(row.Rfm_Soft_Copy==0)
+                        {
+                            //console.log(row.Center_Id);
+                            varButtons=row.Rfm_Soft_Copy;
+                        }
+                    
+                    else
+                    {   
+                        varButtons += '<a onclick="GetPassedCandidates(\'' + row.Batch_Id + '\',\'' + 11 + '\', \'' + row.Batch_Code + '\')"  style="color:blue;cursor:pointer" >' + row.Rfm_Soft_Copy + '</a>';
+                    }
+                    return varButtons;
+                    // row.Result_Verified;
+                    }
+            },
+            {
+                "data": function (row, type, val, meta) {
+                    var varButtons = ""; 
                     if(row.Requested_Printing==0)
                         {
                             //console.log(row.Center_Id);
@@ -548,22 +633,39 @@ function GetPassedCandidates(BatchId,Stage,Batch_Code){
     $('#hdn_batch_id').val(BatchId);
     $('#hdn_cert_stage_id').val(Stage.toString());
     $('#hdn_batch_code').val(Batch_Code);
-    if((Stage==0) & (($('#hdn_home_user_role_id').val()=='27')||($('#hdn_home_user_role_id').val()=='1')))
+    if((Stage==0) & (($('#hdn_home_user_role_id').val()=='15')||($('#hdn_home_user_role_id').val()=='1')))
     {   
+        $('#btnStatusChange').show();
+
+    } 
+    else if((Stage==9) & (($('#hdn_home_user_role_id').val()=='15')||($('#hdn_home_user_role_id').val()=='1')))
+    {   
+        $('#btnStatusChange').show();
+
+    } 
+    else if((Stage==11) & (($('#hdn_home_user_role_id').val()=='27')||($('#hdn_home_user_role_id').val()=='1')))
+    {
         $('#btnUploadCertificate').show();
         $('#btnStatusChange').hide();
-    } 
+
+    }
     else
     {   
         $('#btnUploadCertificate').hide();
+        
         if((Stage==1) &(($('#hdn_home_user_role_id').val()=='40')||($('#hdn_home_user_role_id').val()=='1')))
         {
             $('#btnStatusChange').show();
         }
+        else if(((Stage==7)|| (Stage==11)) &(($('#hdn_home_user_role_id').val()=='40')||($('#hdn_home_user_role_id').val()=='1')))
+        {
+            $('#btnStatusChange').hide();
+            $('#btnBulkUploadCertificate').show();
+        }
         else if((Stage==2) &(($('#hdn_home_user_role_id').val()=='27')||($('#hdn_home_user_role_id').val()=='1')))
         {
             $('#btnStatusChange').show();
-            $('#btnBulkUploadCertificate').show();
+            $('#btnBulkUploadCertificate').hide();
             $('#btnBulkDownloadCertificate').show();
         }
         else if((Stage==3) &(($('#hdn_home_user_role_id').val()=='5')||($('#hdn_home_user_role_id').val()=='1')))
@@ -623,6 +725,8 @@ function GetPassedCandidates(BatchId,Stage,Batch_Code){
                             varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Mobile_Number +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Email_Id +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Intervention_Value +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Score +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Result +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Certificate_Number +'</td>';
                             varCerti='';
                             varCerti += '<a onclick="DownloadCertificate(\'' + data.Candidates[i].Certificate_Copy +  '\' )"  style="color:blue;cursor:pointer" >' + data.Candidates[i].Certificate_Copy + '</a>';
@@ -635,7 +739,7 @@ function GetPassedCandidates(BatchId,Stage,Batch_Code){
                             {
                                 action+='<a onclick="UploadCandImage(\'' + data.Candidates[i].Intervention_Value + '\')" class="user-btn" style="cursor:pointer" ><i title="Upload Candidate Image" class="fe-upload" ></i></a>';
                             }
-                            if(((Stage==2)||((Stage==0)&(parseInt(data.Candidates[i].Certification_Stage_Id)>2))) & (($('#hdn_home_user_role_id').val()=='40')||($('#hdn_home_user_role_id').val()=='1')))
+                            if((Stage==7 ||Stage==11) & (($('#hdn_home_user_role_id').val()=='40')||($('#hdn_home_user_role_id').val()=='1')))
                             {
                                 action+='<a onclick="UploadCandCertificate(\'' + data.Candidates[i].Intervention_Value + '\')" class="user-btn" style="cursor:pointer" ><i title="Upload Candidate Certificate" class="fe-upload" ></i></a>';
                             }
@@ -1034,7 +1138,40 @@ function UploadFileToProcess()
         }
     });
 }
-
+function LoadCertificationStageOnSelectedStage()
+{
+    if ($('#hdn_cert_stage_id').val().toString()=='0')
+    {
+        if($('#ddlResultStages').val().toString()=='8')
+        {
+            $('#TxtCertStages').val('Requested For Modification(Result)');
+            $('#DivRemarks').show();
+        }
+        if($('#ddlResultStages').val().toString()=='7')
+        {
+        
+                $('#TxtCertStages').val('Result Confirmed');
+                $('#DivRemarks').hide();
+            
+        }
+    }
+    else 
+    {
+        if($('#ddlSoftCopyStages').val().toString()=='11')
+        {
+            $('#TxtCertStages').val('Requested For Modification(Soft Copy)');
+            $('#DivRemarks').show();
+        }
+        if($('#ddlSoftCopyStages').val().toString()=='10')
+        {
+        
+                $('#TxtCertStages').val('Soft Copy Approved');
+                $('#DivRemarks').hide();
+            
+        }
+    }
+    
+}
 function ChangeStage(){
     var enrollments='';
     $('[name=candcheckcase]').each(function () {
@@ -1062,11 +1199,32 @@ function ChangeStage(){
     $('#DivCGDesig').hide();
     $('#DivCGOrg').hide();
     $('#DivCGOrgLoc').hide();
-   
+    $('#DivResultVerify').hide();
+    $('#DivRemarks').hide();
+    
     switch (($('#hdn_cert_stage_id').val().toString())) {        
         case "1":
             $('#DivSentPrintingDate').show(); 
             $('#TxtCertStages').val('Sent For Printing');
+            break;
+        case "0":
+            $('#DivResultVerify').show();
+            $('#ddlResultStages').empty();
+            $('#ddlResultStages').append(new Option('Result Confirmed','7'));
+            $('#ddlResultStages').append(new Option('Requested For Modification(Result)','8'));
+       
+            $('#TxtCertStages').val('Result Confirmed');
+            break;
+        case "9":
+            $('#DivSoftCopyVerify').show();
+            $('#ddlSoftCopyStages').empty();
+            $('#ddlSoftCopyStages').append(new Option('Soft Copy Approved','10'));
+            $('#ddlSoftCopyStages').append(new Option('Requested For Modification(Soft Copy)','11'));
+        
+            $('#TxtCertStages').val('Soft Copy Approved');
+            break;
+        case "7":
+            $('#TxtCertStages').val('Soft Copy Uploaded');
             break;
         case "2":
             $('#TxtCertStages').val('Sent To Center');
@@ -1106,12 +1264,22 @@ function ChangeCertificationStage()
     });
     enrollments=enrollments.substring(0,enrollments.length-1)
     var cands=enrollments.toString();
-    if(!(($('#hdn_home_user_role_id').val()=="5") || ($('#hdn_home_user_role_id').val()=="40") || ($('#hdn_home_user_role_id').val()=="1")) )
+    if(!(($('#hdn_home_user_role_id').val()=="5") || ($('#hdn_home_user_role_id').val()=="40") || ($('#hdn_home_user_role_id').val()=="1") || ($('#hdn_home_user_role_id').val()=="15")) )
     {
         
             alert("Access Denied FOr Changing Certification Stage.");
             return false; 
        
+    }
+    if(($('#hdn_cert_stage_id').val().toString()=="0") & ($('#ddlResultStages').val().toString()=="8") &($('#TxtRemark').val()==''))
+    {
+        alert("Please enter Remark.");
+        return false;
+    }
+    if(($('#hdn_cert_stage_id').val().toString()=="9") & ($('#ddlResultStages').val().toString()=="11") &($('#TxtRemark').val()==''))
+    {
+        alert("Please enter Remark.");
+        return false;
     }
      if(($('#hdn_cert_stage_id').val().toString()=="1") & ($('#TxtSentPrintingDate').val()==''))
     {
@@ -1158,7 +1326,8 @@ function ChangeCertificationStage()
                 "cg_name" :  $('#TxtCGName').val(),
                 "cg_desig" :  $('#TxtCGDesig').val(),
                 "cg_org" :  $('#TxtCGOrg').val(),
-                "cg_org_loc": $('#TxtCGOrgLoc').val()
+                "cg_org_loc": $('#TxtCGOrgLoc').val(),
+                "remark" : $('#TxtRemark').val()
             },
             success:function(data){
                 var message="",title="",icon="";
