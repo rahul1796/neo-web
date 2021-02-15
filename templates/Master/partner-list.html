@@ -255,6 +255,9 @@
         $('#hdn_modal_partner_id2').val(PartnerId);
         $('#headerPartnerContract').text(PartnerName);
         var URL=$('#hdn_web_url').val()+ "/GetPartnerContract?partner_id="+PartnerId;
+        var doc;
+        var fileExtentionDOC = ['doc','docx']
+        var fileExtentionPDF = ['pdf']
         $.ajax({
             type:"GET",
             url:URL,
@@ -287,8 +290,14 @@
                                 varHtml+='  <td style="text-align:center;">'+ data.PartnerContract[i].Partner_Contract_Code +'</td>';                    
                                 varHtml+='  <td style="text-align:center;">'+ data.PartnerContract[i].Start_Date +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.PartnerContract[i].End_Date +'</td>';   
-                                if (data.PartnerContract[i].Mou=='NA' || data.PartnerContract[i].Mou=='')
+                                doc = data.PartnerContract[i].Mou
+                                //doc.split('.')[doc.split('.').length-1] doc.split('.').pop()
+                                if (doc=='NA' || doc=='')
                                     varHtml+='  <td style="text-align:center;">NA</td>';
+                                else if (fileExtentionPDF.includes(doc.split('.').pop().toLowerCase()))
+                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path + data.PartnerContract[i].Mou.replace(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ 'static/assets/images/pdf-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                                else if (fileExtentionDOC.includes(doc.split('.').pop().toLowerCase()))
+                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path + data.PartnerContract[i].Mou.replace(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ 'static/assets/images/document-download-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
                                 else
                                     varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path + data.PartnerContract[i].Mou.replace(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ data.S3_Path + data.PartnerContract[i].Mou.replace(" ", "%20") +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
                                 //varHtml+='  <td style="text-align:center;">'+ data.PartnerContract[i].Mou +'</td>';   
