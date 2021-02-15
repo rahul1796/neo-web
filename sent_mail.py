@@ -63,6 +63,10 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
             stage_name='Planned For Distribution'
         if NewStageId==6:
             stage_name='Distributed'
+        if NewStageId==7:
+            stage_name='Result Approved'
+        if NewStageId==8:
+            stage_name='Result Requested For Modification'
         msg['From'] = "do-not-reply@labournet.in"
         msg['To'] = emailTo
         msg['Cc'] = EmailCC + ',neo.helpdesk@labournet.in'
@@ -79,7 +83,8 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
                 part.add_header('Content-Disposition',
                                 'attachment; filename="{}"'.format(Path(path).name))
                 msg.attach(part)
-        res = server.sendmail(msg['From'], [msg['To']] + EmailCC.split(",") + ['neo.helpdesk@labournet.in'] , msg.as_string())
+        print(msg)
+       # res = server.sendmail(msg['From'], [msg['To']] + EmailCC.split(",") + ['neo.helpdesk@labournet.in'] , msg.as_string())
         server.quit()
 
         return {'status':True,'description':'Email sent'}

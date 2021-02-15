@@ -18,8 +18,8 @@ class Assessments:
         return Database.AllCertificateNames(batch_id,stage)
     def ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag):
         return Database.ScheduleAssessment(batch_id,user_id,requested_date,scheduled_date,assessment_date,assessment_type_id,assessment_agency_id,assessment_id,partner_id,current_stage_id,present_candidate,absent_candidate,assessor_name,assessor_email,assessor_mobile,reassessment_flag)
-    def ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc):
-        return Database.ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc)
+    def ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark):
+        return Database.ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark)
 
 class DownloadAssessmentResultUploadTemplate(Resource):
     DownloadPath=config.DownloadcandidateResultPathLocal
