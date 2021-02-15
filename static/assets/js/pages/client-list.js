@@ -21,7 +21,10 @@ $(document).ready(function () {
         $('#btn_download').show();
     else 
         $('#btn_download').hide();
-
+    $('#ddlStatus').empty();
+    $('#ddlStatus').append(new Option('All','-1'));
+    $('#ddlStatus').append(new Option('Active','1'));
+    $('#ddlStatus').append(new Option('Inactive','0'));
     LoadTable(); 
 
 
@@ -156,7 +159,7 @@ function LoadTable()
                 d.user_role_id=$('#hdn_home_user_role_id').val();
                 d.client_id = 0;
                 d.funding_sources=$('#ddlFundingSource').val().toString();
-                d.is_active=-1;
+                d.is_active=$('#ddlStatus').val();
                 d.customer_groups = $('#ddlcustomergroup').val().toString();
                 d.category_type_ids = $('#ddlCategoryType').val().toString();
             },
@@ -196,7 +199,8 @@ function LoadTable()
             { "data": "Funding_Source_Name" },
             { "data": "Customer_Group_Name" },
             { "data": "Category_Type_Name" },
-            { "data": "Industry_Type_Name" }
+            { "data": "Industry_Type_Name" },
+            {"data": "Is_Active"}
           
         ],
         // "ColumnDefs"  :[
@@ -302,7 +306,7 @@ function Download()
                         'user_role_id':$('#hdn_home_user_role_id').val(),
                         'client_id':0,
                         'funding_sources':$('#ddlFundingSource').val().toString(),
-                        'is_active': 1,
+                        'is_active':$('#ddlStatus').val(),
                         'customer_groups':$('#ddlcustomergroup').val().toString(),
                         'category_type_ids':$('#ddlCategoryType').val().toString()
                     },
