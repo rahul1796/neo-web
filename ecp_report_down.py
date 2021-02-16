@@ -41,9 +41,9 @@ def create_report(user_id, user_role_id, customer_ids, contract_ids, region_ids,
         for col_num, value in enumerate(stagelog_default_column):
             worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
         for col_num, value in enumerate(first_row):
-            worksheet.merge_range(0, 8+col_num*3, 0, 10+col_num*3, value, header_format)
+            worksheet.merge_range(0, 10+col_num*3, 0, 12+col_num*3, value, header_format)
         for col_num, value in enumerate(second_row):
-            worksheet.write(1, 8+col_num, value, header_format)
+            worksheet.write(1, 10+col_num, value, header_format)
         writer.save()
         curs.close()
         cnxn.close()
