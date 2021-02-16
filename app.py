@@ -1444,9 +1444,10 @@ class candidate_list(Resource):
             user_id=request.form['user_id']
             user_role_id=request.form['user_role_id']
             Contracts = request.form["Contracts"]
-            candidate_stage = request.form["candidate_stage"]
+            #candidate_stage = request.form["candidate_stage"]
             from_date = request.form["from_date"]
             to_date = request.form["to_date"]
+            
             #print(Contracts, candidate_stage, from_date, to_date)
             
             start_index = request.form['start']
@@ -8715,8 +8716,10 @@ class download_candidate_data(Resource):
                 candidate_stage = request.form["candidate_stage"]
                 from_date = request.form["from_date"]
                 to_date = request.form["to_date"]
+                status_id = request.form["status_id"]
+                stage_ids = request.form["stage_ids"]
                 
-                resp = Report.DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date)
+                resp = Report.DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date, status_id, stage_ids)
                 
                 return resp
             except Exception as e:
