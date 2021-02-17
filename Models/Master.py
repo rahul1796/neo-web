@@ -333,6 +333,8 @@ class Master:
 
     def GetPartnerContract(partner_id):
         return {"PartnerContract":Database.GetPartnerContract(partner_id), "S3_Path":"https://labournet.s3.ap-south-1.amazonaws.com/neo_skills/qa/bulk_upload/Partner%20MOU/"}
+    def GetPartnerContractMilestones(Partner_Contract_Id):
+        return {"PartnerContract":Database.GetPartnerContractMilestones(Partner_Contract_Id), "S3_Path":"https://labournet.s3.ap-south-1.amazonaws.com/neo_skills/qa/bulk_upload/Partner%20MOU/"}
 
     def add_edit_partner_contract(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId):
         popupMessage = {"PopupMessage": Database.add_edit_partner_contract(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId)}

@@ -8139,13 +8139,13 @@ SELECT					cb.name as candidate_name,
         curs.close()
         conn.close()
         return h
-    def DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date):
+    def DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date, status_id, stage_ids):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
         sheet1_columns=[]
-        sql = 'exec [candidate_details].[sp_get_candidate_data] ?,?,?,?,?,?,?,?,?,?,?,?'
-        values = (customer,Contracts,project, sub_project, batch,project_types,created_by,from_date,to_date,candidate_stage ,user_id, user_role_id)
+        sql = 'exec [candidate_details].[sp_get_candidate_data] ?,?,?,?,?,?,?,?,?,?,?,?,?,?'
+        values = (customer,Contracts,project, sub_project, batch,project_types,created_by,from_date,to_date,candidate_stage ,user_id, user_role_id, status_id, stage_ids)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]  
         data = curs.fetchall()
@@ -8911,17 +8911,30 @@ SELECT					cb.name as candidate_name,
 
     def GetPartnerContract(partner_id):
         response = []
-        h={}
+        res={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
         sql = 'exec [masters].[sp_get_partner_contract] ?'
         values = (partner_id,)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
-        for row in cur2:
-            for i in range(len(columns)):
-                h[columns[i]]=row[i]
-            response.append(h.copy())
+        data = list(map(lambda x:list(x), cur2.fetchall()))
+        for i in set(map(lambda x:x[1],data)):
+            f_data = list(filter(lambda x:x[1]==i,data))
+            res["S_No"]=f_data[0][0]
+            res["Partner_Contract_Id"]=f_data[0][1]
+            res["Partner_Id"]=f_data[0][2]
+            res["Partner_Contract_Name"]=f_data[0][3]
+            res["Partner_Contract_Code"]=f_data[0][4]
+            res["Start_Date"]=f_data[0][5]
+            res["End_Date"]=f_data[0][6]
+            res["Mou"]=f_data[0][7]
+            mile=[]
+            for j in f_data:
+                if j[9]!=0:
+                    mile.append({"Id":j[9], 'Cost':j[8]})
+            res["Mile"]=mile
+            response.append(res.copy())
         cur2.close()
         con.close()
         return response
@@ -8947,3 +8960,32 @@ SELECT					cb.name as candidate_name,
                     if pop==2:
                         msg={"message":"Partner Contract Code already exists","Status":False}
         return msg
+
+    def GetPartnerContractMilestones(Partner_Contract_Id):
+        response = []
+        res={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_partner_contract_Milestone] ?'
+        values = (Partner_Contract_Id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        data = list(map(lambda x:list(x), cur2.fetchall()))
+        
+        res["S_No"]=data[0][0]
+        res["Partner_Contract_Id"]=data[0][1]
+        res["Partner_Id"]=data[0][2]
+        res["Partner_Contract_Name"]=data[0][3]
+        res["Partner_Contract_Code"]=data[0][4]
+        res["Start_Date"]=data[0][5]
+        res["End_Date"]=data[0][6]
+        res["Mou"]=data[0][7]
+        mile=[]
+        for j in data:
+            if j[9]!=0:
+                mile.append({"Id":j[9], 'Cost':j[8], 'Milestone':j[10]})
+        res["Mile"]=mile
+        
+        cur2.close()
+        con.close()
+        return res
