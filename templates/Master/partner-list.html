@@ -281,11 +281,11 @@
                                 td_close=   '</td>';       
                                 varHtml+='<tr>';
                                 varHtml+='  <td style="text-align:center;">'+ data.PartnerContract[i].S_No +'</td>';
-                                
-                                // if($('#hdn_home_user_role_id').val()!='50')
-                                //     varHtml+='  <td style="text-align:center;">'+'<a onclick="EditModal(\'' + data.PartnerUsers[i].User_Name + '\',\'' + data.PartnerUsers[i].Email + '\',\'' + data.PartnerUsers[i].Mobile + '\',\'' + data.PartnerUsers[i].Is_Active + '\',\'' + data.PartnerUsers[i].Partner_User_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Partner User" class="fas fa-edit" ></i></a>'+'</td>';
-                                // else
-                                //     varHtml+='  <td style="text-align:center;">'+ ''+'</td>';
+                                //console.log(''+JSON.stringify(data.PartnerContract[i].Mile).replaceAll("\"")+'\\"')
+                                if(1==1) // $('#hdn_home_user_role_id').val()!='50'  
+                                    varHtml+='  <td style="text-align:center;">'+'<a onclick="EditPartnerModal(\'' + data.PartnerContract[i].Partner_Contract_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Partner Contract" class="fas fa-edit" ></i></a>'+'</td>';
+                                else
+                                    varHtml+='  <td style="text-align:center;">'+ ''+'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.PartnerContract[i].Partner_Contract_Name +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.PartnerContract[i].Partner_Contract_Code +'</td>';                    
                                 varHtml+='  <td style="text-align:center;">'+ data.PartnerContract[i].Start_Date +'</td>';
@@ -415,6 +415,7 @@
         $('#mdl_Partner_Users').modal('hide');
         $('#mdl_add_edit_Users').modal('show');
     }
+
     function EditModal(Name,Email,Mobile,IsActive,PartnerUserId)
     {       
         if(IsActive)
@@ -708,6 +709,81 @@ function AddPartnerModal(){
     $('#mdl_Partner_Contract').modal('hide');
     $('#mdl_add_edit_Partner_contract').modal('show');        
 }
+function EditPartnerModal(Partner_Contract_Id){
+    $('#isactive2').prop('checked',true);
+
+    $('#ddlBillingMilestones').empty();
+    $('#ddlBillingMilestones').append(new Option('Enrollment','1'));
+    $('#ddlBillingMilestones').append(new Option('Certification','5'));
+    $('#ddlBillingMilestones').append(new Option('Certificate Distribution','6'));
+    $('#ddlBillingMilestones').append(new Option('Placement','7'));
+
+    document.getElementById("Contract_Name").disabled = true;
+    document.getElementById("ContractCode").disabled = true;
+    document.getElementById("MOUDocument").disabled = true;
+
+    $('#hdn_modal_partner_id3').val($('#hdn_modal_partner_id2').val());
+
+    var URL=$('#hdn_web_url').val()+ "/GetPartnerContractMilestones"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:
+            {   
+                "Partner_Contract_Id":Partner_Contract_Id
+            },
+            success: function (data){
+                $('#hdn_modal_partner_contract_id').val(data.PartnerContract.Partner_Contract_Id);
+                $('#Contract_Name').val(data.PartnerContract.Partner_Contract_Name);
+                $('#ContractCode').val(data.PartnerContract.Partner_Contract_Code);
+                $('#StartDate').val(data.PartnerContract.Start_Date);
+                $('#EndDate').val(data.PartnerContract.End_Date);
+
+                if(data.PartnerContract.Mile != null)
+                {
+                    var count=data.PartnerContract.Mile.length;
+                    if( count> 0)
+                    {   
+                        $('#divPartnerMilestones').empty();
+                        for(var i=0;i<count;i++)
+                        {
+                            let id=data.PartnerContract.Mile[i].Id;
+                            let val=data.PartnerContract.Mile[i].Milestone;
+                            $("#ddlBillingMilestones option[value="+id+"]").remove();
+                            MilestoneObject[id]=val;
+                            let varHtml='';
+                            varHtml+='<div class="form-group" id="div_milestone_'+id+'">';
+                            varHtml+='<div class="row">';
+                            varHtml+='  <div class="col-lg-4" id="milestone-container-'+id+'">';
+                            varHtml+='      <input type="text" placeholder="" readonly class="form-control" id="billing_milestone_'+id+'" name="milestone['+id+'][billing_milestone]" value="'+val+'" data-value='+id+' >';                                               
+                            varHtml+='  </div>';
+                            varHtml+='  <div class="col-lg-4" id="cost-container-'+id+'">';     
+                            varHtml+='      <input type="number" class="form-control" step="1" id="cost_'+id+'"  name="milestone['+id+'][cost]" value="'+data.PartnerContract.Mile[i].Cost+'" placeholder="Enter Cost" required="">';
+                            varHtml+='  </div>';
+                            varHtml+='  <div class="col-lg-4" id="milestone-delete-container-'+id+'">';
+                            varHtml+='      <button type="button" id="milestone_del_btn_'+id+'" data-value="'+id+'" class="btn btn-danger waves-effect waves-light" onclick="removeMilestone(event)"><i class="mdi mdi-close"></i></button>';
+                            varHtml+='  </div>';     
+                            varHtml+= '</div>';
+                            varHtml+= '</div>';
+                            
+                            $('#divPartnerMilestones').append(varHtml);
+                        }
+                    }
+                }
+            },
+            error:function(err)
+            {
+                alert('Error while fetching milestone data');
+                return false;
+            }
+        });
+    $('#mdl_Partner_Contract').modal('hide');
+    $('#mdl_add_edit_Partner_contract').modal('show'); 
+    return false;
+}
 function AddMilestone()
     {
         let id=$('#ddlBillingMilestones').val();
@@ -759,17 +835,22 @@ function add_popup_message(){
     var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_'
     var filename = ''
     //hdn_home_user_id_modal2 hdn_home_user_role_id_modal2 hdn_upl_session_id myFile
-    var file = document.getElementById('MOUDocument').files[0]
-    filename = filename_prefix + file.name
-    if (!validImageTypes.includes(file['type'])){
-        alert('allowed format are : '+validImageTypes.toString());
-        $('#imgSpinner3').hide();
-        return
+    if($('#hdn_modal_partner_contract_id').val()=='0'){
+        var file = document.getElementById('MOUDocument').files[0]
+        filename = filename_prefix + file.name
+        if (!validImageTypes.includes(file['type'])){
+            alert('allowed format are : '+validImageTypes.toString());
+            $('#imgSpinner3').hide();
+            return
+        }
+        else if(file.size > 5*1024*1024){
+            alert('Image size is not valid');
+            $('#imgSpinner3').hide();
+            return
+        }
     }
-    else if(file.size > 5*1024*1024){
-        alert('Image size is not valid');
-        $('#imgSpinner3').hide();
-        return
+    if (1==0){
+        console.log('false')
     }
     else{
         var varJson='';
@@ -819,11 +900,14 @@ function add_popup_message(){
             success: function(data) 
             {   //PopupMessage, message, Status
                 //console.log(data)
-                var status;
-                file = document.getElementById('MOUDocument').files[0]
-                //file = document.getElementById('myFile').files[0]
-                UploadFileData(file,filename);
-                status = true;
+                if($('#hdn_modal_partner_contract_id').val()=='0'){
+                    var status;
+                    file = document.getElementById('MOUDocument').files[0]
+                    //file = document.getElementById('myFile').files[0]
+                    UploadFileData(file,filename);
+                    status = true;
+                }
+                
                 $('#imgSpinner3').hide();
                 var message="",title="",icon="";
                 if(data.PopupMessage.Status){
@@ -1168,7 +1252,7 @@ function add_popup_message(){
                         <thead>
                             <tr style="background-color: #f5f6f8;">
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
-                                <!-- <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Action</th> -->
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Action</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Contract Name</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Contract Code</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Contract Start Date</th>

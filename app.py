@@ -9717,5 +9717,14 @@ class add_edit_partner_contract(Resource):
             return Master.add_edit_partner_contract(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId)
 api.add_resource(add_edit_partner_contract,'/add_edit_partner_contract')
 
+class GetPartnerContractMilestones(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            Partner_Contract_Id=request.args.get('Partner_Contract_Id',0,type=int)
+            response=Master.GetPartnerContractMilestones(Partner_Contract_Id)
+            return response
+api.add_resource(GetPartnerContractMilestones,'/GetPartnerContractMilestones')
+
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
