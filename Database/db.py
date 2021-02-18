@@ -8988,20 +8988,20 @@ SELECT					cb.name as candidate_name,
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         data = list(map(lambda x:list(x), cur2.fetchall()))
-        
-        res["S_No"]=data[0][0]
-        res["Partner_Contract_Id"]=data[0][1]
-        res["Partner_Id"]=data[0][2]
-        res["Partner_Contract_Name"]=data[0][3]
-        res["Partner_Contract_Code"]=data[0][4]
-        res["Start_Date"]=data[0][5]
-        res["End_Date"]=data[0][6]
-        res["Mou"]=data[0][7]
-        mile=[]
-        for j in data:
-            if j[9]!=0:
-                mile.append({"Id":j[9], 'Cost':j[8], 'Milestone':j[10]})
-        res["Mile"]=mile
+        if (data!=[]):
+            res["S_No"]=data[0][0]
+            res["Partner_Contract_Id"]=data[0][1]
+            res["Partner_Id"]=data[0][2]
+            res["Partner_Contract_Name"]=data[0][3]
+            res["Partner_Contract_Code"]=data[0][4]
+            res["Start_Date"]=data[0][5]
+            res["End_Date"]=data[0][6]
+            res["Mou"]=data[0][7]
+            mile=[]
+            for j in data:
+                if j[9]!=0:
+                    mile.append({"Id":j[9], 'Cost':j[8], 'Milestone':j[10]})
+            res["Mile"]=mile
         
         cur2.close()
         con.close()
