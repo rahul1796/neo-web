@@ -287,7 +287,7 @@ function LoadTable()
               "visible": true,
                 "data": function(row, type, val, meta) {
                     var varButtons='';
-                    if((row.Planned_Distribution>0)&($('#hdn_home_user_role_id').val()=='1'||$('#hdn_home_user_role_id').val()=='5'))
+                    if(((row.Planned_Distribution>0) || (row.Distributed_Count>0))&($('#hdn_home_user_role_id').val()=='1'||$('#hdn_home_user_role_id').val()=='5'))
                         varButtons+='<a onclick="UploadBatchImage(\'' + row.Batch_Id + '\',\'' + row.Batch_Code + '\')" class="btn" style="cursor:pointer" ><i title="Upload Batch Image" class="fe-upload" ></i></a>';
                     if(row.Batch_Image!= '')
                         varButtons+='<a onclick="DownloadCertificationImage(\'' + row.Batch_Image + '\',)" class="btn" style="cursor:pointer" ><i title="Download Batch Image" class="fe-download" ></i></a>';
