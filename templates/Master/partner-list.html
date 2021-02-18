@@ -294,12 +294,12 @@
                                 //doc.split('.')[doc.split('.').length-1] doc.split('.').pop()
                                 if (doc=='NA' || doc=='')
                                     varHtml+='  <td style="text-align:center;">NA</td>';
-                                else if (fileExtentionPDF.includes(doc.split('.').pop().toLowerCase()))
-                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path + data.PartnerContract[i].Mou.replaceAll()(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ 'static/assets/images/pdf-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                                else if (fileExtentionPDF.includes(doc.split('.').pop().toLowerCase())) 
+                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path + data.PartnerContract[i].Mou.replaceAll(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ 'static/assets/images/pdf-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
                                 else if (fileExtentionDOC.includes(doc.split('.').pop().toLowerCase()))
-                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path + data.PartnerContract[i].Mou.replaceAll()(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ 'static/assets/images/document-download-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path + data.PartnerContract[i].Mou.replaceAll(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ 'static/assets/images/document-download-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
                                 else
-                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path + data.PartnerContract[i].Mou.replaceAll()(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ data.S3_Path + data.PartnerContract[i].Mou.replace(" ", "%20") +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path + data.PartnerContract[i].Mou.replaceAll(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ data.S3_Path + data.PartnerContract[i].Mou.replaceAll(" ", "%20") +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
                                 //varHtml+='  <td style="text-align:center;">'+ data.PartnerContract[i].Mou +'</td>';   
                                 varHtml+='</tr>';                            
                             }
