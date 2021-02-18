@@ -4879,6 +4879,7 @@ class ChangeCertificationStage(Resource):
     @staticmethod
     def post():
         if request.method == 'POST':
+            print(request.form['remark'])
             batch_id = request.form['batch_id']
             batch_code = request.form['batch_code']
             user_id = request.form['user_id']
@@ -4898,6 +4899,7 @@ class ChangeCertificationStage(Resource):
             courier_number = request.form['courier_number']
             courier_name = request.form['courier_name']
             courier_url = request.form['courier_url']
+            print(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark,courier_number,courier_name,courier_url)
             return Assessments.ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark,courier_number,courier_name,courier_url)
 api.add_resource(ScheduleAssessment,'/ScheduleAssessment')
 api.add_resource(ChangeCertificationStage,'/ChangeCertificationStage')

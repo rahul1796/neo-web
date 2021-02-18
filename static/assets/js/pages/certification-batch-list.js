@@ -643,7 +643,7 @@ function GetPassedCandidates(BatchId,Stage,Batch_Code){
         $('#btnStatusChange').show();
 
     } 
-    else if((Stage==11) & (($('#hdn_home_user_role_id').val()=='27')||($('#hdn_home_user_role_id').val()=='1')))
+    else if((Stage==10) & (($('#hdn_home_user_role_id').val()=='27')||($('#hdn_home_user_role_id').val()=='1')))
     {
         $('#btnUploadCertificate').show();
         $('#btnStatusChange').hide();
@@ -666,7 +666,7 @@ function GetPassedCandidates(BatchId,Stage,Batch_Code){
         {
             $('#btnStatusChange').show();
             $('#btnBulkUploadCertificate').hide();
-            $('#btnBulkDownloadCertificate').show();
+            $('#btnBulkDownloadCertificate').hide();
         }
         else if((Stage==3) &(($('#hdn_home_user_role_id').val()=='5')||($('#hdn_home_user_role_id').val()=='1')))
         {
@@ -1320,7 +1320,6 @@ function ChangeCertificationStage()
         alert("Please enter actual dstribution date.");
         return false;
     }
-    
     var URL=$('#hdn_web_url').val()+ "/ChangeCertificationStage";
         $.ajax({
             type:"POST",
