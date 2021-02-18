@@ -199,6 +199,16 @@
 
 
             function add_popup_message(){
+                if($('#StartDate').val()=='')
+                {
+                    alert('please select start date');
+                    return false;
+                }
+                if($('#EndDate').val()=='')
+                {
+                    alert('please select end date');
+                    return false;
+                }
                 var URL=$('#hdn_web_url').val()+ "/add_contract_details";
                     $.ajax({
                         type:"POST",

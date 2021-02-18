@@ -662,11 +662,11 @@ function GetPassedCandidates(BatchId,Stage,Batch_Code){
             $('#btnStatusChange').hide();
             $('#btnBulkUploadCertificate').show();
         }
-        else if((Stage==2) &(($('#hdn_home_user_role_id').val()=='27')||($('#hdn_home_user_role_id').val()=='1')))
+        else if((Stage==2) &(($('#hdn_home_user_role_id').val()=='40')||($('#hdn_home_user_role_id').val()=='1')))
         {
             $('#btnStatusChange').show();
             $('#btnBulkUploadCertificate').hide();
-            $('#btnBulkDownloadCertificate').hide();
+            $('#btnBulkDownloadCertificate').show();
         }
         else if((Stage==3) &(($('#hdn_home_user_role_id').val()=='5')||($('#hdn_home_user_role_id').val()=='1')))
         {

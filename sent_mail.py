@@ -87,7 +87,7 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
                                 'attachment; filename="{}"'.format(Path(path).name))
                 msg.attach(part)
         #print(msg)
-       # res = server.sendmail(msg['From'],[msg['To']] + [msg['Cc']]  , msg.as_string())
+        #res = server.sendmail(msg['From'],[msg['To']] + [msg['Cc']]  , msg.as_string())
         server.quit()
 
         return {'status':True,'description':'Email sent'}
@@ -125,7 +125,7 @@ def certification_stage_change_mail_with_remarks(NewStageId,emailTo,emailToName,
         <br><br>
         Remarks :  <b>{} </b>
         <br><br>
-        For any further details visit the URL <b>https://neo-qa.labourmet.com/</b> .
+        For any further details visit the URL <b>https://neo.labourmet.com/</b> .
         </p>
         </div>
         <br>
@@ -160,7 +160,7 @@ def certification_stage_change_mail_with_remarks(NewStageId,emailTo,emailToName,
                                 'attachment; filename="{}"'.format(Path(path).name))
                 msg.attach(part)
         #print(msg)
-       # res = server.sendmail(msg['From'], [msg['To']] + [msg['Cc']] , msg.as_string())
+        #res = server.sendmail(msg['From'], [msg['To']] + [msg['Cc']] , msg.as_string())
         server.quit()
 
         return {'status':True,'description':'Email sent'}
