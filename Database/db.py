@@ -4472,6 +4472,14 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=user_mail_id_cc+str(row[0])
+                    
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
                     cur.execute(sql,(values))
@@ -4539,6 +4547,14 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=user_mail_id_cc+str(row[0])
+                    
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
                     cur.execute(sql,(values))
@@ -4574,6 +4590,14 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=user_mail_id_cc+str(row[0])
+                    
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
                     cur.execute(sql,(values))
@@ -4609,6 +4633,14 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=user_mail_id_cc+str(row[0])
+                    
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
                     cur.execute(sql,(values))
@@ -6995,6 +7027,14 @@ SELECT					cb.name as candidate_name,
                 cur.execute(sql)
                 for row in cur:
                     assigned_by_email_id=row[0]
+                rec_type='CC'
+                cur.commit()
+                sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                values = (batch_id,1,rec_type)
+                cur.execute(sql,(values))                    
+                for row in cur:
+                    assigned_by_email_id=assigned_by_email_id+str(row[0])
+                    
                 #sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                 #values = (batch_id,enrollment_ids)
                 #cur.execute(sql,(values))
