@@ -4478,7 +4478,7 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql,(values))
                     
                     for row in cur:
-                        user_mail_id_cc=user_mail_id_cc+str(row[0])
+                        user_mail_id_cc=user_mail_id_cc+','+str(row[0])
                     
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
@@ -4553,7 +4553,7 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql,(values))
                     
                     for row in cur:
-                        user_mail_id_cc=user_mail_id_cc+str(row[0])
+                        user_mail_id_cc=user_mail_id_cc+','+str(row[0])
                     
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
@@ -4596,7 +4596,7 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql,(values))
                     
                     for row in cur:
-                        user_mail_id_cc=user_mail_id_cc+str(row[0])
+                        user_mail_id_cc=user_mail_id_cc+','+str(row[0])
                     
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
@@ -4639,7 +4639,7 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql,(values))
                     
                     for row in cur:
-                        user_mail_id_cc=user_mail_id_cc+str(row[0])
+                        user_mail_id_cc=user_mail_id_cc+','+str(row[0])
                     
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
@@ -7033,7 +7033,7 @@ SELECT					cb.name as candidate_name,
                 values = (batch_id,1,rec_type)
                 cur.execute(sql,(values))                    
                 for row in cur:
-                    assigned_by_email_id=assigned_by_email_id+str(row[0])
+                    assigned_by_email_id=assigned_by_email_id+','+str(row[0])
                     
                 #sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                 #values = (batch_id,enrollment_ids)
