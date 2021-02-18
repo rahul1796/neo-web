@@ -1230,6 +1230,9 @@ function ChangeStage(){
             $('#TxtCertStages').val('Sent To Center');
             $('#DivSentCenterDate').show();
             $('#DivCenterExpArrivalDate').show();
+            $('#DivCourierNumber').show();
+            $('#DivCourierName').show();
+            $('#DivCourierUrl').show();
             break;
         case "3":
             $('#TxtCertStages').val('Received By Center');
@@ -1271,24 +1274,35 @@ function ChangeCertificationStage()
             return false; 
        
     }
-    if(($('#hdn_cert_stage_id').val().toString()=="0") & ($('#ddlResultStages').val().toString()=="8") &($('#TxtRemark').val()==''))
+    else if(($('#hdn_cert_stage_id').val().toString()=="9") & ($('#ddlSoftCopyStages').val().toString()=="11") &($('#TxtRemark').val()==''))
     {
         alert("Please enter Remark.");
         return false;
     }
-    if(($('#hdn_cert_stage_id').val().toString()=="9") & ($('#ddlResultStages').val().toString()=="11") &($('#TxtRemark').val()==''))
-    {
-        alert("Please enter Remark.");
-        return false;
-    }
-     if(($('#hdn_cert_stage_id').val().toString()=="1") & ($('#TxtSentPrintingDate').val()==''))
+    else if(($('#hdn_cert_stage_id').val().toString()=="1") & ($('#TxtSentPrintingDate').val()==''))
     {
         alert("Please enter sent for printing date.");
         return false;
     }
+    else if(($('#hdn_cert_stage_id').val().toString()=="0") & ($('#ddlResultStages').val().toString()=="8") &($('#TxtRemark').val()==''))
+    {
+        alert("Please enter Remark.");
+        return false;
+    }
+   
     else if($('#hdn_cert_stage_id').val().toString()=="2" & $('#TxtSentCenterDate').val()=='')
     {
         alert("Please enter sent to center date.");
+        return false;
+    }
+    else if($('#hdn_cert_stage_id').val().toString()=="2" & $('#TxtCourierName').val()=='')
+    {
+        alert("Please enter courier comapny name.");
+        return false;
+    }
+    else if($('#hdn_cert_stage_id').val().toString()=="2" & $('#TxtCourierNumber').val()=='')
+    {
+        alert("Please enter courier number.");
         return false;
     }
     else if($('#hdn_cert_stage_id').val().toString()=="3" & $('#TxtReceivedDate').val()=='')
@@ -1327,7 +1341,10 @@ function ChangeCertificationStage()
                 "cg_desig" :  $('#TxtCGDesig').val(),
                 "cg_org" :  $('#TxtCGOrg').val(),
                 "cg_org_loc": $('#TxtCGOrgLoc').val(),
-                "remark" : $('#TxtRemark').val()
+                "remark" : $('#TxtRemark').val(),
+                "courier_number" : $('#TxtCourierNumber').val(),
+                "courier_name" : $('#TxtCourierName').val(),
+                "courier_url" : $('#TxtCourierUrl').val()
             },
             success:function(data){
                 var message="",title="",icon="";
@@ -1795,8 +1812,9 @@ function UploadBulkCertificateFileToProcess()
                         icon:icon,
                         confirmButtonClass:"btn btn-confirm mt-2"
                         }).then(function(){
-                            $('#mdl_bulk_certificate_upload').modal('hide');
-                            GetPassedCandidates($('#hdn_batch_id').val(),parseInt($('#hdn_cert_stage_id').val()),$('#hdn_batch_code').val());
+                            window.location.href = '/certification';
+                            //$('#mdl_bulk_certificate_upload').modal('hide');
+                            //GetPassedCandidates($('#hdn_batch_id').val(),parseInt($('#hdn_cert_stage_id').val()),$('#hdn_batch_code').val());
                         }); 
         },
         error:function(err)
