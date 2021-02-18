@@ -75,6 +75,9 @@
             LoadRegionddl();
             loadClient();
             LoadCertificationStages();
+            $('#ddlResultStages').append(new Option('','0'));
+            $('#ddlSoftCopyStages').append(new Option('','0'));
+            
              role_id=parseInt($('#hdn_home_user_role_id').val());
             if(role_id == 1 || role_id ==5 || role_id ==15 || role_id  ==27)
                 $('#btn_create').show();
@@ -416,7 +419,40 @@
                                 <div class="col-lg-4"></div>
                             </div>
                         </div>
-                        <div class="form-group" id="DivReceivedDate" style="display:none">
+                        <div class="form-group" id="DivCourierNumber" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtCourierNumber">Courier Number * :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtCourierNumber" name="TxtCourierNumber" class="form-control " placeholder="Enter Courier Number">
+                                </div>
+                                 <div class="col-lg-4"></div>
+                            </div>
+                        </div> 
+                        <div class="form-group" id="DivCourierName" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtCourierName">Courier company Name * :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtCourierName" name="TxtCourierName" class="form-control " placeholder="Enter Courier Company">
+                                </div>
+                                 <div class="col-lg-4"></div>
+                            </div>
+                        </div> 
+                        <div class="form-group" id="DivCourierUrl" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtCourierUrl">Courier Tracking URL :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtCourierUrl" name="TxtCourierUrl" class="form-control " placeholder="Enter Courier Tracking URL">
+                                </div>
+                                 <div class="col-lg-4"></div>
+                            </div>
+                        </div> 
+                       <div class="form-group" id="DivReceivedDate" style="display:none">
                             <div class="row">
                                 <div class="col-lg-4">
                                     <label for="TxtReceivedDate">Received Date*:</label>
