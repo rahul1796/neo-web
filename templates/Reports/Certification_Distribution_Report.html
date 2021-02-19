@@ -22,7 +22,13 @@
         });
     
         LoadRegionddl();
-        loadClient();
+        LoadCustomers();
+
+        $('#ddlStatus').empty();
+        $('#ddlStatus').append(new Option('All','-1'));
+        $('#ddlStatus').append(new Option('Active','1'));
+        $('#ddlStatus').append(new Option('Inactive','0'));
+        //loadClient();
     });
     function LoadRegionddl(){
         var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
@@ -63,18 +69,17 @@
         });
         return false;
     }
-
-    function loadClient(){
-        var URL=$('#hdn_web_url').val()+ "/GetALLClient"
+    function LoadCustomers(){
+        var URL=$('#hdn_web_url').val()+ "/GetALLClientBasedOnStatus"
         $.ajax({
             type:"GET",
             url:URL,
-            async:false,
             beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
             datatype:"json",
             data:{
                 "user_id": $('#hdn_home_user_id').val(),
-                "user_role_id": $('#hdn_home_user_role_id').val()
+                "user_role_id": $('#hdn_home_user_role_id').val(),
+                "status_id": $('#ddlStatus').val()
             },
             success: function (data){
                 if(data.Clients != null)
@@ -83,24 +88,24 @@
                     var count=data.Clients.length;
                     if( count> 0)
                     {
-                        //$('#ddlClient').append(new Option('ALL','-1'));
                         for(var i=0;i<count;i++)
                             $('#ddlClient').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
                     }
                     else
                     {
-                        $('#ddlClient').append(new Option('ALL','-1'));
+                     //   $('#ddlCustomer').append(new Option('Choose Customer',''));
                     }
                 }
             },
             error:function(err)
             {
-                //alert($('#ddlClient').val().toString())
-                alert('Error! Please try again');
+                alert('Error loading customers! Please try again');
                 return false;
             }
         });
+        return false;
     }
+                  
     function loadbasedonclient()
     {
         LoadProject();
@@ -243,7 +248,8 @@
                     centers : $('#ddlCenter').val().toString(),
                     Batches : $('#ddlBatches').val(),
                     FromDate : $('#FromDate').val(),
-                    ToDate : $('#ToDate').val()
+                    ToDate : $('#ToDate').val(),
+                    status_id:$('#ddlStatus').val()
                 },
                 success: function(resp) 
                 {
@@ -332,6 +338,12 @@
             <div class="card-box">
                 <div class="row">
                     <div class="col-lg-3">
+                        <label for="ddlStatus" class="mr-2">Customer Status</label>
+                        <select class="form-control dropdown-search-filter" id="ddlStatus" onchange="LoadCustomers();">
+                            <option selected="" value="">All</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
                         <label for="ddlClient" class="mr-2">Customer</label>
                         <select class="form-control dropdown-search-filter" onchange="loadbasedonclient();" id="ddlClient" multiple>
                             <!-- <option selected="" value="">All</option> -->
@@ -349,14 +361,14 @@
                             <!-- <option selected="" value="">All</option> -->
                         </select>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-lg-3">
                         <label for="ddlRegion" class="mr-2">Region</label>
                         <select class="form-control dropdown-search-filter" onchange="LoadCenter();" id="ddlRegion" multiple>
                             <!-- <option selected="" value="">All</option> -->
                         </select>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-3">
                         <label for="ddlCenter" class="mr-2">Center</label>
                         <select class="form-control dropdown-search-filter" id="ddlCenter" multiple>
@@ -373,13 +385,13 @@
                         <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" 
                             ClientIdMode="static" placeholder="From Date">
                     </div>
-                        <div class="col-lg-3" id="divToDate">
+                </div>
+                <div class="row">
+                    <div class="col-lg-3" id="divToDate">
                         <label for="ToDate" class="mr-2">To Date</label>
                         <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
                             ClientIdMode="static" placeholder="To Date">
                     </div>
-                </div>
-                <div class="row">
                     <div class="form-group col-lg-1">                                         
                         <a class="btn btn-primary" style="float: left; color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
                         <a id="lnkDownload" style="display:none;"></a>
