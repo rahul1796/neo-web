@@ -73,11 +73,16 @@
                         
                     </div>
                     <br>
-                    
                     <div class="row" >
                         <div class="col-lg-3">
                             <label for="ddlcreated_by" class="mr-2">Created By</label>
                             <select class="form-control dropdown-search-filter" id="ddlcreated_by" multiple placeholder="Select created by">
+                                <option selected="" value="">All</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-3" id="customer_status_div">
+                            <label for="ddlStatus" class="mr-2">Customer Status</label>
+                            <select class="form-control dropdown-search-filter" id="ddlStatus" onchange="LoadCustomers();">
                                 <option selected="" value="">All</option>
                             </select>
                         </div>
@@ -87,20 +92,12 @@
                                 <!-- <option selected="" value="">All</option> -->
                             </select>
                         </div>
-                        <div class="col-lg-3" id="contract_div" >
-                            <label for="ddlContract" class="mr-2">Contract</label>
-                            <select class="form-control dropdown-search-filter"  id="ddlContract" multiple> <!-- onchange="LoadContract();" -->>
-                                <!-- <option selected="" value="">All</option> -->
-                            </select>
+                        <div class="col-lg-3" id="contract_stage_div">
+                            <label for="ddlStage" class="mr-2">Contract Stage</label>
+                            <select class="form-control dropdown-search-filter" id="ddlStage" multiple  onchange="LoadContract();" >
+                                
+                             </select>
                         </div>
-                        <div class="col-lg-3" id="project_div" >
-                            <label for="ddlProject" class="mr-2">Project</label>
-                            <select class="form-control dropdown-search-filter" onchange="LoadSubProject();" id="ddlProject" multiple>
-                                <!-- <option selected="" value="">All</option> -->
-                            </select>
-                        </div>
-                       
-                       
                     </div>
                     <!-- <div class="row">
                         <div class="col-lg-3">
@@ -126,7 +123,18 @@
                         <!-- <div class="col-lg-1" style="float: center; margin-top: 30px">
                             <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTable()">Search</button>
                         </div> -->
-                        
+                        <div class="col-lg-3" id="contract_div" >
+                            <label for="ddlContract" class="mr-2">Contract</label>
+                            <select class="form-control dropdown-search-filter"  id="ddlContract" multiple> <!-- onchange="LoadContract();" -->>
+                                <!-- <option selected="" value="">All</option> -->
+                            </select>
+                        </div>
+                        <div class="col-lg-3" id="project_div" >
+                            <label for="ddlProject" class="mr-2">Project</label>
+                            <select class="form-control dropdown-search-filter" onchange="LoadSubProject();" id="ddlProject" multiple>
+                                <!-- <option selected="" value="">All</option> -->
+                            </select>
+                        </div>
                         <div class="col-lg-3" id="subproject_div"  >
                             <label for="ddlSubProject" class="mr-2">Sub Project</label>
                             <select class="form-control dropdown-search-filter" id="ddlSubProject" onchange="LoadBatches();" multiple>  <!-- onchange="LoadCenter();"-->>
@@ -138,6 +146,8 @@
                             <select class="form-control dropdown-search-filter" id="ddlBatches" multiple>
                             </select>
                         </div>
+                    </div>
+                    <div class="row"> 
                         <div class="form-group col-lg-2">                                         
                             <a class="btn btn-primary" style=" color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
                             <a id="lnkDownload" style="display:none;"></a>
