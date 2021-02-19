@@ -9373,10 +9373,11 @@ class download_Certification_Distribution_Report(Resource):
                 Batches = request.form['Batches']
                 FromDate = request.form['FromDate']
                 ToDate = request.form['ToDate']
+                status_id = request.form['status_id']
 
                 file_name='Certification_Distribution_Report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
             
-                resp = Report.download_Certification_Distribution_Report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+                resp = Report.download_Certification_Distribution_Report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate,status_id)
                 return resp
                 
             except Exception as e:
