@@ -1365,6 +1365,8 @@ class Database:
         cur = con.cursor()
         sql = '''update assessments.tbl_map_certification_candidates_stages 
                 set certificate_copy=? ,
+                certification_stage_id=9,
+                soft_copy_uploaded_date=getdate(),
                 created_by=?
                 where intervention_value=? and assessment_id=(select TOP(1) assessment_id 
                                                             from assessments.tbl_batch_assessments
@@ -1387,6 +1389,9 @@ class Database:
         sql = '''update assessments.tbl_map_certification_candidates_stages 
                 set certificate_copy=? ,
                 created_by=?,
+                certification_stage_id=9,
+                soft_copy_uploaded_date=getdate(),
+                
                 created_on=getdate()
                 where intervention_value in  (	
 								select	value 
@@ -4427,14 +4432,14 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             print("Exc"+str(e))
             return(str(e))
-    def ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc):
+    def ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark,courier_number,courier_name,courier_url):
         try:
             response=[]
             h={}
             con = pyodbc.connect(conn_str)
             cur = con.cursor()
-            sql = 'exec [assessments].[sp_change_certification_stage] ?,?,?,?,?,?,?,?,?,?,?,?,?,?'
-            values = (batch_id,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc)
+            sql = 'exec [assessments].[sp_change_certification_stage] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
+            values = (batch_id,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark,courier_number,courier_name,courier_url)
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]
             for row in cur:
@@ -4467,6 +4472,14 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=user_mail_id_cc+','+str(row[0])
+                    
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
                     cur.execute(sql,(values))
@@ -4534,6 +4547,14 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=user_mail_id_cc+','+str(row[0])
+                    
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
                     cur.execute(sql,(values))
@@ -4569,6 +4590,14 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=user_mail_id_cc+','+str(row[0])
+                    
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
                     cur.execute(sql,(values))
@@ -4604,6 +4633,14 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=user_mail_id_cc+','+str(row[0])
+                    
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
                     cur.execute(sql,(values))
@@ -4614,6 +4651,122 @@ SELECT					cb.name as candidate_name,
                         response.append(h.copy())
                     attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
                     sent_mail.certification_stage_change_mail(6,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                if(pop==7):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    rec_type='TO'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_name_to='Logistic Team'
+                        user_mail_id_to=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail(7,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                if(pop==8):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    rec_type='TO'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_name_to='Team'
+                        user_mail_id_to=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail_with_remarks(8,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file,remark)
+                if(pop==10):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    rec_type='TO'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_name_to='Team'
+                        user_mail_id_to=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail(10,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                if(pop==11):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    rec_type='TO'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))                    
+                    for row in cur:
+                        user_name_to='Team'
+                        user_mail_id_to=row[0]
+                    rec_type='CC'
+                    cur.commit()
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))                    
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    cur.commit()
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail_with_remarks(11,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file,remark)
                 
                 
                 out={"message":msg,"success":1}
@@ -4623,6 +4776,7 @@ SELECT					cb.name as candidate_name,
             con.close()
             return out
         except Exception as e:
+            print(str(e))
             return {"message":"Error changing assessment stage"+e.message,"success":0,"assessment_id":0}
     
     def GetAssessmentCandidateResults(AssessmentId):
@@ -6873,6 +7027,14 @@ SELECT					cb.name as candidate_name,
                 cur.execute(sql)
                 for row in cur:
                     assigned_by_email_id=row[0]
+                rec_type='CC'
+                cur.commit()
+                sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                values = (batch_id,1,rec_type)
+                cur.execute(sql,(values))                    
+                for row in cur:
+                    assigned_by_email_id=assigned_by_email_id+','+str(row[0])
+                    
                 #sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                 #values = (batch_id,enrollment_ids)
                 #cur.execute(sql,(values))
@@ -7994,13 +8156,13 @@ SELECT					cb.name as candidate_name,
         curs.close()
         conn.close()
         return h
-    def DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date):
+    def DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date, status_id, stage_ids):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
         sheet1_columns=[]
-        sql = 'exec [candidate_details].[sp_get_candidate_data] ?,?,?,?,?,?,?,?,?,?,?,?'
-        values = (customer,Contracts,project, sub_project, batch,project_types,created_by,from_date,to_date,candidate_stage ,user_id, user_role_id)
+        sql = 'exec [candidate_details].[sp_get_candidate_data] ?,?,?,?,?,?,?,?,?,?,?,?,?,?'
+        values = (customer,Contracts,project, sub_project, batch,project_types,created_by,from_date,to_date,candidate_stage ,user_id, user_role_id, status_id, stage_ids)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]  
         data = curs.fetchall()
@@ -8764,3 +8926,83 @@ SELECT					cb.name as candidate_name,
         out = {'Status': True, 'message': "Submitted Successfully"}
         return out
 
+    def GetPartnerContract(partner_id):
+        response = []
+        res={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_partner_contract] ?'
+        values = (partner_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        data = list(map(lambda x:list(x), cur2.fetchall()))
+        for i in set(map(lambda x:x[1],data)):
+            f_data = list(filter(lambda x:x[1]==i,data))
+            res["S_No"]=f_data[0][0]
+            res["Partner_Contract_Id"]=f_data[0][1]
+            res["Partner_Id"]=f_data[0][2]
+            res["Partner_Contract_Name"]=f_data[0][3]
+            res["Partner_Contract_Code"]=f_data[0][4]
+            res["Start_Date"]=f_data[0][5]
+            res["End_Date"]=f_data[0][6]
+            res["Mou"]=f_data[0][7]
+            mile=[]
+            for j in f_data:
+                if j[9]!=0:
+                    mile.append({"Id":j[9], 'Cost':j[8]})
+            res["Mile"]=mile
+            response.append(res.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    def add_edit_partner_contract(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId):
+        #print(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId)
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_add_edit_partner_contract] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated","Status":True}
+        else: 
+                if pop==0:
+                    msg={"message":"Created","Status":True}
+                else:
+                    if pop==2:
+                        msg={"message":"Partner Contract Code already exists","Status":False}
+        return msg
+
+    def GetPartnerContractMilestones(Partner_Contract_Id):
+        response = []
+        res={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_partner_contract_Milestone] ?'
+        values = (Partner_Contract_Id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        data = list(map(lambda x:list(x), cur2.fetchall()))
+        if (data!=[]):
+            res["S_No"]=data[0][0]
+            res["Partner_Contract_Id"]=data[0][1]
+            res["Partner_Id"]=data[0][2]
+            res["Partner_Contract_Name"]=data[0][3]
+            res["Partner_Contract_Code"]=data[0][4]
+            res["Start_Date"]=data[0][5]
+            res["End_Date"]=data[0][6]
+            res["Mou"]=data[0][7]
+            mile=[]
+            for j in data:
+                if j[9]!=0:
+                    mile.append({"Id":j[9], 'Cost':j[8], 'Milestone':j[10]})
+            res["Mile"]=mile
+        
+        cur2.close()
+        con.close()
+        return res
