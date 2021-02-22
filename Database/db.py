@@ -5546,7 +5546,7 @@ SELECT					cb.name as candidate_name,
         if int(app_version) < int(data):
             curs.close()
             conn.close()
-            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            out = {'success': False, 'validation_error':False, 'description': "Lower App Version", 'app_status':False}
             return out
         
         #url = candidate_xml_weburl + xml
@@ -5559,18 +5559,19 @@ SELECT					cb.name as candidate_name,
         json_array_cont = []
         for child in root:
             temp_data = child.attrib
-            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
+            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"row_id":temp_data['row_id'], "primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
 
         sql = 'exec	[masters].[sp_validate_upload_mobh_contact_info] ?'
         values = (json.dumps(json_array_cont),)
         curs.execute(sql,(values))
         vali = curs.fetchall()
-
+        validation = []
         if vali!=[]:
-            vali = [i[0] for i in vali]
-            out = {'success': False, 'description': '\n'.join(vali), 'app_status':True}
+            for temp in vali:
+                validation.append({"row_id":temp[0],"error_flag":temp[3],"mobile":temp[1],"email":temp[2]})
+            out = {'success': False, 'validation_error':True, 'description': 'Mobile/Email validation error', 'app_status':True, 'error_message':validation } #'\n'.join()
             return out
-
+        
         try:
             '''
             insert into candidate_details.tbl_candidate_interventions
@@ -5618,13 +5619,14 @@ SELECT					cb.name as candidate_name,
             #print(quer2 + '\n' + quer3)
             curs.execute(quer2 + '\n' + quer3)
             curs.commit()
-            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
+            out = {'success': True, 'validation_error':False, 'description': "Submitted Successfully", 'app_status':True}
         except Exception as e:
-            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+            out = {'success': False, 'validation_error':False, 'description': "error: "+str(e), 'app_status':True}
         finally:
             curs.close()
             conn.close()
             return out
+
     def get_submit_candidate_reg(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
@@ -5970,7 +5972,7 @@ SELECT					cb.name as candidate_name,
         if int(app_version) < int(data):
             curs.close()
             conn.close()
-            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            out = {'success': False, 'validation_error':False, 'description': "Lower App Version", 'app_status':False}
             return out
         
         #url = candidate_xml_weburl + xml
@@ -5988,18 +5990,19 @@ SELECT					cb.name as candidate_name,
                 mobilization_type = temp_data['mobilization_type']
             if 'assign_batch' in temp_data:
                 json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
-            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
+            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"row_id":row_id,"primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
 
         sql = 'exec	[masters].[sp_validate_upload_mobh_contact_info] ?'
         values = (json.dumps(json_array_cont),)
         curs.execute(sql,(values))
         vali = curs.fetchall()
-
+        validation = []
         if vali!=[]:
-            vali = [i[0] for i in vali]
-            out = {'success': False, 'description': '\n'.join(vali), 'app_status':True}
+            for temp in vali:
+                validation.append({"row_id":temp[0],"error_flag":temp[3],"mobile":temp[1],"email":temp[2]})
+            out = {'success': False, 'validation_error':True, 'description': 'Mobile/Email validation error', 'app_status':True, 'error_message':validation } #'\n'.join()
             return out
-        
+            
         if int(mobilization_type)==1:
             if json_array!=[]:
                 sql = 'exec	[masters].[sp_validate_enrollment_m] ?'
@@ -6013,11 +6016,11 @@ SELECT					cb.name as candidate_name,
                     msg = """Sorry, You can't enroll new candidates to the batch : {}
                     Note: The Actual Enrolment count has exceeded the Planned Target.""".format(vali[1])
 
-                    out = {'success': False, 'description': msg, 'app_status':True}
+                    out = {'success': False, 'validation_error':False, 'description': msg, 'app_status':True}
                     return out
                 elif vali[0]==2:
                     msg = """Sorry, enrollment process has ended, you cannot enroll candidates to the batch : {}.""".format(vali[1])
-                    out = {'success': False, 'description': msg, 'app_status':True}
+                    out = {'success': False, 'validation_error':False, 'description': msg, 'app_status':True}
                     return out
 
         try:
@@ -6302,13 +6305,13 @@ SELECT					cb.name as candidate_name,
                 quer6 += fam_query[:-1]+';'
                 curs.execute(quer6)
                 curs.commit()
-            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True,'data':response_data}
+            out = {'success': True, 'validation_error':False, 'description': "Submitted Successfully", 'app_status':True,'data':response_data}
             curs.close()
             conn.close()
             return out
 
         except Exception as e:            
-            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+            out = {'success': False, 'validation_error':False, 'description': "error: "+str(e), 'app_status':True}
             return out
 
     def get_batch_list_updated(user_id,candidate_id,role_id,mobilization_type):

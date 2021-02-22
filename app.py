@@ -5761,11 +5761,11 @@ class submit_candidate_updated(Resource):
                 elif cand_stage==4:
                     out = Database.get_submit_candidate_re_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 else:
-                    out = {'success': False, 'description': "incorrect stage", 'app_status':True}
+                    out = {'success': False, 'validation_error':False, 'description': "incorrect stage", 'app_status':True}
                 return jsonify(out)
             
             else:
-                res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
+                res = {'success': False, 'validation_error':False, 'description': "client name and password not matching", 'app_status':True}
                 return jsonify(res)
 
 #Base URL + "/submit_candidate_updated" api will provide all the unzynched QP data as response
