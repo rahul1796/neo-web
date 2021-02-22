@@ -5718,7 +5718,7 @@ SELECT					cb.name as candidate_name,
                     she_query="({},{},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),int(data['score']),int(data['result']),data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['serve_as_she'],data['sign_contract_with_LN'],data['adopt_digital_transaction'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['age_18_40'],data['eight_pass'],data['past_work_exp'],data['full_time_work'],data['trvl_within_panchayat'],data['bank_act'],user_id)
                     insert_query_she += '\n'+she_query
                 if int(data['mobilization_type'])==4:
-                    dell_query="({},{},'{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),data['asp_district'],data['dell_income_certi'],user_id)
+                    dell_query="({},{},'{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),data['asp_district'],data['dell_income_certi'],user_id)
                     insert_query_dell += '\n'+dell_query
                 query += '\n' + quer3.format(1 if data['isFresher']=='true' else 0,int(data['mobilization_type']) ,user_id,data['cand_id'])
                 
