@@ -8119,12 +8119,15 @@ class DownloadEmployeeWiseReport(Resource):
         if request.method=='POST':
             month = request.form["month"]
             role_id = request.form["role_id"]
+
             customer_ids = request.form["customer_ids"]
             contract_ids = request.form["contract_ids"]
+            stage_ids = request.form["stage_ids"]
+            status_id = request.form["status_id"]
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            #DownloadEmployeeWiseReport
-            resp = Report.DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id)
+            #DownloadEmployeeWiseReport  stage_ids status_id
+            resp = Report.DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids, status_id)
             return resp
 api.add_resource(DownloadEmployeeWiseReport,'/DownloadEmployeeWiseReport')
 

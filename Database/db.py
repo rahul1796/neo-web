@@ -7660,7 +7660,7 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
 
-    def DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id):
+    def DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids, status_id):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
@@ -7673,22 +7673,22 @@ SELECT					cb.name as candidate_name,
         sql1=''
         sql2=''
         if int(role_id)==11:
-            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_coo] ?, ?, ?,?,?'
-            sql1 = 'exec [reports].[sp_get_EmployeeWise_report_data_coo_sub_project] ?, ?, ?,?,?'
+            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_coo] ?, ?, ?,?,?,?,?'
+            sql1 = 'exec [reports].[sp_get_EmployeeWise_report_data_coo_sub_project] ?, ?, ?,?,?,?,?'
             #sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_course] ?, ?, ?,?,?'
         if int(role_id)==14:
-            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_territory_manager] ?, ?, ?,?,?'
-            sql1 = 'exec [reports].[sp_get_EmployeeWise_report_data_territory_manager_sub_project] ?, ?, ?,?,?'
+            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_territory_manager] ?, ?, ?,?,?,?,?'
+            sql1 = 'exec [reports].[sp_get_EmployeeWise_report_data_territory_manager_sub_project] ?, ?, ?,?,?,?,?'
             #sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_course] ?, ?, ?,?,?'
         if int(role_id)==5:
-            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_center_manager] ?, ?, ?,?,?'
-            sql1 = 'exec [reports].[sp_get_EmployeeWise_report_data_center_manager_sub_project] ?, ?, ?,?,?'
+            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_center_manager] ?, ?, ?,?,?,?,?'
+            sql1 = 'exec [reports].[sp_get_EmployeeWise_report_data_center_manager_sub_project] ?, ?, ?,?,?,?,?'
             #sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_course] ?, ?, ?,?,?'
         if int(role_id)==2:
-            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_mobilizer] ?, ?, ?,?,?'
+            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_mobilizer] ?, ?, ?,?,?,?,?'
             #sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_sub_project] ?, ?, ?,?,?'
             #sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_course] ?, ?, ?,?,?'
-        values = (customer_ids, contract_ids, month,user_id,user_role_id)
+        values = (customer_ids, contract_ids, month,user_id,user_role_id, stage_ids, status_id)
         
         res = {}
         curs.execute(sql,(values))
