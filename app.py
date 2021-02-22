@@ -5993,7 +5993,7 @@ class upload_bulk_upload(Resource):
                 #print(df.columns.to_list())
                 if ProjectType==1:
                     #print(df['Candidate Photo*'])
-                    img_column ='Candidate Photo*,Aadhar Image,Document copy,Educational Marksheet*,Income Certificate'
+                    img_column ='Candidate Photo*,Aadhar Image,Document copy,Income Certificate'
                     schema = Schema([
                         #nan check column non mandate
                         Column('Candidate_id',null_validation),
@@ -6064,7 +6064,6 @@ class upload_bulk_upload(Resource):
                         Column('Registered by*',email_validation+str_validation),
                         #DELL
                         Column('Aspirational District*',str_validation + null_validation),
-                        Column('Educational Marksheet*', null_validation),
                         Column('Income Certificate', null_validation)
                         ])
                 else:
@@ -6124,6 +6123,8 @@ class upload_bulk_upload(Resource):
                         Column('BOCW Registration Id',null_validation),
                         Column('Whatsapp Number',mob_validation + null_validation),
                         Column('Aadhar Image',null_validation),
+                        Column('Educational Marksheet', null_validation),
+                        
                         #str+null check
                         Column('Fresher/Experienced?*',str_validation + null_validation),
                         Column('Salutation*',str_validation + null_validation),
@@ -6660,7 +6661,7 @@ class DownloadRegTemplate(Resource):
                     'Permanent_Taluk_Block', 'Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country', 'Aadhar_No', 'Identifier_Type', 
                     'Identity_Number', 'Document_Copy_Image_Name', 'Employment_Type', 'Preferred_Job_Role', 'Years_Of_Experience', 'Relevant_Years_Of_Experience', 
                     'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc', 
-                    'Aadhar_Image_Name','Registered_By', 'Whatsapp_Number']
+                    'Aadhar_Image_Name','Registered_By', 'Whatsapp_Number','Educational Marksheet']
 
                     Column = ['Candidate_id', 'Fresher/Experienced?*', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 
                     'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 'Gender*', 'Marital Status*', 'Caste*', 'Disability Status*', 'Religion*', 
@@ -6670,7 +6671,7 @@ class DownloadRegTemplate(Resource):
                     'Permanent Taluk/Block', 'Permanent District*', 'Permanent State*', 'Permanent Pincode*', 'Permanent Country*', 'Aadhar No', 'Identifier Type', 
                     'Identity number', 'Document copy', 'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 
                     'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 'Expected CTC*',
-                    'Aadhar Image','Registered by*','Whatsapp Number']
+                    'Aadhar Image','Registered by*','Whatsapp Number','Educational Marksheet']
                 
                     if Project_Type==1:
                         col = ['Candidate_Id', 'Isfresher', 'Candidate_Photo', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 
@@ -6682,7 +6683,7 @@ class DownloadRegTemplate(Resource):
                         'Identity_Number', 'Document_Copy_Image_Name', 'Employment_Type', 'Preferred_Job_Role', 'Years_Of_Experience', 'Relevant_Years_Of_Experience', 
                         'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc', 
                         'Aadhar_Image_Name','Registered_By', 'Whatsapp_Number']
-                        col += ['Aspirational District', 'Educational Marksheet', 'Income Certificate']
+                        col += ['Aspirational District',  'Income Certificate']
 
                         Column = ['Candidate_id', 'Fresher/Experienced?*', 'Candidate Photo*', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 
                         'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 'Gender*', 'Marital Status*', 'Caste*', 'Disability Status*', 'Religion*', 
@@ -6693,7 +6694,7 @@ class DownloadRegTemplate(Resource):
                         'Identity number', 'Document copy', 'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 
                         'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 'Expected CTC*',
                         'Aadhar Image','Registered by*','Whatsapp Number']
-                        Column += ['Aspirational District*', 'Educational Marksheet*', 'Income Certificate']
+                        Column += ['Aspirational District*', 'Income Certificate']
 
                         filename = 'CandidateBulkUpload_Registration_DELL_'
                     elif Project_Type==2:
