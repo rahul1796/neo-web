@@ -726,9 +726,9 @@ class Report:
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
     
-    def DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id):
+    def DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids, status_id):
         try:
-            data=Database.DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id)
+            data=Database.DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids, status_id)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.EmployeeWiseFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.EmployeeWiseFileName + ".*")
