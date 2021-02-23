@@ -2,6 +2,7 @@ import pypyodbc as pyodbc
 #import pyodbc
 from .config import *
 #from Database import config
+from Models import *
 import pandas as pd
 from datetime import datetime
 from flask import request,make_response
@@ -6983,11 +6984,38 @@ SELECT					cb.name as candidate_name,
                 pop=row[0]
 
             cur.commit()
-            cur.close()
-            con.close()
+            
             if pop >0 :
                 Status=True
                 msg="Uploaded Successfully"
+                user_mail_id_cc=''
+                user_mail_id_to=''
+                user_name_to=''
+                batch_code=''
+
+                rec_type='CC'
+                sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                values = (batch_id,8,rec_type)
+                cur.execute(sql,(values))                
+                for row in cur:
+                    user_name_to='PMT Team'
+                    user_mail_id_to=row[0]
+
+                rec_type='TO'
+                sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                values = (batch_id,8,rec_type)
+                cur.execute(sql,(values))                
+                for row in cur:
+                    user_mail_id_cc=row[0]
+
+                sql = 'select top(1) batch_code from batches.tbl_batches where batch_id='+str(batch_id)
+                cur.execute(sql)                
+                for row in cur:
+                    batch_code=row[0]
+
+                attachment_file=Assessments.create_assessment_candidate_result_file(assessment_id,batch_code)
+                sent_mail.assessment_stage_change_mail(4,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                   
             elif pop==-1:
                 msg="Only one batch data allowed at a time"
                 Status=False
@@ -6997,6 +7025,8 @@ SELECT					cb.name as candidate_name,
             else:
                 msg="Wrong Batch code/Enrollment Id"
                 Status=False
+            cur.close()
+            con.close()
             return {"Status":Status,'message':msg}
         except Exception as e:
             # print(str(e))
@@ -7077,6 +7107,43 @@ SELECT					cb.name as candidate_name,
             if pop >0 :
                 Status=True
                 msg="Uploaded Successfully"
+                user_mail_id_cc=''
+                user_mail_id_to=''
+                user_name_to=''
+                batch_code=''
+
+                rec_type='CC'
+                sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                values = (batch_id,8,rec_type)
+                cur.execute(sql,(values))                
+                for row in cur:
+                    user_name_to='PMT Team'
+                    user_mail_id_to=row[0]
+
+                rec_type='TO'
+                sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                values = (batch_id,8,rec_type)
+                cur.execute(sql,(values))                
+                for row in cur:
+                    user_mail_id_cc=row[0]
+
+                sql = 'select top(1) batch_code from batches.tbl_batches where batch_id='+str(batch_id)+';'
+                cur.execute(sql)                
+                for row in cur:
+                    batch_code=row[0]
+                cur.commit()
+                assessment_id=0
+                sql='''select TOP(1) assessment_id 
+                        from assessments.tbl_batch_assessments
+                        where batch_id='''+ str(batch_id)+''' and assessment_type_id=2
+                        order by assessment_id desc;'''
+                cur.execute(sql)                
+                for row in cur:
+                    assessment_id=int(row[0])
+                cur.commit()                                                           
+                attachment_file=Assessments.create_assessment_candidate_result_file(assessment_id,batch_code)
+                sent_mail.assessment_stage_change_mail(4,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                
             elif pop==-1:
                 msg="Only one batch data allowed at a time"
                 Status=False

@@ -167,6 +167,73 @@ def certification_stage_change_mail_with_remarks(NewStageId,emailTo,emailToName,
     except Exception as e:
         print(e)
         return {'status':False,'description':'Unable to sent email'}
+def assessment_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch_Code,files):
+    #print(NewStageId,emailTo,emailToName,EmailCC,Batch_Code)
+    try:
+        server = smtplib.SMTP('smtp.office365.com','587')
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login("do-not-reply@labournet.in","Donotreply@123")
+
+        msg = MIMEMultipart()
+        stage_name=''
+        if NewStageId==4:
+            stage_name='Result Uploaded'
+        msg['From'] = "do-not-reply@labournet.in"
+        msg['To'] = ','.join(list(dict.fromkeys(list(emailTo.split(",")))))
+        msg['Cc'] = ','.join(list(dict.fromkeys(list(EmailCC.split(",")))))
+        msg['Subject'] = "LN NEO - "+str(Batch_Code)+" Assessment " + str(stage_name)
+        html_msg= '''
+        <div>
+        <p style="font-size:12pt;font-family:Times New Roman,serif;margin:0;">Dear <b>{},</b><br>
+        <br>
+        Greetings from NEO Team!
+        <br><br>
+        Assessment Stage is changed for the batch <b>{}</b> to <b>{}</b> by <b>{}</b> 
+        <br><br>
+        For any further details visit the URL <b>https://neo.labourmet.com/</b> .
+        </p>
+        </div>
+        <br>
+
+        <div align="center" style="font-size:12pt;font-family:Times New Roman,serif;text-align:center;margin:0;">
+        <hr align="center" width="100%" size="2">
+        </div>
+        <p style="font-size:12pt;font-family:Times New Roman,serif;margin:0;">
+        Best Regards,<br>
+        <b>NEO Team</b> </p>
+        <div align="center" style="font-size:12pt;font-family:Times New Roman,serif;text-align:center;margin:0;">
+        <hr align="center" width="100%" size="2">
+        </div>
+
+        <div>
+        <!--p style="font-size:12pt;font-family:Times New Roman,serif;margin:0 0 12pt 0;">&nbsp;</p-->
+        <p align="center" style="font-size:12pt;font-family:Times New Roman,serif;text-align:center;margin:0;">
+        <i>This is an auto generated e-mail. Please do not reply to this mail.</i></p>
+        </div>
+        <br>
+        '''
+
+        html_msg = html_msg.format('Team',Batch_Code,stage_name,session['user_name'])
+        msg.attach(MIMEText(html_msg, 'html'))
+        if files != '':
+            for path in [files]:
+                part = MIMEText('application', "octet-stream")
+                with open(path, 'rb') as file:
+                    part.set_payload(file.read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition',
+                                'attachment; filename="{}"'.format(Path(path).name))
+                msg.attach(part)
+        #print(msg)
+        res = server.sendmail(msg['From'], [msg['To']] + [msg['Cc']] , msg.as_string())
+        server.quit()
+
+        return {'status':True,'description':'Email sent'}
+    except Exception as e:
+        print(e)
+        return {'status':False,'description':'Unable to sent email'}
 
 def ShikshaEnrolmentMail(candidate_name,enrolment_id,course,email_id,mobile):
     #print(NewStageId,emailTo,emailToName,EmailCC,Batch_Code)
