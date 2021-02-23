@@ -21,6 +21,27 @@ class Assessments:
     def ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark,courier_number,courier_name,courier_url):
         print(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark,courier_number,courier_name,courier_url)
         return Database.ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark,courier_number,courier_name,courier_url)
+    def create_assessment_candidate_result_file(AssessmentId,Batch_Code):
+        try:
+            report_name = config.AssessmentCandidateResult+'_'+Batch_Code.replace('/','_')+'_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"   
+
+            #print(AssessmentId)
+            r=re.compile(config.AssessmentCandidateResult + ".*")
+            lst=os.listdir(DownloadAssessmentResult.DownloadPath)
+            #print(DownloadAssessmentResult.DownloadPath)
+            newlist = list(filter(r.match, lst))
+            for i in newlist:
+                os.remove( DownloadAssessmentResult.DownloadPath + i)
+            path = '{}{}'.format(DownloadAssessmentResult.DownloadPath,report_name)
+            response=Database.GetAssessmentCandidateResults(AssessmentId)
+            res=DownloadAssessmentResult.CreateExcelForDump(response,path,'Result')
+            ImagePath=config.DownloadcandidateResultPathWeb
+            os.chmod(ImagePath+report_name, 0o777)
+        
+            return str(ImagePath+report_name)
+        except Exception as e:
+            return str(e)
+
 
 class DownloadAssessmentResultUploadTemplate(Resource):
     DownloadPath=config.DownloadcandidateResultPathLocal
@@ -40,7 +61,10 @@ class DownloadAssessmentResultUploadTemplate(Resource):
                 path = '{}{}'.format(DownloadAssessmentResultUploadTemplate.DownloadPath,report_name)
                 response=Database.GetAssessmentCandidateResultUploadTemplate(AssessmentId,BatchId)
                 res=DownloadAssessmentResult.CreateExcelForDump(response,path,'Template')
+                
                 ImagePath=config.DownloadcandidateResultPathWeb
+                os.chmod(ImagePath+report_name, 0o777)
+            
                 return {"status":True,'FileName':report_name,'FilePath':ImagePath}
             except Exception as e:
                 return {"status":False,"exception":"Error : " + str(e),"File":"HI"}
@@ -68,10 +92,13 @@ class DownloadAssessmentResult(Resource):
                 response=Database.GetAssessmentCandidateResults(AssessmentId)
                 res=DownloadAssessmentResult.CreateExcelForDump(response,path,'Result')
                 ImagePath=config.DownloadcandidateResultPathWeb
+                os.chmod(ImagePath+report_name, 0o777)
+            
                 return {"status":True, 'FileName':report_name,'FilePath':ImagePath}
             except Exception as e:
                 return {"status":False,"exception":"Error : " + str(e),"File":"HI"}
-
+    
+    
     def CreateExcelForDump(Response,file_path,sheet_name):
         try:
             #print(Response)
