@@ -21,27 +21,7 @@ class Assessments:
     def ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark,courier_number,courier_name,courier_url):
         print(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark,courier_number,courier_name,courier_url)
         return Database.ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark,courier_number,courier_name,courier_url)
-    def create_assessment_candidate_result_file(AssessmentId,Batch_Code):
-        try:
-            DownloadPath=config.neo_report_file_path+'report file/'
-            report_name = 'Assessment_Candidate_Result_'+Batch_Code.replace('/','_')+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
-            r=re.compile('Assessment_Candidate_Result_.*')
-            lst=os.listdir(DownloadPath)
-            newlist = list(filter(r.match, lst))
-            for i in newlist:
-                os.remove( DownloadPath + i)
-            path = '{}{}'.format(DownloadPath,report_name)
-            
-            response=Database.GetAssessmentCandidateResults(AssessmentId)
-            res=DownloadAssessmentResult.CreateExcelForDump(response,path,'Result')
-            #ImagePath=config.DownloadcandidateResultPathWeb
-            os.chmod(DownloadPath+report_name, 0o777)
-            
-            return str(config.neo_report_file_path_web+report_name)
-        except Exception as e:
-            return str(e)
-
-
+    
 class DownloadAssessmentResultUploadTemplate(Resource):
     DownloadPath=config.DownloadcandidateResultPathLocal
     @staticmethod
