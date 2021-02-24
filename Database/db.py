@@ -6582,7 +6582,7 @@ SELECT					cb.name as candidate_name,
                 '''
                 for row in out:
                     query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[7]=='' else 0,row[46],row[2],row[3],row[4],row[5],row[6],row[7],row[9],row[11],row[12],row[13],row[14],row[15],row[19],row[27],row[28],row[29],row[30],row[36],row[37],row[38],row[39],quer_user.format(row[55],row[55]),p,row[0])
-                    query += '\n' + quer2.format(row[16],row[17],row[18],row[20],row[21],row[40],row[41],row[42],row[43],row[44],row[45],row[47],row[48],row[49],row[50],row[51],row[52],row[53],row[22],row[31],quer_user.format(row[55],row[55]),row[56],row[54],row[58],row[0])
+                    query += '\n' + quer2.format(row[16],row[17],row[18],row[20],row[21],row[40],row[41],row[42],row[43],row[44],row[45],row[47],row[48],row[49],row[50],row[51],row[52],row[53],row[22],row[31],quer_user.format(row[55],row[55]),row[56],row[54],row[57],row[0])
                     query += '\n' + quer3.format(row[23],row[24],row[25],row[26],row[32],row[33],row[34],row[37],quer_user.format(row[55],row[55]),row[0])
                     
                 if ProjectType==2:
