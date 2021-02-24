@@ -7842,24 +7842,23 @@ SELECT					cb.name as candidate_name,
         return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet4':sheet4,'sheet5':sheet5,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns,'sheet4_columns':sheet4_columns,'sheet5_columns':sheet5_columns}
         curs.close()
         con.close()  
-    def DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id):
+    def DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id,status_id):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
         sheet1_columns=[]
         
-        sql = 'exec [reports].[sp_get_assessment_productivity_report_data] ?,?,?,?, ?, ?,?,?'
-        
-        values = (customer_ids, contract_ids,project_ids,sub_project_ids,regions, month,user_id,user_role_id)
+        sql = 'exec [reports].[sp_get_assessment_productivity_report_data] ?,?,?,?, ?, ?,?,?,?'
+        values = (customer_ids, contract_ids,project_ids,sub_project_ids,regions, month,user_id,user_role_id,status_id)
         
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
         sheet1 = list(map(lambda x:list(x), data))        
-        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
-        cur2.close()
+        curs.close()
         con.close()    
-    
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+        
     def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
@@ -8642,15 +8641,13 @@ SELECT					cb.name as candidate_name,
         cnxn.close()
         return (data,columns)
     
-    def DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id):
+    def DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id, status_id):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
-
         sheet1=[]
         sheet1_columns=[]
-
-        sql = 'exec [reports].[sp_get_certificate_distribution_productivity_report] ?, ?, ?,?,?, ?, ?'
-        values = (month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
+        sql = 'exec [reports].[sp_get_certificate_distribution_productivity_report] ?, ?, ?,?,?, ?, ?, ?'
+        values = (month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id, status_id)
         
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
