@@ -1754,7 +1754,7 @@ function add_map_message(){
                     }    
                     else
                     {
-                        alert(data.msg);
+                        alert(data.FilePath+data.FileName);
                         return false;
                     }  
                 }                    

@@ -5993,7 +5993,7 @@ class upload_bulk_upload(Resource):
                 #print(df.columns.to_list())
                 if ProjectType==1:
                     #print(df['Candidate Photo*'])
-                    img_column ='Candidate Photo*,Aadhar Image,Document copy,Income Certificate','Educational Marksheet*'
+                    img_column ='Candidate Photo*,Aadhar Image,Document copy,Income Certificate,Educational Marksheet*'
                     schema = Schema([
                         #nan check column non mandate
                         Column('Candidate_id',null_validation),
