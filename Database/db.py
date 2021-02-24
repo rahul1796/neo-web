@@ -8365,7 +8365,7 @@ SELECT					cb.name as candidate_name,
         quer1 = "update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}' where candidate_id={}"
         quer2 = "update candidate_details.tbl_candidate_reg_enroll_details set aadhar_image_name='{}' where candidate_id = {}"
         quer3 = "update candidate_details.tbl_candidate_reg_enroll_details set document_copy_image_name = '{}' where candidate_id = {}"
-        quer4 = "update candidate_details.tbl_candidate_dell_details set [Educational Marksheet]='{}' where candidate_id={}"
+        quer4 = "update candidate_details.tbl_candidate_reg_enroll_details set [educational_marksheet]='{}' where candidate_id={}"
         quer5 = "update candidate_details.tbl_candidate_dell_details set [Income Certificate]='{}' where candidate_id={}"
         quer6 = "update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set attachment_image_name='{}' where candidate_id={}"
         quer7 = "update candidate_details.tbl_candidate_she_details set [Educational qualification]='{}' where candidate_id={}"
