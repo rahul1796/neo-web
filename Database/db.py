@@ -2,12 +2,18 @@ import pypyodbc as pyodbc
 #import pyodbc
 from .config import *
 #from Database import config
-from Models import *
 import pandas as pd
+
+import xlsxwriter
+import calendar
+import time
+from Database import config
+
 from datetime import datetime
 from flask import request,make_response
 import requests
 import xml.etree.ElementTree as ET
+
 import io
 import csv
 import json
@@ -4378,17 +4384,61 @@ SELECT					cb.name as candidate_name,
             return out
         except Exception as e:
             return {"message":"Error changing assessment stage"+e.message,"success":0,"assessment_id":0}
-    def create_assessment_candidate_file(data,columns,batch_code,file_type):
+    def create_assessment_candidate_result_file(AssessmentId,Batch_Code):
+        
         try:
-            import pandas as pd
-            import pypyodbc as pyodbc
-            import xlsxwriter
-            import calendar
-            import time
-            from Database import config
-        except:
-            return({'Description':'Module Error', 'Status':False})
+            DownloadPath=config.neo_report_file_path+'report file/'
+            report_name = 'Assessment_Candidate_Result_'+Batch_Code.replace('/','_')+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
+            r=re.compile('Assessment_Candidate_Result_.*')
+            lst=os.listdir(DownloadPath)
+            newlist = list(filter(r.match, lst))
+            for i in newlist:
+                os.remove( DownloadPath + i)
+            path = '{}{}'.format(DownloadPath,report_name)
+            
+            response=Database.GetAssessmentCandidateResults(AssessmentId)
+            res=Database.CreateExcelForDump(response,path,'Result')
+            #ImagePath=config.DownloadcandidateResultPathWeb
+            os.chmod(DownloadPath+report_name, 0o777)
+            
+            return str(config.neo_report_file_path_web+report_name)
+        except Exception as e:
+            return str(e)
+    def CreateExcelForDump(Response,file_path,sheet_name):
+        try:
+            #print(Response)
+            workbook = xlsxwriter.Workbook(file_path)
+            
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'align': 'top',
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
 
+            write_format = workbook.add_format({
+                'border': 1,
+                'align': 'top',
+                'valign': 'top'})
+
+            worksheet = workbook.add_worksheet(sheet_name)
+            #print(worksheet.name)
+            for i in range(len(Response['columns'])):
+                worksheet.write(0,i ,Response['columns'][i], header_format)   
+            for j in range(len(Response['data'])) : 
+                for k in range(len(Response['columns'])):
+                    if Response['data'].iloc[j,k] is None:
+                        worksheet.write(j+1,k ,'',write_format)
+                    else:
+                        worksheet.write(j+1,k ,Response['data'].iloc[j,k],write_format)
+                                                    
+            workbook.close()
+            return True
+        except Exception as e:
+            print(str(e))
+            return False
+    def create_assessment_candidate_file(data,columns,batch_code,file_type):
         try:
             gmt = time.gmtime() 
             ts = calendar.timegm(gmt)
@@ -7016,7 +7066,7 @@ SELECT					cb.name as candidate_name,
                 for row in cur:
                     batch_code=row[0]
 
-                attachment_file=Assessments.create_assessment_candidate_result_file(assessment_id,batch_code)
+                attachment_file=Database.create_assessment_candidate_result_file(assessment_id,batch_code)
                 sent_mail.assessment_stage_change_mail(4,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
                    
             elif pop==-1:
@@ -7144,7 +7194,7 @@ SELECT					cb.name as candidate_name,
                 for row in cur:
                     assessment_id=int(row[0])
                 cur.commit()                                                           
-                attachment_file=Assessments.create_assessment_candidate_result_file(assessment_id,batch_code)
+                attachment_file=Database.create_assessment_candidate_result_file(assessment_id,batch_code)
                 sent_mail.assessment_stage_change_mail(4,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
                 
             elif pop==-1:

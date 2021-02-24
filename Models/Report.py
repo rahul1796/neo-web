@@ -1504,6 +1504,8 @@ class Report:
         except Exception as e:
             print(str(e))
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+    
+
     def download_courses_list(user_id, user_role_id, course_id, sectors, qps, status):
         try:
             data=Database.download_courses_list(user_id, user_role_id, course_id, sectors, qps, status)
