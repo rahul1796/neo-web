@@ -1759,9 +1759,9 @@ class Report:
             return({'Description':'Error creating excel' + str(e), 'Status':False, 'Error':str(e)})
 
 
-    def DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id):
+    def DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id,status_id):
         try:
-            data=Database.DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id)
+            data=Database.DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id,status_id)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.AssessmentProductivityFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.AssessmentProductivityFileName + ".*")
@@ -2439,9 +2439,9 @@ class Report:
             return({'Description':'Error creating excel ' + str(e), 'Status':False, 'Error':str(e)})
 
 
-    def DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id):
+    def DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id, status_id):
         try:
-            data=Database.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
+            data=Database.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id, status_id)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.CertificateProductivityFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.CertificateProductivityFileName + ".*")

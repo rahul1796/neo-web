@@ -8144,7 +8144,9 @@ class DownloadAssessmentProductivityReport(Resource):
             regions = request.form["regions"]
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            resp = Report.DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id)
+
+            status_id =request.form["status_id"]
+            resp = Report.DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id,status_id)
             return resp
 
 api.add_resource(DownloadAssessmentProductivityReport,'/DownloadAssessmentProductivityReport')
@@ -9413,6 +9415,7 @@ class DownloadCertification_DistributionProductivityReport(Resource):
     def post():
         if request.method=='POST':
             month = request.form["month"]
+            status_id = request.form["status_id"]
             customer_ids = request.form["customer_ids"]
             project_ids = request.form["project_ids"]
             sub_project_ids = request.form["sub_project_ids"]
@@ -9420,8 +9423,7 @@ class DownloadCertification_DistributionProductivityReport(Resource):
             
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            
-            resp = Report.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
+            resp = Report.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id, status_id)
             return resp
 api.add_resource(DownloadCertification_DistributionProductivityReport,'/DownloadCertification_DistributionProductivityReport')
 
