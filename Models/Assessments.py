@@ -53,7 +53,7 @@ class DownloadAssessmentResultUploadTemplate(Resource):
                 BatchId=request.args.get('BatchId',0,type=int)
                 Batch_Code=request.args.get('Batch_Code','',type=str)
                 report_name = config.AssessmentCandidateResultUploadTemplate+'_'+Batch_Code.replace('/','_')+'_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"   
-                r=re.compile(Assessment_Result_Upload_Template_ + ".*")
+                r=re.compile("Assessment_Result_Upload_Template_" + ".*")
                 lst=os.listdir(DownloadAssessmentResultUploadTemplate.DownloadPath)
                 newlist = list(filter(r.match, lst))
                 for i in newlist:
