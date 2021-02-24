@@ -6541,7 +6541,7 @@ SELECT					cb.name as candidate_name,
             quer_exp = ''
             if ProjectType==1:
                 for row in out:
-                    quer4 += '\n' + "({},4,'{}','{}','{}',GETDATE(),{},1),".format(row[0],row[59],row[60],quer_user.format(row[56],row[56]))
+                    quer4 += '\n' + "({},4,'{}','{}',GETDATE(),{},1),".format(row[0],row[59],row[60],quer_user.format(row[56],row[56]))
                 quer_exp = quer4
             elif ProjectType==2:
                 for row in out:
