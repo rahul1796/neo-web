@@ -6685,7 +6685,7 @@ class DownloadRegTemplate(Resource):
                         'Permanent_Taluk_Block', 'Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country', 'Aadhar_No', 'Identifier_Type', 
                         'Identity_Number', 'Document_Copy_Image_Name', 'Employment_Type', 'Preferred_Job_Role', 'Years_Of_Experience', 'Relevant_Years_Of_Experience', 
                         'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc', 
-                        'Aadhar_Image_Name','Registered_By', 'Whatsapp_Number','Educational Marksheet*']
+                        'Aadhar_Image_Name','Registered_By', 'Whatsapp_Number','Educational Marksheet']
                         col += ['Aspirational District',  'Income Certificate']
 
                         Column = ['Candidate_id', 'Fresher/Experienced?*', 'Candidate Photo*', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 
