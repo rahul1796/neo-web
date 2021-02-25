@@ -1368,6 +1368,9 @@ class Database:
         msg={"message":"Batch Cancelled"}
         return msg
     def upload_assessment_certificate_copy(certi_name,user_id,enrolment_id,batch_id):
+        response=[]
+        h={}
+            
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = '''update assessments.tbl_map_certification_candidates_stages 
@@ -1386,11 +1389,50 @@ class Database:
         values = (certi_name,user_id,enrolment_id,batch_id)
         cur.execute(sql,(values))
         cur.commit()
+        user_mail_id_cc=''
+        batch_code=''
+        user_mail_id_to=''
+        user_name_to=''
+        sql = 'select top(1) batch_code from batches.tbl_batches where batch_id='+str(batch_id)
+        cur.execute(sql)                
+        for row in cur:
+            batch_code=row[0]
+        cur.commit()
+        
+        rec_type='TO'
+        sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+        values = (batch_id,9,rec_type)
+        cur.execute(sql,(values))                    
+        for row in cur:
+            user_name_to='Team'
+            user_mail_id_to=row[0]
+        rec_type='CC'
+        cur.commit()
+        sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+        values = (batch_id,9,rec_type)
+        cur.execute(sql,(values))                    
+        for row in cur:
+            user_mail_id_cc=row[0]
+        cur.commit()
+        sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+        values = (batch_id,enrolment_id)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]                   
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+        sent_mail.certification_stage_change_mail(9,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+        
         cur.close()
         con.close()
         msg={"Status":True,"message":"Certificate Uploaded"}
         return msg
     def upload_assessment_certificate_copy_bulk_upload(certi_name,user_id,enrolment_id,batch_id):
+        response=[]
+        h={}
+            
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = '''update assessments.tbl_map_certification_candidates_stages 
@@ -1416,6 +1458,42 @@ class Database:
         values = (certi_name,user_id,enrolment_id,batch_id)
         cur.execute(sql,(values))
         cur.commit()
+        user_mail_id_cc=''
+        batch_code=''
+        user_mail_id_to=''
+        user_name_to=''
+        sql = 'select top(1) batch_code from batches.tbl_batches where batch_id='+str(batch_id)
+        cur.execute(sql)                
+        for row in cur:
+            batch_code=row[0]
+        cur.commit()
+        
+        rec_type='TO'
+        sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+        values = (batch_id,9,rec_type)
+        cur.execute(sql,(values))                    
+        for row in cur:
+            user_name_to='Team'
+            user_mail_id_to=row[0]
+        rec_type='CC'
+        cur.commit()
+        sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+        values = (batch_id,9,rec_type)
+        cur.execute(sql,(values))                    
+        for row in cur:
+            user_mail_id_cc=row[0]
+        cur.commit()
+        sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+        values = (batch_id,enrolment_id)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]                   
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+        sent_mail.certification_stage_change_mail(9,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                
         cur.close()
         con.close()
         msg={"Status":True,"message":"Certificate Uploaded"}
