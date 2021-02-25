@@ -52,30 +52,41 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
 
         msg = MIMEMultipart()
         stage_name=''
+        next_stage=''
         if NewStageId==1:
             stage_name='Requested For Printing'
+            next_stage='Sent For Printing'
         if NewStageId==2:
             stage_name='Sent For Printing'
+            next_stage='Sent To Center'
         if NewStageId==3:
             stage_name='Sent To Center'
+            next_stage='Received By Center'
         if NewStageId==4:
             stage_name='Received By Center'
+            next_stage='Planned For Distribution'
         if NewStageId==5:
             stage_name='Planned For Distribution'
+            next_stage='Distributed'
         if NewStageId==6:
             stage_name='Distributed'
+            next_stage='Verify Details'
         if NewStageId==7:
             stage_name='Result Approved'
-        if NewStageId==8:
-            stage_name='Result Requested For Modification'
+            next_stage='Soft Copy Upload'
+        if NewStageId==9:
+            stage_name='Soft Copy Uploaded'
+            next_stage='Soft Copy Approval/Modification'
+        
         if NewStageId==10:
             stage_name='Soft Copy Approved'
+            next_stage='Requested For Printing'
         msg['From'] = "do-not-reply@labournet.in"
         msg['To'] = ','.join(list(dict.fromkeys(list(emailTo.split(",")))))
         msg['Cc'] = ','.join(list(dict.fromkeys(list(EmailCC.split(",")))))
         msg['Subject'] = "LN NEO - "+str(Batch_Code)+" Certificates " + str(stage_name)
         html_msg= config.html_email_msg_certification_stage_change
-        html_msg = html_msg.format(emailToName,Batch_Code,stage_name,session['user_name'])
+        html_msg = html_msg.format(emailToName,Batch_Code,stage_name,session['user_name'],next_stage)
         msg.attach(MIMEText(html_msg, 'html'))
         if files != '':
             for path in [files]:
@@ -107,10 +118,13 @@ def certification_stage_change_mail_with_remarks(NewStageId,emailTo,emailToName,
 
         msg = MIMEMultipart()
         stage_name=''
+        next_stage=''
         if NewStageId==8:
             stage_name='Requested For Modification(Result)'
+            next_stage='Soft Copy Upload'
         if NewStageId==11:
             stage_name='Requested For Modification(Soft Copy)'
+            next_stage='Assessment Result Upload'
         msg['From'] = "do-not-reply@labournet.in"
         msg['To'] = ','.join(list(dict.fromkeys(list(emailTo.split(",")))))
         msg['Cc'] = ','.join(list(dict.fromkeys(list(EmailCC.split(",")))))
@@ -125,7 +139,7 @@ def certification_stage_change_mail_with_remarks(NewStageId,emailTo,emailToName,
         <br><br>
         Remarks :  <b>{} </b>
         <br><br>
-        For any further details visit the URL <b>https://neo.labourmet.com/</b> .
+        For any further details visit the URL <b>https://neo.labourmet.com/</b> and update the next stage/step(<b>{}</b>).
         </p>
         </div>
         <br>
@@ -148,7 +162,7 @@ def certification_stage_change_mail_with_remarks(NewStageId,emailTo,emailToName,
         <br>
         '''
 
-        html_msg = html_msg.format(emailToName,Batch_Code,stage_name,session['user_name'],remark)
+        html_msg = html_msg.format(emailToName,Batch_Code,stage_name,session['user_name'],remark,next_stage)
         msg.attach(MIMEText(html_msg, 'html'))
         if files != '':
             for path in [files]:
