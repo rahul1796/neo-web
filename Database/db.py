@@ -4476,7 +4476,7 @@ SELECT					cb.name as candidate_name,
             #ImagePath=config.DownloadcandidateResultPathWeb
             os.chmod(DownloadPath+report_name, 0o777)
             
-            return str(config.neo_report_file_path_web+report_name)
+            return str(DownloadPath+report_name)
         except Exception as e:
             return str(e)
     def CreateExcelForDump(Response,file_path,sheet_name):
