@@ -5761,11 +5761,11 @@ class submit_candidate_updated(Resource):
                 elif cand_stage==4:
                     out = Database.get_submit_candidate_re_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 else:
-                    out = {'success': False, 'description': "incorrect stage", 'app_status':True}
+                    out = {'success': False, 'validation_error':False, 'description': "incorrect stage", 'app_status':True}
                 return jsonify(out)
             
             else:
-                res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
+                res = {'success': False, 'validation_error':False, 'description': "client name and password not matching", 'app_status':True}
                 return jsonify(res)
 
 #Base URL + "/submit_candidate_updated" api will provide all the unzynched QP data as response
@@ -8123,12 +8123,15 @@ class DownloadEmployeeWiseReport(Resource):
         if request.method=='POST':
             month = request.form["month"]
             role_id = request.form["role_id"]
+
             customer_ids = request.form["customer_ids"]
             contract_ids = request.form["contract_ids"]
+            stage_ids = request.form["stage_ids"]
+            status_id = request.form["status_id"]
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            #DownloadEmployeeWiseReport
-            resp = Report.DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id)
+            #DownloadEmployeeWiseReport  stage_ids status_id
+            resp = Report.DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids, status_id)
             return resp
 api.add_resource(DownloadEmployeeWiseReport,'/DownloadEmployeeWiseReport')
 
@@ -8144,7 +8147,9 @@ class DownloadAssessmentProductivityReport(Resource):
             regions = request.form["regions"]
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            resp = Report.DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id)
+
+            status_id =request.form["status_id"]
+            resp = Report.DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id,status_id)
             return resp
 
 api.add_resource(DownloadAssessmentProductivityReport,'/DownloadAssessmentProductivityReport')
@@ -9383,10 +9388,11 @@ class download_Certification_Distribution_Report(Resource):
                 Batches = request.form['Batches']
                 FromDate = request.form['FromDate']
                 ToDate = request.form['ToDate']
+                status_id = request.form['status_id']
 
                 file_name='Certification_Distribution_Report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
             
-                resp = Report.download_Certification_Distribution_Report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+                resp = Report.download_Certification_Distribution_Report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate,status_id)
                 return resp
                 
             except Exception as e:
@@ -9412,6 +9418,7 @@ class DownloadCertification_DistributionProductivityReport(Resource):
     def post():
         if request.method=='POST':
             month = request.form["month"]
+            status_id = request.form["status_id"]
             customer_ids = request.form["customer_ids"]
             project_ids = request.form["project_ids"]
             sub_project_ids = request.form["sub_project_ids"]
@@ -9419,8 +9426,7 @@ class DownloadCertification_DistributionProductivityReport(Resource):
             
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            
-            resp = Report.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
+            resp = Report.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id, status_id)
             return resp
 api.add_resource(DownloadCertification_DistributionProductivityReport,'/DownloadCertification_DistributionProductivityReport')
 

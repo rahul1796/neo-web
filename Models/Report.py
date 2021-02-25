@@ -726,9 +726,9 @@ class Report:
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
     
-    def DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id):
+    def DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids, status_id):
         try:
-            data=Database.DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id)
+            data=Database.DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids, status_id)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.EmployeeWiseFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.EmployeeWiseFileName + ".*")
@@ -1761,9 +1761,9 @@ class Report:
             return({'Description':'Error creating excel' + str(e), 'Status':False, 'Error':str(e)})
 
 
-    def DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id):
+    def DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id,status_id):
         try:
-            data=Database.DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id)
+            data=Database.DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id,status_id)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.AssessmentProductivityFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.AssessmentProductivityFileName + ".*")
@@ -2398,7 +2398,7 @@ class Report:
         except Exception as e:
             return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
     
-    def download_Certification_Distribution_Report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+    def download_Certification_Distribution_Report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate,status_id):
         try:
             name_withpath = config.neo_report_file_path + 'report file/'+ file_name
             
@@ -2411,18 +2411,18 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
 
-            resp = Database.download_Certification_Distribution_Report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+            resp = Database.download_Certification_Distribution_Report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate,status_id)
             if len(resp[0])==0:
                 return({'Description':'No data available for the selected items', 'Status':False})
             df = pd.DataFrame(resp[0],columns=resp[1])
             df=df.fillna('')
 
-            col = ['Region_Name', 'Coo', 'Tm', 'Cm', 'Customer_Name', 'Contract_Name', 'Contract_Code', 'Project_Name', 'Project_Code', 'Sub_Project_Name', 'Sub_Project_Code', 'Center_Name', 
+            col = ['Region_Name', 'Coo', 'Tm', 'Cm', 'Customer_Name', 'Customer_Status', 'Contract_Name', 'Contract_Code', 'Project_Name', 'Project_Code', 'Sub_Project_Name', 'Sub_Project_Code', 'Center_Name', 
             'Course_Name', 'Course_Code', 'Qp_Name', 'Qp_Code', 'Enrolled_Count', 'Certified_Count', 'Batch_Code', 'Batch_Name', 'Actual_Start_Date', 'Actual_End_Date', 'Ojt_Startdate', 'Ojt_Enddate', 
             'Assessment_Types_Name', 'Awarding_Body', 'Partner_Category_Name', 'Partner_Name', 'Result_Upload_Date', 'Requested_Date', 'Sent_For_Printing_Date', 
             'Sent_To_Center_Date', 'Center_Received_Date', 'Actual_Distribution_Date', 'Certification_Distribution_Count']
             
-            Header = ["Region", "COO", "TM", "CM/PC", "Customer Name", "Contract Name", "Contract Code", "Project Name", "Project Code", "Sub-Project Name", "Sub-Project Code", "Center Name",
+            Header = ["Region", "COO", "TM", "CM/PC", "Customer Name", "Customer Status", "Contract Name", "Contract Code", "Project Name", "Project Code", "Sub-Project Name", "Sub-Project Code", "Center Name",
             "Course Name", "Course Code", "QP Name", "QP Code", "Enrolment Count", "Passed/Certified Candidate", "Batch Code", "Batch Name", "Batch Start Date", "Batch End Date", "OJT Start Date", "OJT End Date",
             "Assessment Type", "Awarding Body", "Assessment Partner Type", "Assesment Partner", "Result Upload Date", "Requested Date for Certificate Printing (PMT)", "Sent for Printing Date (Admin)",
             "Certification Sent to Center Date (Admin)", "Certification Received at Center Date (Center)", "Certification Distributed Date", "Certification Distributed Nos"]
@@ -2438,12 +2438,12 @@ class Report:
             return({'Description':'created excel', 'Status':True, 'filename':file_name})
 
         except Exception as e:
-            return({'Description':'Error creating excel', 'Status':False, 'Error':str(e)})
+            return({'Description':'Error creating excel ' + str(e), 'Status':False, 'Error':str(e)})
 
 
-    def DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id):
+    def DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id, status_id):
         try:
-            data=Database.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
+            data=Database.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id, status_id)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.CertificateProductivityFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.CertificateProductivityFileName + ".*")
