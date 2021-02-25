@@ -1337,7 +1337,7 @@ class Database:
         cur.commit()
         cur.close()
         con.close()
-        print(pop)
+        #print(pop)
         if pop >0:
             msg={"message":"Batch Assigned"}
         else:
@@ -4074,7 +4074,7 @@ SELECT					cb.name as candidate_name,
 
         sql = 'exec [masters].[sp_get_batches_based_on_sub_projects] ?,?,?'
         values=(user_id,user_role_id,sub_project_id)
-        print(values)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
@@ -4197,7 +4197,6 @@ SELECT					cb.name as candidate_name,
         cur = con.cursor()
         sql = 'exec [assessments].[get_batch_assessments] ?,?'
         values = (BatchId,Stage)
-        print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -4217,7 +4216,7 @@ SELECT					cb.name as candidate_name,
         cur = con.cursor()
         sql = 'exec [assessments].[get_batch_assessments_history] ?'
         values = (AssessentId,)
-        print("Hii")
+        #print("Hii")
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -4228,7 +4227,6 @@ SELECT					cb.name as candidate_name,
         cur.commit()
         cur.close()
         con.close()   
-        print(response)    
         return out
 
 
@@ -4315,7 +4313,6 @@ SELECT					cb.name as candidate_name,
             
             if pop>0:
                 out={"message":msg,"success":1,"assessment_id":pop}
-                print(str(partner_id),str(assessment_type_id),msg)
                 if((str(partner_id)=="1") & (str(assessment_type_id)=="2") & ((msg=='Assessment Proposed') | (msg=='Re-Assessment Proposed'))):
                     SDMSBatchId=''
                     Stage=''
@@ -4838,7 +4835,7 @@ SELECT					cb.name as candidate_name,
             cur = con.cursor()
             sql = 'exec [assessments].[sp_get_candidate_result] ?'
             values=(AssessmentId,)  
-            print(values)          
+            #print(values)          
             cur.execute(sql,(values))
             col = [column[0].title() for column in cur.description]
             data=cur.fetchall()   
@@ -4849,7 +4846,7 @@ SELECT					cb.name as candidate_name,
             cur.close()
             con.close()
             response= {"columns":col,"data":df}
-            print(response)
+            #print(response)
             return response
         except Exception as e:
             print(str(e))
