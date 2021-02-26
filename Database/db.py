@@ -5695,7 +5695,7 @@ SELECT					cb.name as candidate_name,
         if vali!=[]:
             for temp in vali:
                 validation.append({"row_id":temp[0],"error_flag":temp[3],"mobile":temp[1],"email":temp[2]})
-            out = {'success': False, 'validation_error':True, 'description': 'Mobile/Email validation error', 'app_status':True, 'error_message':validation } #'\n'.join()
+            out = {'success': False, 'validation_error':True, 'description': 'Mobile/Email already exists', 'app_status':True, 'error_message':validation } #'\n'.join()
             return out
         
         try:
@@ -6133,7 +6133,7 @@ SELECT					cb.name as candidate_name,
         if vali!=[]:
             for temp in vali:
                 validation.append({"row_id":temp[0],"error_flag":temp[3],"mobile":temp[1],"email":temp[2]})
-            out = {'success': False, 'validation_error':True, 'description': 'Mobile/Email validation error', 'app_status':True, 'error_message':validation } #'\n'.join()
+            out = {'success': False, 'validation_error':True, 'description': 'Mobile/Email already exists', 'app_status':True, 'error_message':validation } #'\n'.join()
             return out
             
         if int(mobilization_type)==1:

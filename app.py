@@ -5620,8 +5620,8 @@ class otp_send(Resource):
                     otp += str(random.randint(0,9))
 
                 out = Database.otp_send_db(otp, mobile_no, app_name, flag,candidate_id)
-
-                if out[0]==True:
+                print(out)
+                if out[0]:
                     res = {'success': False, 'description': "Mobile number already registered"}
                     return jsonify(res)
                 else:
