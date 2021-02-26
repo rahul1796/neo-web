@@ -363,14 +363,14 @@ class Database:
         con.close()
         return h
     
-    def project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status):
+    def project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,customer_status):
         content = {}
         d = []
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,entity,customer,p_group,block,practice,bu,product,status)
+        sql = 'exec [masters].[sp_get_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,entity,customer,p_group,block,practice,bu,product,status,customer_status)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -5928,7 +5928,9 @@ SELECT					cb.name as candidate_name,
             sql = 'exec	candidate_details.sp_candidate_re_enr_skilling ?'
             values = (json.dumps(merger_skilling),)
             curs.execute(sql,(values))
-            d = list(map(lambda x:x[0],curs.fetchall()))
+            #d = list(map(lambda x:x[0],curs.fetchall()))
+            columns = [column[0].title() for column in curs.description]
+            d = list(map(lambda x:list(x),curs.fetchall()))
             
             # quer4 = quer4[:-1]+';'
             # curs.execute(quer4)
@@ -5947,11 +5949,13 @@ SELECT					cb.name as candidate_name,
                 curs.execute(quer6)
                 curs.commit()
             response_data=[]
-            intervention_string =','.join(map(str, d))
-            response_query = 'SELECT c.candidate_id as Candidate_Id,c.first_name as First_Name,COALESCE(middle_name,\'\') as Middle_Name,COALESCE(last_name,\'\') as Last_Name,c.primary_contact_no as Mobile_Number,cis.intervention_value as Enrollment_Id FROM candidate_details.tbl_candidate_interventions ci LEFT JOIN candidate_details.tbl_candidates as c on c.candidate_id=ci.candidate_id LEFT JOIN candidate_details. tbl_map_candidate_intervention_skilling as cis on cis.intervention_id=ci.candidate_intervention_id where ci.candidate_intervention_id IN ('+intervention_string+');'
-            curs.execute(response_query)
-            columns = [column[0].title() for column in curs.description]
-            for row in curs:
+            #print(d)
+            #intervention_string =','.join(map(str, d))
+            #print(intervention_string)
+            #response_query = 'SELECT c.candidate_id as Candidate_Id,c.first_name as First_Name,COALESCE(middle_name,\'\') as Middle_Name,COALESCE(last_name,\'\') as Last_Name,c.primary_contact_no as Mobile_Number,cis.intervention_value as Enrollment_Id FROM candidate_details.tbl_candidate_interventions ci LEFT JOIN candidate_details.tbl_candidates as c on c.candidate_id=ci.candidate_id LEFT JOIN candidate_details. tbl_map_candidate_intervention_skilling as cis on cis.intervention_id=ci.candidate_intervention_id where ci.candidate_id IN ('+intervention_string+');'
+            #curs.execute(response_query)
+            #columns = [column[0].title() for column in curs.description]
+            for row in d:
                 h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5]}
                 response_data.append(h)
             out = {'success': True, 'description': "Submitted Successfully", 'app_status':True,'data':response_data}
@@ -6351,14 +6355,14 @@ SELECT					cb.name as candidate_name,
         con.close()
         return response
 
-    def sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project):
+    def sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project,customer_status):
         response = {}
         d = []
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_sub_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
-        values = (user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,entity,customer,p_group,block,practice,bu,product,status,project)
+        sql = 'exec [masters].[sp_get_sub_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?'
+        values = (user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,entity,customer,p_group,block,practice,bu,product,status,project,customer_status)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -7760,7 +7764,7 @@ SELECT					cb.name as candidate_name,
         curs.close()
         con.close() 
 
-    def DownloadProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status):
+    def DownloadProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,customer_status):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
@@ -7772,10 +7776,10 @@ SELECT					cb.name as candidate_name,
         sql=''
         sql1=''
         sql2=''
-        sql = 'exec [reports].[sp_get_project_download] ?, ?, ?,?,?,?,?,?,?,?,?'
-        sql1 = 'exec [reports].[sp_get_project_center_download] ?, ?, ?,?,?,?,?,?,?,?,?'
-        sql2 = 'exec [reports].[sp_get_project_course_download]  ?, ?, ?,?,?,?,?,?,?,?,?'
-        values = (user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+        sql = 'exec [reports].[sp_get_project_download] ?, ?, ?,?,?,?,?,?,?,?,?, ?'
+        sql1 = 'exec [reports].[sp_get_project_center_download] ?, ?, ?,?,?,?,?,?,?,?,?, ?'
+        sql2 = 'exec [reports].[sp_get_project_course_download]  ?, ?, ?,?,?,?,?,?,?,?,?, ?'
+        values = (user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,customer_status)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
@@ -7790,11 +7794,11 @@ SELECT					cb.name as candidate_name,
         sheet3_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
         sheet3 = list(map(lambda x:list(x), data))        
-        return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
         curs.close()
-        con.close()    
-       
-    def DownloadSubProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project):
+        con.close()  
+        return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
+
+    def DownloadSubProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project,customer_status):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
@@ -7812,16 +7816,19 @@ SELECT					cb.name as candidate_name,
         sql2=''
         sql3=''
         sql4=''
-        sql = 'exec [reports].[sp_get_sub_project_download] ?, ?, ?,?,?,?,?,?,?,?,?,?'
+        sql = 'exec [reports].[sp_get_sub_project_download] ?, ?, ?,?,?,?,?,?,?,?,?,?,?'
         sql1 = 'exec [reports].[sp_get_sub_project_center_download] ?, ?, ?,?,?,?,?,?,?,?,?,?'
         sql2 = 'exec [reports].[sp_get_sub_project_course_download]  ?, ?, ?,?,?,?,?,?,?,?,?,?'
         sql3 = 'exec [reports].[sp_get_sub_project_user_download] ?, ?, ?,?,?,?,?,?,?,?,?,?'
         sql4 = 'exec [reports].[sp_get_sub_project_planned_batches_download]  ?, ?, ?,?,?,?,?,?,?,?,?,?'
-        values = (user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project)
+        
+        values = (user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project,customer_status)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
-        sheet1 = list(map(lambda x:list(x), data))        
+        sheet1 = list(map(lambda x:list(x), data))  
+        
+        values = (user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project)
         curs.execute(sql1,(values))
         sheet2_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
@@ -7859,7 +7866,7 @@ SELECT					cb.name as candidate_name,
         con.close()    
         return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
         
-    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
+    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
@@ -7872,10 +7879,10 @@ SELECT					cb.name as candidate_name,
         sql1=''
         sql2=''
         
-        sql = 'exec [reports].[sp_get_region_productivity_report_data] ?, ?, ?,?,?,?'
-        sql1 = 'exec [reports].[sp_get_region_productivity_report_data_batch] ?, ?, ?,?,?,?'
-        sql2 = 'exec [reports].[sp_get_region_productivity_report_data_customer] ?, ?, ?,?,?,?'
-        values = (customer_ids, contract_ids, region_ids,month,user_id,user_role_id)
+        sql = 'exec [reports].[sp_get_region_productivity_report_data] ?, ?, ?,?,?,?, ?, ?'
+        sql1 = 'exec [reports].[sp_get_region_productivity_report_data_batch] ?, ?, ?,?,?,?, ?, ?'
+        sql2 = 'exec [reports].[sp_get_region_productivity_report_data_customer] ?, ?, ?,?,?,?, ?, ?'
+        values = (customer_ids, contract_ids, region_ids,month,user_id,user_role_id, status_id, stage_ids)
         #print(values)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
@@ -7892,11 +7899,11 @@ SELECT					cb.name as candidate_name,
         sheet3_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
         sheet3 = list(map(lambda x:list(x), data))
+        
+        curs.close()
+        con.close()
         return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
-        cur2.close()
-        con.close()
-        con.close()
-
+        
     def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()

@@ -1299,9 +1299,9 @@ class Report:
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
-    def create_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status):
+    def create_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,customer_status):
         try:
-            data=Database.DownloadProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+            data=Database.DownloadProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,customer_status)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = 'Project_Report_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile('Project_Report_.*')
@@ -1337,7 +1337,7 @@ class Report:
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Project-Center') 
             df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Project-Course') 
-            first_row = ['Entity Name','Customer Name','Project Code','Project Name','Group','Type','Block','Practice','BU','Product','Project Manager','Start Date','End Date','Status','Created By','Created On','Last Modified By','Last Modified On']
+            first_row = ['Entity Name','Customer Status','Customer Name','Project Code','Project Name','Group','Type','Block','Practice','BU','Product','Project Manager','Start Date','End Date','Status','Created By','Created On','Last Modified By','Last Modified On']
             worksheet = writer.sheets['Projects']
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format) 
@@ -1355,9 +1355,9 @@ class Report:
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
-    def create_sub_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project):
+    def create_sub_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project,customer_status):
         try:
-            data=Database.DownloadSubProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project)
+            data=Database.DownloadSubProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project,customer_status)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = 'Sub_Project_Report_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile('Sub_Project_Report_.*')
@@ -1399,7 +1399,7 @@ class Report:
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='SubProject-User')
             df = pd.DataFrame(data['sheet5'], columns=data['sheet5_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Sub-Project-Plannned Batches') 
-            first_row = ['Sub Project Code','Sub Project Name','Entity Name','Customer Name','Project Code','Project Name','Group','Type','Block','Practice','BU','Product','Project Manager','Start Date','End Date','Status','Created By','Created On','Last Modified By','Last Modified On']
+            first_row = ['Sub Project Code','Sub Project Name','Entity Name','Customer Status','Customer Name','Project Code','Project Name','Group','Type','Block','Practice','BU','Product','Project Manager','Start Date','End Date','Status','Created By','Created On','Last Modified By','Last Modified On']
             worksheet = writer.sheets['Sub-Projects']
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format) 
@@ -1832,9 +1832,9 @@ class Report:
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
     
-    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
+    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids):
         try:
-            data=Database.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id)
+            data=Database.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.RegionProductivityFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.RegionProductivityFileName + ".*")
@@ -1879,7 +1879,7 @@ class Report:
                          'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
                          'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %']
             
-            default_column1 = ['Region','BU','Contract']
+            default_column1 = ['Region','BU', 'Contract Stage', 'Contract']
             first_row1 = ['Enrolment', 'Certification','Placement','Revenue (In Rs)']
             second_row1 = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
             third_row1 = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
@@ -1890,7 +1890,7 @@ class Report:
             worksheet = writer.sheets['Region-Contract Nos & Revenue']
             for col_num, value in enumerate(default_column1):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=3
+            col=4
             for col_num, value in enumerate(first_row1):
                 if col_num==-1:
                     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
@@ -1898,7 +1898,7 @@ class Report:
                 else:
                     worksheet.merge_range(0, col, 0, 10+col, value, header_format)
                     col=col+11
-            col=3
+            col=4
             for col_num, value in enumerate(second_row1):
                 if col_num==-1:
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -1911,7 +1911,7 @@ class Report:
                     col=col+6                
             
             for col_num, value in enumerate(third_row1):
-                worksheet.write(2, 3+col_num, value, header_format)
+                worksheet.write(2, 4+col_num, value, header_format)
 
             worksheet = writer.sheets['Region Wise Batch Count']
             #default_column = ['COO','Sub Project']
@@ -1940,10 +1940,10 @@ class Report:
                 worksheet.write(2, 2+col_num, value, header_format)
 
             worksheet = writer.sheets['Customer Wise Candidate Count']            
-            default_column = ['Region','BU','Customer']
+            default_column = ['Region','BU','Customer Status','Customer']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=3
+            col=4
             for col_num, value in enumerate(first_row):
                 if col_num==-1:
                     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
@@ -1951,7 +1951,7 @@ class Report:
                 else:
                     worksheet.merge_range(0, col, 0, 10+col, value, header_format)
                     col=col+11
-            col=3
+            col=4
             for col_num, value in enumerate(second_row):
                 if col_num==-1:
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -1963,7 +1963,7 @@ class Report:
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6
             for col_num, value in enumerate(third_row):
-                worksheet.write(2, 3+col_num, value, header_format)
+                worksheet.write(2, 4+col_num, value, header_format)
             writer.save()
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:

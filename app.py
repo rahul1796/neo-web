@@ -2859,6 +2859,7 @@ class project_list(Resource):
             bu = request.form['bu']
             product = request.form['product']
             status = request.form['status']
+            customer_status = request.form['customer_status']
             
             user_id = request.form['user_id']
             user_role_id = request.form['user_role_id'] 
@@ -2869,8 +2870,8 @@ class project_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            print(start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-            return Master.project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status)
+            #print(start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Master.project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,customer_status)
 
 class add_project_details(Resource):
     @staticmethod
@@ -5135,7 +5136,8 @@ class sub_project_list(Resource):
             practice = request.form['practice']
             bu = request.form['bu']
             product = request.form['product']
-            status = request.form['status']            
+            status = request.form['status']  
+            customer_status = request.form['customer_status']  
             user_id = request.form['user_id']
             user_role_id = request.form['user_role_id'] 
             user_region_id = request.form['user_region_id']
@@ -5147,7 +5149,7 @@ class sub_project_list(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             #print(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
-            return Master.sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project)
+            return Master.sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project,customer_status)
 api.add_resource(sub_project_list, '/sub_project_list')
 
 class add_subproject_details(Resource):
@@ -7337,8 +7339,9 @@ class project_download_report(Resource):
                 status = request.form['status']                
                 user_id = request.form['user_id']
                 user_role_id = request.form['user_role_id'] 
-                user_region_id = request.form['user_region_id']                
-                resp = Report.create_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+                user_region_id = request.form['user_region_id']
+                customer_status = request.form['customer_status']                
+                resp = Report.create_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,customer_status)
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:
@@ -7358,12 +7361,14 @@ class sub_project_download_report(Resource):
                 practice = request.form['practice']
                 bu = request.form['bu']
                 product = request.form['product']
-                status = request.form['status']            
+                status = request.form['status'] 
+                customer_status = request.form['customer_status'] 
+                           
                 user_id = request.form['user_id']
                 user_role_id = request.form['user_role_id'] 
                 user_region_id = request.form['user_region_id']
                 project=request.form['project']                
-                resp = Report.create_sub_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project)
+                resp = Report.create_sub_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project,customer_status)
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:
@@ -8158,11 +8163,12 @@ class DownloadRegionProductivityReport(Resource):
             region_ids = request.form["region_ids"]
             customer_ids = request.form["customer_ids"]
             contract_ids = request.form["contract_ids"]
+            status_id = request.form["status_id"]
+            stage_ids = request.form["stage_ids"]
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            resp = Report.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id)
+            resp = Report.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids)
             return resp
-
 api.add_resource(DownloadRegionProductivityReport,'/DownloadRegionProductivityReport')
 
 class DownloadCustomerTargetReport(Resource):
