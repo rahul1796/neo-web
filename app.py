@@ -8183,9 +8183,12 @@ class DownloadCustomerTargetReport(Resource):
             region_ids = request.form["region_ids"]
             customer_ids = request.form["customer_ids"]
             contract_ids = request.form["contract_ids"]
+            status_id = request.form["status_id"]
+            stage_ids = request.form["stage_ids"]
+
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            resp = Report.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id)
+            resp = Report.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids)
             return resp
 
 api.add_resource(DownloadCustomerTargetReport,'/DownloadCustomerTargetReport')

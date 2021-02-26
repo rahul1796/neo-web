@@ -1969,9 +1969,9 @@ class Report:
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
     
-    def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
+    def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids):
         try:
-            data=Database.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id)
+            data=Database.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.CustomerTargetFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.CustomerTargetFileName + ".*")
@@ -2029,19 +2029,18 @@ class Report:
                 worksheet.write(1, 2+col_num, value, header_format)
 
             worksheet = writer.sheets['Customer-BU Wise Nos']            
-            default_column = ['Region','BU','Customer ','PMT']
+            default_column = ['Region','BU','Customer Status','Customer ','PMT']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
-            col=4
+            col=5
             for col_num, value in enumerate(first_row):
                 worksheet.merge_range(0, col, 0, 2+col, value, header_format)
                 col=col+3
-            
             for col_num, value in enumerate(second_row):
-                worksheet.write(1, 4+col_num, value, header_format)
+                worksheet.write(1, 5+col_num, value, header_format)
 
             worksheet = writer.sheets['Batch Plan Summary']            
-            default_column = ['Region','BU','Customer ']
+            default_column = ['Region','BU','Customer Status','Customer ']
             first_row = ['  New Batch Start(Planned Vs Actual)  ', '  Batch Certification(Planned Vs Actual)  ']
             second_row = ['MTD Batch Plan', 'Actual Batch','Cancelled Planned Batch','Yet To Start',
                           'MTD Batch Plan', 'Actual Batch','Cancelled Planned Batch','Yet To Start'
@@ -2054,14 +2053,12 @@ class Report:
                 'border': 1})
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
-            col=3
-
+            col=4
             for col_num, value in enumerate(first_row):
                 worksheet.merge_range(0, col, 0, 3+col, value, header_format)
                 col=col+4
-            
             for col_num, value in enumerate(second_row):
-                worksheet.write(1, 3+col_num, value, header_format)
+                worksheet.write(1, 4+col_num, value, header_format)
 
             writer.save()
             return({'msg':'created excel', 'success':True, 'filename':path})

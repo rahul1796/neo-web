@@ -7904,7 +7904,8 @@ SELECT					cb.name as candidate_name,
         con.close()
         return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
         
-    def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
+    def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids):
+        #  , status_id, stage_ids
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
@@ -7917,10 +7918,10 @@ SELECT					cb.name as candidate_name,
         sql1=''
         sql2=''
         
-        sql = 'exec [reports].[sp_get_monthly_target_report_data] ?, ?, ?,?,?,?'
-        sql1 = 'exec [reports].[sp_get_monthly_target_report_data_customerwise] ?, ?, ?,?,?,?'
-        sql2 = 'exec [reports].[sp_get_monthly_target_report_data_customerwise_batches] ?, ?, ?,?,?,?'
-        values = (customer_ids, contract_ids, region_ids,month,user_id,user_role_id)
+        sql = 'exec [reports].[sp_get_monthly_target_report_data] ?, ?, ?,?,?,?, ?, ?'
+        sql1 = 'exec [reports].[sp_get_monthly_target_report_data_customerwise] ?, ?, ?,?,?,?, ?, ?'
+        sql2 = 'exec [reports].[sp_get_monthly_target_report_data_customerwise_batches] ?, ?, ?,?,?,?, ?, ?'
+        values = (customer_ids, contract_ids, region_ids,month,user_id,user_role_id,status_id, stage_ids)
         #print(values)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
