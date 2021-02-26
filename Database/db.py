@@ -986,7 +986,7 @@ class Database:
         con.close()
         return content
         
-    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids,batch_codes, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
+    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids,batch_codes, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate,customer_status):
         #print(status, customer, project, course, region, center)
         content = {}
         d = []
@@ -994,9 +994,9 @@ class Database:
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
 
-        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?'
+        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?'
 
-        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids, batch_codes,Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids, batch_codes,Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate, customer_status) #
 
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]

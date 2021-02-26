@@ -898,6 +898,8 @@ class batch_list_updated(Resource):
             region = request.form['region']
             center = request.form['center']
             center_type = request.form['center_type']
+            customer_status = request.form['customer_status']
+            
             # Planned_actual = request.form['Planned_actual']
             # StartFromDate = request.form['StartFromDate']
             # StartToDate = request.form['StartToDate']
@@ -938,7 +940,7 @@ class batch_list_updated(Resource):
 
             #print(order_by_column_position)
             
-            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, batch_codes,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
+            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, batch_codes,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate,customer_status)
 class batch_list_assessment(Resource):
     @staticmethod
     def post():
@@ -7261,6 +7263,8 @@ class batch_download_report(Resource):
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
                 status = request.form["status"]
+                customer_status = request.form["customer_status"]
+                
                 customer = request.form["customer"]
                 project = request.form["project"]
                 sub_project = request.form["sub_project"]
@@ -7276,7 +7280,7 @@ class batch_download_report(Resource):
                 EndToDate = request.form["EndToDate"]
                 file_name='batch_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
                 #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
-                resp = batch_report.create_report(batch_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type,BU,BatchCodes ,Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate, file_name)
+                resp = batch_report.create_report(batch_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type,BU,BatchCodes ,Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate, file_name, customer_status)
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:
