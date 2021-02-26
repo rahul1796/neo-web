@@ -726,9 +726,9 @@ class Report:
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
     
-    def DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id):
+    def DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids, status_id):
         try:
-            data=Database.DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id)
+            data=Database.DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids, status_id)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.EmployeeWiseFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.EmployeeWiseFileName + ".*")
@@ -1299,9 +1299,9 @@ class Report:
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
-    def create_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status):
+    def create_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,customer_status):
         try:
-            data=Database.DownloadProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+            data=Database.DownloadProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,customer_status)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = 'Project_Report_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile('Project_Report_.*')
@@ -1337,7 +1337,7 @@ class Report:
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Project-Center') 
             df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Project-Course') 
-            first_row = ['Entity Name','Customer Name','Project Code','Project Name','Group','Type','Block','Practice','BU','Product','Project Manager','Start Date','End Date','Status','Created By','Created On','Last Modified By','Last Modified On']
+            first_row = ['Entity Name','Customer Status','Customer Name','Project Code','Project Name','Group','Type','Block','Practice','BU','Product','Project Manager','Start Date','End Date','Status','Created By','Created On','Last Modified By','Last Modified On']
             worksheet = writer.sheets['Projects']
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format) 
@@ -1355,9 +1355,9 @@ class Report:
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
-    def create_sub_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project):
+    def create_sub_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project,customer_status):
         try:
-            data=Database.DownloadSubProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project)
+            data=Database.DownloadSubProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project,customer_status)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = 'Sub_Project_Report_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile('Sub_Project_Report_.*')
@@ -1399,7 +1399,7 @@ class Report:
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='SubProject-User')
             df = pd.DataFrame(data['sheet5'], columns=data['sheet5_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Sub-Project-Plannned Batches') 
-            first_row = ['Sub Project Code','Sub Project Name','Entity Name','Customer Name','Project Code','Project Name','Group','Type','Block','Practice','BU','Product','Project Manager','Start Date','End Date','Status','Created By','Created On','Last Modified By','Last Modified On']
+            first_row = ['Sub Project Code','Sub Project Name','Entity Name','Customer Status','Customer Name','Project Code','Project Name','Group','Type','Block','Practice','BU','Product','Project Manager','Start Date','End Date','Status','Created By','Created On','Last Modified By','Last Modified On']
             worksheet = writer.sheets['Sub-Projects']
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format) 
@@ -1504,6 +1504,8 @@ class Report:
         except Exception as e:
             print(str(e))
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+    
+
     def download_courses_list(user_id, user_role_id, course_id, sectors, qps, status):
         try:
             data=Database.download_courses_list(user_id, user_role_id, course_id, sectors, qps, status)
@@ -1759,9 +1761,9 @@ class Report:
             return({'Description':'Error creating excel' + str(e), 'Status':False, 'Error':str(e)})
 
 
-    def DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id):
+    def DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id,status_id):
         try:
-            data=Database.DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id)
+            data=Database.DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id,status_id)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.AssessmentProductivityFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.AssessmentProductivityFileName + ".*")
@@ -1832,9 +1834,9 @@ class Report:
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
     
-    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
+    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids):
         try:
-            data=Database.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id)
+            data=Database.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.RegionProductivityFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.RegionProductivityFileName + ".*")
@@ -1879,7 +1881,7 @@ class Report:
                          'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
                          'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %']
             
-            default_column1 = ['Region','BU','Contract']
+            default_column1 = ['Region','BU', 'Contract Stage', 'Contract']
             first_row1 = ['Enrolment', 'Certification','Placement','Revenue (In Rs)']
             second_row1 = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
             third_row1 = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
@@ -1890,7 +1892,7 @@ class Report:
             worksheet = writer.sheets['Region-Contract Nos & Revenue']
             for col_num, value in enumerate(default_column1):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=3
+            col=4
             for col_num, value in enumerate(first_row1):
                 if col_num==-1:
                     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
@@ -1898,7 +1900,7 @@ class Report:
                 else:
                     worksheet.merge_range(0, col, 0, 10+col, value, header_format)
                     col=col+11
-            col=3
+            col=4
             for col_num, value in enumerate(second_row1):
                 if col_num==-1:
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -1911,7 +1913,7 @@ class Report:
                     col=col+6                
             
             for col_num, value in enumerate(third_row1):
-                worksheet.write(2, 3+col_num, value, header_format)
+                worksheet.write(2, 4+col_num, value, header_format)
 
             worksheet = writer.sheets['Region Wise Batch Count']
             #default_column = ['COO','Sub Project']
@@ -1940,10 +1942,10 @@ class Report:
                 worksheet.write(2, 2+col_num, value, header_format)
 
             worksheet = writer.sheets['Customer Wise Candidate Count']            
-            default_column = ['Region','BU','Customer']
+            default_column = ['Region','BU','Customer Status','Customer']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=3
+            col=4
             for col_num, value in enumerate(first_row):
                 if col_num==-1:
                     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
@@ -1951,7 +1953,7 @@ class Report:
                 else:
                     worksheet.merge_range(0, col, 0, 10+col, value, header_format)
                     col=col+11
-            col=3
+            col=4
             for col_num, value in enumerate(second_row):
                 if col_num==-1:
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -1963,15 +1965,15 @@ class Report:
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6
             for col_num, value in enumerate(third_row):
-                worksheet.write(2, 3+col_num, value, header_format)
+                worksheet.write(2, 4+col_num, value, header_format)
             writer.save()
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
     
-    def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
+    def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids):
         try:
-            data=Database.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id)
+            data=Database.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.CustomerTargetFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.CustomerTargetFileName + ".*")
@@ -2029,19 +2031,18 @@ class Report:
                 worksheet.write(1, 2+col_num, value, header_format)
 
             worksheet = writer.sheets['Customer-BU Wise Nos']            
-            default_column = ['Region','BU','Customer ','PMT']
+            default_column = ['Region','BU','Customer Status','Customer ','PMT']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
-            col=4
+            col=5
             for col_num, value in enumerate(first_row):
                 worksheet.merge_range(0, col, 0, 2+col, value, header_format)
                 col=col+3
-            
             for col_num, value in enumerate(second_row):
-                worksheet.write(1, 4+col_num, value, header_format)
+                worksheet.write(1, 5+col_num, value, header_format)
 
             worksheet = writer.sheets['Batch Plan Summary']            
-            default_column = ['Region','BU','Customer ']
+            default_column = ['Region','BU','Customer Status','Customer ']
             first_row = ['  New Batch Start(Planned Vs Actual)  ', '  Batch Certification(Planned Vs Actual)  ']
             second_row = ['MTD Batch Plan', 'Actual Batch','Cancelled Planned Batch','Yet To Start',
                           'MTD Batch Plan', 'Actual Batch','Cancelled Planned Batch','Yet To Start'
@@ -2054,14 +2055,12 @@ class Report:
                 'border': 1})
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
-            col=3
-
+            col=4
             for col_num, value in enumerate(first_row):
                 worksheet.merge_range(0, col, 0, 3+col, value, header_format)
                 col=col+4
-            
             for col_num, value in enumerate(second_row):
-                worksheet.write(1, 3+col_num, value, header_format)
+                worksheet.write(1, 4+col_num, value, header_format)
 
             writer.save()
             return({'msg':'created excel', 'success':True, 'filename':path})
@@ -2151,11 +2150,11 @@ class Report:
                        'Are You Willing To Follow  Environment, Health And Safety Norms In Your Business?', 'Have You Ever Been Subjected To Any Legal Enquiry For Non Ethical Work/Business?', 'Address As Per Aadhar Card (Incl Pin Code)', 'Number Of Members Earning In The Family', 'Rented Or Own House?', 'Size Of The House', 'Ration Card (Apl Or Bpl)', 'Tv', 'Refrigerator', 'Washing Machine', 'Ac /Cooler', 'Car',  'Medical Insurance', 'Life Insurance', 'Others', 'Educational Qualification', 'Age Proof', 'Signed Mou', 'Mou Signed Date', 'Kit Given Date', 'Head Of The Household', 'Farm Land', 'If Yes, Acres Of Land','Sponsor']
             for i in range(len(default_column_she)):
                 worksheet3.write(0,i ,default_column_she[i], header_format)
-            df_reg=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Present_Address_Line1','Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block','Present_District', 'Present_State', 'Present_Pincode', 'Present_Country', 'Permanaet_Address_Line1','Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 'Permanent_Taluk_Block','Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country','Aadhar_No', 'Identifier_Type', 'Identity_Number','Employment_Type', 'Preferred_Job_Role', 'Relevant_Years_Of_Experience', 'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc','Project_Type','Candidate_Image','Aadhar_Image_Front','Aadhar_Image_Back','Identifier_Image','Registered_On','Registered_By']]
+            df_reg=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Present_Address_Line1','Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block','Present_District', 'Present_State', 'Present_Pincode', 'Present_Country', 'Permanaet_Address_Line1','Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 'Permanent_Taluk_Block','Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country','Aadhar_No', 'Identifier_Type', 'Identity_Number','Employment_Type', 'Preferred_Job_Role', 'Relevant_Years_Of_Experience', 'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc','Project_Type','Candidate_Image','Aadhar_Image_Front','Aadhar_Image_Back','Identifier_Image','Educational Marksheet','Registered_On','Registered_By']]
             df_reg.drop_duplicates(keep='first',inplace=True) 
             df_reg.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Registration') 
             worksheet2 = writer.sheets['Registration']
-            default_column_reg = ['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Present_Address_Line1','Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block','Present_District', 'Present_State', 'Present_Pincode', 'Present_Country', 'Permanent_Address_Line1','Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 'Permanent_Taluk_Block','Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country','Aadhar_No', 'Identifier_Type', 'Identity_Number','Employment_Type', 'Preferred_Job_Role', 'Relevant_Years_Of_Experience', 'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc','Project_Type','Candidate_Image','Aadhar_First_Side','Aadhar_Second_Side','Identifier_Image','Registered_On','Registered_By']
+            default_column_reg = ['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Present_Address_Line1','Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block','Present_District', 'Present_State', 'Present_Pincode', 'Present_Country', 'Permanent_Address_Line1','Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 'Permanent_Taluk_Block','Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country','Aadhar_No', 'Identifier_Type', 'Identity_Number','Employment_Type', 'Preferred_Job_Role', 'Relevant_Years_Of_Experience', 'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc','Project_Type','Candidate_Image','Aadhar_First_Side','Aadhar_Second_Side','Identifier_Image','Educational Marksheet','Registered_On','Registered_By']
             for i in range(len(default_column_reg)):
                 worksheet2.write(0,i ,default_column_reg[i], header_format)
             
@@ -2167,11 +2166,11 @@ class Report:
             for i in range(len(default_column_enr)):
                 worksheet4.write(0,i ,default_column_enr[i], header_format)
             
-            df_dell=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Aspirational District','Educational Marksheet','Income Certificate']]
+            df_dell=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Aspirational District','Income Certificate']]
             df_dell.drop_duplicates(keep='first',inplace=True) 
             df_dell.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Dell') 
             worksheet5 = writer.sheets['Dell']
-            default_column_dell = ['Candidate_Id', 'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Aspirational District','Educational Marksheet','Income Certificate']
+            default_column_dell = ['Candidate_Id', 'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Aspirational District','Income Certificate']
             for i in range(len(default_column_dell)):
                 worksheet5.write(0,i ,default_column_dell[i], header_format)
                       
@@ -2439,9 +2438,9 @@ class Report:
             return({'Description':'Error creating excel ' + str(e), 'Status':False, 'Error':str(e)})
 
 
-    def DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id):
+    def DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id, status_id):
         try:
-            data=Database.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
+            data=Database.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id, status_id)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.CertificateProductivityFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.CertificateProductivityFileName + ".*")

@@ -52,30 +52,41 @@ def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch
 
         msg = MIMEMultipart()
         stage_name=''
+        next_stage=''
         if NewStageId==1:
             stage_name='Requested For Printing'
+            next_stage='Sent For Printing'
         if NewStageId==2:
             stage_name='Sent For Printing'
+            next_stage='Sent To Center'
         if NewStageId==3:
             stage_name='Sent To Center'
+            next_stage='Received By Center'
         if NewStageId==4:
             stage_name='Received By Center'
+            next_stage='Planned For Distribution'
         if NewStageId==5:
             stage_name='Planned For Distribution'
+            next_stage='Distributed'
         if NewStageId==6:
             stage_name='Distributed'
+            next_stage='Verify Details'
         if NewStageId==7:
             stage_name='Result Approved'
-        if NewStageId==8:
-            stage_name='Result Requested For Modification'
+            next_stage='Soft Copy Upload'
+        if NewStageId==9:
+            stage_name='Soft Copy Uploaded'
+            next_stage='Soft Copy Approval/Modification'
+        
         if NewStageId==10:
             stage_name='Soft Copy Approved'
+            next_stage='Requested For Printing'
         msg['From'] = "do-not-reply@labournet.in"
         msg['To'] = ','.join(list(dict.fromkeys(list(emailTo.split(",")))))
         msg['Cc'] = ','.join(list(dict.fromkeys(list(EmailCC.split(",")))))
         msg['Subject'] = "LN NEO - "+str(Batch_Code)+" Certificates " + str(stage_name)
         html_msg= config.html_email_msg_certification_stage_change
-        html_msg = html_msg.format(emailToName,Batch_Code,stage_name,session['user_name'])
+        html_msg = html_msg.format(emailToName,Batch_Code,stage_name,session['user_name'],next_stage)
         msg.attach(MIMEText(html_msg, 'html'))
         if files != '':
             for path in [files]:
@@ -107,10 +118,13 @@ def certification_stage_change_mail_with_remarks(NewStageId,emailTo,emailToName,
 
         msg = MIMEMultipart()
         stage_name=''
+        next_stage=''
         if NewStageId==8:
             stage_name='Requested For Modification(Result)'
+            next_stage='Soft Copy Upload'
         if NewStageId==11:
             stage_name='Requested For Modification(Soft Copy)'
+            next_stage='Assessment Result Upload'
         msg['From'] = "do-not-reply@labournet.in"
         msg['To'] = ','.join(list(dict.fromkeys(list(emailTo.split(",")))))
         msg['Cc'] = ','.join(list(dict.fromkeys(list(EmailCC.split(",")))))
@@ -124,6 +138,73 @@ def certification_stage_change_mail_with_remarks(NewStageId,emailTo,emailToName,
         Certification Stage is changed for the batch <b>{}</b> to <b>{}</b> by <b>{}</b> with following remarks ,
         <br><br>
         Remarks :  <b>{} </b>
+        <br><br>
+        For any further details visit the URL <b>https://neo.labourmet.com/</b> and update the next stage/step(<b>{}</b>).
+        </p>
+        </div>
+        <br>
+
+        <div align="center" style="font-size:12pt;font-family:Times New Roman,serif;text-align:center;margin:0;">
+        <hr align="center" width="100%" size="2">
+        </div>
+        <p style="font-size:12pt;font-family:Times New Roman,serif;margin:0;">
+        Best Regards,<br>
+        <b>NEO Team</b> </p>
+        <div align="center" style="font-size:12pt;font-family:Times New Roman,serif;text-align:center;margin:0;">
+        <hr align="center" width="100%" size="2">
+        </div>
+
+        <div>
+        <!--p style="font-size:12pt;font-family:Times New Roman,serif;margin:0 0 12pt 0;">&nbsp;</p-->
+        <p align="center" style="font-size:12pt;font-family:Times New Roman,serif;text-align:center;margin:0;">
+        <i>This is an auto generated e-mail. Please do not reply to this mail.</i></p>
+        </div>
+        <br>
+        '''
+
+        html_msg = html_msg.format(emailToName,Batch_Code,stage_name,session['user_name'],remark,next_stage)
+        msg.attach(MIMEText(html_msg, 'html'))
+        if files != '':
+            for path in [files]:
+                part = MIMEText('application', "octet-stream")
+                with open(path, 'rb') as file:
+                    part.set_payload(file.read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition',
+                                'attachment; filename="{}"'.format(Path(path).name))
+                msg.attach(part)
+        #print(msg)
+        res = server.sendmail(msg['From'], [msg['To']] + [msg['Cc']] , msg.as_string())
+        server.quit()
+
+        return {'status':True,'description':'Email sent'}
+    except Exception as e:
+        print(e)
+        return {'status':False,'description':'Unable to sent email'}
+def assessment_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch_Code,files):
+    #print(NewStageId,emailTo,emailToName,EmailCC,Batch_Code)
+    try:
+        server = smtplib.SMTP('smtp.office365.com','587')
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login("do-not-reply@labournet.in","Donotreply@123")
+
+        msg = MIMEMultipart()
+        stage_name=''
+        if NewStageId==4:
+            stage_name='Result Uploaded'
+        msg['From'] = "do-not-reply@labournet.in"
+        msg['To'] = ','.join(list(dict.fromkeys(list(emailTo.split(",")))))
+        msg['Cc'] = ','.join(list(dict.fromkeys(list(EmailCC.split(",")))))
+        msg['Subject'] = "LN NEO - "+str(Batch_Code)+" Assessment " + str(stage_name)
+        html_msg= '''
+        <div>
+        <p style="font-size:12pt;font-family:Times New Roman,serif;margin:0;">Dear <b>{},</b><br>
+        <br>
+        Greetings from NEO Team!
+        <br><br>
+        Assessment Stage is changed for the batch <b>{}</b> to <b>{}</b> by <b>{}</b> 
         <br><br>
         For any further details visit the URL <b>https://neo.labourmet.com/</b> .
         </p>
@@ -148,7 +229,7 @@ def certification_stage_change_mail_with_remarks(NewStageId,emailTo,emailToName,
         <br>
         '''
 
-        html_msg = html_msg.format(emailToName,Batch_Code,stage_name,session['user_name'],remark)
+        html_msg = html_msg.format('Team',Batch_Code,stage_name,session['user_name'])
         msg.attach(MIMEText(html_msg, 'html'))
         if files != '':
             for path in [files]:

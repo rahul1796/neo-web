@@ -1746,21 +1746,24 @@ function add_map_message(){
                      "Batch_Code":Batch_Code
             },
             success:function(data){
-                console.log(data);
                 if(data!=null)
-                {   
-                    if(data.status){
-                        window.location=data.FilePath+data.FileName;
-                    }
-                    else{
-                        alert(data.exception);
-                    }
+                {         
+                    if(data.success)
+                    {
+                       window.location=data.FilePath+data.FileName;
+                    }    
+                    else
+                    {
+                        alert(data.FilePath+data.FileName);
+                        return false;
+                    }  
                 }                    
             },
-            error:function(x){
-                alert('Error while downloading Report. ');
+            error:function()
+            {
+                //$("#imgSpinner").hide();
             }
-        }); 
+        });
     }
    
 function UploadFileData()

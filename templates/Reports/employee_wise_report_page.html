@@ -1,4 +1,3 @@
-
 <link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
          
@@ -26,19 +25,33 @@
             var last= months[lastDay.getMonth()] +"-"+lastDay.getFullYear();
             $('#FromDate').val(first);
             $('#ToDate').val(last);
-            LoadCustomerdl();  
+            LoadStageStausddl();
+            LoadCustomers();  
         });
-    function LoadCustomerdl(){
-        var URL=$('#hdn_web_url').val()+ "/GetALLClient"
-            $.ajax({
+        function LoadStageStausddl()
+        {
+            $('#ddlStage').empty();
+            $('#ddlStage').append(new Option('Yet To Start','0'));
+            $('#ddlStage').append(new Option('Open','1'));
+            $('#ddlStage').append(new Option('Expired','2'));
+            $('#ddlStatus').empty();
+            $('#ddlStatus').append(new Option('All','-1'));
+            $('#ddlStatus').append(new Option('Active','1'));
+            $('#ddlStatus').append(new Option('Inactive','0'));   
+        }
+    
+    function LoadCustomers(){
+        var URL=$('#hdn_web_url').val()+ "/GetALLClientBasedOnStatus"
+        $.ajax({
             type:"GET",
             url:URL,
-            async:false,        
             beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
             datatype:"json",
             data:{
                 "user_id": $('#hdn_home_user_id').val(),
-                "user_role_id": $('#hdn_home_user_role_id').val()
+                "user_role_id": $('#hdn_home_user_role_id').val(),
+                "status_id": $('#ddlStatus').val()
+
             },
             success: function (data){
                 if(data.Clients != null)
@@ -47,20 +60,57 @@
                     var count=data.Clients.length;
                     if( count> 0)
                     {
-                        //$('#ddlRegion').append(new Option('ALL','-1'));
                         for(var i=0;i<count;i++)
                             $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
-                        //$('#ddlCourse').val('-1');
                     }
                     else
                     {
-                    // $('#ddlCustomer').append(new Option('No Customer','-1'));
+                     //   $('#ddlCustomer').append(new Option('Choose Customer',''));
                     }
                 }
             },
             error:function(err)
             {
-                alert('Error while loading BU! Please try again');
+                alert('Error loading customers! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function LoadContract(){
+        var URL=$('#hdn_web_url').val()+ "/GetContractsBasedOnCustomerAndStage"  //"/GetALLProject_multiple"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "customer_id":$('#ddlCustomer').val().toString(),
+                "user_id": $('#hdn_home_user_id').val(),
+                "contract_stage_ids": $('#ddlStage').val().toString(),
+                "user_role_id": $('#hdn_home_user_role_id').val()
+                
+            },
+            success: function (data){
+                if(data.Contracts != null)
+                {
+                    $('#ddlContract').empty();
+                    var count=data.Contracts.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlProject').append(new Option('ALL','-1'));  , 
+                        for(var i=0;i<count;i++)
+                            $('#ddlContract').append(new Option(data.Contracts[i].Contract_Name,data.Contracts[i].Contract_Id));
+                    }
+                    else
+                    {
+                    // $('#ddlContract').append(new Option('ALL','-1'));
+                    }
+                }
+            },
+            error:function(request, err)
+            {
+                alert('Error! Please try again');
                 return false;
             }
         });
@@ -106,44 +156,6 @@
         });
         return false;
     }
-    function LoadContract(){
-        var URL=$('#hdn_web_url').val()+ "/GetContractsBasedOnCustomer"  //"/GetALLProject_multiple"
-        $.ajax({
-            type:"GET",
-            url:URL,
-            async:false,
-            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-            datatype:"json",
-            data:{
-                "customer_id":$('#ddlCustomer').val().toString(),
-                "user_id": $('#hdn_home_user_id').val(),
-                "user_role_id": $('#hdn_home_user_role_id').val()
-            },
-            success: function (data){
-                if(data.Contracts != null)
-                {
-                    $('#ddlContract').empty();
-                    var count=data.Contracts.length;
-                    if( count> 0)
-                    {
-                        //$('#ddlProject').append(new Option('ALL','-1'));  , 
-                        for(var i=0;i<count;i++)
-                            $('#ddlContract').append(new Option(data.Contracts[i].Contract_Name,data.Contracts[i].Contract_Id));
-                    }
-                    else
-                    {
-                    // $('#ddlContract').append(new Option('ALL','-1'));
-                    }
-                }
-            },
-            error:function(request, err)
-            {
-                alert('Error! Please try again');
-                return false;
-            }
-        });
-        return false;
-    }
     function DownloadReport()
     {       
         if($('#ddlRole').val()=='')
@@ -171,8 +183,11 @@
                 data:{ 
                     "month": months[to_date.getMonth()]+"-"+to_date.getFullYear(),
                     "role_id" : $('#ddlRole').val(),
+                    // customer_ids contract_ids stage_ids status_id
                     "customer_ids":$('#ddlCustomer').val().toString(),
-                    "contract_ids":$('#ddlContract').val().toString()
+                    "contract_ids":$('#ddlContract').val().toString(),
+                    "stage_ids":$('#ddlStage').val().toString(),
+                    "status_id":$('#ddlStatus').val()
                 },
                 success:function(data){
                     if(data!=null)
@@ -219,16 +234,31 @@
             <div class="card-box">
                 <div class="row">
                     <div class="col-lg-3">
+                        <label for="ddlStatus" class="mr-2">Customer Status</label>
+                        <select class="form-control dropdown-search-filter" id="ddlStatus" onchange="LoadCustomers();">
+                            <option selected="" value="">All</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-lg-3">
                         <label for="ddlCustomer" class="mr-2">Customer</label>
                         <select class="form-control dropdown-search-filter" onchange="LoadContract();" id="ddlCustomer" multiple>
                             <option selected="" value="">All</option>                            
                         </select>
                     </div>
                     <div class="col-lg-3">
+                        <label for="ddlStage" class="mr-2">Contract Stage</label>
+                        <select class="form-control dropdown-search-filter" id="ddlStage" multiple  onchange="LoadContract();" >
+
+                         </select>
+                    </div>
+                    <div class="col-lg-3">
                         <label for="ddlContract" class="mr-2">Contract</label>
                         <select class="form-control dropdown-search-filter" id="ddlContract" multiple>
                         </select>
-                    </div>                     
+                    </div>
+                </div>              
+                <div class="row">
                     <div class="col-lg-3">
                         <label for="ddlRole" class="mr-2">Role</label>
                         <select class="form-control"  id="ddlRole">
@@ -244,9 +274,7 @@
                         <!-- <input type="text" id="FromDate" name="FromDate" class="form-control date-picker" data-date-format="MM yyyy" 
                         ClientIdMode="static" placeholder="From Date"> -->
                         <input type="month" id="MonthYear" name="MonthYear" class="form-control" ClientIdMode="static" />
-                    </div> 
-                </div>
-                <div class="row">
+                    </div>
                     <div class="form-group col-lg-2">                                         
                         <a class="btn btn-primary" style=" color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadReport()">Download</a>
                     </div>

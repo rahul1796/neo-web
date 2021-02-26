@@ -26,20 +26,35 @@
             var last= months[lastDay.getMonth()] +"-"+lastDay.getFullYear();
             $('#FromDate').val(first);
             $('#ToDate').val(last);
-            LoadCustomerdl();  
+
+            LoadStageStausddl();
+            LoadCustomers();
             LoadRegionddl();
         });
-    function LoadCustomerdl(){
-        var URL=$('#hdn_web_url').val()+ "/GetALLClient"
-            $.ajax({
+
+    function LoadStageStausddl(){
+    //     $('#ddlStage').empty();
+    //     $('#ddlStage').append(new Option('Yet To Start','0'));
+    //     $('#ddlStage').append(new Option('Open','1'));
+    //     $('#ddlStage').append(new Option('Expired','2'));
+        $('#ddlStatus').empty();
+        $('#ddlStatus').append(new Option('All','-1'));
+        $('#ddlStatus').append(new Option('Active','1'));
+        $('#ddlStatus').append(new Option('Inactive','0'));
+        
+    }
+    function LoadCustomers(){
+        var URL=$('#hdn_web_url').val()+ "/GetALLClientBasedOnStatus"
+        $.ajax({
             type:"GET",
             url:URL,
-            async:false,        
             beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
             datatype:"json",
             data:{
                 "user_id": $('#hdn_home_user_id').val(),
-                "user_role_id": $('#hdn_home_user_role_id').val()
+                "user_role_id": $('#hdn_home_user_role_id').val(),
+                "status_id": $('#ddlStatus').val()
+
             },
             success: function (data){
                 if(data.Clients != null)
@@ -48,20 +63,18 @@
                     var count=data.Clients.length;
                     if( count> 0)
                     {
-                        //$('#ddlRegion').append(new Option('ALL','-1'));
                         for(var i=0;i<count;i++)
                             $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
-                        //$('#ddlCourse').val('-1');
                     }
                     else
                     {
-                    // $('#ddlCustomer').append(new Option('No Customer','-1'));
+                     //   $('#ddlCustomer').append(new Option('Choose Customer',''));
                     }
                 }
             },
             error:function(err)
             {
-                alert('Error while loading BU! Please try again');
+                alert('Error loading customers! Please try again');
                 return false;
             }
         });
@@ -289,6 +302,7 @@
                 datatype:"json",
                 data:{ 
                     "month": months[to_date.getMonth()]+"-"+to_date.getFullYear(),
+                    "status_id":$('#ddlStatus').val(),
                     "customer_ids":$('#ddlCustomer').val().toString(),
                     "contract_ids":'',
                     "project_ids":$('#ddlProject').val().toString(),
@@ -413,6 +427,13 @@
         <div class="col-12">
             <div class="card-box">
                 <div class="row">
+                    <div class="col-lg-3">
+                        <label for="ddlStatus" class="mr-2">Customer Status</label>
+                        <select class="form-control dropdown-search-filter" id="ddlStatus" onchange="LoadCustomers();">
+                            <option selected="" value="">All</option>
+                        </select>
+                    </div>
+                    
                     <div class="col-lg-3">
                         <label for="ddlCustomer" class="mr-2">Customer</label>
                         <select class="form-control dropdown-search-filter" onchange="LoadProject();" id="ddlCustomer" multiple>

@@ -898,6 +898,8 @@ class batch_list_updated(Resource):
             region = request.form['region']
             center = request.form['center']
             center_type = request.form['center_type']
+            customer_status = request.form['customer_status']
+            
             # Planned_actual = request.form['Planned_actual']
             # StartFromDate = request.form['StartFromDate']
             # StartToDate = request.form['StartToDate']
@@ -938,7 +940,7 @@ class batch_list_updated(Resource):
 
             #print(order_by_column_position)
             
-            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, batch_codes,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate)
+            return Batch.batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids, batch_codes,BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate,customer_status)
 class batch_list_assessment(Resource):
     @staticmethod
     def post():
@@ -2859,6 +2861,7 @@ class project_list(Resource):
             bu = request.form['bu']
             product = request.form['product']
             status = request.form['status']
+            customer_status = request.form['customer_status']
             
             user_id = request.form['user_id']
             user_role_id = request.form['user_role_id'] 
@@ -2869,8 +2872,8 @@ class project_list(Resource):
             order_by_column_position = request.form['order[0][column]']
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
-            print(start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
-            return Master.project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status)
+            #print(start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Master.project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,customer_status)
 
 class add_project_details(Resource):
     @staticmethod
@@ -5135,7 +5138,8 @@ class sub_project_list(Resource):
             practice = request.form['practice']
             bu = request.form['bu']
             product = request.form['product']
-            status = request.form['status']            
+            status = request.form['status']  
+            customer_status = request.form['customer_status']  
             user_id = request.form['user_id']
             user_role_id = request.form['user_role_id'] 
             user_region_id = request.form['user_region_id']
@@ -5147,7 +5151,7 @@ class sub_project_list(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             #print(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
-            return Master.sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project)
+            return Master.sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project,customer_status)
 api.add_resource(sub_project_list, '/sub_project_list')
 
 class add_subproject_details(Resource):
@@ -5616,8 +5620,8 @@ class otp_send(Resource):
                     otp += str(random.randint(0,9))
 
                 out = Database.otp_send_db(otp, mobile_no, app_name, flag,candidate_id)
-
-                if out[0]==True:
+                print(out)
+                if out[0]:
                     res = {'success': False, 'description': "Mobile number already registered"}
                     return jsonify(res)
                 else:
@@ -5761,11 +5765,11 @@ class submit_candidate_updated(Resource):
                 elif cand_stage==4:
                     out = Database.get_submit_candidate_re_enr(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version)
                 else:
-                    out = {'success': False, 'description': "incorrect stage", 'app_status':True}
+                    out = {'success': False, 'validation_error':False, 'description': "incorrect stage", 'app_status':True}
                 return jsonify(out)
             
             else:
-                res = {'success': False, 'description': "client name and password not matching", 'app_status':True}
+                res = {'success': False, 'validation_error':False, 'description': "client name and password not matching", 'app_status':True}
                 return jsonify(res)
 
 #Base URL + "/submit_candidate_updated" api will provide all the unzynched QP data as response
@@ -5993,7 +5997,7 @@ class upload_bulk_upload(Resource):
                 #print(df.columns.to_list())
                 if ProjectType==1:
                     #print(df['Candidate Photo*'])
-                    img_column ='Candidate Photo*,Aadhar Image,Document copy,Educational Marksheet*,Income Certificate'
+                    img_column ='Candidate Photo*,Aadhar Image,Document copy,Income Certificate,Educational Marksheet*'
                     schema = Schema([
                         #nan check column non mandate
                         Column('Candidate_id',null_validation),
@@ -6015,6 +6019,9 @@ class upload_bulk_upload(Resource):
                         Column('BOCW Registration Id',null_validation),
                         Column('Whatsapp Number',mob_validation + null_validation),
                         Column('Aadhar Image',null_validation),
+                        Column('Educational Marksheet*', null_validation),
+                        
+                        
                         #str+null check
                         Column('Candidate Photo*', null_validation),
                         Column('Fresher/Experienced?*',str_validation + null_validation),
@@ -6064,7 +6071,6 @@ class upload_bulk_upload(Resource):
                         Column('Registered by*',email_validation+str_validation),
                         #DELL
                         Column('Aspirational District*',str_validation + null_validation),
-                        Column('Educational Marksheet*', null_validation),
                         Column('Income Certificate', null_validation)
                         ])
                 else:
@@ -6101,7 +6107,7 @@ class upload_bulk_upload(Resource):
                             Column('Result',pass_fail_validation + null_validation)
                             ])
 
-                    img_column ='Aadhar Image,Document copy'
+                    img_column ='Aadhar Image,Document copy,Educational Marksheet'
                     schema = Schema([
                         #nan check column non mandate
                         Column('Candidate_id',null_validation),
@@ -6124,6 +6130,8 @@ class upload_bulk_upload(Resource):
                         Column('BOCW Registration Id',null_validation),
                         Column('Whatsapp Number',mob_validation + null_validation),
                         Column('Aadhar Image',null_validation),
+                        Column('Educational Marksheet', null_validation),
+                        
                         #str+null check
                         Column('Fresher/Experienced?*',str_validation + null_validation),
                         Column('Salutation*',str_validation + null_validation),
@@ -6660,7 +6668,7 @@ class DownloadRegTemplate(Resource):
                     'Permanent_Taluk_Block', 'Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country', 'Aadhar_No', 'Identifier_Type', 
                     'Identity_Number', 'Document_Copy_Image_Name', 'Employment_Type', 'Preferred_Job_Role', 'Years_Of_Experience', 'Relevant_Years_Of_Experience', 
                     'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc', 
-                    'Aadhar_Image_Name','Registered_By', 'Whatsapp_Number']
+                    'Aadhar_Image_Name','Registered_By', 'Whatsapp_Number','Educational Marksheet']
 
                     Column = ['Candidate_id', 'Fresher/Experienced?*', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 
                     'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 'Gender*', 'Marital Status*', 'Caste*', 'Disability Status*', 'Religion*', 
@@ -6670,7 +6678,7 @@ class DownloadRegTemplate(Resource):
                     'Permanent Taluk/Block', 'Permanent District*', 'Permanent State*', 'Permanent Pincode*', 'Permanent Country*', 'Aadhar No', 'Identifier Type', 
                     'Identity number', 'Document copy', 'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 
                     'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 'Expected CTC*',
-                    'Aadhar Image','Registered by*','Whatsapp Number']
+                    'Aadhar Image','Registered by*','Whatsapp Number','Educational Marksheet']
                 
                     if Project_Type==1:
                         col = ['Candidate_Id', 'Isfresher', 'Candidate_Photo', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 
@@ -6681,8 +6689,8 @@ class DownloadRegTemplate(Resource):
                         'Permanent_Taluk_Block', 'Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country', 'Aadhar_No', 'Identifier_Type', 
                         'Identity_Number', 'Document_Copy_Image_Name', 'Employment_Type', 'Preferred_Job_Role', 'Years_Of_Experience', 'Relevant_Years_Of_Experience', 
                         'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc', 
-                        'Aadhar_Image_Name','Registered_By', 'Whatsapp_Number']
-                        col += ['Aspirational District', 'Educational Marksheet', 'Income Certificate']
+                        'Aadhar_Image_Name','Registered_By', 'Whatsapp_Number','Educational Marksheet']
+                        col += ['Aspirational District',  'Income Certificate']
 
                         Column = ['Candidate_id', 'Fresher/Experienced?*', 'Candidate Photo*', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 
                         'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 'Gender*', 'Marital Status*', 'Caste*', 'Disability Status*', 'Religion*', 
@@ -6692,8 +6700,8 @@ class DownloadRegTemplate(Resource):
                         'Permanent Taluk/Block', 'Permanent District*', 'Permanent State*', 'Permanent Pincode*', 'Permanent Country*', 'Aadhar No', 'Identifier Type', 
                         'Identity number', 'Document copy', 'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 
                         'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 'Expected CTC*',
-                        'Aadhar Image','Registered by*','Whatsapp Number']
-                        Column += ['Aspirational District*', 'Educational Marksheet*', 'Income Certificate']
+                        'Aadhar Image','Registered by*','Whatsapp Number','Educational Marksheet*']
+                        Column += ['Aspirational District*', 'Income Certificate']
 
                         filename = 'CandidateBulkUpload_Registration_DELL_'
                     elif Project_Type==2:
@@ -7255,6 +7263,8 @@ class batch_download_report(Resource):
                 user_id = request.form["user_id"]
                 user_role_id = request.form["user_role_id"]
                 status = request.form["status"]
+                customer_status = request.form["customer_status"]
+                
                 customer = request.form["customer"]
                 project = request.form["project"]
                 sub_project = request.form["sub_project"]
@@ -7270,7 +7280,7 @@ class batch_download_report(Resource):
                 EndToDate = request.form["EndToDate"]
                 file_name='batch_report_'+str(user_id) +'_'+ str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
                 #print(candidate_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type, file_name)
-                resp = batch_report.create_report(batch_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type,BU,BatchCodes ,Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate, file_name)
+                resp = batch_report.create_report(batch_id, user_id, user_role_id, status, customer, project, sub_project, region, center, center_type,BU,BatchCodes ,Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate, file_name, customer_status)
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:
@@ -7337,8 +7347,9 @@ class project_download_report(Resource):
                 status = request.form['status']                
                 user_id = request.form['user_id']
                 user_role_id = request.form['user_role_id'] 
-                user_region_id = request.form['user_region_id']                
-                resp = Report.create_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+                user_region_id = request.form['user_region_id']
+                customer_status = request.form['customer_status']                
+                resp = Report.create_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,customer_status)
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:
@@ -7358,12 +7369,14 @@ class sub_project_download_report(Resource):
                 practice = request.form['practice']
                 bu = request.form['bu']
                 product = request.form['product']
-                status = request.form['status']            
+                status = request.form['status'] 
+                customer_status = request.form['customer_status'] 
+                           
                 user_id = request.form['user_id']
                 user_role_id = request.form['user_role_id'] 
                 user_region_id = request.form['user_region_id']
                 project=request.form['project']                
-                resp = Report.create_sub_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project)
+                resp = Report.create_sub_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project,customer_status)
                 return resp
                 #return {'FileName':"abc.excel",'FilePath':'lol', 'download_file':''}
             except Exception as e:
@@ -8119,12 +8132,15 @@ class DownloadEmployeeWiseReport(Resource):
         if request.method=='POST':
             month = request.form["month"]
             role_id = request.form["role_id"]
+
             customer_ids = request.form["customer_ids"]
             contract_ids = request.form["contract_ids"]
+            stage_ids = request.form["stage_ids"]
+            status_id = request.form["status_id"]
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            #DownloadEmployeeWiseReport
-            resp = Report.DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id)
+            #DownloadEmployeeWiseReport  stage_ids status_id
+            resp = Report.DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids, status_id)
             return resp
 api.add_resource(DownloadEmployeeWiseReport,'/DownloadEmployeeWiseReport')
 
@@ -8140,7 +8156,9 @@ class DownloadAssessmentProductivityReport(Resource):
             regions = request.form["regions"]
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            resp = Report.DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id)
+
+            status_id =request.form["status_id"]
+            resp = Report.DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id,status_id)
             return resp
 
 api.add_resource(DownloadAssessmentProductivityReport,'/DownloadAssessmentProductivityReport')
@@ -8153,11 +8171,12 @@ class DownloadRegionProductivityReport(Resource):
             region_ids = request.form["region_ids"]
             customer_ids = request.form["customer_ids"]
             contract_ids = request.form["contract_ids"]
+            status_id = request.form["status_id"]
+            stage_ids = request.form["stage_ids"]
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            resp = Report.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id)
+            resp = Report.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids)
             return resp
-
 api.add_resource(DownloadRegionProductivityReport,'/DownloadRegionProductivityReport')
 
 class DownloadCustomerTargetReport(Resource):
@@ -8168,9 +8187,12 @@ class DownloadCustomerTargetReport(Resource):
             region_ids = request.form["region_ids"]
             customer_ids = request.form["customer_ids"]
             contract_ids = request.form["contract_ids"]
+            status_id = request.form["status_id"]
+            stage_ids = request.form["stage_ids"]
+
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            resp = Report.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id)
+            resp = Report.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids)
             return resp
 
 api.add_resource(DownloadCustomerTargetReport,'/DownloadCustomerTargetReport')
@@ -9409,6 +9431,7 @@ class DownloadCertification_DistributionProductivityReport(Resource):
     def post():
         if request.method=='POST':
             month = request.form["month"]
+            status_id = request.form["status_id"]
             customer_ids = request.form["customer_ids"]
             project_ids = request.form["project_ids"]
             sub_project_ids = request.form["sub_project_ids"]
@@ -9416,8 +9439,7 @@ class DownloadCertification_DistributionProductivityReport(Resource):
             
             user_id =  session['user_id']
             user_role_id =  session['user_role_id']
-            
-            resp = Report.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
+            resp = Report.DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id, status_id)
             return resp
 api.add_resource(DownloadCertification_DistributionProductivityReport,'/DownloadCertification_DistributionProductivityReport')
 
