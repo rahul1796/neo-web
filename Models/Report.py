@@ -1609,7 +1609,7 @@ class Report:
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Employees')            
             
-            first_row = ['S No','Name','Email','Employee Code','Entity','Department','Region','Reporting Manager','Employment Status','NEO Role','Jobs Role','CRM Role','Mobile Number','HR Role','created by','created on','last modified by','last modified on']
+            first_row = ['S No','Name','Email','Employee Code','Entity','Department','Region','Reporting Manager','Employment Status','NEO Role','Jobs Role','CRM Role','Mobile Number','HR Role','Active Status','created by','created on','last modified by','last modified on']
             worksheet = writer.sheets['Employees']
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format)           
