@@ -727,6 +727,7 @@ function GetPassedCandidates(BatchId,Stage,Batch_Code){
                             varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Intervention_Value +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Score +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Result +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Assessment_Status +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.Candidates[i].Certificate_Number +'</td>';
                             varCerti='';
                             varCerti += '<a onclick="DownloadCertificate(\'' + data.Candidates[i].Certificate_Copy +  '\' )"  style="color:blue;cursor:pointer" >' + data.Candidates[i].Certificate_Copy + '</a>';
