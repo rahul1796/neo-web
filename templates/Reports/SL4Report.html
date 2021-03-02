@@ -11,8 +11,6 @@
 <link href="static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
 
-
-
 <script type="text/javascript">
     var Candidates = {};
         $(document).ready(function(){  
@@ -21,20 +19,34 @@
             $(".date-picker").flatpickr({
                 dateFormat:'d-M-Y'
             });
-            LoadCustomerdl();
+            LoadStageStausddl();
+            LoadCustomers();
+            LoadRegionddl();  
+            //LoadTableBasedOnSearch();
         });
-
-        function LoadCustomerdl(){
-        var URL=$('#hdn_web_url').val()+ "/GetALLClient"
-            $.ajax({
+    function LoadStageStausddl()
+    {
+        // $('#ddlStage').empty();
+        // $('#ddlStage').append(new Option('Yet To Start','0'));
+        // $('#ddlStage').append(new Option('Open','1'));
+        // $('#ddlStage').append(new Option('Expired','2'));
+        $('#ddlStatus').empty();
+        $('#ddlStatus').append(new Option('All','-1'));
+        $('#ddlStatus').append(new Option('Active','1'));
+        $('#ddlStatus').append(new Option('Inactive','0'));    
+    }
+    function LoadCustomers(){
+        var URL=$('#hdn_web_url').val()+ "/GetALLClientBasedOnStatus"
+        $.ajax({
             type:"GET",
             url:URL,
-            async:false,        
             beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
             datatype:"json",
             data:{
                 "user_id": $('#hdn_home_user_id').val(),
-                "user_role_id": $('#hdn_home_user_role_id').val()
+                "user_role_id": $('#hdn_home_user_role_id').val(),
+                "status_id": $('#ddlStatus').val()
+
             },
             success: function (data){
                 if(data.Clients != null)
@@ -43,26 +55,24 @@
                     var count=data.Clients.length;
                     if( count> 0)
                     {
-                        $('#ddlCustomer').append(new Option('ALL','0'));
                         for(var i=0;i<count;i++)
                             $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
-                        //$('#ddlCourse').val('0');
                     }
                     else
                     {
-                    // $('#ddlCustomer').append(new Option('No Customer','-1'));
+                     //   $('#ddlCustomer').append(new Option('Choose Customer',''));
                     }
                 }
             },
             error:function(err)
             {
-                alert('Error while loading BU! Please try again');
+                alert('Error loading customers! Please try again');
                 return false;
             }
         });
         return false;
     }
-    function LoadProject(){
+function LoadProject(){
     var URL=$('#hdn_web_url').val()+ "/GetALLProject_multiple"  //"/GetALLProject_multiple"
     $.ajax({
         type:"POST",
@@ -163,7 +173,8 @@ function LoadSubProject(){
 						'to_date':$('#ToDate').val(),
                         'Customers':$('#ddlCustomer').val().toString(),
                         'projects':$('#ddlProject').val().toString(),
-                        'sub_projects':$('#ddlSubProject').val()
+                        'sub_projects':$('#ddlSubProject').val(),
+                        "status_id":$('#ddlStatus').val()
 						},
                         success: function(resp) 
                         {
@@ -235,19 +246,25 @@ function LoadSubProject(){
         <div class="col-12">
             <div class="card-box">
                 <div class="row">
-                    <div class="col-lg-4">
-                        <label for="ddlCustomer" class="mr-2">Customer*</label>
-                        <select class="form-control dropdown-search-filter" id="ddlCustomer" onchange="LoadProject();" multiple >
-                            <option value="">All</option>
+                    <div class="col-lg-3">
+                        <label for="ddlStatus" class="mr-2">Customer Status</label>
+                        <select class="form-control dropdown-search-filter" id="ddlStatus" onchange="LoadCustomers();">
+                            <option selected="" value="">All</option>
                         </select>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
+                        <label for="ddlCustomer" class="mr-2">Customer</label>
+                        <select class="form-control dropdown-search-filter" onchange="LoadProject();" id="ddlCustomer" multiple>
+                            <option selected="" value="">All</option>                            
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
                         <label for="ddlProject" class="mr-2">Project</label>
                         <select class="form-control dropdown-search-filter" onchange="LoadSubProject();" id="ddlProject" multiple>
                             <option selected="" value="">All</option>
                         </select>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <label for="ddlSubProject" class="mr-2">Sub Project</label>
                         <select class="form-control dropdown-search-filter" id="ddlSubProject" >  <!-- onchange="LoadCenter();"-->>
                             </select>
@@ -268,17 +285,13 @@ function LoadSubProject(){
                         <a class="btn btn-primary" style="margin-right: 20px;color:white;font-weight:bold;cursor:pointer;margin-top:30px;" onclick="DownloadTableBasedOnSearch()">Download</a>
                         <a id="lnkDownload" style="display:none;"></a>
                     </div>
-                </div>
-				
-                
-				<div class="row">  
-					<div class="form-group col-lg-4">
+                    <div class="form-group col-lg-4">
                         <div id="imgSpinner">
                             <img src="static/assets/images/spinner1.gif" style="height:30px;display:inline-block;"/>
                             <label style="display:inline-block;">Please wait while downloading report...</label>
                         </div> 
                     </div>
-				</div>
+                </div>
             </div>
         </div>
     </div>
