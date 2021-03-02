@@ -17,42 +17,52 @@
             $(".date-picker").flatpickr({
                 dateFormat:'d-M-Y'
             });
-            LoadCustomerdl();
+            LoadStageStausddl();
+            LoadCustomers();
         });
-
-        function LoadCustomerdl(){
-        var URL=$('#hdn_web_url').val()+ "/GetALLClient"
-            $.ajax({
+    function LoadStageStausddl()
+    {
+        // $('#ddlStage').empty();
+        // $('#ddlStage').append(new Option('Yet To Start','0'));
+        // $('#ddlStage').append(new Option('Open','1'));
+        // $('#ddlStage').append(new Option('Expired','2'));
+        $('#ddlStatus').empty();
+        $('#ddlStatus').append(new Option('All','-1'));
+        $('#ddlStatus').append(new Option('Active','1'));
+        $('#ddlStatus').append(new Option('Inactive','0'));    
+    }
+    function LoadCustomers(){
+        var URL=$('#hdn_web_url').val()+ "/GetALLClientBasedOnStatus"
+        $.ajax({
             type:"GET",
             url:URL,
-            async:false,        
             beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
             datatype:"json",
             data:{
                 "user_id": $('#hdn_home_user_id').val(),
-                "user_role_id": $('#hdn_home_user_role_id').val()
+                "user_role_id": $('#hdn_home_user_role_id').val(),
+                "status_id": $('#ddlStatus').val()
+
             },
             success: function (data){
                 if(data.Clients != null)
                 {
-                    $('#ddlClient').empty();
+                    $('#ddlCustomer').empty();
                     var count=data.Clients.length;
                     if( count> 0)
                     {
-                        //$('#ddlClient').append(new Option('ALL','0'));
                         for(var i=0;i<count;i++)
-                            $('#ddlClient').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
-                        //$('#ddlCourse').val('0');
+                            $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
                     }
                     else
                     {
-                    // $('#ddlCustomer').append(new Option('No Customer','-1'));
+                     //   $('#ddlCustomer').append(new Option('Choose Customer',''));
                     }
                 }
             },
             error:function(err)
             {
-                alert('Error while loading BU! Please try again');
+                alert('Error loading customers! Please try again');
                 return false;
             }
         });
@@ -99,10 +109,10 @@
                         data: { 
                         'user_id':$('#hdn_home_user_id').val(),
                         'user_role_id':$('#hdn_home_user_role_id').val(),
-                        'Customers': $('#ddlClient').val().toString(),
+                        'Customers': $('#ddlCustomer').val().toString(),
 						'from_date':$('#FromDate').val(),
-						'to_date':$('#ToDate').val()                       
-                       
+                        'to_date':$('#ToDate').val(),
+                        "status_id":$('#ddlStatus').val()
 						},
                         success:function(data){
                         if(data!=null)
@@ -161,14 +171,17 @@
            <div class="row">
             <div class="col-12">
                 <div class="card-box">
-                   
-                    
                     <div class="row" >
-                        
-                        <div class="col-lg-3" >
-                            <label for="ddlClient" class="mr-2">Customer</label>
-                            <select class="form-control dropdown-search-filter"  id="ddlClient" multiple>
-                                 <option selected="" value="">All</option>
+                        <div class="col-lg-3">
+                            <label for="ddlStatus" class="mr-2">Customer Status</label>
+                            <select class="form-control dropdown-search-filter" id="ddlStatus" onchange="LoadCustomers();">
+                                <option selected="" value="">All</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="ddlCustomer" class="mr-2">Customer</label>
+                            <select class="form-control dropdown-search-filter" id="ddlCustomer" multiple> <!-- onchange="LoadContract();" -->>
+                                <option selected="" value="">All</option>                            
                             </select>
                         </div>
                         <div class="col-lg-3">
@@ -180,18 +193,13 @@
                             <label for="ToDate" class="mr-2">Attandance Date To*</label>
                             <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
                              ClientIdMode="static" placeholder="To Date">
-                        </div>
-                       
-                       
+                        </div> 
                     </div>
                     
-                   
                     <div class="row"> 
                         <!-- <div class="col-lg-1" style="float: center; margin-top: 30px">
                             <button  type="button" class="btn btn-success waves-effect waves-light" onclick="LoadTable()">Search</button>
-                        </div> -->
-                        
-                        
+                        </div> -->    
                         <div class="col-lg-2">                                         
                             <button style="float: left;margin-top: 30px" type="button" id="btn_download" class="btn btn-primary waves-effect waves-light submit" 
                             onclick="DownloadTableBasedOnSearch()">Download</button></div>

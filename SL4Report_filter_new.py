@@ -1,5 +1,5 @@
-def create_report(from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, report_name):
-    print(from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, report_name)
+def create_report(from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, report_name, status_id):
+    #print(from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, report_name)
     '''
     from datetime import datetime
     start_time = datetime.now()
@@ -62,8 +62,8 @@ def create_report(from_date, to_date, Customers,projects,sub_projects, user_id, 
         def trainee_fxn():
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [reports].[sp_sl4_trainee_report] ?, ?, ?, ?, ?,?,?'
-            values = (from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id)
+            sql = 'exec [reports].[sp_sl4_trainee_report] ?, ?, ?, ?, ?,?,?, ?'
+            values = (from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, status_id)
             curs.execute(sql,(values))
             data = curs.fetchall()
             data = list(map(lambda x:list(x), data))
@@ -101,8 +101,8 @@ def create_report(from_date, to_date, Customers,projects,sub_projects, user_id, 
         def trainee_assesment_fxn():
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [reports].sp_sl4_trainee_assesment_report ?, ?, ?, ?, ?,?,?'
-            values = (from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id)
+            sql = 'exec [reports].sp_sl4_trainee_assesment_report ?, ?, ?, ?, ?,?,?, ?'
+            values = (from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, status_id)
             curs.execute(sql,(values))
             data = curs.fetchall()
             data = list(map(lambda x:list(x), data))
@@ -141,8 +141,8 @@ def create_report(from_date, to_date, Customers,projects,sub_projects, user_id, 
         def trainee_placemnet_fxn():
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [reports].sp_sl4_trainee_placement_report ?, ?, ?, ?, ?,?,?'
-            values = (from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id)
+            sql = 'exec [reports].sp_sl4_trainee_placement_report ?, ?, ?, ?, ?,?,?, ?'
+            values = (from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, status_id)
             curs.execute(sql,(values))
             data = curs.fetchall()
             data = list(map(lambda x:list(x), data))
@@ -184,8 +184,8 @@ def create_report(from_date, to_date, Customers,projects,sub_projects, user_id, 
         def trainee_dell_tracker_fxn():
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [reports].sp_dell_tracker_report ?, ?, ?, ?, ?,?,?'
-            values = (from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id)
+            sql = 'exec [reports].sp_dell_tracker_report ?, ?, ?, ?, ?,?,?, ?'
+            values = (from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, status_id)
             curs.execute(sql,(values))
             columns = [column[0].title() for column in curs.description]
             data = curs.fetchall()
@@ -205,8 +205,8 @@ def create_report(from_date, to_date, Customers,projects,sub_projects, user_id, 
         def trainee_dell_tracker2_fxn():
             cnxn=pyodbc.connect(conn_str)
             curs = cnxn.cursor()
-            sql = 'exec [reports].sp_dell_tracker2_report ?, ?, ?, ?, ?,?,?'
-            values = (from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id)
+            sql = 'exec [reports].sp_dell_tracker2_report ?, ?, ?, ?, ?,?,?, ?'
+            values = (from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, status_id)
             curs.execute(sql,(values))
             columns = [column[0].title() for column in curs.description]
             data = curs.fetchall()

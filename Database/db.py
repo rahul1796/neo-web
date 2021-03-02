@@ -1551,15 +1551,15 @@ class Database:
         cur.close()
         con.close()
         return content
-    def user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status_id):
         content = {}
         d = []
         h={}
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [reports].[sp_get_user_sub_project_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [reports].[sp_get_user_sub_project_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, status_id)
         #print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
@@ -5064,13 +5064,13 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
-    def GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+    def GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec [reports].[sp_get_placement_ageing_report_data ]  ?,?,?,?,?,?'
-        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+        sql = 'exec [reports].[sp_get_placement_ageing_report_data ]  ?,?,?,?,?,?, ?, ?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)
         #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
@@ -5081,16 +5081,15 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return {"Data":response}
-    def GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date):
+    def GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec  [reports].[sp_get_candidate_based_on_placement_stage]  ?,?,?,?,?,?,?,?'
-        values = (user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date)
+        sql = 'exec  [reports].[sp_get_candidate_based_on_placement_stage]  ?,?,?,?,?,?,?,?, ?, ?'
+        values = (user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)
         cur2.execute(sql,(values))
-        #   print(cur2.fetchall())
-        #print(cur2)
+        
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
             for i in range(len(columns)):
@@ -7095,14 +7094,14 @@ SELECT					cb.name as candidate_name,
             # print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
     
-    def GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+    def GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec [reports].[sp_get_qp_wise_report_data]   ?,?,?,?,?,?'
-        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
-        print(values)
+        sql = 'exec [reports].[sp_get_qp_wise_report_data]   ?,?,?,?,?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -7129,14 +7128,14 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
-    def GetQpWiseRegionWiseBatchLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id,region_id):
+    def GetQpWiseRegionWiseBatchLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id,region_id, status_id, stage_ids):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
         sql = 'exec [reports].[sp_get_qp_wise_region_wise_batch_report_data]    ?,?,?,?,?,?,?,?'
         values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id,region_id)
-        print(values)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -7147,16 +7146,17 @@ SELECT					cb.name as candidate_name,
         con.close()
         return {"response":response,"columns":columns}
 
-    def GetQpWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids):
+    def GetQpWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids, status_id, stage_ids):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec [reports].[sp_get_qp_wise_report_data_download]   ?,?,?,?'
-        values = (user_id,user_role_id,customer_ids,contract_ids)
-        print(values)
+        sql = 'exec [reports].[sp_get_qp_wise_report_data_download]   ?,?,?,?, ?, ?'
+        values = (user_id,user_role_id,customer_ids,contract_ids, status_id, stage_ids)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
+        #print(columns)
         for row in cur2:
             for i in range(len(columns)):
                 h[columns[i]]=row[i]           
@@ -7164,14 +7164,14 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
-    def GetRegionWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids):
+    def GetRegionWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids, status_id, stage_ids):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec [reports].[sp_get_region_wise_report_data_download]   ?,?,?,?'
-        values = (user_id,user_role_id,customer_ids,contract_ids)
-        print(values)
+        sql = 'exec [reports].[sp_get_region_wise_report_data_download]   ?,?,?,?, ?, ?'
+        values = (user_id,user_role_id,customer_ids,contract_ids, status_id, stage_ids)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -7316,14 +7316,14 @@ SELECT					cb.name as candidate_name,
         curs.execute(quer)
         return list(map(lambda x:str.lower(x[0]), curs.fetchall()))
 
-    def DownloadBatchStatusReport(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date):
+    def DownloadBatchStatusReport(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date, status_id, stage_ids):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec [reports].[sp_get_batch_status_report_data]    ?,?,?,?,?,?,?,?'
-        values = (user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date)
-        print(values)
+        sql = 'exec [reports].[sp_get_batch_status_report_data]    ?,?,?,?,?,?,?,?, ?, ?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date, status_id, stage_ids)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -7333,14 +7333,14 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
-    def GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status_id, stage_ids):
         response = {}
         d = []
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [reports].[sp_get_batch_status_date_list] ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
-        values = (user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [reports].[sp_get_batch_status_date_list] ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, status_id, stage_ids)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -7354,6 +7354,7 @@ SELECT					cb.name as candidate_name,
         response = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
+        print(values)
         return response
 
     def upload_batch_target_plan(df,user_id,user_role_id):
@@ -8520,12 +8521,12 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()
         return {'sheet1':data,'sheet1_columns':columns}
-    def shiksha_attandance_report(user_id, user_role_id, Customers, from_date, to_date):
+    def shiksha_attandance_report(user_id, user_role_id, Customers, from_date, to_date, status_id):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
-        sql = 'exec [reports].[sp_get_shiksha_attendance_download] ?, ?, ?,?, ?'
-        values = ((user_id, user_role_id, Customers, from_date, to_date))
-        print(values)
+        sql = 'exec [reports].[sp_get_shiksha_attendance_download] ?, ?, ?,?, ?, ?'
+        values = (user_id, user_role_id, Customers, from_date, to_date, status_id)
+        #print(values)
         curs.execute(sql,(values))
         columns = [column[0].title() for column in curs.description]
         data = curs.fetchall()
@@ -8533,7 +8534,7 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()
         return {'sheet1':data,'sheet1_columns':columns}
-    def GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+    def GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
         sheet1=[]
@@ -8542,14 +8543,14 @@ SELECT					cb.name as candidate_name,
         sheet2_columns=[]
         placement_stage=-1
         sub_project_code=''
-        sql = 'exec [reports].[sp_get_placement_ageing_report_data] ?, ?, ?,?, ?, ?'
-        sql1 = 'exec [reports].[sp_get_candidate_based_on_placement_stage]?, ?, ?,?, ?, ?,?,?'
-        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+        sql = 'exec [reports].[sp_get_placement_ageing_report_data] ?, ?, ?,?, ?, ?, ?, ?'
+        sql1 = 'exec [reports].[sp_get_candidate_based_on_placement_stage]?, ?, ?,?, ?, ?,?,?, ?, ?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]
         data = curs.fetchall()
         sheet1 = list(map(lambda x:list(x), data))
-        values = (user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date)        
+        values = (user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)        
         curs.execute(sql1,(values))
         sheet2_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
@@ -8621,11 +8622,11 @@ SELECT					cb.name as candidate_name,
             print('Ex'+str(e))
             return {"Status":False,'message': "error: "+str(e)}
 
-    def download_Assessment_report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+    def download_Assessment_report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate, status_id):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
-        sql = 'exec [reports].[sp_get_assesment_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+        sql = 'exec [reports].[sp_get_assesment_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate, status_id)
         curs.execute(sql,(values))
         columns = [column[0].title() for column in curs.description]
         data = curs.fetchall()

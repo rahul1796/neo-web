@@ -1,7 +1,6 @@
-
 <link href="static/assets/libs/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 <link href="static/assets/libs/datatables/responsive.dataTables.min.css" rel="stylesheet" type="text/css" /> 
-         
+
 <style>
     .modal {
                 overflow-y:auto;
@@ -25,19 +24,33 @@
             var last= lastDay.getDate()+"-"+ months[lastDay.getMonth()] +"-"+lastDay.getFullYear();
             $('#FromDate').val(first);
             $('#ToDate').val(last);
-            LoadCustomerdl();  
+
+            LoadStageStausddl();
+            LoadCustomers();
         });
-    function LoadCustomerdl(){
-        var URL=$('#hdn_web_url').val()+ "/GetALLClient"
-            $.ajax({
+    function LoadStageStausddl()
+    {
+        $('#ddlStage').empty();
+        $('#ddlStage').append(new Option('Yet To Start','0'));
+        $('#ddlStage').append(new Option('Open','1'));
+        $('#ddlStage').append(new Option('Expired','2'));
+        $('#ddlStatus').empty();
+        $('#ddlStatus').append(new Option('All','-1'));
+        $('#ddlStatus').append(new Option('Active','1'));
+        $('#ddlStatus').append(new Option('Inactive','0'));    
+    }
+    function LoadCustomers(){
+        var URL=$('#hdn_web_url').val()+ "/GetALLClientBasedOnStatus"
+        $.ajax({
             type:"GET",
             url:URL,
-            async:false,        
             beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
             datatype:"json",
             data:{
                 "user_id": $('#hdn_home_user_id').val(),
-                "user_role_id": $('#hdn_home_user_role_id').val()
+                "user_role_id": $('#hdn_home_user_role_id').val(),
+                "status_id": $('#ddlStatus').val()
+
             },
             success: function (data){
                 if(data.Clients != null)
@@ -46,20 +59,56 @@
                     var count=data.Clients.length;
                     if( count> 0)
                     {
-                        //$('#ddlRegion').append(new Option('ALL','-1'));
                         for(var i=0;i<count;i++)
                             $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
-                        //$('#ddlCourse').val('-1');
                     }
                     else
                     {
-                    // $('#ddlCustomer').append(new Option('No Customer','-1'));
+                     //   $('#ddlCustomer').append(new Option('Choose Customer',''));
                     }
                 }
             },
             error:function(err)
             {
-                alert('Error while loading BU! Please try again');
+                alert('Error loading customers! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function LoadContract(){
+        var URL=$('#hdn_web_url').val()+ "/GetContractsBasedOnCustomerAndStage"  //"/GetALLProject_multiple"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "customer_id":$('#ddlCustomer').val().toString(),
+                "user_id": $('#hdn_home_user_id').val(),
+                "contract_stage_ids": $('#ddlStage').val().toString(),
+                "user_role_id": $('#hdn_home_user_role_id').val()
+            },
+            success: function (data){
+                if(data.Contracts != null)
+                {
+                    $('#ddlContract').empty();
+                    var count=data.Contracts.length;
+                    if( count> 0)
+                    {
+                        //$('#ddlProject').append(new Option('ALL','-1'));  , 
+                        for(var i=0;i<count;i++)
+                            $('#ddlContract').append(new Option(data.Contracts[i].Contract_Name,data.Contracts[i].Contract_Id));
+                    }
+                    else
+                    {
+                    // $('#ddlContract').append(new Option('ALL','-1'));
+                    }
+                }
+            },
+            error:function(request, err)
+            {
+                alert('Error! Please try again');
                 return false;
             }
         });
@@ -105,51 +154,8 @@
         });
         return false;
     }
-    function LoadContract(){
-        var URL=$('#hdn_web_url').val()+ "/GetContractsBasedOnCustomer"  //"/GetALLProject_multiple"
-        $.ajax({
-            type:"GET",
-            url:URL,
-            async:false,
-            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-            datatype:"json",
-            data:{
-                "customer_id":$('#ddlCustomer').val().toString(),
-                "user_id": $('#hdn_home_user_id').val(),
-                "user_role_id": $('#hdn_home_user_role_id').val()
-            },
-            success: function (data){
-                if(data.Contracts != null)
-                {
-                    $('#ddlContract').empty();
-                    var count=data.Contracts.length;
-                    if( count> 0)
-                    {
-                        //$('#ddlProject').append(new Option('ALL','-1'));  , 
-                        for(var i=0;i<count;i++)
-                            $('#ddlContract').append(new Option(data.Contracts[i].Contract_Name,data.Contracts[i].Contract_Id));
-                    }
-                    else
-                    {
-                    // $('#ddlContract').append(new Option('ALL','-1'));
-                    }
-                }
-            },
-            error:function(request, err)
-            {
-                alert('Error! Please try again');
-                return false;
-            }
-        });
-        return false;
-    }
     function LoadTableBasedOnSearch()
-    {   /*
-        if($('#FromDate').val()=='' || $('#ToDate').val()=='')
-        {
-            alert("Please selct from and to dates.");
-        }
-        */
+    {   
         if($('#ddlCustomer').val().toString()=='')
         {
             alert('Please select atleast one customer.');
@@ -169,7 +175,9 @@
                     "customer_ids":$('#ddlCustomer').val().toString(),
                     "contract_ids":$('#ddlContract').val().toString(),
                     "from_date" : $('#FromDate').val(),
-                    "to_date" : $('#ToDate').val()
+                    "to_date" : $('#ToDate').val(),
+                    "stage_ids":$('#ddlStage').val().toString(),
+                    "status_id":$('#ddlStatus').val()
                 },
             success: function (data){
                 varHtml='';
@@ -184,13 +192,13 @@
                         {
                             for(var i=0;i<count;i++)
                             {
-                            
                                 varHtml+='<tr>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Data[i].S_No +'</td>';
                                 let varLink='<a onclick="GetQpWiseRegionLevelData(\'' + data.Data[i].Qp_Id + '\',\'' + data.Data[i].Qp_Name + '\')"  style="color:blue;cursor:pointer" >' + data.Data[i].Qp_Name + '</a>';
                                 varHtml+='  <td style="text-align:center;">'+ varLink +'</td>';
+
+                                varHtml+='  <td style="text-align:center;">'+ data.Data[i].Is_Active +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Data[i].Batch_Count +'</td>';
-                                
                                 varHtml+='  <td style="text-align:center;">'+ data.Data[i].Enrolled +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Data[i].Dropped +'</td>';
                                 varHtml+='  <td style="text-align:center;">'+ data.Data[i].Certified +'</td>';
@@ -425,7 +433,9 @@
                     "user_id": $('#hdn_home_user_id').val(),
                     "user_role_id" : $('#hdn_home_user_role_id').val(),
                     "customer_ids":$('#ddlCustomer').val().toString(),
-                    "contract_ids":$('#ddlContract').val().toString()
+                    "contract_ids":$('#ddlContract').val().toString(),
+                    "stage_ids":$('#ddlStage').val().toString(),
+                    "status_id":$('#ddlStatus').val()
                 },
                 success:function(data){
                     if(data!=null)
@@ -544,16 +554,31 @@
             <div class="card-box">
                 <div class="row">
                     <div class="col-lg-3">
+                        <label for="ddlStatus" class="mr-2">Customer Status</label>
+                        <select class="form-control" id="ddlStatus" onchange="LoadCustomers();">
+                            <option selected="" value="">All</option>
+                        </select>
+                    </div>
+                    <!--  dropdown-search-filter -->
+                    <div class="col-lg-3">
                         <label for="ddlCustomer" class="mr-2">Customer</label>
                         <select class="form-control dropdown-search-filter" onchange="LoadContract();" id="ddlCustomer" multiple>
                             <option selected="" value="">All</option>                            
                         </select>
                     </div>
                     <div class="col-lg-3">
+                        <label for="ddlStage" class="mr-2">Contract Stage</label>
+                        <select class="form-control dropdown-search-filter" id="ddlStage" multiple  onchange="LoadContract();" >
+
+                         </select>
+                    </div>
+                    <div class="col-lg-3">
                         <label for="ddlContract" class="mr-2">Contract</label>
                         <select class="form-control dropdown-search-filter" id="ddlContract" multiple>
                         </select>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-lg-1" >
                         <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light" 
                                 onclick="LoadTableBasedOnSearch()">Search</button>
@@ -580,7 +605,6 @@
                         <input type="text" id="ToDate" name="ToDate" class="form-control date-picker" 
                         ClientIdMode="static" placeholder="To Date">
                     </div>
-                    
                 </div>
                 <div class="row">
                     <div class="col-lg-12">
@@ -606,6 +630,8 @@
                                 <tr>
                                     <th style="text-align:center;">S.No</th>
                                     <th style="text-align:center;">QP Name</th>
+
+                                    <th style="text-align:center;">Customer Status</th>
                                     <th style="text-align:center;">Batch Count</th>
                                     <th style="text-align:center;">Enrolment</th>
                                     <th style="text-align:center;">Drop Out</th>
