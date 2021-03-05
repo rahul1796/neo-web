@@ -55,7 +55,7 @@ function LoadCustomers()
             data:{
                 "user_id": $('#hdn_home_user_id').val(),
                 "user_role_id": $('#hdn_home_user_role_id').val(),
-                "status_id": $('#ddlStatus').val()
+                "status_id": $('#ddlCusStatus').val()
 
             },
             success: function (data){
