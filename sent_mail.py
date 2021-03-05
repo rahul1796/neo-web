@@ -36,7 +36,7 @@ def forget_password(email, password, name):
 
         return {'status':True,'description':'Email sent'}
     except Exception as e:
-        print(e)
+        #print(e)
         return {'status':False,'description':'Unable to sent email'}
 
 def certification_stage_change_mail(NewStageId,emailTo,emailToName,EmailCC,Batch_Code,files):
