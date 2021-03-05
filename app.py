@@ -3492,11 +3492,11 @@ class recover_pass(Resource):
             if len(data)>0:
                 res = sent_mail.forget_password(reco_email,data[0][1],data[0][3] + ' ' + data[0][4])
                 if res['status']:
-                    msg = {"message":res['description'], "title":'Sucess',"UserId":data[0][0]}
+                    msg = {"success":True,"message":res['description'], "title":'Sucess',"UserId":data[0][0]}
                 else:
-                    msg = {"message":res['description'], "title":'Unable to sent',"UserId":data[0][0]}
+                    msg = {"success":False,"message":res['description'], "title":'Unable to sent',"UserId":data[0][0]}
             else:
-                msg = {"message":'Please check email or contact to admin',"title":'Invalid Email',"UserId":0}
+                msg = {"success":False, "message":'Please check email or contact to admin',"title":'Invalid Email',"UserId":0}
 
             response={"PopupMessage":msg}
             return response
