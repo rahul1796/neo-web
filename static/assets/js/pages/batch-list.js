@@ -46,46 +46,55 @@ function LoadRegionddl(){
     });
     return false;
 }
+function LoadStageStausddl()
+    {
+        // $('#ddlStage').empty();
+        // $('#ddlStage').append(new Option('Yet To Start','0'));
+        // $('#ddlStage').append(new Option('Open','1'));
+        // $('#ddlStage').append(new Option('Expired','2'));
+        $('#ddlCusStatus').empty();
+        $('#ddlCusStatus').append(new Option('All','-1'));
+        $('#ddlCusStatus').append(new Option('Active','1'));
+        $('#ddlCusStatus').append(new Option('Inactive','0'));  
+    }
+function LoadCustomers()
+    {
+        var URL=$('#hdn_web_url').val()+ "/GetALLClientBasedOnStatus"
+        $.ajax({
+            type:"GET",
+            url:URL,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "user_id": $('#hdn_home_user_id').val(),
+                "user_role_id": $('#hdn_home_user_role_id').val(),
+                "status_id": $('#ddlStatus').val()
 
-
-function loadClient(){
-    var URL=$('#hdn_web_url').val()+ "/GetALLClient"
-    $.ajax({
-        type:"GET",
-        url:URL,
-        async:false,
-        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-        datatype:"json",
-        data:{
-            "user_id": $('#hdn_home_user_id').val(),
-            "user_role_id": $('#hdn_home_user_role_id').val()
-        },
-        success: function (data){
-            if(data.Clients != null)
+            },
+            success: function (data){
+                if(data.Clients != null)
+                {
+                    $('#ddlCustomer').empty();
+                    var count=data.Clients.length;
+                    if( count> 0)
+                    {
+                        for(var i=0;i<count;i++)
+                            $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
+                    }
+                    else
+                    {
+                     //   $('#ddlCustomer').append(new Option('Choose Customer',''));
+                    }
+                }
+            },
+            error:function(err)
             {
-                $('#ddlClient').empty();
-                var count=data.Clients.length;
-                if( count> 0)
-                {
-                    //$('#ddlClient').append(new Option('ALL','-1'));
-                    for(var i=0;i<count;i++)
-                        $('#ddlClient').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
-                }
-                else
-                {
-                    $('#ddlClient').append(new Option('ALL','-1'));
-                }
+                alert('Error loading customers! Please try again');
+                return false;
             }
-        },
-        error:function(err)
-        {
-            //alert($('#ddlClient').val().toString())
-            alert('Error! Please try again');
-            return false;
-        }
-    });
-}
-
+        });
+        return false;
+    }
 function loadBU(){
     var URL=$('#hdn_web_url').val()+ "/Get_all_BU" 
     $.ajax({
@@ -129,7 +138,7 @@ function LoadProject(){
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
         data:{
-            "ClientId":$('#ddlClient').val().toString(),
+            "ClientId":$('#ddlCustomer').val().toString(),
             "user_id": $('#hdn_home_user_id').val(),
             "user_role_id": $('#hdn_home_user_role_id').val()
         },
@@ -298,7 +307,8 @@ function LoadTable()
 		        d.user_id = $('#hdn_home_user_id').val();
                 d.user_role_id  = $('#hdn_home_user_role_id').val();
                 d.status = $('#ddlStatus').val().toString();
-                d.customer = $('#ddlClient').val().toString();
+                d.customer_status = $('#ddlCusStatus').val();
+                d.customer = $('#ddlCustomer').val().toString();
                 d.project = $('#ddlProject').val().toString();
                 d.sub_project = $('#ddlSubProject').val().toString();
                 d.region = $('#ddlRegion').val().toString();
@@ -399,6 +409,7 @@ function LoadTable()
                     return varButtons;
                     }
             },
+            { "data": "Customer_Status" },
             { "data": "Customer_Name" },
             { "data": "Status"},
             { "data": "Batch_Name" },
@@ -1209,7 +1220,8 @@ function add_drop_message(){
                                 'user_id':$('#hdn_home_user_id').val(),
                                 'user_role_id':$('#hdn_home_user_role_id').val(),
                                 'status':$('#ddlStatus').val().toString(),
-                                'customer':$('#ddlClient').val().toString(),
+                                'customer_status':$('#ddlCusStatus').val(),
+                                'customer':$('#ddlCustomer').val().toString(),
                                 'project': $('#ddlProject').val().toString(),
                                 'sub_project':$('#ddlSubProject').val().toString(),
                                 'region':$('#ddlRegion').val().toString(),

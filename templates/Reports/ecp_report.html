@@ -28,7 +28,7 @@
             LoadRegionddl();  
             //LoadTableBasedOnSearch();
         });
-        function LoadStageStausddl()
+    function LoadStageStausddl()
     {
         $('#ddlStage').empty();
         $('#ddlStage').append(new Option('Yet To Start','0'));
@@ -37,11 +37,10 @@
         $('#ddlStatus').empty();
         $('#ddlStatus').append(new Option('All','-1'));
         $('#ddlStatus').append(new Option('Active','1'));
-        $('#ddlStatus').append(new Option('Inactive','0'));
-        
+        $('#ddlStatus').append(new Option('Inactive','0'));    
     }
     
-        function LoadCustomers(){
+    function LoadCustomers(){
         var URL=$('#hdn_web_url').val()+ "/GetALLClientBasedOnStatus"
         $.ajax({
             type:"GET",
@@ -78,8 +77,7 @@
         });
         return false;
     }
-    
-        function LoadRegionddl(){
+    function LoadRegionddl(){
             var URL=$('#hdn_web_url').val()+ "/AllRegionsBasedOnUser"
                 $.ajax({
                 type:"GET",
@@ -119,7 +117,7 @@
             });
             return false;
         }
-        function LoadContract(){
+    function LoadContract(){
         var URL=$('#hdn_web_url').val()+ "/GetContractsBasedOnCustomerAndStage"  //"/GetALLProject_multiple"
         $.ajax({
             type:"GET",
@@ -185,6 +183,7 @@
                         "status_id":$('#ddlStatus').val()
                     },
                 success: function (data){
+                    console.log(data)
                     varHtml='';
                     let varTxt='';
                     $("#tbl_list").dataTable().fnDestroy();
