@@ -1,4 +1,4 @@
-def create_report(sub_project,project,region,customer,user_id,user_role_id,employee_status,sub_project_status,month,year,file_name):
+def create_report(sub_project,project,region,customer,user_id,user_role_id,employee_status,sub_project_status,month,year, status_id,file_name):
     try:
         import pandas as pd
         import pypyodbc as pyodbc
@@ -31,8 +31,8 @@ def create_report(sub_project,project,region,customer,user_id,user_role_id,emplo
 
         cnxn=pyodbc.connect(config.conn_str) #
         curs = cnxn.cursor()
-        sql = 'exec [reports].[sp_get_user_sub_project_report_download] ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status)
+        sql = 'exec [reports].[sp_get_user_sub_project_report_download] ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status, status_id)
         curs.execute(sql,(values))
         
         columns = [column[0].title() for column in curs.description]
@@ -47,9 +47,8 @@ def create_report(sub_project,project,region,customer,user_id,user_role_id,emplo
         for col_num, value in enumerate(Column):
             worksheet.write(0, col_num, value, header_format)
 
-        sql = 'exec [reports].[sp_get_user_sub_project__weekwise_allocation_download] ?, ?, ?, ?, ?, ?, ?, ?,?,?'
-        values = (customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,month,year)
-        print(values)
+        sql = 'exec [reports].[sp_get_user_sub_project__weekwise_allocation_download] ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?'
+        values = (customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status, status_id,month,year)
         curs.execute(sql,(values))
         
         columns = [column[0].title() for column in curs.description]

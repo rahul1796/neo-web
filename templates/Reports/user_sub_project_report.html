@@ -31,12 +31,17 @@
                 <div class="card-box">
                     <div class="row">
                         <div class="col-lg-3">
-                            <label for="ddlClient" class="mr-2">Customer</label>
-                            <select class="form-control dropdown-search-filter" onchange="loadbasedonclient();" id="ddlClient" multiple>
-                                <!-- <option selected="" value="">All</option> -->
+                            <label for="ddlStatus" class="mr-2">Customer Status</label>
+                            <select class="form-control dropdown-search-filter" id="ddlStatus" onchange="LoadCustomers();">
+                                <option selected="" value="">All</option>
                             </select>
                         </div>
-                       
+                        <div class="col-lg-3">
+                            <label for="ddlCustomer" class="mr-2">Customer</label>
+                            <select class="form-control dropdown-search-filter" onchange="loadbasedonclient();" id="ddlCustomer" multiple>
+                                <option selected="" value="">All</option>                            
+                            </select>
+                        </div>
                         <div class="col-lg-3">
                             <label for="ddlProject" class="mr-2">Project</label>
                             <select class="form-control dropdown-search-filter" onchange="LoadSubProject();" id="ddlProject" multiple>
@@ -49,17 +54,14 @@
                                 <!-- <option selected="" value="">All</option> -->
                             </select>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-lg-3">
                             <label for="ddlRegion" class="mr-2">Region</label>
                             <select class="form-control dropdown-search-filter" id="ddlRegion" multiple>
                                 <!-- <option selected="" value="">All</option> -->
                             </select>
                         </div>
-                    </div>
-                    <div class="row">
-                        
-                        
-                       
                         <div class="col-lg-3">
                             <label for="ddlStatus" class="mr-2">User Status</label>
                             <select class="form-control dropdown-search-filter" id="ddlUserStatus" multiple>
@@ -88,7 +90,6 @@
                             <a id="lnkDownload" style="display:none;"></a>
                         </div>
                     </div>
-                    
                     <div class="row">  
                         <div class="form-group col-lg-4">
                             <div id="imgSpinner" >
@@ -129,7 +130,6 @@
                                            <th>Employement Type</th>
                                            </tr>
                                    </thead>
-                               
                                <tbody></tbody>
                                </table>
                            </div>

@@ -38,7 +38,9 @@ $('#ddlStatus').append(new Option('Open','2'));
 $('#ddlStatus').append(new Option('Expired','3'));
 console.log('{{project_id}}','{{customer_id}}')
 LoadEntitydl();
-LoadCustomerdl();
+LoadStageStausddl();
+LoadCustomers();
+//LoadCustomerdl();
 LoadProjectGroupdl();
 LoadBlockdl();
 LoadPracticedl();
@@ -106,27 +108,32 @@ GetSub_project('{{project_id}}')
                                    <option selected="" value="">All</option>
                                </select>
                            </div>
-                           <div class="col-lg-3">
-                               <label for="ddlCustomer" class="mr-2">Customer</label>
-                               <select class="form-control dropdown-search-filter" id="ddlCustomer" onchange="LoadProject();" multiple>
-                                   <option selected="" value="">All</option>
-                               </select>
-                           </div>
-                           <div class="col-lg-3">
+                        <div class="col-lg-3">
+                            <label for="ddlCusStatus" class="mr-2">Customer Status</label>
+                            <select class="form-control dropdown-search-filter" id="ddlCusStatus" onchange="LoadCustomers();">
+                                <option selected="" value="">All</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="ddlCustomer" class="mr-2">Customer</label>
+                            <select class="form-control dropdown-search-filter" onchange="LoadProject();" id="ddlCustomer" multiple>
+                                <option selected="" value="">All</option>                            
+                            </select>
+                        </div>
+                        <div class="col-lg-3">
                             <label for="ddlProject" class="mr-2">Project</label>
                             <select class="form-control dropdown-search-filter" id="ddlProject" multiple>
                                 <option selected="" value="">All</option>
                             </select>
                         </div>
-                           <div class="col-lg-3">
-                               <label for="ddlP_Group" class="mr-2">Project Group</label>
-                               <select class="form-control dropdown-search-filter" id="ddlP_Group" multiple>
-                                   <option selected="" value="">All</option>
-                                   
-                               </select>
-                           </div>                           
-                       </div>
+                    </div>
                        <div class="row">
+                            <div class="col-lg-3">
+                                <label for="ddlP_Group" class="mr-2">Project Group</label>
+                                <select class="form-control dropdown-search-filter" id="ddlP_Group" multiple>
+                                    <option selected="" value="">All</option>     
+                                </select>
+                            </div>
                             <div class="col-lg-3">
                                 <label for="ddlBlock" class="mr-2">Block</label>
                                 <select class="form-control dropdown-search-filter" id="ddlBlock" multiple>
@@ -137,32 +144,31 @@ GetSub_project('{{project_id}}')
                            <div class="col-lg-3">
                                <label for="ddlPractice" class="mr-2">Practice</label>
                                <select class="form-control dropdown-search-filter" id="ddlPractice"  multiple>
-                                   <option selected="" value="">All</option>
-                                   
+                                   <option selected="" value="">All</option>       
                                </select>
                            </div>
                            <div class="col-lg-3">
                                <label for="ddlBU" class="mr-2">BU</label>
                                <select class="form-control dropdown-search-filter" id="ddlBU"  multiple>
                                    <option selected="" value="">All</option>
-                                   
                                </select>
-                           </div>
-                           <div class="col-lg-3">
-                               <label for="ddlProduct" class="mr-2">Product</label>
-                               <select class="form-control dropdown-search-filter" id="ddlProduct"  multiple>
-                                   <option selected="" value="">All</option>
-                               </select>
-                           </div>
-                           
+                           </div>   
                        </div>
                        <div class="row">
+                            <div class="col-lg-3">
+                                <label for="ddlProduct" class="mr-2">Product</label>
+                                <select class="form-control dropdown-search-filter" id="ddlProduct"  multiple>
+                                    <option selected="" value="">All</option>
+                                </select>
+                            </div>
                             <div class="col-lg-3">
                                 <label for="ddlStatus" class="mr-2">Status</label>
                                 <select class="form-control dropdown-search-filter" id="ddlStatus" >
                                     <option selected="" value="">All</option>
                                 </select>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-lg-1" >    
                                 <button style="float: right; margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
                                 onclick="LoadTable()">Search</button>
@@ -170,12 +176,12 @@ GetSub_project('{{project_id}}')
                                 <!--button style="margin-top: 30px" type="button" class="btn btn-primary waves-effect waves-light submit" 
                                 onclick="Download()">Download</button-->
                             </div>
-                            <div class="col-lg-2" >                                        
+                            <div class="col-lg-5" >                                        
                                 <button style="float: left;margin-top: 30px" type="button" id="btn_download" class="btn btn-primary waves-effect waves-light submit" 
                                 onclick="Download()">Download</button>
                             </div>
                            
-                            <div class="col-lg-6" >
+                            <div class="col-lg-6" style="float: right;">
                                 <button style="float: left; margin-top: 30px; margin-right:8px; display:none;"  id="btn_create" type="submit" class="btn btn-primary waves-effect">Create Sub Project</a>
 
                                 <button style="float: left; margin-top: 30px; margin-right:8px; display:none;"  id="btn_upload" onclick="UploadBatchTargetMdl()" type="button" class="btn btn-info waves-effect waves-light">Upload Batch Target Plan</a>
@@ -223,6 +229,7 @@ GetSub_project('{{project_id}}')
                                            <th>Users</th>
                                            <th>Planned Batches</th>
                                            <th>Entity Name</th>
+                                           <th>Customer Status</th>
                                            <th>Customer Name</th>
                                            <th>Project Code</th>
                                            <th>Project Name</th>

@@ -136,25 +136,25 @@ class Report:
             print(str(e))
             
         return path
-    def GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
-        return Database.GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
-    def GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date):
-        return Database.GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date)
+    def GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids):
+        return Database.GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)
+    def GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids):
+        return Database.GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)
     
     def GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date,stage_ids,status_id):
         return Database.GetECPReportData(user_id,user_role_id,customer_ids,contract_ids,region_ids,from_date,to_date,stage_ids,status_id)
     def GetMobilizerReportData(user_id,user_role_id,Role, Date):
         return Database.GetMobilizerReportData(user_id,user_role_id,Role, Date)
 
-    def GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
-        return {"Data":Database.GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)}
+    def GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids):
+        return {"Data":Database.GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)}
     def GetQpWiseRegionLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id):
         return {"Data":Database.GetQpWiseRegionLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id)}
     def GetQpWiseRegionWiseBatchLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id,region_id):
         res=Database.GetQpWiseRegionWiseBatchLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id,region_id)
         return {"Data":res['response']}
     
-    def DownloadBatchReport(user_id,user_role_id,customer_ids,contract_ids):
+    def DownloadBatchReport(user_id,user_role_id,customer_ids,contract_ids, status_id, stage_ids):
         try:
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.BatchReportFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
@@ -164,22 +164,22 @@ class Report:
             for i in newlist:
                 os.remove( DownloadPath + i)
             path = '{}{}'.format(DownloadPath,report_name)
-            response=Database.GetQpWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids)
-            
+
+            response=Database.GetQpWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids, status_id, stage_ids)
             df=pd.DataFrame(response)
-            
-            df=df[[ 'Customer_Name','Contract_Name','Qp_Code','Qp_Name','Batch_Count','Target_Enrolment','Target_Certification','Target_Placement','Enrolled','Dropped','Certified','In_Training','Placement']]
-            columns=['Customer Name','Contract Name', 'Qp Code','Qp Name','Batch Count','Target Enrolment','Target Certification','Target Placement','Enrolled','Dropped','Certified','In Training','Placement']
+            if response!=[]:
+                df=df[['Is_Active', 'Customer_Name','Contract_Stage_Name','Contract_Name','Qp_Code','Qp_Name','Batch_Count','Target_Enrolment','Target_Certification','Target_Placement','Enrolled','Dropped','Certified','In_Training','Placement']]
+            columns=['Customer Status', 'Customer Name','Contract Stage','Contract Name', 'Qp Code','Qp Name','Batch Count','Target Enrolment','Target Certification','Target Placement','Enrolled','Dropped','Certified','In Training','Placement']
             temp_qp={"data":df,"columns":columns} 
-                     
-            response=Database.GetRegionWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids)
-            
+           
+            response=Database.GetRegionWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids, status_id, stage_ids)
             df=pd.DataFrame(response)
-            df=df[['Region_Name', 'Customer_Name','Contract_Name','Qp_Code','Qp_Name','Target_Enrolment','Target_Certification','Target_Placement','Enrolled','Dropped','Certified','In_Training','Placement']]
-            columns=['Region Name','Customer Name','Contract Name','Qp Code', 'Qp Name','Target Enrolment','Target Certification','Target Placement','Enrolled','Dropped','Certified','In Training','Placement']
+            if response!=[]:
+                df=df[['Region_Name', 'Is_Active', 'Customer_Name','Contract_Stage_Name','Contract_Name','Qp_Code','Qp_Name','Target_Enrolment','Target_Certification','Target_Placement','Enrolled','Dropped','Certified','In_Training','Placement']]
+            columns=['Region Name','Customer Status', 'Customer Name','Contract Stage','Contract Name','Qp Code', 'Qp Name','Target Enrolment','Target Certification','Target Placement','Enrolled','Dropped','Certified','In Training','Placement']
             temp_region={"data":df,"columns":columns}
 
-            response=Database.GetQpWiseRegionWiseBatchLevelData(user_id,user_role_id,customer_ids,contract_ids,'','',0,0)
+            response=Database.GetQpWiseRegionWiseBatchLevelData(user_id,user_role_id,customer_ids,contract_ids, status_id, stage_ids, '','',0,0)
             df1=pd.DataFrame(response['response'])
             df1=df1[['Region_Name', 'Qp_Name','Center_Name','Batch_Code','Actual_Start_Date','Actual_End_Date','Enrolled','Dropped','Certified','In_Training','Placement']]
             columns=['Region Name', 'Qp Name','Center Name','Batch Code','Actual Start Date','Actual End Date','Enrolled','Dropped','Certified','In Training','Placement']
@@ -248,10 +248,10 @@ class Report:
             print(str(e))
             return {"success":False,"msg":str(e)}
 
-    def user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        return Database.user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+    def user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status_id):
+        return Database.user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status_id)
     
-    def DownloadBatchStatusReport(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date):
+    def DownloadBatchStatusReport(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date, status_id, stage_ids):
         try:
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.BatchStatusReportFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
@@ -261,12 +261,12 @@ class Report:
             for i in newlist:
                 os.remove( DownloadPath + i)
             path = '{}{}'.format(DownloadPath,report_name)
-            response=Database.DownloadBatchStatusReport(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date)
+            response=Database.DownloadBatchStatusReport(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date, status_id, stage_ids)
             
             df=pd.DataFrame(response)
             if len(df.index)>0:
-                df=df[[ 'Practice_Name','Customer_Name','Contract_Code','Contract_Name','Project_Code','Project_Name','Sub_Project_Code','Sub_Project_Name','Center_Name','Product_Name','Bu_Name','Region_Name','Batch_Code','Course_Code','Course_Name','Status','Actual_Start_Date','Actual_End_Date','Unit_Rate','E_Ratio','C_Ratio','P_Ratio','Batch_Enrolled','Batch_Dropped','Batch_Certified','Certification_Distribution','Batch_Placement','Placement_Count_Rr','Placement_Is_Per_Of','Ojt_Completed','Filtered_Enrolled','Filtered_Dropped','Filtered_Certified','Filtered_Certification_Distribution','Filtered_Placed','Filtered_Placement_Count_Rr','Filtered_Ojt_Completed','Excess_No','Excess_Revenue','Overall_Revenue','Mon_Revenue']]
-                columns=[ 'Practice','Customer','Contract Code','Contract Name','Project Code','Project Name','Sub Project Code','Sub Project Name','Center','Product','BU','Region','Batch Code','Course Code','Course Name','Status','Actual Start Date','Actual End Date','Unit Rate','E Ratio','C Ratio','P Ratio','Enrolled','Dropped','Certified','Certificates Distribution','Placed','Placement Count(RR)','Placement Is Percent Of','Ojt Completed','Enrolled(Selected Duration)','Dropped(Selected Duration)','Certified(Selected Duration)','Certificates Distribution(Selected Duration)','Placed(Selected Duration)','Placement Count RR(Selected Duration)','Ojt Completed(Selected Duration)','Excess No','Excess Revenue','Revenue(Without Excess)','Revenue(Selected Duration)']
+                df=df[[ 'Practice_Name','Is_Active','Customer_Name','Contract_Stage_Name','Contract_Code','Contract_Name','Project_Code','Project_Name','Sub_Project_Code','Sub_Project_Name','Center_Name','Product_Name','Bu_Name','Region_Name','Batch_Code','Course_Code','Course_Name','Status','Actual_Start_Date','Actual_End_Date','Unit_Rate','E_Ratio','C_Ratio','P_Ratio','Batch_Enrolled','Batch_Dropped','Batch_Certified','Certification_Distribution','Batch_Placement','Placement_Count_Rr','Placement_Is_Per_Of','Ojt_Completed','Filtered_Enrolled','Filtered_Dropped','Filtered_Certified','Filtered_Certification_Distribution','Filtered_Placed','Filtered_Placement_Count_Rr','Filtered_Ojt_Completed','Excess_No','Excess_Revenue','Overall_Revenue','Mon_Revenue']]
+                columns=[ 'Practice','Customer Status','Customer','Contract Stage','Contract Code','Contract Name','Project Code','Project Name','Sub Project Code','Sub Project Name','Center','Product','BU','Region','Batch Code','Course Code','Course Name','Status','Actual Start Date','Actual End Date','Unit Rate','E Ratio','C Ratio','P Ratio','Enrolled','Dropped','Certified','Certificates Distribution','Placed','Placement Count(RR)','Placement Is Percent Of','Ojt Completed','Enrolled(Selected Duration)','Dropped(Selected Duration)','Certified(Selected Duration)','Certificates Distribution(Selected Duration)','Placed(Selected Duration)','Placement Count RR(Selected Duration)','Ojt Completed(Selected Duration)','Excess No','Excess Revenue','Revenue(Without Excess)','Revenue(Selected Duration)']
                 temp={"data":df,"columns":columns} 
                 
                 res=Report.CreateExcelFun(temp,path,'Batch Status')
@@ -309,15 +309,14 @@ class Report:
                     if Response['data'].iloc[j,k] is None:
                         worksheet.write(j+1,k ,'',write_format)
                     else:
-                        worksheet.write(j+1,k ,Response['data'].iloc[j,k],write_format)
-                                                    
+                        worksheet.write(j+1,k ,Response['data'].iloc[j,k],write_format)                     
             workbook.close()
             return True
         except Exception as e:
             print(str(e))
             return False
-    def GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
-        return Database.GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw) 
+    def GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status_id, stage_ids):
+        return Database.GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status_id, stage_ids) 
     
     def DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids,status_id):
         try:
@@ -1299,9 +1298,9 @@ class Report:
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
-    def create_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status):
+    def create_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,customer_status):
         try:
-            data=Database.DownloadProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+            data=Database.DownloadProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,customer_status)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = 'Project_Report_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile('Project_Report_.*')
@@ -1337,7 +1336,7 @@ class Report:
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Project-Center') 
             df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Project-Course') 
-            first_row = ['Entity Name','Customer Name','Project Code','Project Name','Group','Type','Block','Practice','BU','Product','Project Manager','Start Date','End Date','Status','Created By','Created On','Last Modified By','Last Modified On']
+            first_row = ['Entity Name','Customer Status','Customer Name','Project Code','Project Name','Group','Type','Block','Practice','BU','Product','Project Manager','Start Date','End Date','Status','Created By','Created On','Last Modified By','Last Modified On']
             worksheet = writer.sheets['Projects']
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format) 
@@ -1355,9 +1354,9 @@ class Report:
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
-    def create_sub_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project):
+    def create_sub_project_report(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project,customer_status):
         try:
-            data=Database.DownloadSubProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project)
+            data=Database.DownloadSubProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project,customer_status)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = 'Sub_Project_Report_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile('Sub_Project_Report_.*')
@@ -1399,7 +1398,7 @@ class Report:
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='SubProject-User')
             df = pd.DataFrame(data['sheet5'], columns=data['sheet5_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Sub-Project-Plannned Batches') 
-            first_row = ['Sub Project Code','Sub Project Name','Entity Name','Customer Name','Project Code','Project Name','Group','Type','Block','Practice','BU','Product','Project Manager','Start Date','End Date','Status','Created By','Created On','Last Modified By','Last Modified On']
+            first_row = ['Sub Project Code','Sub Project Name','Entity Name','Customer Status','Customer Name','Project Code','Project Name','Group','Type','Block','Practice','BU','Product','Project Manager','Start Date','End Date','Status','Created By','Created On','Last Modified By','Last Modified On']
             worksheet = writer.sheets['Sub-Projects']
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format) 
@@ -1620,9 +1619,9 @@ class Report:
         except Exception as e:
             print(str(e))
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
-    def shiksha_attandance_report(user_id, user_role_id, Customers, from_date, to_date):
+    def shiksha_attandance_report(user_id, user_role_id, Customers, from_date, to_date, status_id):
         try:
-            data=Database.shiksha_attandance_report(user_id, user_role_id, Customers, from_date, to_date)
+            data=Database.shiksha_attandance_report(user_id, user_role_id, Customers, from_date, to_date, status_id)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = 'Attendance_Report_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile('Attendance_Report_.*')
@@ -1656,20 +1655,18 @@ class Report:
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Attendance')            
             
-            first_row = ['Attendance Date','Region','Customer','Center','Trainer Name','Trainer Email','Course Code','Course Name','Batch Code','Batch Start Date','Batch End Date','Enrollment Id','Candidate Name','Candidate Email','Role','Start Time','End Time','Time Duration of Class(Minutes)']
+            first_row = ['Attendance Date','Region','Customer Status','Customer','Center','Trainer Name','Trainer Email','Course Code','Course Name','Batch Code','Batch Start Date','Batch End Date','Enrollment Id','Candidate Name','Candidate Email','Role','Start Time','End Time','Time Duration of Class(Minutes)']
             worksheet = writer.sheets['Attendance']
             for col_num, value in enumerate(first_row):
-                worksheet.write(0, 0+col_num, value, header_format)           
-            
+                worksheet.write(0, 0+col_num, value, header_format)
             writer.save()
-
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             print(str(e))
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
-    def GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+    def GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids):
         try:
-            data=Database.GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+            data=Database.GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = 'Placement_Ageing_Report_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile('Placement_Ageing_Report_.*')
@@ -1710,17 +1707,16 @@ class Report:
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format) 
 
-            first_row = ['Region','State','Customer','Center','Center Type','Course Code','Batch Code','Batch Start Date','Batch End Date','Candidate Name','Candidate Mobile','Assessed','Certified','Placement Status(Joined)','Company Name','Company SPOC Name','Company SPOC Number','Placement Status(OPffered)','Trainer Name','Trainer Email','Placement Officer Name','Placement Officer Email','Placement Officer Number','Ageing days']
+            first_row = ['Region','State','Customer Status','Customer','Center','Center Type','Course Code','Batch Code','Batch Start Date','Batch End Date','Candidate Name','Candidate Mobile','Assessed','Certified','Placement Status(Joined)','Company Name','Company SPOC Name','Company SPOC Number','Placement Status(OPffered)','Trainer Name','Trainer Email','Placement Officer Name','Placement Officer Email','Placement Officer Number','Ageing days']
             worksheet = writer.sheets['Detailed Report']
             for col_num, value in enumerate(first_row):
-                worksheet.write(0, 0+col_num, value, header_format)           
-            
+                worksheet.write(0, 0+col_num, value, header_format)
             writer.save()
-
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             print(str(e))
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+            
     def DownloadEmpTimeAllocationTemplate(file_name, user_id, user_role_id):
         try:
             name_withpath = config.neo_report_file_path + 'report file/'+ file_name
@@ -1834,9 +1830,9 @@ class Report:
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
     
-    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
+    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids):
         try:
-            data=Database.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id)
+            data=Database.DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.RegionProductivityFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.RegionProductivityFileName + ".*")
@@ -1881,7 +1877,7 @@ class Report:
                          'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
                          'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %']
             
-            default_column1 = ['Region','BU','Contract']
+            default_column1 = ['Region','BU', 'Contract Stage', 'Contract']
             first_row1 = ['Enrolment', 'Certification','Placement','Revenue (In Rs)']
             second_row1 = ['Target', 'Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
             third_row1 = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','Conversion %',
@@ -1892,7 +1888,7 @@ class Report:
             worksheet = writer.sheets['Region-Contract Nos & Revenue']
             for col_num, value in enumerate(default_column1):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=3
+            col=4
             for col_num, value in enumerate(first_row1):
                 if col_num==-1:
                     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
@@ -1900,7 +1896,7 @@ class Report:
                 else:
                     worksheet.merge_range(0, col, 0, 10+col, value, header_format)
                     col=col+11
-            col=3
+            col=4
             for col_num, value in enumerate(second_row1):
                 if col_num==-1:
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -1913,7 +1909,7 @@ class Report:
                     col=col+6                
             
             for col_num, value in enumerate(third_row1):
-                worksheet.write(2, 3+col_num, value, header_format)
+                worksheet.write(2, 4+col_num, value, header_format)
 
             worksheet = writer.sheets['Region Wise Batch Count']
             #default_column = ['COO','Sub Project']
@@ -1942,10 +1938,10 @@ class Report:
                 worksheet.write(2, 2+col_num, value, header_format)
 
             worksheet = writer.sheets['Customer Wise Candidate Count']            
-            default_column = ['Region','BU','Customer']
+            default_column = ['Region','BU','Customer Status','Customer']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=3
+            col=4
             for col_num, value in enumerate(first_row):
                 if col_num==-1:
                     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
@@ -1953,7 +1949,7 @@ class Report:
                 else:
                     worksheet.merge_range(0, col, 0, 10+col, value, header_format)
                     col=col+11
-            col=3
+            col=4
             for col_num, value in enumerate(second_row):
                 if col_num==-1:
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -1965,15 +1961,15 @@ class Report:
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6
             for col_num, value in enumerate(third_row):
-                worksheet.write(2, 3+col_num, value, header_format)
+                worksheet.write(2, 4+col_num, value, header_format)
             writer.save()
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
     
-    def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
+    def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids):
         try:
-            data=Database.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id)
+            data=Database.DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.CustomerTargetFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.CustomerTargetFileName + ".*")
@@ -2031,19 +2027,18 @@ class Report:
                 worksheet.write(1, 2+col_num, value, header_format)
 
             worksheet = writer.sheets['Customer-BU Wise Nos']            
-            default_column = ['Region','BU','Customer ','PMT']
+            default_column = ['Region','BU','Customer Status','Customer ','PMT']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
-            col=4
+            col=5
             for col_num, value in enumerate(first_row):
                 worksheet.merge_range(0, col, 0, 2+col, value, header_format)
                 col=col+3
-            
             for col_num, value in enumerate(second_row):
-                worksheet.write(1, 4+col_num, value, header_format)
+                worksheet.write(1, 5+col_num, value, header_format)
 
             worksheet = writer.sheets['Batch Plan Summary']            
-            default_column = ['Region','BU','Customer ']
+            default_column = ['Region','BU','Customer Status','Customer ']
             first_row = ['  New Batch Start(Planned Vs Actual)  ', '  Batch Certification(Planned Vs Actual)  ']
             second_row = ['MTD Batch Plan', 'Actual Batch','Cancelled Planned Batch','Yet To Start',
                           'MTD Batch Plan', 'Actual Batch','Cancelled Planned Batch','Yet To Start'
@@ -2056,14 +2051,12 @@ class Report:
                 'border': 1})
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 1, col_num, value, header_format)
-            col=3
-
+            col=4
             for col_num, value in enumerate(first_row):
                 worksheet.merge_range(0, col, 0, 3+col, value, header_format)
                 col=col+4
-            
             for col_num, value in enumerate(second_row):
-                worksheet.write(1, 3+col_num, value, header_format)
+                worksheet.write(1, 4+col_num, value, header_format)
 
             writer.save()
             return({'msg':'created excel', 'success':True, 'filename':path})
@@ -2356,7 +2349,7 @@ class Report:
         except Exception as e:
             return({'Description':'Error creating excel' + str(e), 'Status':False, 'Error':str(e)})
 
-    def download_Assessment_report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+    def download_Assessment_report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate, status_id):
         try:
             name_withpath = config.neo_report_file_path + 'report file/'+ file_name
             
@@ -2369,18 +2362,18 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
 
-            resp = Database.download_Assessment_report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+            resp = Database.download_Assessment_report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate, status_id)
             if len(resp[0])==0:
                 return({'Description':'No data available for the selected items', 'Status':False})
             df = pd.DataFrame(resp[0],columns=resp[1])
             df=df.fillna('')
             
-            col = ['Region_Name', 'Coo', 'Tm', 'Cm', 'Customer_Name', 'Contract_Name', 'Contract_Code', 'Project_Name', 'Project_Code', 'Sub_Project_Name', 'Sub_Project_Code', 'Center_Name', 
+            col = ['Region_Name', 'Coo', 'Tm', 'Cm', 'Customer_Status', 'Customer_Name', 'Contract_Name', 'Contract_Code', 'Project_Name', 'Project_Code', 'Sub_Project_Name', 'Sub_Project_Code', 'Center_Name', 
             'Course_Name', 'Course_Code', 'Qp_Name', 'Qp_Code', 'Enrolled_Count', 'Batch_Code', 'Batch_Name', 'Actual_Start_Date', 'Actual_End_Date', 'Ojt_Startdate', 'Ojt_Enddate', 
             'Assessment_Types_Name', 'Awarding_Body', 'Partner_Category_Name', 'Partner_Name', 'Requested_Date', 'Scheduled_Date', 
             'Scheduled_On', 'Assessor_Name', 'Assessor_Mobile', 'Assessor_Email', 'Asses_Candidate', 'Result_Uploaded', 'Certified_Candidate']
             
-            Header = ["Region", "COO", "TM", "CM/PC", "Customer Name", "Contract Name", "Contract Code", "Project Name", "Project Code", "Sub-Project Name", "Sub-Project Code", "Center Name",
+            Header = ["Region", "COO", "TM", "CM/PC", "Customer Status", "Customer Name", "Contract Name", "Contract Code", "Project Name", "Project Code", "Sub-Project Name", "Sub-Project Code", "Center Name",
             "Course Name", "Course Code", "QP Name", "QP Code", "Enrolment Count", "Batch Code", "Batch Name", "Batch Start Date", "Batch End Date", "OJT Start Date", "OJT End Date",
             "Assessment Type", "Awarding Body", "Assessment Partner Type", "Assesment Partner", "Assessment/Re-Assessment Request Date", "Assessment/Re-Assessment Proposed Date",
             "Actual Assessment/Re-Assessment Date", "Assessor Name", "Assessor Mobile No", "Assessor Email", "Assessed Candidate", "Result Upload Date", "Certified Candidate"]

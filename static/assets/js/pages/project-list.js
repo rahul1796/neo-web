@@ -33,44 +33,55 @@ function LoadEntitydl(){
     });
     return false;
 }
-function LoadCustomerdl(){
-    var URL=$('#hdn_web_url').val()+ "/GetALLClient"
+function LoadStageStausddl()
+    {
+        // $('#ddlStage').empty();
+        // $('#ddlStage').append(new Option('Yet To Start','0'));
+        // $('#ddlStage').append(new Option('Open','1'));
+        // $('#ddlStage').append(new Option('Expired','2'));
+        $('#ddlCusStatus').empty();
+        $('#ddlCusStatus').append(new Option('All','-1'));
+        $('#ddlCusStatus').append(new Option('Active','1'));
+        $('#ddlCusStatus').append(new Option('Inactive','0'));  
+    }
+function LoadCustomers()
+    {
+        var URL=$('#hdn_web_url').val()+ "/GetALLClientBasedOnStatus"
         $.ajax({
-        type:"GET",
-        url:URL,
-        async:false,        
-        beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
-        datatype:"json",
-        data:{
-            "user_id": $('#hdn_home_user_id').val(),
-            "user_role_id": $('#hdn_home_user_role_id').val()
-        },
-        success: function (data){
-            if(data.Clients != null)
+            type:"GET",
+            url:URL,
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:{
+                "user_id": $('#hdn_home_user_id').val(),
+                "user_role_id": $('#hdn_home_user_role_id').val(),
+                "status_id": $('#ddlStatus').val()
+
+            },
+            success: function (data){
+                if(data.Clients != null)
+                {
+                    $('#ddlCustomer').empty();
+                    var count=data.Clients.length;
+                    if( count> 0)
+                    {
+                        for(var i=0;i<count;i++)
+                            $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
+                    }
+                    else
+                    {
+                     //   $('#ddlCustomer').append(new Option('Choose Customer',''));
+                    }
+                }
+            },
+            error:function(err)
             {
-                $('#ddlCustomer').empty();
-                var count=data.Clients.length;
-                if( count> 0)
-                {
-                    //$('#ddlRegion').append(new Option('ALL','-1'));
-                    for(var i=0;i<count;i++)
-                        $('#ddlCustomer').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
-                    //$('#ddlCourse').val('-1');
-                }
-                else
-                {
-                   // $('#ddlCustomer').append(new Option('No Customer','-1'));
-                }
+                alert('Error loading customers! Please try again');
+                return false;
             }
-        },
-        error:function(err)
-        {
-            alert('Error while loading BU! Please try again');
-            return false;
-        }
-    });
-    return false;
-}
+        });
+        return false;
+    }
 function LoadProjectGroupdl(){
     var URL=$('#hdn_web_url').val()+ "/Get_all_Project_Group"
         $.ajax({
@@ -267,6 +278,7 @@ function LoadTable()
                 d.bu        = $('#ddlBU').val().toString();
                 d.product   = $('#ddlProduct').val().toString();
                 d.status    = $('#ddlStatus').val().toString();
+                d.customer_status    = $('#ddlCusStatus').val();
                 
                 d.user_id =$('#hdn_home_user_id').val();
                 d.user_role_id = $('#hdn_home_user_role_id').val();
@@ -275,7 +287,6 @@ function LoadTable()
             error: function (e) {
                 $("#tbl_projects tbody").empty().append('<tr class="odd"><td valign="top" colspan="16" class="dataTables_empty">ERROR</td></tr>');
             }
-
         },
         "columns": [
             { "data": "S_No"},
@@ -293,6 +304,7 @@ function LoadTable()
             },
 
             { "data": "Entity_Name"},
+            { "data": "Customer_Status"},
             {
                 "data": function (row, type, val, meta) {
                     var varButtons = ""; 
@@ -388,6 +400,7 @@ function Download()
                             'bu':$('#ddlBU').val().toString(),
                             'product':$('#ddlBU').val().toString(),
                             'status':$('#ddlStatus').val().toString(),
+                            'customer_status':$('#ddlCusStatus').val(),
                             'user_id':$('#hdn_home_user_id').val(),
                             'user_role_id':$('#hdn_home_user_role_id').val(),    
                             'user_region_id':$('#hdn_user_region_id').val()
