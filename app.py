@@ -1495,9 +1495,11 @@ class user_sub_project_list_download(Resource):
             user_role_id=request.form['user_role_id']
             employee_status=request.form['user_status']
             sub_project_status=request.form['sub_project_status']
+            month=request.form['month']
+            year=request.form['year']
             file_name='user_sub_project_report.xlsx'
             
-            resp = user_subproject_download.create_report(sub_project,project,region,customer,user_id,user_role_id,employee_status,sub_project_status,file_name)
+            resp = user_subproject_download.create_report(sub_project,project,region,customer,user_id,user_role_id,employee_status,sub_project_status,month,year,file_name)
             return resp       
 
 api.add_resource(candidate_list, '/candidate_list')
