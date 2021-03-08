@@ -1,7 +1,13 @@
 var varTable;
+const months = ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; 
+     
 $(document).ready(function () {
     $("#imgSpinner").hide();
     $('.dropdown-search-filter').select2();
+    $(".date-picker").flatpickr({
+        dateFormat:'M-Y',
+        minDate: 'Apr.2019'
+    }); 
    
     $("#tbl_user_sub_project").dataTable().fnDestroy();
     //Loadcandidatestatusddl();
@@ -192,7 +198,8 @@ function DownloadTableBasedOnSearch(){
     else{ 
         $("#imgSpinner").show();       
         var URL=$('#hdn_web_url').val()+ "/user_sub_project_list_download"
-      
+        var to_date = new Date($('#MonthYear').val());
+        
         //window.location = URL + "?ActivityDate=2019-09-09"
         $.ajax({
             type: "POST",
@@ -207,6 +214,8 @@ function DownloadTableBasedOnSearch(){
                 region : $('#ddlRegion').val().toString(),
                 user_status : $('#ddlUserStatus').val().toString(),
                 sub_project_status : $('#ddlSubProjectStatus').val().toString(),
+                month: to_date.getMonth(),
+                year: to_date.getFullYear(),
                 status_id : $('#ddlStatus').val()
             },
             success:function(data){
