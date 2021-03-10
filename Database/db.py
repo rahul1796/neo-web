@@ -892,9 +892,9 @@ class Database:
         record="0"
         fil="0"
         for row in cur:
-            record=row[18]
-            fil=row[17]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16]}
+            record=row[19]
+            fil=row[18]
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16],""+columns[17]+"":row[17]}
             d.append(h)
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
@@ -9128,6 +9128,41 @@ SELECT					cb.name as candidate_name,
         con.close()
         out = {'Status': True, 'message': "Submitted Successfully"}
         return out
+    def GetTrainerProfile(trainer_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sql = 'exec [masters].[sp_get_trainer_profile] ?'
+        values = (trainer_id,)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        for row in curs:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())        
+        curs.close()
+        con.close()
+        #print(response)
+        return response
+    def GetSingleTrainerProfile(trainer_profile_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sql = 'exec [masters].[sp_get_single_trainer_profile] ?'
+        values = (trainer_profile_id,)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        for row in curs:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())        
+        curs.close()
+        con.close()
+        #print(response)
+        return response
+
 
     def GetPartnerContract(partner_id):
         response = []
@@ -9179,6 +9214,28 @@ SELECT					cb.name as candidate_name,
                 else:
                     if pop==2:
                         msg={"message":"Partner Contract Code already exists","Status":False}
+        return msg
+    def add_edit_trainer_profile(certificate_name, sector_id, start_date, end_date, filename, trainer_id, is_active, user_id, trainer_profile_id):
+        #print(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId)
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_add_edit_trainer_profile] ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (certificate_name, sector_id, start_date, end_date, filename, trainer_id, is_active, user_id, trainer_profile_id)
+        #print(values)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated","Status":True}
+        else: 
+                if pop==0:
+                    msg={"message":"Created","Status":True}
+                else:
+                    if pop==2:
+                        msg={"message":"Error while updating record","Status":False}
         return msg
 
     def GetPartnerContractMilestones(Partner_Contract_Id):
