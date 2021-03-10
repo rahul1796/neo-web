@@ -9757,6 +9757,33 @@ class GetPartnerContract(Resource):
             return response
 api.add_resource(GetPartnerContract,'/GetPartnerContract')
 
+class GetTrainerProfile(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            trainer_id=request.args.get('trainer_id',0,type=int)
+            response=Master.GetTrainerProfile(trainer_id)
+            return response
+api.add_resource(GetTrainerProfile,'/GetTrainerProfile')
+class add_edit_trainer_profile(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            #Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId
+
+            certificate_name=request.form['certificate_name']
+            sector_id=request.form['sector_id']
+            start_date=request.form['start_date']
+            end_date=request.form['end_date']
+            filename=request.form['filename']
+            trainer_id=request.form['trainer_id']
+            is_active=request.form['is_active']
+            trainer_profile_id=request.form['trainer_profile_id']
+            user_id=g.user_id
+            
+            return Master.add_edit_trainer_profile(certificate_name, sector_id, start_date, end_date, filename, trainer_id, is_active, user_id, trainer_profile_id)
+api.add_resource(add_edit_trainer_profile,'/add_edit_trainer_profile')
+
 class add_edit_partner_contract(Resource):
     @staticmethod
     def post():
@@ -9776,7 +9803,14 @@ class add_edit_partner_contract(Resource):
             
             return Master.add_edit_partner_contract(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId)
 api.add_resource(add_edit_partner_contract,'/add_edit_partner_contract')
-
+class GetSingleTrainerProfile(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            trainer_profile_id=request.args.get('trainer_profile_id',0,type=int)
+            response=Master.GetSingleTrainerProfile(trainer_profile_id)
+            return response
+api.add_resource(GetSingleTrainerProfile,'/GetSingleTrainerProfile')
 class GetPartnerContractMilestones(Resource):
     @staticmethod
     def get():
