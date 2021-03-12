@@ -515,7 +515,7 @@ function GetCertificateDetails(TrainerId,TrainerName)
         var URL=$('#hdn_web_url').val()+ "/GetTrainerProfile?trainer_id="+TrainerId;
         var doc;
         var fileExtentionDOC = ['doc','docx']
-        var fileExtentionPDF = ['pdf']
+        var fileExtentionPDF = ['pdf','doc','docx','jpg','jpeg']
         
         $.ajax({
             type:"GET",
