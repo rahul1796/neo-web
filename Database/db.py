@@ -8273,15 +8273,16 @@ SELECT					cb.name as candidate_name,
             cur.execute(sql)
             for row in cur:
                 pop=row[0]
-            cur.commit()
-            cur.close()
-            con.close()
+            
             if pop >0 :
                 Status=True
                 msg="Synced Successfully"
             else:
                 msg="Error in Syncing"
                 Status=False
+            cur.commit()
+            cur.close()
+            con.close()
             return {"Status":Status,'Message':msg}
         except Exception as e:
             print(str(e))
