@@ -655,21 +655,20 @@ function add_popup_message(){
     $('#imgSpinner3').show();
     //console.log($('#Contract_Name').val()+$('#ContractCode').val()+$('#StartDate').val()+$('#EndDate').val()+$('#MOUDocument').val()+$('#ddlBillingMilestones').val());
     var validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'application/pdf'];  // , 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_'
-    var filename = ''
-    //hdn_home_user_id_modal2 hdn_home_user_role_id_modal2 hdn_upl_session_id myFile
-    if($('#hdn_modal_trainer_profile_id').val()=='0'){
-        var file = document.getElementById('CertificateDocument').files[0]
-        filename = filename_prefix + file.name
+    var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_';
+    var filename = '';
+    if(1==1){
+        var file = document.getElementById('CertificateDocument').files[0];
+        filename = filename_prefix + file.name;
         if (!validImageTypes.includes(file['type'])){
             alert('allowed format are : '+validImageTypes.toString());
             $('#imgSpinner3').hide();
-            return
+            return false;
         }
         else if(file.size > 5*1024*1024){
             alert('Image size is not valid');
             $('#imgSpinner3').hide();
-            return
+            return false;
         }
     }
     if ($('#StartDate').val() >= $('#EndDate').val()){
@@ -677,7 +676,7 @@ function add_popup_message(){
         $('#imgSpinner3').hide();
         //console.log($('#StartDate').val(),$('#EndDate').val())
     }
-    if (($('#StartDate').val() =='')||($('#EndDate').val() =='')||($('#Certificate_Name').val() =='')){
+    else if (($('#StartDate').val() =='')||($('#EndDate').val() =='')||($('#Certificate_Name').val() =='')){
         alert('Please fill all required details!');
         $('#imgSpinner3').hide();
         //console.log($('#StartDate').val(),$('#EndDate').val())
@@ -741,7 +740,8 @@ function add_popup_message(){
                             icon:icon,
                             confirmButtonClass:"btn btn-confirm mt-2"
                             }).then(function(){
-                                window.location.href = '/trainer';
+                                $('#mdl_add_edit_trainer_profile').modal('hide');
+                                GetCertificateDetails( $('#hdn_modal_trainer_id').val(), $('#hdn_modal_trainer_name').val());
                                 //Create_add_Remove_attachment_Html($('#hdn_upl_session_id').val());
                             });
             },
@@ -761,7 +761,10 @@ function add_popup_message(){
         });
     }
 }
- 
+function Back()
+{
+    window.location.href = '/trainer';
+}
     function LoadTableBasedOnSearch(){
 		LoadTable('', $('#ddlStatus').val());
 		/*$('#ddlCenter').val().toString()
@@ -1078,7 +1081,7 @@ function add_popup_message(){
                 <div class="modal-content ">
                     <div class="modal-header">
                         <h4 class="modal-title" ><span id="headerTrainerProfile"></span></h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="Back()">×</button>
                     </div>                    
                     <div class="modal-body">
                         <input type="hidden" id="hdn_modal_trainer_id" name="hdn_modal_trainer_id" value="0">
@@ -1098,8 +1101,8 @@ function add_popup_message(){
                                         <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Action</th>
                                         <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Trade Qualification</th>
                                         <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Certification</th>
-                                        <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Validity Start Date</th>
-                                        <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Validity End Date</th>
+                                        <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Valid From </th>
+                                        <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Valid To</th>
                                         <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Document</th>
                                     </tr>
                                 </thead>
@@ -1110,7 +1113,7 @@ function add_popup_message(){
                         </div>	
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="Back()"> Close</button>
                     </div>
                 </div>
             </div>
@@ -1152,7 +1155,7 @@ function add_popup_message(){
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <label for="ddlSector2">Trainer Qualification :</label>
+                                                <label for="ddlSector2">Trade Qualification :</label>
                                             </div>
                                             <div class="col-lg-6">
                                                 <select class="form-control" id="ddlSector2" >
@@ -1174,7 +1177,7 @@ function add_popup_message(){
                                    
                                     <div class="form-group row ">
                                             <div class="col-lg-6">
-                                                    <label for="StartDate"> Validity Start Date* :</label>
+                                                    <label for="StartDate"> Valid From* :</label>
                                                 </div>
                                                 <div class="col-lg-6">
                                             <input type="text" id="StartDate" name="StartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required>
@@ -1182,7 +1185,7 @@ function add_popup_message(){
                                     </div>
                                     <div class="form-group row ">
                                             <div class="col-lg-6">
-                                                    <label for="EndDate"> Validity End Date* :</label>
+                                                    <label for="EndDate"> Valid To* :</label>
                                                 </div>
                                                 <div class="col-lg-6">
                                             <input type="text" id="EndDate" name="EndDate" class="form-control date-picker" ClientIdMode="static" placeholder="EndDate" required>
