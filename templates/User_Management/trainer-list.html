@@ -554,11 +554,11 @@ function GetCertificateDetails(TrainerId,TrainerName)
                                 if (doc=='NA' || doc=='')
                                     varHtml+='  <td style="text-align:center;">NA</td>';
                                 else if (fileExtentionPDF.includes(doc.split('.').pop().toLowerCase())) 
-                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path +data.TrainerProfile[i].Certificate_Copy.replaceAll(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ 'static/assets/images/document-download-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path +data.TrainerProfile[i].Certificate_Copy.replaceAll(" ", "%20") + ' target="_blank" title="Open in new tab"><img src='+ 'static/assets/images/document-download-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
                                 else if (fileExtentionDOC.includes(doc.split('.').pop().toLowerCase()))
-                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.TrainerProfile[i].Certificate_Copy.replaceAll(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ 'static/assets/images/document-download-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.TrainerProfile[i].Certificate_Copy.replaceAll(" ", "%20") + ' target="_blank" title="Open in new tab"><img src='+ 'static/assets/images/document-download-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
                                 else
-                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.TrainerProfile[i].Certificate_Copy.replaceAll(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ data.S3_Path + data.TrainerProfile[i].Certificate_Copy.replaceAll(" ", "%20") +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.TrainerProfile[i].Certificate_Copy.replaceAll(" ", "%20") + ' target="_blank" title="Open in new tab"><img src='+ data.S3_Path + data.TrainerProfile[i].Certificate_Copy.replaceAll(" ", "%20") +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
                                 //varHtml+='  <td style="text-align:center;">'+ data.PartnerContract[i].Mou +'</td>';   
                                 varHtml+='</tr>';                            
                             }
@@ -705,7 +705,7 @@ function add_popup_message(){
             success: function(data) 
             {   //PopupMessage, message, Status
                 //console.log(data)
-                if($('#hdn_modal_trainer_profile_id').val()=='0'){
+                if(1==1){
                     var status;
                     file = document.getElementById('CertificateDocument').files[0]
                     //file = document.getElementById('myFile').files[0]
