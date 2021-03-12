@@ -515,7 +515,7 @@ function GetCertificateDetails(TrainerId,TrainerName)
         var URL=$('#hdn_web_url').val()+ "/GetTrainerProfile?trainer_id="+TrainerId;
         var doc;
         var fileExtentionDOC = ['doc','docx']
-        var fileExtentionPDF = ['pdf','doc','docx','jpg','jpeg']
+        var fileExtentionPDF = ['pdf','doc','docx','jpg','jpeg','png']
         
         $.ajax({
             type:"GET",
@@ -554,7 +554,7 @@ function GetCertificateDetails(TrainerId,TrainerName)
                                 if (doc=='NA' || doc=='')
                                     varHtml+='  <td style="text-align:center;">NA</td>';
                                 else if (fileExtentionPDF.includes(doc.split('.').pop().toLowerCase())) 
-                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path +data.TrainerProfile[i].Certificate_Copy.replaceAll(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ 'static/assets/images/pdf-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path +data.TrainerProfile[i].Certificate_Copy.replaceAll(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ 'static/assets/images/document-download-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
                                 else if (fileExtentionDOC.includes(doc.split('.').pop().toLowerCase()))
                                     varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.TrainerProfile[i].Certificate_Copy.replaceAll(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ 'static/assets/images/document-download-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
                                 else
