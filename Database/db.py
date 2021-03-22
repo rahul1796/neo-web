@@ -4968,7 +4968,10 @@ SELECT					cb.name as candidate_name,
         response=[]
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'select state_id, state_name from masters.tbl_states where is_active=1 and region_id ='+str(region_id)
+        if region_id ==5 or region_id==6:
+            sql = 'select state_id, state_name from masters.tbl_states where is_active=1'
+        else:
+            sql = 'select state_id, state_name from masters.tbl_states where is_active=1 and region_id ='+str(region_id)
         cur.execute(sql)
         columns = [column[0].title() for column in cur.description]
         for row in cur:
