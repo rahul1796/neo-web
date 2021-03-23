@@ -5,26 +5,40 @@ $(document).ready(function () {
     $('.dropdown-search-filter').select2();
     $(".date-picker").flatpickr({
         dateFormat:'d-M-Y',
+        maxDate: "today",
         minDate: '01.Apr.2019'
     });
     $("#tbl_candidate").dataTable().fnDestroy();
     hideEnrollmentDiv();
     Loadcreatedbyddl();   
-      
+    LoadStageStausddl();
     role_id=parseInt($('#hdn_home_user_role_id').val());
     if(role_id == 5)
         $('#btn_create').hide();
+    
+    LoadCustomers();
     //LoadTable();
 });
+
+function LoadStageStausddl()
+    {
+        $('#ddlStage').empty();
+        $('#ddlStage').append(new Option('Yet To Start','0'));
+        $('#ddlStage').append(new Option('Open','1'));
+        $('#ddlStage').append(new Option('Expired','2'));
+        $('#ddlStatus').empty();
+        $('#ddlStatus').append(new Option('All','-1'));
+        $('#ddlStatus').append(new Option('Active','1'));
+        $('#ddlStatus').append(new Option('Inactive','0'));
+    }
 function hideEnrollmentDiv(){
-     
+    $("#customer_status_div").hide();  
     $("#customer_div").hide();  
+    $("#contract_stage_div").hide();
     $("#contract_div").hide();  
     $("#project_div").hide();  
     $("#subproject_div").hide();  
-    $("#batch_div").hide();        
-   
-    
+    $("#batch_div").hide();
 }
 function Loadcreatedbyddl(){
     var URL=$('#hdn_web_url').val()+ "/AllCreatedByBasedOnUser"
@@ -68,19 +82,23 @@ function Loadcreatedbyddl(){
 function ChangeEnrollmentDiv(){
     if (($('#ddlStages').val()=='1')|($('#ddlStages').val()=='2'))
     {   
+        $("#customer_status_div").hide();  
         $("#customer_div").hide();  
+        $("#contract_stage_div").hide();  
         $("#contract_div").hide();  
         $("#project_div").hide();  
         $("#subproject_div").hide();  
         $("#batch_div").hide();        
     }
     else{
+        $("#customer_status_div").show();  
         $("#customer_div").show();  
+        $("#contract_stage_div").show();
         $("#contract_div").show();  
         $("#project_div").show();  
         $("#subproject_div").show();  
         $("#batch_div").show();  
-        loadClient();
+        LoadCustomers();
     }
 }
 function LoadRegionddl(){
@@ -124,17 +142,18 @@ function LoadRegionddl(){
     return false;
 }
 
-function loadClient(){
-    var URL=$('#hdn_web_url').val()+ "/GetALLClient"
+function LoadCustomers(){
+    var URL=$('#hdn_web_url').val()+ "/GetALLClientBasedOnStatus"
     $.ajax({
         type:"GET",
         url:URL,
-        async:false,
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
         data:{
             "user_id": $('#hdn_home_user_id').val(),
-            "user_role_id": $('#hdn_home_user_role_id').val()
+            "user_role_id": $('#hdn_home_user_role_id').val(),
+            "status_id": $('#ddlStatus').val()
+
         },
         success: function (data){
             if(data.Clients != null)
@@ -143,23 +162,22 @@ function loadClient(){
                 var count=data.Clients.length;
                 if( count> 0)
                 {
-                    //$('#ddlClient').append(new Option('ALL','-1'));
                     for(var i=0;i<count;i++)
                         $('#ddlClient').append(new Option(data.Clients[i].Customer_Name,data.Clients[i].Customer_Id));
                 }
                 else
                 {
-                    $('#ddlClient').append(new Option('ALL','-1'));
+                 //   $('#ddlCustomer').append(new Option('Choose Customer',''));
                 }
             }
         },
         error:function(err)
         {
-            //alert($('#ddlClient').val().toString())
-            alert('Error! Please try again');
+            alert('Error loading customers! Please try again');
             return false;
         }
     });
+    return false;
 }
 function loadbasedonclient()
 {
@@ -168,17 +186,16 @@ function loadbasedonclient()
     LoadProject();
 }
 function LoadContract(){
-
-    var URL=$('#hdn_web_url').val()+ "/GetContractsBasedOnCustomer"  //"/GetALLProject_multiple"
+    var URL=$('#hdn_web_url').val()+ "/GetContractsBasedOnCustomerAndStage"  //"/GetALLProject_multiple"
     $.ajax({
         type:"GET",
         url:URL,
-        async:false,
         beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
         datatype:"json",
         data:{
             "customer_id":$('#ddlClient').val().toString(),
             "user_id": $('#hdn_home_user_id').val(),
+            "contract_stage_ids": $('#ddlStage').val().toString(),
             "user_role_id": $('#hdn_home_user_role_id').val()
         },
         success: function (data){
@@ -424,7 +441,8 @@ function LoadTable()
                 d.candidate_id = 0;
 		        d.user_id = $('#hdn_home_user_id').val();
                 d.user_role_id  = $('#hdn_home_user_role_id').val();
-                d.status = $('#ddlStatus').val().toString();
+                d.status_id = $('#ddlStatus').val();
+                d.stage_ids = $('#ddlStage').val().toString();
                 d.customer = $('#ddlClient').val().toString();
                 d.project = $('#ddlProject').val().toString();
                 d.sub_project = $('#ddlSubProject').val().toString();
@@ -658,12 +676,13 @@ function DownloadTableBasedOnSearch(){
                     'Contracts' :$('#ddlContract').val().toString(),
                     'candidate_stage':$('#ddlStages').val().toString(),
                     'from_date' : $('#FromDate').val(),
-                    'to_date' : $('#ToDate').val()
-
+                    'to_date' : $('#ToDate').val(),
+                    'status_id' : $('#ddlStatus').val(),
+                    'stage_ids' : $('#ddlStage').val().toString()
             },
             success: function(resp) 
             {
-                console.log(resp)
+                //console.log(resp)
                 if (resp.success){
                     var varAnchor = document.getElementById('lnkDownload');
                     varAnchor.href = $('#hdn_web_url').val() + '/report file/' + resp.FileName;

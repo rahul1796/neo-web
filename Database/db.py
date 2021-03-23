@@ -3,10 +3,17 @@ import pypyodbc as pyodbc
 from .config import *
 #from Database import config
 import pandas as pd
+
+import xlsxwriter
+import calendar
+import time
+from Database import config
+
 from datetime import datetime
 from flask import request,make_response
 import requests
 import xml.etree.ElementTree as ET
+
 import io
 import csv
 import json
@@ -363,14 +370,14 @@ class Database:
         con.close()
         return h
     
-    def project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status):
+    def project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,customer_status):
         content = {}
         d = []
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,entity,customer,p_group,block,practice,bu,product,status)
+        sql = 'exec [masters].[sp_get_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,entity,customer,p_group,block,practice,bu,product,status,customer_status)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -859,7 +866,6 @@ class Database:
         cur = con.cursor()
         sql = 'exec [users].[sp_get_users_list] ?, ?, ?, ?, ?, ?,? ,? ,? ,? ,? ,?, ?, ?, ?, ?, ?'
         values = (user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids)
-        print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -886,9 +892,9 @@ class Database:
         record="0"
         fil="0"
         for row in cur:
-            record=row[18]
-            fil=row[17]
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16]}
+            record=row[19]
+            fil=row[18]
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],""+columns[8]+"":row[8],""+columns[9]+"":row[9],""+columns[10]+"":row[10],""+columns[11]+"":row[11],""+columns[12]+"":row[12],""+columns[13]+"":row[13],""+columns[14]+"":row[14],""+columns[15]+"":row[15],""+columns[16]+"":row[16],""+columns[17]+"":row[17]}
             d.append(h)
         content = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
@@ -979,7 +985,7 @@ class Database:
         con.close()
         return content
         
-    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids,batch_codes, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate):
+    def batch_list_updated(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type,course_ids,batch_codes, BU, Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate,customer_status):
         #print(status, customer, project, course, region, center)
         content = {}
         d = []
@@ -987,9 +993,9 @@ class Database:
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
 
-        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?'
+        sql = 'exec [batches].[sp_get_batch_list_updatd] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?'
 
-        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids, batch_codes,Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate) #
+        values = (batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,user_id,user_role_id, status, customer, project, sub_project, region, center, center_type, BU,course_ids, batch_codes,Planned_actual, StartFromDate, StartToDate, EndFromDate, EndToDate, customer_status) #
 
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
@@ -1330,7 +1336,7 @@ class Database:
         cur.commit()
         cur.close()
         con.close()
-        print(pop)
+        #print(pop)
         if pop >0:
             msg={"message":"Batch Assigned"}
         else:
@@ -1361,10 +1367,15 @@ class Database:
         msg={"message":"Batch Cancelled"}
         return msg
     def upload_assessment_certificate_copy(certi_name,user_id,enrolment_id,batch_id):
+        response=[]
+        h={}
+            
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = '''update assessments.tbl_map_certification_candidates_stages 
                 set certificate_copy=? ,
+                certification_stage_id=9,
+                soft_copy_uploaded_date=getdate(),
                 created_by=?
                 where intervention_value=? and assessment_id=(select TOP(1) assessment_id 
                                                             from assessments.tbl_batch_assessments
@@ -1377,16 +1388,58 @@ class Database:
         values = (certi_name,user_id,enrolment_id,batch_id)
         cur.execute(sql,(values))
         cur.commit()
+        user_mail_id_cc=''
+        batch_code=''
+        user_mail_id_to=''
+        user_name_to=''
+        sql = 'select top(1) batch_code from batches.tbl_batches where batch_id='+str(batch_id)
+        cur.execute(sql)                
+        for row in cur:
+            batch_code=row[0]
+        cur.commit()
+        
+        rec_type='TO'
+        sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+        values = (batch_id,9,rec_type)
+        cur.execute(sql,(values))                    
+        for row in cur:
+            user_name_to='Team'
+            user_mail_id_to=row[0]
+        rec_type='CC'
+        cur.commit()
+        sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+        values = (batch_id,9,rec_type)
+        cur.execute(sql,(values))                    
+        for row in cur:
+            user_mail_id_cc=row[0]
+        cur.commit()
+        sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+        values = (batch_id,enrolment_id)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]                   
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+        sent_mail.certification_stage_change_mail(9,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+        
         cur.close()
         con.close()
         msg={"Status":True,"message":"Certificate Uploaded"}
         return msg
     def upload_assessment_certificate_copy_bulk_upload(certi_name,user_id,enrolment_id,batch_id):
+        response=[]
+        h={}
+            
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = '''update assessments.tbl_map_certification_candidates_stages 
                 set certificate_copy=? ,
                 created_by=?,
+                certification_stage_id=9,
+                soft_copy_uploaded_date=getdate(),
+                
                 created_on=getdate()
                 where intervention_value in  (	
 								select	value 
@@ -1404,6 +1457,42 @@ class Database:
         values = (certi_name,user_id,enrolment_id,batch_id)
         cur.execute(sql,(values))
         cur.commit()
+        user_mail_id_cc=''
+        batch_code=''
+        user_mail_id_to=''
+        user_name_to=''
+        sql = 'select top(1) batch_code from batches.tbl_batches where batch_id='+str(batch_id)
+        cur.execute(sql)                
+        for row in cur:
+            batch_code=row[0]
+        cur.commit()
+        
+        rec_type='TO'
+        sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+        values = (batch_id,9,rec_type)
+        cur.execute(sql,(values))                    
+        for row in cur:
+            user_name_to='Team'
+            user_mail_id_to=row[0]
+        rec_type='CC'
+        cur.commit()
+        sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+        values = (batch_id,9,rec_type)
+        cur.execute(sql,(values))                    
+        for row in cur:
+            user_mail_id_cc=row[0]
+        cur.commit()
+        sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+        values = (batch_id,enrolment_id)
+        cur.execute(sql,(values))
+        columns = [column[0].title() for column in cur.description]                   
+        for row in cur:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())
+        attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+        sent_mail.certification_stage_change_mail(9,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                
         cur.close()
         con.close()
         msg={"Status":True,"message":"Certificate Uploaded"}
@@ -1546,15 +1635,15 @@ class Database:
         cur.close()
         con.close()
         return content
-    def user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status_id):
         content = {}
         d = []
         h={}
         
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [reports].[sp_get_user_sub_project_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [reports].[sp_get_user_sub_project_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, status_id)
         #print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
@@ -4062,7 +4151,7 @@ SELECT					cb.name as candidate_name,
 
         sql = 'exec [masters].[sp_get_batches_based_on_sub_projects] ?,?,?'
         values=(user_id,user_role_id,sub_project_id)
-        print(values)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for r in cur2:
@@ -4185,7 +4274,6 @@ SELECT					cb.name as candidate_name,
         cur = con.cursor()
         sql = 'exec [assessments].[get_batch_assessments] ?,?'
         values = (BatchId,Stage)
-        print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -4205,7 +4293,7 @@ SELECT					cb.name as candidate_name,
         cur = con.cursor()
         sql = 'exec [assessments].[get_batch_assessments_history] ?'
         values = (AssessentId,)
-        print("Hii")
+        #print("Hii")
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -4216,7 +4304,6 @@ SELECT					cb.name as candidate_name,
         cur.commit()
         cur.close()
         con.close()   
-        print(response)    
         return out
 
 
@@ -4303,7 +4390,6 @@ SELECT					cb.name as candidate_name,
             
             if pop>0:
                 out={"message":msg,"success":1,"assessment_id":pop}
-                print(str(partner_id),str(assessment_type_id),msg)
                 if((str(partner_id)=="1") & (str(assessment_type_id)=="2") & ((msg=='Assessment Proposed') | (msg=='Re-Assessment Proposed'))):
                     SDMSBatchId=''
                     Stage=''
@@ -4372,17 +4458,61 @@ SELECT					cb.name as candidate_name,
             return out
         except Exception as e:
             return {"message":"Error changing assessment stage"+e.message,"success":0,"assessment_id":0}
-    def create_assessment_candidate_file(data,columns,batch_code,file_type):
+    def create_assessment_candidate_result_file(AssessmentId,Batch_Code):
+        
         try:
-            import pandas as pd
-            import pypyodbc as pyodbc
-            import xlsxwriter
-            import calendar
-            import time
-            from Database import config
-        except:
-            return({'Description':'Module Error', 'Status':False})
+            DownloadPath=config.neo_report_file_path+'report file/'
+            report_name = 'Assessment_Candidate_Result_'+Batch_Code.replace('/','_')+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
+            r=re.compile('Assessment_Candidate_Result_.*')
+            lst=os.listdir(DownloadPath)
+            newlist = list(filter(r.match, lst))
+            for i in newlist:
+                os.remove( DownloadPath + i)
+            path = '{}{}'.format(DownloadPath,report_name)
+            
+            response=Database.GetAssessmentCandidateResults(AssessmentId)
+            res=Database.CreateExcelForDump(response,path,'Result')
+            #ImagePath=config.DownloadcandidateResultPathWeb
+            os.chmod(DownloadPath+report_name, 0o777)
+            
+            return str(DownloadPath+report_name)
+        except Exception as e:
+            return str(e)
+    def CreateExcelForDump(Response,file_path,sheet_name):
+        try:
+            #print(Response)
+            workbook = xlsxwriter.Workbook(file_path)
+            
+            header_format = workbook.add_format({
+                'bold': True,
+                #'text_wrap': True,
+                'align': 'top',
+                'valign': 'center',
+                'fg_color': '#D7E4BC',
+                'border': 1})
 
+            write_format = workbook.add_format({
+                'border': 1,
+                'align': 'top',
+                'valign': 'top'})
+
+            worksheet = workbook.add_worksheet(sheet_name)
+            #print(worksheet.name)
+            for i in range(len(Response['columns'])):
+                worksheet.write(0,i ,Response['columns'][i], header_format)   
+            for j in range(len(Response['data'])) : 
+                for k in range(len(Response['columns'])):
+                    if Response['data'].iloc[j,k] is None:
+                        worksheet.write(j+1,k ,'',write_format)
+                    else:
+                        worksheet.write(j+1,k ,Response['data'].iloc[j,k],write_format)
+                                                    
+            workbook.close()
+            return True
+        except Exception as e:
+            print(str(e))
+            return False
+    def create_assessment_candidate_file(data,columns,batch_code,file_type):
         try:
             gmt = time.gmtime() 
             ts = calendar.timegm(gmt)
@@ -4427,14 +4557,14 @@ SELECT					cb.name as candidate_name,
         except Exception as e:
             print("Exc"+str(e))
             return(str(e))
-    def ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc):
+    def ChangeCertificationStage(batch_id,batch_code,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark,courier_number,courier_name,courier_url):
         try:
             response=[]
             h={}
             con = pyodbc.connect(conn_str)
             cur = con.cursor()
-            sql = 'exec [assessments].[sp_change_certification_stage] ?,?,?,?,?,?,?,?,?,?,?,?,?,?'
-            values = (batch_id,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc)
+            sql = 'exec [assessments].[sp_change_certification_stage] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
+            values = (batch_id,user_id,current_stage_id,enrollment_ids,sent_printing_date,sent_center_date,expected_arrival_date,received_date,planned_distribution_date,actual_distribution_date,cg_name,cg_desig,cg_org,cg_org_loc,remark,courier_number,courier_name,courier_url)
             cur.execute(sql,(values))
             columns = [column[0].title() for column in cur.description]
             for row in cur:
@@ -4467,6 +4597,14 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=user_mail_id_cc+','+str(row[0])
+                    
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
                     cur.execute(sql,(values))
@@ -4534,6 +4672,14 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=user_mail_id_cc+','+str(row[0])
+                    
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
                     cur.execute(sql,(values))
@@ -4569,6 +4715,14 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=user_mail_id_cc+','+str(row[0])
+                    
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
                     cur.execute(sql,(values))
@@ -4604,6 +4758,14 @@ SELECT					cb.name as candidate_name,
                     cur.execute(sql)
                     for row in cur:
                         user_mail_id_cc=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=user_mail_id_cc+','+str(row[0])
+                    
                     sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                     values = (batch_id,enrollment_ids)
                     cur.execute(sql,(values))
@@ -4614,6 +4776,122 @@ SELECT					cb.name as candidate_name,
                         response.append(h.copy())
                     attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
                     sent_mail.certification_stage_change_mail(6,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                if(pop==7):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    rec_type='TO'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_name_to='Logistic Team'
+                        user_mail_id_to=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail(7,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                if(pop==8):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    rec_type='TO'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_name_to='Team'
+                        user_mail_id_to=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail_with_remarks(8,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file,remark)
+                if(pop==10):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    rec_type='TO'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_name_to='Team'
+                        user_mail_id_to=row[0]
+                    rec_type='CC'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))
+                    
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail(10,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                if(pop==11):
+                    user_mail_id_cc=''
+                    user_mail_id_to=''
+                    user_name_to=''
+                    rec_type='TO'
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))                    
+                    for row in cur:
+                        user_name_to='Team'
+                        user_mail_id_to=row[0]
+                    rec_type='CC'
+                    cur.commit()
+                    sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                    values = (batch_id,pop,rec_type)
+                    cur.execute(sql,(values))                    
+                    for row in cur:
+                        user_mail_id_cc=row[0]
+                    cur.commit()
+                    sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
+                    values = (batch_id,enrollment_ids)
+                    cur.execute(sql,(values))
+                    columns = [column[0].title() for column in cur.description]                   
+                    for row in cur:
+                        for i in range(len(columns)):
+                            h[columns[i]]=row[i]
+                        response.append(h.copy())
+                    attachment_file=Database.create_assessment_candidate_file(response,columns,batch_code,'certification')
+                    sent_mail.certification_stage_change_mail_with_remarks(11,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file,remark)
                 
                 
                 out={"message":msg,"success":1}
@@ -4623,6 +4901,7 @@ SELECT					cb.name as candidate_name,
             con.close()
             return out
         except Exception as e:
+            print(str(e))
             return {"message":"Error changing assessment stage"+e.message,"success":0,"assessment_id":0}
     
     def GetAssessmentCandidateResults(AssessmentId):
@@ -4633,7 +4912,7 @@ SELECT					cb.name as candidate_name,
             cur = con.cursor()
             sql = 'exec [assessments].[sp_get_candidate_result] ?'
             values=(AssessmentId,)  
-            print(values)          
+            #print(values)          
             cur.execute(sql,(values))
             col = [column[0].title() for column in cur.description]
             data=cur.fetchall()   
@@ -4644,7 +4923,7 @@ SELECT					cb.name as candidate_name,
             cur.close()
             con.close()
             response= {"columns":col,"data":df}
-            print(response)
+            #print(response)
             return response
         except Exception as e:
             print(str(e))
@@ -4689,7 +4968,10 @@ SELECT					cb.name as candidate_name,
         response=[]
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'select state_id, state_name from masters.tbl_states where is_active=1 and region_id ='+str(region_id)
+        if region_id ==5 or region_id==6:
+            sql = 'select state_id, state_name from masters.tbl_states where is_active=1'
+        else:
+            sql = 'select state_id, state_name from masters.tbl_states where is_active=1 and region_id ='+str(region_id)
         cur.execute(sql)
         columns = [column[0].title() for column in cur.description]
         for row in cur:
@@ -4910,13 +5192,13 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
-    def GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+    def GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec [reports].[sp_get_placement_ageing_report_data ]  ?,?,?,?,?,?'
-        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+        sql = 'exec [reports].[sp_get_placement_ageing_report_data ]  ?,?,?,?,?,?, ?, ?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)
         #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
@@ -4927,16 +5209,15 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return {"Data":response}
-    def GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date):
+    def GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec  [reports].[sp_get_candidate_based_on_placement_stage]  ?,?,?,?,?,?,?,?'
-        values = (user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date)
+        sql = 'exec  [reports].[sp_get_candidate_based_on_placement_stage]  ?,?,?,?,?,?,?,?, ?, ?'
+        values = (user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)
         cur2.execute(sql,(values))
-        #   print(cur2.fetchall())
-        #print(cur2)
+        
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
             for i in range(len(columns)):
@@ -5392,7 +5673,7 @@ SELECT					cb.name as candidate_name,
         if int(app_version) < int(data):
             curs.close()
             conn.close()
-            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            out = {'success': False, 'validation_error':False, 'description': "Lower App Version", 'app_status':False}
             return out
         
         #url = candidate_xml_weburl + xml
@@ -5405,18 +5686,19 @@ SELECT					cb.name as candidate_name,
         json_array_cont = []
         for child in root:
             temp_data = child.attrib
-            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
+            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"row_id":temp_data['row_id'], "primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
 
         sql = 'exec	[masters].[sp_validate_upload_mobh_contact_info] ?'
         values = (json.dumps(json_array_cont),)
         curs.execute(sql,(values))
         vali = curs.fetchall()
-
+        validation = []
         if vali!=[]:
-            vali = [i[0] for i in vali]
-            out = {'success': False, 'description': '\n'.join(vali), 'app_status':True}
+            for temp in vali:
+                validation.append({"row_id":temp[0],"error_flag":temp[3],"mobile":temp[1],"email":temp[2]})
+            out = {'success': False, 'validation_error':True, 'description': 'Mobile/Email already exists', 'app_status':True, 'error_message':validation } #'\n'.join()
             return out
-
+        
         try:
             '''
             insert into candidate_details.tbl_candidate_interventions
@@ -5464,13 +5746,14 @@ SELECT					cb.name as candidate_name,
             #print(quer2 + '\n' + quer3)
             curs.execute(quer2 + '\n' + quer3)
             curs.commit()
-            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True}
+            out = {'success': True, 'validation_error':False, 'description': "Submitted Successfully", 'app_status':True}
         except Exception as e:
-            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+            out = {'success': False, 'validation_error':False, 'description': "error: "+str(e), 'app_status':True}
         finally:
             curs.close()
             conn.close()
             return out
+
     def get_submit_candidate_reg(user_id, role_id, xml, latitude, longitude, timestamp, app_version,device_model,imei_num,android_version):
         conn = pyodbc.connect(conn_str)
         curs = conn.cursor()
@@ -5489,7 +5772,7 @@ SELECT					cb.name as candidate_name,
             update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',primary_contact_no='{}',secondary_contact_no='{}',email_id='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}',candidate_stage_id=2,candidate_status_id=2,created_on=GETDATE(),created_by='{}',created_by_role_id='{}',is_active=1 where candidate_id='{}';
             '''
             quer2='''
-            update candidate_details.tbl_candidate_reg_enroll_details set whatsapp_number='{}',candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type={},identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',created_by='{}',aadhar_image_name='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
+            update candidate_details.tbl_candidate_reg_enroll_details set whatsapp_number='{}',candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type={},identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',created_by='{}',aadhar_image_name='{}',educational_marksheet='{}',created_on=GETDATE(),is_active=1 where candidate_id='{}';
             '''
             quer3 = '''
             update candidate_details.tbl_candidates set isFresher={}, project_type={},created_by='{}',is_active=1,created_on=getdate() where candidate_id='{}';
@@ -5530,8 +5813,7 @@ SELECT					cb.name as candidate_name,
             INSERT INTO [candidate_details].[tbl_candidate_dell_details]
                 ([candidate_id]
                 ,[mobilization_type]
-                ,[Educational Marksheet]
-                ,[Aspirational District]
+               ,[Aspirational District]
                 ,[Income Certificate]
                 ,[created_on]
                 ,[created_by]
@@ -5551,17 +5833,21 @@ SELECT					cb.name as candidate_name,
             for child in root:
                 data = child.attrib
                 aadhar_image_name=''
+                educational_marksheet=''
                 if 'aadhar_image_name' in data:
                     aadhar_image_name=data['aadhar_image_name']
+                if 'edu_marsheet' in data:
+                    educational_marksheet=data['edu_marsheet']
+                
                 if 'yrsExp' in data:
                     query += '\n' + quer1.format(1 if data['isFresher']=='true' else 0 ,1 if data['dobEntered']=='true' else 0,data['yrsExp'],data['candSaltn'],data['firstname'],data['midName'],data['lastName'],data['candDob'],data['candAge'],data['primaryMob'],data['secMob'],data['candEmail'],data['candGender'],data['maritalStatus'],data['candCaste'],data['disableStatus'],data['candReligion'],data['candSource'],user_id,role_id,data['cand_id'])
                 if 'aadhaarNo' in data:
-                    query += '\n' + quer2.format(data['whatsapp_number'],data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['aadhaarNo'],data['idType'],data['idNum'],data['idCopy'],data['empType'],data['prefJob'],data['relExp'],data['lastCtc'],data['prefLocation'],data['willTravel'],data['workShift'],data['bocwId'],data['expectCtc'],user_id,aadhar_image_name,data['cand_id'])
+                    query += '\n' + quer2.format(data['whatsapp_number'],data['candPic'],data['motherTongue'],data['candOccuptn'],data['annualIncome'],data['interestCourse'],data['candProduct'],data['aadhaarNo'],data['idType'],data['idNum'],data['idCopy'],data['empType'],data['prefJob'],data['relExp'],data['lastCtc'],data['prefLocation'],data['willTravel'],data['workShift'],data['bocwId'],data['expectCtc'],user_id,aadhar_image_name,educational_marksheet,data['cand_id'])
                 if int(data['mobilization_type'])==2:
                     she_query="({},{},{},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),int(data['score']),int(data['result']),data['read_write_local_lang'],data['smart_phone'],data['buy_smart_phone'],data['own_two_wheeler'],data['serve_as_she'],data['sign_contract_with_LN'],data['adopt_digital_transaction'],data['any_loan'],data['active_loan'],data['loan_for_tools'],data['health_insurance'],data['allergic_to_chemicals'],data['follow_safety_norms'],data['subjected_to_legal_enq'],data['age_18_40'],data['eight_pass'],data['past_work_exp'],data['full_time_work'],data['trvl_within_panchayat'],data['bank_act'],user_id)
                     insert_query_she += '\n'+she_query
                 if int(data['mobilization_type'])==4:
-                    dell_query="({},{},'{}','{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),data['edu_marsheet'],data['asp_district'],data['dell_income_certi'],user_id)
+                    dell_query="({},{},'{}','{}',GETDATE(),{},1),".format(int(data['cand_id']),int(data['mobilization_type']),data['asp_district'],data['dell_income_certi'],user_id)
                     insert_query_dell += '\n'+dell_query
                 query += '\n' + quer3.format(1 if data['isFresher']=='true' else 0,int(data['mobilization_type']) ,user_id,data['cand_id'])
                 
@@ -5772,7 +6058,9 @@ SELECT					cb.name as candidate_name,
             sql = 'exec	candidate_details.sp_candidate_re_enr_skilling ?'
             values = (json.dumps(merger_skilling),)
             curs.execute(sql,(values))
-            d = list(map(lambda x:x[0],curs.fetchall()))
+            #d = list(map(lambda x:x[0],curs.fetchall()))
+            columns = [column[0].title() for column in curs.description]
+            d = list(map(lambda x:list(x),curs.fetchall()))
             
             # quer4 = quer4[:-1]+';'
             # curs.execute(quer4)
@@ -5791,11 +6079,13 @@ SELECT					cb.name as candidate_name,
                 curs.execute(quer6)
                 curs.commit()
             response_data=[]
-            intervention_string =','.join(map(str, d))
-            response_query = 'SELECT c.candidate_id as Candidate_Id,c.first_name as First_Name,COALESCE(middle_name,\'\') as Middle_Name,COALESCE(last_name,\'\') as Last_Name,c.primary_contact_no as Mobile_Number,cis.intervention_value as Enrollment_Id FROM candidate_details.tbl_candidate_interventions ci LEFT JOIN candidate_details.tbl_candidates as c on c.candidate_id=ci.candidate_id LEFT JOIN candidate_details. tbl_map_candidate_intervention_skilling as cis on cis.intervention_id=ci.candidate_intervention_id where ci.candidate_intervention_id IN ('+intervention_string+');'
-            curs.execute(response_query)
-            columns = [column[0].title() for column in curs.description]
-            for row in curs:
+            #print(d)
+            #intervention_string =','.join(map(str, d))
+            #print(intervention_string)
+            #response_query = 'SELECT c.candidate_id as Candidate_Id,c.first_name as First_Name,COALESCE(middle_name,\'\') as Middle_Name,COALESCE(last_name,\'\') as Last_Name,c.primary_contact_no as Mobile_Number,cis.intervention_value as Enrollment_Id FROM candidate_details.tbl_candidate_interventions ci LEFT JOIN candidate_details.tbl_candidates as c on c.candidate_id=ci.candidate_id LEFT JOIN candidate_details. tbl_map_candidate_intervention_skilling as cis on cis.intervention_id=ci.candidate_intervention_id where ci.candidate_id IN ('+intervention_string+');'
+            #curs.execute(response_query)
+            #columns = [column[0].title() for column in curs.description]
+            for row in d:
                 h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5]}
                 response_data.append(h)
             out = {'success': True, 'description': "Submitted Successfully", 'app_status':True,'data':response_data}
@@ -5816,7 +6106,7 @@ SELECT					cb.name as candidate_name,
         if int(app_version) < int(data):
             curs.close()
             conn.close()
-            out = {'success': False, 'description': "Lower App Version", 'app_status':False}
+            out = {'success': False, 'validation_error':False, 'description': "Lower App Version", 'app_status':False}
             return out
         
         #url = candidate_xml_weburl + xml
@@ -5834,18 +6124,19 @@ SELECT					cb.name as candidate_name,
                 mobilization_type = temp_data['mobilization_type']
             if 'assign_batch' in temp_data:
                 json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
-            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
+            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"row_id":row_id,"primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
 
         sql = 'exec	[masters].[sp_validate_upload_mobh_contact_info] ?'
         values = (json.dumps(json_array_cont),)
         curs.execute(sql,(values))
         vali = curs.fetchall()
-
+        validation = []
         if vali!=[]:
-            vali = [i[0] for i in vali]
-            out = {'success': False, 'description': '\n'.join(vali), 'app_status':True}
+            for temp in vali:
+                validation.append({"row_id":temp[0],"error_flag":temp[3],"mobile":temp[1],"email":temp[2]})
+            out = {'success': False, 'validation_error':True, 'description': 'Mobile/Email already exists', 'app_status':True, 'error_message':validation } #'\n'.join()
             return out
-        
+            
         if int(mobilization_type)==1:
             if json_array!=[]:
                 sql = 'exec	[masters].[sp_validate_enrollment_m] ?'
@@ -5859,11 +6150,11 @@ SELECT					cb.name as candidate_name,
                     msg = """Sorry, You can't enroll new candidates to the batch : {}
                     Note: The Actual Enrolment count has exceeded the Planned Target.""".format(vali[1])
 
-                    out = {'success': False, 'description': msg, 'app_status':True}
+                    out = {'success': False, 'validation_error':False, 'description': msg, 'app_status':True}
                     return out
                 elif vali[0]==2:
                     msg = """Sorry, enrollment process has ended, you cannot enroll candidates to the batch : {}.""".format(vali[1])
-                    out = {'success': False, 'description': msg, 'app_status':True}
+                    out = {'success': False, 'validation_error':False, 'description': msg, 'app_status':True}
                     return out
 
         try:
@@ -6148,13 +6439,13 @@ SELECT					cb.name as candidate_name,
                 quer6 += fam_query[:-1]+';'
                 curs.execute(quer6)
                 curs.commit()
-            out = {'success': True, 'description': "Submitted Successfully", 'app_status':True,'data':response_data}
+            out = {'success': True, 'validation_error':False, 'description': "Submitted Successfully", 'app_status':True,'data':response_data}
             curs.close()
             conn.close()
             return out
 
         except Exception as e:            
-            out = {'success': False, 'description': "error: "+str(e), 'app_status':True}
+            out = {'success': False, 'validation_error':False, 'description': "error: "+str(e), 'app_status':True}
             return out
 
     def get_batch_list_updated(user_id,candidate_id,role_id,mobilization_type):
@@ -6194,14 +6485,14 @@ SELECT					cb.name as candidate_name,
         con.close()
         return response
 
-    def sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project):
+    def sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project,customer_status):
         response = {}
         d = []
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [masters].[sp_get_sub_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
-        values = (user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,entity,customer,p_group,block,practice,bu,product,status,project)
+        sql = 'exec [masters].[sp_get_sub_project_list] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?'
+        values = (user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,entity,customer,p_group,block,practice,bu,product,status,project,customer_status)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -6359,7 +6650,7 @@ SELECT					cb.name as candidate_name,
             update candidate_details.tbl_candidates set isFresher={},isDob={},years_of_experience='{}',salutation='{}',first_name='{}',middle_name='{}',last_name='{}',date_of_birth='{}',age='{}',secondary_contact_no='{}',gender='{}',marital_status='{}',caste='{}',disability_status='{}',religion='{}',source_of_information='{}', present_district='{}', present_state=(select state_id from masters.tbl_states where state_name like trim('{}')),present_pincode='{}',present_country=(select country_id from masters.tbl_countries where country_name like trim('{}')),permanent_district='{}',permanent_state=(select state_id from masters.tbl_states where state_name like trim('{}')),permanent_pincode='{}',permanent_country=(select country_id from masters.tbl_countries where country_name like trim('{}')), candidate_stage_id=2,candidate_status_id=2,created_on=GETDATE(),created_by={},is_active=1,project_type={} where candidate_id='{}';
             '''
             quer2='''
-            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where UPPER(identification_name)=UPPER('{}')),identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',present_address_line1='{}',permanaet_address_line1='{}',created_by={},created_on=GETDATE(),is_active=1 ,whatsapp_number='{}',aadhar_image_name='{}' where candidate_id='{}';
+            update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}',mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where UPPER(identification_name)=UPPER('{}')),identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',present_address_line1='{}',permanaet_address_line1='{}',created_by={},created_on=GETDATE(),is_active=1 ,whatsapp_number='{}',aadhar_image_name='{}',educational_marksheet='{}' where candidate_id='{}';
             '''
             quer3='''
             update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set present_address_line2='{}',present_village='{}',present_panchayat='{}',present_taluk_block='{}',permanent_address_line2='{}',permanent_village='{}',permanent_panchayat='{}',permanent_taluk_block='{}',created_by={},created_on=GETDATE(),is_active=1 where candidate_id='{}';
@@ -6371,7 +6662,7 @@ SELECT					cb.name as candidate_name,
 
             quer4 = '''
             insert into candidate_details.tbl_candidate_dell_details
-            (candidate_id, mobilization_type, [Educational Marksheet], [Aspirational District], [Income Certificate],created_on,created_by,is_active)
+            (candidate_id, mobilization_type,  [Aspirational District], [Income Certificate],created_on,created_by,is_active)
             values
             '''
 
@@ -6383,7 +6674,7 @@ SELECT					cb.name as candidate_name,
             quer_exp = ''
             if ProjectType==1:
                 for row in out:
-                    quer4 += '\n' + "({},4,'{}','{}','{}',GETDATE(),{},1),".format(row[0],row[58],row[59],row[60],quer_user.format(row[56],row[56]))
+                    quer4 += '\n' + "({},4,'{}','{}',GETDATE(),{},1),".format(row[0],row[59],row[60],quer_user.format(row[56],row[56]))
                 quer_exp = quer4
             elif ProjectType==2:
                 for row in out:
@@ -6414,17 +6705,17 @@ SELECT					cb.name as candidate_name,
             if (ProjectType==1):
                 for row in out:
                     query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[8]=='' else 0,row[47],row[3],row[4],row[5],row[6],row[7],row[8],row[10],row[12],row[13],row[14],row[15],row[16],row[20],row[28],row[29],row[30],row[31],row[37],row[38],row[39],row[40],quer_user.format(row[56],row[56]),p,row[0])
-                    query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[23],row[32],quer_user.format(row[56],row[56]),row[57],row[55],row[0])
+                    query += '\n' + quer2.format(row[2],row[17],row[18],row[19],row[21],row[22],row[41],row[42],row[43],row[44],row[45],row[46],row[48],row[49],row[50],row[51],row[52],row[53],row[54],row[23],row[32],quer_user.format(row[56],row[56]),row[57],row[55],row[58],row[0])
                     query += '\n' + quer3.format(row[24],row[25],row[26],row[27],row[33],row[34],row[35],row[36],quer_user.format(row[56],row[56]),row[0])
 
                     # query += '\n' + quer4.format(row[58],row[59],row[60],quer_user.format(row[56],row[56]),row[0])
             else:
                 quer2='''
-                update candidate_details.tbl_candidate_reg_enroll_details set mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where UPPER(identification_name)=UPPER('{}')),identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',present_address_line1='{}',permanaet_address_line1='{}',created_by={},created_on=GETDATE(),is_active=1 ,whatsapp_number='{}',aadhar_image_name='{}' where candidate_id='{}';
+                update candidate_details.tbl_candidate_reg_enroll_details set mother_tongue='{}',current_occupation='{}',average_annual_income='{}',interested_course='{}',product='{}',aadhar_no='{}',identifier_type=(select identification_id from masters.tbl_identification_type where UPPER(identification_name)=UPPER('{}')),identity_number='{}',document_copy_image_name='{}',employment_type='{}',preferred_job_role='{}',relevant_years_of_experience='{}',current_last_ctc='{}',preferred_location='{}',willing_to_travel='{}',willing_to_work_in_shifts='{}',bocw_registration_id='{}',expected_ctc='{}',present_address_line1='{}',permanaet_address_line1='{}',created_by={},created_on=GETDATE(),is_active=1 ,whatsapp_number='{}',aadhar_image_name='{}',educational_marksheet='{}' where candidate_id='{}';
                 '''
                 for row in out:
                     query += '\n' + quer1.format(1 if str(row[1]).lower()=='true' else 0, 1 if row[7]=='' else 0,row[46],row[2],row[3],row[4],row[5],row[6],row[7],row[9],row[11],row[12],row[13],row[14],row[15],row[19],row[27],row[28],row[29],row[30],row[36],row[37],row[38],row[39],quer_user.format(row[55],row[55]),p,row[0])
-                    query += '\n' + quer2.format(row[16],row[17],row[18],row[20],row[21],row[40],row[41],row[42],row[43],row[44],row[45],row[47],row[48],row[49],row[50],row[51],row[52],row[53],row[22],row[31],quer_user.format(row[55],row[55]),row[56],row[54],row[0])
+                    query += '\n' + quer2.format(row[16],row[17],row[18],row[20],row[21],row[40],row[41],row[42],row[43],row[44],row[45],row[47],row[48],row[49],row[50],row[51],row[52],row[53],row[22],row[31],quer_user.format(row[55],row[55]),row[56],row[54],row[57],row[0])
                     query += '\n' + quer3.format(row[23],row[24],row[25],row[26],row[32],row[33],row[34],row[37],quer_user.format(row[55],row[55]),row[0])
                     
                 if ProjectType==2:
@@ -6826,11 +7117,38 @@ SELECT					cb.name as candidate_name,
                 pop=row[0]
 
             cur.commit()
-            cur.close()
-            con.close()
+            
             if pop >0 :
                 Status=True
                 msg="Uploaded Successfully"
+                user_mail_id_cc=''
+                user_mail_id_to=''
+                user_name_to=''
+                batch_code=''
+
+                rec_type='CC'
+                sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                values = (batch_id,8,rec_type)
+                cur.execute(sql,(values))                
+                for row in cur:
+                    user_name_to='PMT Team'
+                    user_mail_id_to=row[0]
+
+                rec_type='TO'
+                sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                values = (batch_id,8,rec_type)
+                cur.execute(sql,(values))                
+                for row in cur:
+                    user_mail_id_cc=row[0]
+
+                sql = 'select top(1) batch_code from batches.tbl_batches where batch_id='+str(batch_id)
+                cur.execute(sql)                
+                for row in cur:
+                    batch_code=row[0]
+
+                attachment_file=Database.create_assessment_candidate_result_file(assessment_id,batch_code)
+                sent_mail.assessment_stage_change_mail(4,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                   
             elif pop==-1:
                 msg="Only one batch data allowed at a time"
                 Status=False
@@ -6840,6 +7158,8 @@ SELECT					cb.name as candidate_name,
             else:
                 msg="Wrong Batch code/Enrollment Id"
                 Status=False
+            cur.close()
+            con.close()
             return {"Status":Status,'message':msg}
         except Exception as e:
             # print(str(e))
@@ -6873,6 +7193,14 @@ SELECT					cb.name as candidate_name,
                 cur.execute(sql)
                 for row in cur:
                     assigned_by_email_id=row[0]
+                rec_type='CC'
+                cur.commit()
+                sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                values = (batch_id,1,rec_type)
+                cur.execute(sql,(values))                    
+                for row in cur:
+                    assigned_by_email_id=assigned_by_email_id+','+str(row[0])
+                    
                 #sql = 'exec [candidate_details].[sp_get_candidate_details_for_certification] ?,?'
                 #values = (batch_id,enrollment_ids)
                 #cur.execute(sql,(values))
@@ -6912,6 +7240,43 @@ SELECT					cb.name as candidate_name,
             if pop >0 :
                 Status=True
                 msg="Uploaded Successfully"
+                user_mail_id_cc=''
+                user_mail_id_to=''
+                user_name_to=''
+                batch_code=''
+
+                rec_type='CC'
+                sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                values = (batch_id,8,rec_type)
+                cur.execute(sql,(values))                
+                for row in cur:
+                    user_name_to='PMT Team'
+                    user_mail_id_to=row[0]
+
+                rec_type='TO'
+                sql = 'exec [batches].[sp_get_batch_emails_for_certification] ?, ?,?'
+                values = (batch_id,8,rec_type)
+                cur.execute(sql,(values))                
+                for row in cur:
+                    user_mail_id_cc=row[0]
+
+                sql = 'select top(1) batch_code from batches.tbl_batches where batch_id='+str(batch_id)+';'
+                cur.execute(sql)                
+                for row in cur:
+                    batch_code=row[0]
+                cur.commit()
+                assessment_id=0
+                sql='''select TOP(1) assessment_id 
+                        from assessments.tbl_batch_assessments
+                        where batch_id='''+ str(batch_id)+''' and assessment_type_id=2
+                        order by assessment_id desc;'''
+                cur.execute(sql)                
+                for row in cur:
+                    assessment_id=int(row[0])
+                cur.commit()                                                           
+                attachment_file=Database.create_assessment_candidate_result_file(assessment_id,batch_code)
+                sent_mail.assessment_stage_change_mail(4,user_mail_id_to,user_name_to,user_mail_id_cc,batch_code,attachment_file)
+                
             elif pop==-1:
                 msg="Only one batch data allowed at a time"
                 Status=False
@@ -6926,14 +7291,14 @@ SELECT					cb.name as candidate_name,
             # print(str(e))
             return {"Status":False,'message': "error: "+str(e)}
     
-    def GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+    def GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec [reports].[sp_get_qp_wise_report_data]   ?,?,?,?,?,?'
-        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
-        print(values)
+        sql = 'exec [reports].[sp_get_qp_wise_report_data]   ?,?,?,?,?,?,?,?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -6960,14 +7325,14 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
-    def GetQpWiseRegionWiseBatchLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id,region_id):
+    def GetQpWiseRegionWiseBatchLevelData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id,region_id, status_id, stage_ids):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
         sql = 'exec [reports].[sp_get_qp_wise_region_wise_batch_report_data]    ?,?,?,?,?,?,?,?'
         values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date,qp_id,region_id)
-        print(values)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -6978,16 +7343,17 @@ SELECT					cb.name as candidate_name,
         con.close()
         return {"response":response,"columns":columns}
 
-    def GetQpWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids):
+    def GetQpWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids, status_id, stage_ids):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec [reports].[sp_get_qp_wise_report_data_download]   ?,?,?,?'
-        values = (user_id,user_role_id,customer_ids,contract_ids)
-        print(values)
+        sql = 'exec [reports].[sp_get_qp_wise_report_data_download]   ?,?,?,?, ?, ?'
+        values = (user_id,user_role_id,customer_ids,contract_ids, status_id, stage_ids)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
+        #print(columns)
         for row in cur2:
             for i in range(len(columns)):
                 h[columns[i]]=row[i]           
@@ -6995,14 +7361,14 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
-    def GetRegionWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids):
+    def GetRegionWiseDownloadData(user_id,user_role_id,customer_ids,contract_ids, status_id, stage_ids):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec [reports].[sp_get_region_wise_report_data_download]   ?,?,?,?'
-        values = (user_id,user_role_id,customer_ids,contract_ids)
-        print(values)
+        sql = 'exec [reports].[sp_get_region_wise_report_data_download]   ?,?,?,?, ?, ?'
+        values = (user_id,user_role_id,customer_ids,contract_ids, status_id, stage_ids)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -7147,14 +7513,14 @@ SELECT					cb.name as candidate_name,
         curs.execute(quer)
         return list(map(lambda x:str.lower(x[0]), curs.fetchall()))
 
-    def DownloadBatchStatusReport(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date):
+    def DownloadBatchStatusReport(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date, status_id, stage_ids):
         response = []
         h={}
         con = pyodbc.connect(conn_str)
         cur2 = con.cursor()
-        sql = 'exec [reports].[sp_get_batch_status_report_data]    ?,?,?,?,?,?,?,?'
-        values = (user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date)
-        print(values)
+        sql = 'exec [reports].[sp_get_batch_status_report_data]    ?,?,?,?,?,?,?,?, ?, ?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date, status_id, stage_ids)
+        #print(values)
         cur2.execute(sql,(values))
         columns = [column[0].title() for column in cur2.description]
         for row in cur2:
@@ -7164,14 +7530,14 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
-    def GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw):
+    def GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status_id, stage_ids):
         response = {}
         d = []
         h={}
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [reports].[sp_get_batch_status_date_list] ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?'
-        values = (user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction)
+        sql = 'exec [reports].[sp_get_batch_status_date_list] ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, status_id, stage_ids)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -7185,6 +7551,7 @@ SELECT					cb.name as candidate_name,
         response = {"draw":draw,"recordsTotal":record,"recordsFiltered":fil,"data":d}
         cur.close()
         con.close()
+        print(values)
         return response
 
     def upload_batch_target_plan(df,user_id,user_role_id):
@@ -7495,7 +7862,7 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
 
-    def DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id):
+    def DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids, status_id):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
@@ -7508,22 +7875,22 @@ SELECT					cb.name as candidate_name,
         sql1=''
         sql2=''
         if int(role_id)==11:
-            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_coo] ?, ?, ?,?,?'
-            sql1 = 'exec [reports].[sp_get_EmployeeWise_report_data_coo_sub_project] ?, ?, ?,?,?'
+            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_coo] ?, ?, ?,?,?,?,?'
+            sql1 = 'exec [reports].[sp_get_EmployeeWise_report_data_coo_sub_project] ?, ?, ?,?,?,?,?'
             #sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_course] ?, ?, ?,?,?'
         if int(role_id)==14:
-            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_territory_manager] ?, ?, ?,?,?'
-            sql1 = 'exec [reports].[sp_get_EmployeeWise_report_data_territory_manager_sub_project] ?, ?, ?,?,?'
+            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_territory_manager] ?, ?, ?,?,?,?,?'
+            sql1 = 'exec [reports].[sp_get_EmployeeWise_report_data_territory_manager_sub_project] ?, ?, ?,?,?,?,?'
             #sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_course] ?, ?, ?,?,?'
         if int(role_id)==5:
-            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_center_manager] ?, ?, ?,?,?'
-            sql1 = 'exec [reports].[sp_get_EmployeeWise_report_data_center_manager_sub_project] ?, ?, ?,?,?'
+            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_center_manager] ?, ?, ?,?,?,?,?'
+            sql1 = 'exec [reports].[sp_get_EmployeeWise_report_data_center_manager_sub_project] ?, ?, ?,?,?,?,?'
             #sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_course] ?, ?, ?,?,?'
         if int(role_id)==2:
-            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_mobilizer] ?, ?, ?,?,?'
+            sql = 'exec [reports].[sp_get_EmployeeWise_report_data_mobilizer] ?, ?, ?,?,?,?,?'
             #sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_sub_project] ?, ?, ?,?,?'
             #sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_course] ?, ?, ?,?,?'
-        values = (customer_ids, contract_ids, month,user_id,user_role_id)
+        values = (customer_ids, contract_ids, month,user_id,user_role_id, stage_ids, status_id)
         
         res = {}
         curs.execute(sql,(values))
@@ -7595,7 +7962,7 @@ SELECT					cb.name as candidate_name,
         curs.close()
         con.close() 
 
-    def DownloadProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status):
+    def DownloadProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,customer_status):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
@@ -7607,10 +7974,10 @@ SELECT					cb.name as candidate_name,
         sql=''
         sql1=''
         sql2=''
-        sql = 'exec [reports].[sp_get_project_download] ?, ?, ?,?,?,?,?,?,?,?,?'
-        sql1 = 'exec [reports].[sp_get_project_center_download] ?, ?, ?,?,?,?,?,?,?,?,?'
-        sql2 = 'exec [reports].[sp_get_project_course_download]  ?, ?, ?,?,?,?,?,?,?,?,?'
-        values = (user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status)
+        sql = 'exec [reports].[sp_get_project_download] ?, ?, ?,?,?,?,?,?,?,?,?, ?'
+        sql1 = 'exec [reports].[sp_get_project_center_download] ?, ?, ?,?,?,?,?,?,?,?,?, ?'
+        sql2 = 'exec [reports].[sp_get_project_course_download]  ?, ?, ?,?,?,?,?,?,?,?,?, ?'
+        values = (user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,customer_status)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
@@ -7625,11 +7992,11 @@ SELECT					cb.name as candidate_name,
         sheet3_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
         sheet3 = list(map(lambda x:list(x), data))        
-        return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
         curs.close()
-        con.close()    
-       
-    def DownloadSubProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project):
+        con.close()  
+        return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
+
+    def DownloadSubProjectReport(user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project,customer_status):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
@@ -7647,16 +8014,19 @@ SELECT					cb.name as candidate_name,
         sql2=''
         sql3=''
         sql4=''
-        sql = 'exec [reports].[sp_get_sub_project_download] ?, ?, ?,?,?,?,?,?,?,?,?,?'
+        sql = 'exec [reports].[sp_get_sub_project_download] ?, ?, ?,?,?,?,?,?,?,?,?,?,?'
         sql1 = 'exec [reports].[sp_get_sub_project_center_download] ?, ?, ?,?,?,?,?,?,?,?,?,?'
         sql2 = 'exec [reports].[sp_get_sub_project_course_download]  ?, ?, ?,?,?,?,?,?,?,?,?,?'
         sql3 = 'exec [reports].[sp_get_sub_project_user_download] ?, ?, ?,?,?,?,?,?,?,?,?,?'
         sql4 = 'exec [reports].[sp_get_sub_project_planned_batches_download]  ?, ?, ?,?,?,?,?,?,?,?,?,?'
-        values = (user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project)
+        
+        values = (user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project,customer_status)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
-        sheet1 = list(map(lambda x:list(x), data))        
+        sheet1 = list(map(lambda x:list(x), data))  
+        
+        values = (user_id,user_role_id,user_region_id,entity,customer,p_group,block,practice,bu,product,status,project)
         curs.execute(sql1,(values))
         sheet2_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
@@ -7677,25 +8047,24 @@ SELECT					cb.name as candidate_name,
         return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet4':sheet4,'sheet5':sheet5,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns,'sheet4_columns':sheet4_columns,'sheet5_columns':sheet5_columns}
         curs.close()
         con.close()  
-    def DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id):
+    def DownloadAssessmentProductivityReport(customer_ids,contract_ids,project_ids,sub_project_ids,regions,month,user_id,user_role_id,status_id):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
         sheet1_columns=[]
         
-        sql = 'exec [reports].[sp_get_assessment_productivity_report_data] ?,?,?,?, ?, ?,?,?'
-        
-        values = (customer_ids, contract_ids,project_ids,sub_project_ids,regions, month,user_id,user_role_id)
+        sql = 'exec [reports].[sp_get_assessment_productivity_report_data] ?,?,?,?, ?, ?,?,?,?'
+        values = (customer_ids, contract_ids,project_ids,sub_project_ids,regions, month,user_id,user_role_id,status_id)
         
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
         sheet1 = list(map(lambda x:list(x), data))        
-        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
-        cur2.close()
+        curs.close()
         con.close()    
-    
-    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns}
+        
+    def DownloadRegionProductivityReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
@@ -7708,10 +8077,10 @@ SELECT					cb.name as candidate_name,
         sql1=''
         sql2=''
         
-        sql = 'exec [reports].[sp_get_region_productivity_report_data] ?, ?, ?,?,?,?'
-        sql1 = 'exec [reports].[sp_get_region_productivity_report_data_batch] ?, ?, ?,?,?,?'
-        sql2 = 'exec [reports].[sp_get_region_productivity_report_data_customer] ?, ?, ?,?,?,?'
-        values = (customer_ids, contract_ids, region_ids,month,user_id,user_role_id)
+        sql = 'exec [reports].[sp_get_region_productivity_report_data] ?, ?, ?,?,?,?, ?, ?'
+        sql1 = 'exec [reports].[sp_get_region_productivity_report_data_batch] ?, ?, ?,?,?,?, ?, ?'
+        sql2 = 'exec [reports].[sp_get_region_productivity_report_data_customer] ?, ?, ?,?,?,?, ?, ?'
+        values = (customer_ids, contract_ids, region_ids,month,user_id,user_role_id, status_id, stage_ids)
         #print(values)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
@@ -7728,12 +8097,13 @@ SELECT					cb.name as candidate_name,
         sheet3_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
         sheet3 = list(map(lambda x:list(x), data))
+        
+        curs.close()
+        con.close()
         return {'sheet1':sheet1,'sheet2':sheet2,'sheet3':sheet3,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns,'sheet3_columns':sheet3_columns}
-        cur2.close()
-        con.close()
-        con.close()
-
-    def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id):
+        
+    def DownloadCustomerTargetReport(customer_ids,contract_ids,month,region_ids,user_id,user_role_id, status_id, stage_ids):
+        #  , status_id, stage_ids
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
@@ -7746,10 +8116,10 @@ SELECT					cb.name as candidate_name,
         sql1=''
         sql2=''
         
-        sql = 'exec [reports].[sp_get_monthly_target_report_data] ?, ?, ?,?,?,?'
-        sql1 = 'exec [reports].[sp_get_monthly_target_report_data_customerwise] ?, ?, ?,?,?,?'
-        sql2 = 'exec [reports].[sp_get_monthly_target_report_data_customerwise_batches] ?, ?, ?,?,?,?'
-        values = (customer_ids, contract_ids, region_ids,month,user_id,user_role_id)
+        sql = 'exec [reports].[sp_get_monthly_target_report_data] ?, ?, ?,?,?,?, ?, ?'
+        sql1 = 'exec [reports].[sp_get_monthly_target_report_data_customerwise] ?, ?, ?,?,?,?, ?, ?'
+        sql2 = 'exec [reports].[sp_get_monthly_target_report_data_customerwise_batches] ?, ?, ?,?,?,?, ?, ?'
+        values = (customer_ids, contract_ids, region_ids,month,user_id,user_role_id,status_id, stage_ids)
         #print(values)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
@@ -7906,15 +8276,16 @@ SELECT					cb.name as candidate_name,
             cur.execute(sql)
             for row in cur:
                 pop=row[0]
-            cur.commit()
-            cur.close()
-            con.close()
+            
             if pop >0 :
                 Status=True
                 msg="Synced Successfully"
             else:
                 msg="Error in Syncing"
                 Status=False
+            cur.commit()
+            cur.close()
+            con.close()
             return {"Status":Status,'Message':msg}
         except Exception as e:
             print(str(e))
@@ -7994,13 +8365,13 @@ SELECT					cb.name as candidate_name,
         curs.close()
         conn.close()
         return h
-    def DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date):
+    def DownloadCandidateData(candidate_id, user_id, user_role_id, project_types, customer, project, sub_project, batch, region, center, created_by, Contracts, candidate_stage, from_date, to_date, status_id, stage_ids):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
         sheet1=[]
         sheet1_columns=[]
-        sql = 'exec [candidate_details].[sp_get_candidate_data] ?,?,?,?,?,?,?,?,?,?,?,?'
-        values = (customer,Contracts,project, sub_project, batch,project_types,created_by,from_date,to_date,candidate_stage ,user_id, user_role_id)
+        sql = 'exec [candidate_details].[sp_get_candidate_data] ?,?,?,?,?,?,?,?,?,?,?,?,?,?'
+        values = (customer,Contracts,project, sub_project, batch,project_types,created_by,from_date,to_date,candidate_stage ,user_id, user_role_id, status_id, stage_ids)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]  
         data = curs.fetchall()
@@ -8133,7 +8504,7 @@ SELECT					cb.name as candidate_name,
         quer1 = "update candidate_details.tbl_candidate_reg_enroll_details set candidate_photo='{}' where candidate_id={}"
         quer2 = "update candidate_details.tbl_candidate_reg_enroll_details set aadhar_image_name='{}' where candidate_id = {}"
         quer3 = "update candidate_details.tbl_candidate_reg_enroll_details set document_copy_image_name = '{}' where candidate_id = {}"
-        quer4 = "update candidate_details.tbl_candidate_dell_details set [Educational Marksheet]='{}' where candidate_id={}"
+        quer4 = "update candidate_details.tbl_candidate_reg_enroll_details set [educational_marksheet]='{}' where candidate_id={}"
         quer5 = "update candidate_details.tbl_candidate_dell_details set [Income Certificate]='{}' where candidate_id={}"
         quer6 = "update candidate_details.tbl_candidate_reg_enroll_non_mandatory_details set attachment_image_name='{}' where candidate_id={}"
         quer7 = "update candidate_details.tbl_candidate_she_details set [Educational qualification]='{}' where candidate_id={}"
@@ -8348,12 +8719,12 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()
         return {'sheet1':data,'sheet1_columns':columns}
-    def shiksha_attandance_report(user_id, user_role_id, Customers, from_date, to_date):
+    def shiksha_attandance_report(user_id, user_role_id, Customers, from_date, to_date, status_id):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
-        sql = 'exec [reports].[sp_get_shiksha_attendance_download] ?, ?, ?,?, ?'
-        values = ((user_id, user_role_id, Customers, from_date, to_date))
-        print(values)
+        sql = 'exec [reports].[sp_get_shiksha_attendance_download] ?, ?, ?,?, ?, ?'
+        values = (user_id, user_role_id, Customers, from_date, to_date, status_id)
+        #print(values)
         curs.execute(sql,(values))
         columns = [column[0].title() for column in curs.description]
         data = curs.fetchall()
@@ -8361,7 +8732,7 @@ SELECT					cb.name as candidate_name,
         curs.close()
         cnxn.close()
         return {'sheet1':data,'sheet1_columns':columns}
-    def GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date):
+    def GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
         sheet1=[]
@@ -8370,14 +8741,14 @@ SELECT					cb.name as candidate_name,
         sheet2_columns=[]
         placement_stage=-1
         sub_project_code=''
-        sql = 'exec [reports].[sp_get_placement_ageing_report_data] ?, ?, ?,?, ?, ?'
-        sql1 = 'exec [reports].[sp_get_candidate_based_on_placement_stage]?, ?, ?,?, ?, ?,?,?'
-        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+        sql = 'exec [reports].[sp_get_placement_ageing_report_data] ?, ?, ?,?, ?, ?, ?, ?'
+        sql1 = 'exec [reports].[sp_get_candidate_based_on_placement_stage]?, ?, ?,?, ?, ?,?,?, ?, ?'
+        values = (user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]
         data = curs.fetchall()
         sheet1 = list(map(lambda x:list(x), data))
-        values = (user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date)        
+        values = (user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)        
         curs.execute(sql1,(values))
         sheet2_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
@@ -8449,11 +8820,11 @@ SELECT					cb.name as candidate_name,
             print('Ex'+str(e))
             return {"Status":False,'message': "error: "+str(e)}
 
-    def download_Assessment_report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+    def download_Assessment_report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate, status_id):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
-        sql = 'exec [reports].[sp_get_assesment_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+        sql = 'exec [reports].[sp_get_assesment_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate, status_id)
         curs.execute(sql,(values))
         columns = [column[0].title() for column in curs.description]
         data = curs.fetchall()
@@ -8463,11 +8834,11 @@ SELECT					cb.name as candidate_name,
         cnxn.close()
         return (data,columns)
 
-    def download_Certification_Distribution_Report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate):
+    def download_Certification_Distribution_Report(user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate,status_id):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
-        sql = 'exec [reports].[sp_get_certification_distribution_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
-        values = (user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+        sql = 'exec [reports].[sp_get_certification_distribution_report] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate,status_id)
         curs.execute(sql,(values))
         columns = [column[0].title() for column in curs.description]
         data = curs.fetchall()
@@ -8477,15 +8848,13 @@ SELECT					cb.name as candidate_name,
         cnxn.close()
         return (data,columns)
     
-    def DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id):
+    def DownloadCertificate_distributionProductivityReport(month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id, status_id):
         cnxn=pyodbc.connect(conn_str)
         curs = cnxn.cursor()
-
         sheet1=[]
         sheet1_columns=[]
-
-        sql = 'exec [reports].[sp_get_certificate_distribution_productivity_report] ?, ?, ?,?,?, ?, ?'
-        values = (month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id)
+        sql = 'exec [reports].[sp_get_certificate_distribution_productivity_report] ?, ?, ?,?,?, ?, ?, ?'
+        values = (month, customer_ids, project_ids, sub_project_ids, regions, user_id, user_role_id, status_id)
         
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
@@ -8763,4 +9132,141 @@ SELECT					cb.name as candidate_name,
         con.close()
         out = {'Status': True, 'message': "Submitted Successfully"}
         return out
+    def GetTrainerProfile(trainer_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sql = 'exec [masters].[sp_get_trainer_profile] ?'
+        values = (trainer_id,)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        for row in curs:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())        
+        curs.close()
+        con.close()
+        #print(response)
+        return response
+    def GetSingleTrainerProfile(trainer_profile_id):
+        response = []
+        h={}
+        con = pyodbc.connect(conn_str)
+        curs = con.cursor()
+        sql = 'exec [masters].[sp_get_single_trainer_profile] ?'
+        values = (trainer_profile_id,)
+        curs.execute(sql,(values))
+        columns = [column[0].title() for column in curs.description]
+        for row in curs:
+            for i in range(len(columns)):
+                h[columns[i]]=row[i]
+            response.append(h.copy())        
+        curs.close()
+        con.close()
+        #print(response)
+        return response
 
+
+    def GetPartnerContract(partner_id):
+        response = []
+        res={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_partner_contract] ?'
+        values = (partner_id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        data = list(map(lambda x:list(x), cur2.fetchall()))
+        for i in set(map(lambda x:x[1],data)):
+            f_data = list(filter(lambda x:x[1]==i,data))
+            res["S_No"]=f_data[0][0]
+            res["Partner_Contract_Id"]=f_data[0][1]
+            res["Partner_Id"]=f_data[0][2]
+            res["Partner_Contract_Name"]=f_data[0][3]
+            res["Partner_Contract_Code"]=f_data[0][4]
+            res["Start_Date"]=f_data[0][5]
+            res["End_Date"]=f_data[0][6]
+            res["Mou"]=f_data[0][7]
+            mile=[]
+            for j in f_data:
+                if j[9]!=0:
+                    mile.append({"Id":j[9], 'Cost':j[8]})
+            res["Mile"]=mile
+            response.append(res.copy())
+        cur2.close()
+        con.close()
+        return response
+
+    def add_edit_partner_contract(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId):
+        #print(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId)
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_add_edit_partner_contract] ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated","Status":True}
+        else: 
+                if pop==0:
+                    msg={"message":"Created","Status":True}
+                else:
+                    if pop==2:
+                        msg={"message":"Partner Contract Code already exists","Status":False}
+        return msg
+    def add_edit_trainer_profile(certificate_name, sector_id, start_date, end_date, filename, trainer_id, is_active, user_id, trainer_profile_id):
+        #print(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId)
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[masters].[sp_add_edit_trainer_profile] ?, ?, ?, ?, ?, ?, ?, ?, ?'
+        values = (certificate_name, sector_id, start_date, end_date, filename, trainer_id, is_active, user_id, trainer_profile_id)
+        #print(values)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==1:
+            msg={"message":"Updated","Status":True}
+        else: 
+                if pop==0:
+                    msg={"message":"Created","Status":True}
+                else:
+                    if pop==2:
+                        msg={"message":"Error while updating record","Status":False}
+        return msg
+
+    def GetPartnerContractMilestones(Partner_Contract_Id):
+        response = []
+        res={}
+        con = pyodbc.connect(conn_str)
+        cur2 = con.cursor()
+        sql = 'exec [masters].[sp_get_partner_contract_Milestone] ?'
+        values = (Partner_Contract_Id,)
+        cur2.execute(sql,(values))
+        columns = [column[0].title() for column in cur2.description]
+        data = list(map(lambda x:list(x), cur2.fetchall()))
+        if (data!=[]):
+            res["S_No"]=data[0][0]
+            res["Partner_Contract_Id"]=data[0][1]
+            res["Partner_Id"]=data[0][2]
+            res["Partner_Contract_Name"]=data[0][3]
+            res["Partner_Contract_Code"]=data[0][4]
+            res["Start_Date"]=data[0][5]
+            res["End_Date"]=data[0][6]
+            res["Mou"]=data[0][7]
+            mile=[]
+            for j in data:
+                if j[9]!=0:
+                    mile.append({"Id":j[9], 'Cost':j[8], 'Milestone':j[10]})
+            res["Mile"]=mile
+        
+        cur2.close()
+        con.close()
+        return res

@@ -75,6 +75,9 @@
             LoadRegionddl();
             loadClient();
             LoadCertificationStages();
+            $('#ddlResultStages').append(new Option('','0'));
+            $('#ddlSoftCopyStages').append(new Option('','0'));
+            
              role_id=parseInt($('#hdn_home_user_role_id').val());
             if(role_id == 1 || role_id ==5 || role_id ==15 || role_id  ==27)
                 $('#btn_create').show();
@@ -205,7 +208,12 @@
                                                     <th>S No</th>
                                                     <th>Actions</th>                                                   
                                                     <th>Batch Code</th>
-                                                    <th>Passed Count</th>
+                                                    <th>Result Uploaded Count</th>
+                                                    <th>Result Confirmed</th>
+                                                    <th>Requested For Modification(Result)</th>
+                                                    <th>Soft Copy Uploaded</th>
+                                                    <th>Soft Copy Approved</th>
+                                                    <th>Requested For Modification(Soft Copy)</th>
                                                     <th>Requested for printing</th>
                                                     <th>Sent for printing</th>
                                                     <th>Sent to Center</th>
@@ -268,7 +276,7 @@
     </div><!--/.modal-->
     <div id="tr_candidate_detail" class="modal fade" role="dialog" style="padding-right: 20px;">
         <div class="modal-dialog modal-xl">
-            <div class="modal-content " style="width: 1300px;margin-left: -50px;">
+            <div class="modal-content " style="width: 1320px;margin-left: -60px;">
                 <div class="modal-header">
                     <h4 class="modal-title">Candidate List:</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="Back()">×</button>
@@ -280,7 +288,7 @@
                     <input type="hidden" id="hdn_mdl_skilling_id" name="hdn_mdl_skilling_id" value="0">
                     <input type="hidden" id="hdn_cand_enrol_id" name="hdn_cand_enrol_id" value="0">
                     
-                    <table id="tbl_candidate" class="table table-bordered dt-responsive wrap w-100" style="border-color: lightgray;width:100% !important;font-size: 10px;">
+                    <table id="tbl_candidate" class="table table-bordered dt-responsive wrap w-100" style="border-color: lightgray;width:100% !important;font-size: 8px;">
                         <thead>
                             <tr style="background-color: #f5f6f8;">
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
@@ -290,6 +298,10 @@
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Mobile Number</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Email</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Enrolment No</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Candidate Score</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Candidate Result/Grade</th>
+                                <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Assessment Status</th>
+                               
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Certificate Number</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Certificate Copy</th>
                                 <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Candidate Image</th>
@@ -329,6 +341,30 @@
                     <input type="hidden" id="hdn_assessment_id" name="hdn_assessment_id" value="0"> 
                     <input type="hidden" id="hdn_current_stage_id" name="hdn_current_stage_id" value="0">
                     <div >
+                         <div class="form-group" id="DivResultVerify" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="ddlResultStages">Select Stage*:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <select class="form-control " id="ddlResultStages" onchange="LoadCertificationStageOnSelectedStage();">  <!-- -->>
+                                   </select>
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
+                        </div>
+                        <div class="form-group" id="DivSoftCopyVerify" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="ddlSoftCopyStages">Select Stage*:</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <select class="form-control " id="ddlSoftCopyStages" onchange="LoadCertificationStageOnSelectedStage();">  <!-- -->>
+                                   </select>
+                                </div>
+                                <div class="col-lg-4"></div>
+                            </div>
+                        </div>
                         <div class="form-group" id="DivCertStages" >
                             <div class="row">
                                 <div class="col-lg-4">
@@ -338,6 +374,17 @@
                                     <input type="text" id="TxtCertStages" name="TxtCertStages" class="form-control " ClientIdMode="static" placeholder="Certification Satge" disabled >
                                 </div>
                                 <div class="col-lg-4"></div>
+                            </div>
+                        </div> 
+                        <div class="form-group" id="DivRemarks" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtRemark">Remarks * :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtRemark" name="TxtRemark" class="form-control " placeholder="Enter Remarks">
+                                </div>
+                                 <div class="col-lg-4"></div>
                             </div>
                         </div> 
                         <div class="form-group" id="DivSentPrintingDate" style="display:none">
@@ -373,7 +420,40 @@
                                 <div class="col-lg-4"></div>
                             </div>
                         </div>
-                        <div class="form-group" id="DivReceivedDate" style="display:none">
+                        <div class="form-group" id="DivCourierNumber" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtCourierNumber">Courier Number * :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtCourierNumber" name="TxtCourierNumber" class="form-control " placeholder="Enter Courier Number">
+                                </div>
+                                 <div class="col-lg-4"></div>
+                            </div>
+                        </div> 
+                        <div class="form-group" id="DivCourierName" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtCourierName">Courier company Name * :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtCourierName" name="TxtCourierName" class="form-control " placeholder="Enter Courier Company">
+                                </div>
+                                 <div class="col-lg-4"></div>
+                            </div>
+                        </div> 
+                        <div class="form-group" id="DivCourierUrl" style="display:none">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtCourierUrl">Courier Tracking URL :</label>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text" id="TxtCourierUrl" name="TxtCourierUrl" class="form-control " placeholder="Enter Courier Tracking URL">
+                                </div>
+                                 <div class="col-lg-4"></div>
+                            </div>
+                        </div> 
+                       <div class="form-group" id="DivReceivedDate" style="display:none">
                             <div class="row">
                                 <div class="col-lg-4">
                                     <label for="TxtReceivedDate">Received Date*:</label>

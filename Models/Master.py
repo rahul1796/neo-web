@@ -1,4 +1,5 @@
 from Database import Database
+from Database import config
 from flask_restful import Resource
 import pandas as pd
 from flask import request,make_response
@@ -32,8 +33,8 @@ class Master:
 
     
     #Project
-    def project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status):
-        project_l= Database.project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status)
+    def project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,customer_status):
+        project_l= Database.project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,customer_status)
         return project_l
     def all_client(user_id,user_role_id):
         all_client={"Clients":Database.GetALLClient(user_id,user_role_id)}
@@ -231,8 +232,8 @@ class Master:
     def GetContractProjectTargets(contact_id,user_id,user_role_id,region_id,from_date,to_date):
         return Database.GetContractProjectTargets(contact_id,user_id,user_role_id,region_id,from_date,to_date)
     
-    def sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project):
-        return Database.sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project)
+    def sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project,customer_status):
+        return Database.sub_project_list(user_id,user_role_id,user_region_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,entity,customer,p_group,block,practice,bu,product,status,project,customer_status)
     def SaveCandidateActivityStatus(json_string,user_id,role_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version):
         return Database.SaveCandidateActivityStatus(json_string,user_id,role_id,latitude,longitude,timestamp,app_version,device_model,imei_num,android_version)
     def get_center_details(center_id):
@@ -258,6 +259,7 @@ class Master:
     def add_edit_partner_user(UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId):
         popupMessage = {"PopupMessage": Database.add_edit_partner_user(UserName,user_id,is_active,Email,Mobile,PartnerId,PartnerUserId)}
         return popupMessage
+    
     def GetPartners(PartnerTypeId):
         return {'Partners':Database.GetPartners(PartnerTypeId)}
 
@@ -313,23 +315,37 @@ class Master:
     def cancel_planned_batch(user_id,planned_batch_code,cancel_reason):
         popupMessage = {"PopupMessage": Database.cancel_planned_batch(user_id,planned_batch_code,cancel_reason)}
         return popupMessage
-
     def GetCustomerSpoc(customer_id):
         return Database.GetCustomerSpoc(customer_id)
-
     def cancel_actual_batch(user_id,actual_batch_id,cancel_reason):
         popupMessage = {"PopupMessage": Database.cancel_actual_batch(user_id,actual_batch_id,cancel_reason)}
         return popupMessage
-
     def GetPOCForCustomer(customer_id):
         return Database.GetPOCForCustomer(customer_id)
     def GetSessionsForCourse(CourseId):
         return Database.GetSessionsForCourse(CourseId)
     def GetPartnerCenters(partner_id):
         return {"PartnerCenters":Database.GetPartnerCenters(partner_id)}
-
     def Sync_UserSubProjectCF_TargetData(c_my, p_my):
         return Database.Sync_UserSubProjectCF_TargetData(c_my, p_my)
     def upload_center_attachment(user_id,user_role_id,filename,session_id):
         Candidate =Database.upload_center_attachment(user_id,user_role_id,filename,session_id)
         return Candidate
+    def GetTrainerProfile(trainer_id):
+        return {"TrainerProfile":Database.GetTrainerProfile(trainer_id), "S3_Path":"https://labournet.s3.ap-south-1.amazonaws.com/"+config.aws_location+"bulk_upload/trainer_certification/"}
+    
+    def GetPartnerContract(partner_id):
+        return {"PartnerContract":Database.GetPartnerContract(partner_id), "S3_Path":"https://labournet.s3.ap-south-1.amazonaws.com/neo_skills/qa/bulk_upload/Partner%20MOU/"}
+    def GetSingleTrainerProfile(trainer_profile_id):
+        return {"TrainerProfile":Database.GetSingleTrainerProfile(trainer_profile_id),  "S3_Path":"https://labournet.s3.ap-south-1.amazonaws.com/"+config.aws_location+"bulk_upload/trainer_certification/"}
+    
+    def GetPartnerContractMilestones(Partner_Contract_Id):
+        return {"PartnerContract":Database.GetPartnerContractMilestones(Partner_Contract_Id), "S3_Path":"https://labournet.s3.ap-south-1.amazonaws.com/neo_skills/qa/bulk_upload/Partner%20MOU/"}
+    def add_edit_trainer_profile(certificate_name, sector_id, start_date, end_date, filename, trainer_id, is_active, user_id, trainer_profile_id):
+        popupMessage = {"PopupMessage": Database.add_edit_trainer_profile(certificate_name, sector_id, start_date, end_date, filename, trainer_id, is_active, user_id, trainer_profile_id)}
+        return popupMessage
+    def add_edit_partner_contract(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId):
+        popupMessage = {"PopupMessage": Database.add_edit_partner_contract(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId)}
+        return popupMessage
+
+        
