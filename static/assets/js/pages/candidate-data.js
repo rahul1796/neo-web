@@ -5,6 +5,7 @@ $(document).ready(function () {
     $('.dropdown-search-filter').select2();
     $(".date-picker").flatpickr({
         dateFormat:'d-M-Y',
+        maxDate: "today",
         minDate: '01.Apr.2019'
     });
     $("#tbl_candidate").dataTable().fnDestroy();

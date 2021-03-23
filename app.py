@@ -1474,8 +1474,9 @@ class user_sub_project_list(Resource):
             user_role_id=request.form['user_role_id']
             employee_status=request.form['user_status']
             sub_project_status=request.form['sub_project_status']
-
-           #print(Contracts, candidate_stage, from_date, to_date)
+            status_id=request.form['status_id']
+            
+            #print(Contracts, candidate_stage, from_date, to_date)
             start_index = request.form['start']
             page_length = request.form['length']
             search_value = request.form['search[value]']
@@ -1483,7 +1484,7 @@ class user_sub_project_list(Resource):
             order_by_column_direction = request.form['order[0][dir]']
             draw=request.form['draw']
             
-            return Report.user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+            return Report.user_sub_project_list(customer,project,sub_project,region,user_id,user_role_id,employee_status,sub_project_status,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status_id)
 
 class user_sub_project_list_download(Resource):
     @staticmethod
@@ -1497,9 +1498,14 @@ class user_sub_project_list_download(Resource):
             user_role_id=request.form['user_role_id']
             employee_status=request.form['user_status']
             sub_project_status=request.form['sub_project_status']
+            month=request.form['month']
+            year=request.form['year']
+            status_id=request.form['status_id']
+
             file_name='user_sub_project_report.xlsx'
-            
-            resp = user_subproject_download.create_report(sub_project,project,region,customer,user_id,user_role_id,employee_status,sub_project_status,file_name)
+
+                       
+            resp = user_subproject_download.create_report(sub_project,project,region,customer,user_id,user_role_id,employee_status,sub_project_status,month,year,status_id,file_name)
             return resp       
 
 api.add_resource(candidate_list, '/candidate_list')
@@ -3490,11 +3496,11 @@ class recover_pass(Resource):
             if len(data)>0:
                 res = sent_mail.forget_password(reco_email,data[0][1],data[0][3] + ' ' + data[0][4])
                 if res['status']:
-                    msg = {"message":res['description'], "title":'Sucess',"UserId":data[0][0]}
+                    msg = {"success":True,"message":res['description'], "title":'Sucess',"UserId":data[0][0]}
                 else:
-                    msg = {"message":res['description'], "title":'Unable to sent',"UserId":data[0][0]}
+                    msg = {"success":False,"message":res['description'], "title":'Unable to sent',"UserId":data[0][0]}
             else:
-                msg = {"message":'Please check email or contact to admin',"title":'Invalid Email',"UserId":0}
+                msg = {"success":False, "message":'Please check email or contact to admin',"title":'Invalid Email',"UserId":0}
 
             response={"PopupMessage":msg}
             return response
@@ -5303,7 +5309,10 @@ class GetPlacementAgeingReportData(Resource):
                 contract_ids=request.args.get('contract_ids','',type=str)
                 from_date=request.args.get('from_date','',type=str)
                 to_date=request.args.get('to_date','',type=str)
-                response = Report.GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+                status_id=request.args.get('status_id',-1,type=int)
+                stage_ids=request.args.get('stage_ids','',type=str)
+
+                response = Report.GetPlacementAgeingReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)
                 return response 
             except Exception as e:
                 return {'exception':str(e)}
@@ -5323,8 +5332,10 @@ class GetCandidatesBasedOnPlacementStage(Resource):
                 contract_ids=request.args.get('contract_ids','',type=str)                
                 from_date=request.args.get('from_date','',type=str)
                 to_date=request.args.get('to_date','',type=str)
+                status_id=request.args.get('status_id',-1,type=int)
+                stage_ids=request.args.get('stage_ids','',type=str)
                    
-                response = Report.GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date)
+                response = Report.GetCandidatesBasedOnPlacementStage(user_id,user_role_id,placement_stage,sub_project_code,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)
                 return response 
             except Exception as e:
                 return {'exception':str(e)}
@@ -5340,7 +5351,10 @@ class GetPlacementAgeingReportDonload(Resource):
             contract_ids=request.args.get('contract_ids','',type=str)
             from_date=request.args.get('from_date','',type=str)
             to_date=request.args.get('to_date','',type=str)
-            resp = Report.GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)            
+            status_id=request.args.get('status_id',-1,type=int)
+            stage_ids=request.args.get('stage_ids','',type=str)
+            
+            resp = Report.GetPlacementAgeingReportDonload(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)
             return resp
 api.add_resource(GetPlacementAgeingReportDonload,'/GetPlacementAgeingReportDonload')
 
@@ -7428,7 +7442,9 @@ class shiksha_attandance_report(Resource):
             Customers = request.args.get('Customers','',type=str)
             from_date = request.args.get('from_date','',type=str)
             to_date = request.args.get('to_date','',type=str)
-            resp = Report.shiksha_attandance_report(user_id, user_role_id, Customers, from_date, to_date)            
+            status_id=request.args.get('status_id',-1,type=int)
+            
+            resp = Report.shiksha_attandance_report(user_id, user_role_id, Customers, from_date, to_date, status_id)
             return resp
 api.add_resource(shiksha_attandance_report,'/shiksha_attandance_report')
 
@@ -7536,7 +7552,10 @@ class GetQpWiseReportData(Resource):
                 contract_ids=request.args.get('contract_ids','',type=str)
                 from_date=request.args.get('from_date','',type=str)
                 to_date=request.args.get('to_date','',type=str)
-                response = Report.GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date)
+
+                status_id=request.args.get('status_id','',type=str)
+                stage_ids=request.args.get('stage_ids','',type=str)
+                response = Report.GetQpWiseReportData(user_id,user_role_id,customer_ids,contract_ids,from_date,to_date, status_id, stage_ids)
                 return response 
             except Exception as e:
                 return {'exception':str(e)}
@@ -7587,7 +7606,10 @@ class DownloadBatchReport(Resource):
             user_role_id = request.form["user_role_id"]
             customer_ids = request.form["customer_ids"]
             contract_ids = request.form["contract_ids"]
-            resp = Report.DownloadBatchReport(user_id,user_role_id,customer_ids,contract_ids)            
+
+            status_id=request.args.get('status_id','',type=str)
+            stage_ids=request.args.get('stage_ids','',type=str)
+            resp = Report.DownloadBatchReport(user_id,user_role_id,customer_ids,contract_ids, status_id, stage_ids)
             return resp
 
 api.add_resource(DownloadBatchReport,'/DownloadBatchReport')
@@ -7702,21 +7724,26 @@ class GetBatchStatusReportDataList(Resource):
             try:
                 user_id=request.form['user_id']
                 user_role_id=request.form['user_role_id']
+                status_id = request.form['status_id']
                 customer_ids = request.form['customer_ids']
+                stage_ids = request.form['stage_ids']
                 contract_ids = request.form['contract_ids']
-                contract_status = request.form['contract_status']
+                
+                contract_status = ''
                 batch_status = request.form['batch_status']
                 from_date = request.form['from_date']
                 to_date = request.form['to_date']
+
                 start_index = request.form['start']
                 page_length = request.form['length']
                 search_value = request.form['search[value]']
                 order_by_column_position = request.form['order[0][column]']
                 order_by_column_direction = request.form['order[0][dir]']
                 draw=request.form['draw']
-                response = Report.GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw)
+                response = Report.GetBatchStatusReportDataList(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, status_id, stage_ids)
                 return response 
             except Exception as e:
+                print({'exception':str(e)})
                 return {'exception':str(e)}
 api.add_resource(GetBatchStatusReportDataList,'/GetBatchStatusReportDataList')
 
@@ -7726,13 +7753,16 @@ class DownloadBatchStatusReport(Resource):
         if request.method=='POST':
             user_id = request.form["user_id"]
             user_role_id = request.form["user_role_id"]
+            
+            status_id = request.form["status_id"]
             customer_ids = request.form["customer_ids"]
+            stage_ids = request.form["stage_ids"]
             contract_ids = request.form["contract_ids"]
             contract_status = request.form["contract_status"]
             batch_status = request.form["batch_status"]
             from_date = request.form["from_date"]
             to_date = request.form["to_date"]
-            resp = Report.DownloadBatchStatusReport(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date)            
+            resp = Report.DownloadBatchStatusReport(user_id,user_role_id,customer_ids,contract_ids,contract_status,batch_status,from_date,to_date, status_id, stage_ids)
             return resp
 
 api.add_resource(DownloadBatchStatusReport,'/DownloadBatchStatusReport')
@@ -8587,9 +8617,10 @@ class updated_new_SL4Report(Resource):
                 Customers = request.form["Customers"]
                 projects = request.form["projects"]
                 sub_projects = request.form["sub_projects"]
+                status_id = request.form["status_id"]
                 
                 report_name = "Customer_wise_MIS_report_"+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
-                resp = SL4Report_filter_new.create_report(from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, report_name)
+                resp = SL4Report_filter_new.create_report(from_date, to_date, Customers,projects,sub_projects, user_id, user_role_id, report_name, status_id)
                 return resp
                 
             except Exception as e:
@@ -9375,10 +9406,10 @@ class download_Assessment_report(Resource):
                 Batches = request.form['Batches']
                 FromDate = request.form['FromDate']
                 ToDate = request.form['ToDate']
-
+                status_id = request.form['status_id']
                 file_name='Assessment_Report_'+str(datetime.now().strftime('%Y%m%d_%H%M%S'))+'.xlsx'
             
-                resp = Report.download_Assessment_report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate)
+                resp = Report.download_Assessment_report(file_name,user_id,user_role_id,customer,project,sub_project,region,centers,Batches,FromDate,ToDate, status_id)
                 return resp
                 
             except Exception as e:
@@ -9726,6 +9757,33 @@ class GetPartnerContract(Resource):
             return response
 api.add_resource(GetPartnerContract,'/GetPartnerContract')
 
+class GetTrainerProfile(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            trainer_id=request.args.get('trainer_id',0,type=int)
+            response=Master.GetTrainerProfile(trainer_id)
+            return response
+api.add_resource(GetTrainerProfile,'/GetTrainerProfile')
+class add_edit_trainer_profile(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            #Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId
+
+            certificate_name=request.form['certificate_name']
+            sector_id=request.form['sector_id']
+            start_date=request.form['start_date']
+            end_date=request.form['end_date']
+            filename=request.form['filename']
+            trainer_id=request.form['trainer_id']
+            is_active=request.form['is_active']
+            trainer_profile_id=request.form['trainer_profile_id']
+            user_id=g.user_id
+            
+            return Master.add_edit_trainer_profile(certificate_name, sector_id, start_date, end_date, filename, trainer_id, is_active, user_id, trainer_profile_id)
+api.add_resource(add_edit_trainer_profile,'/add_edit_trainer_profile')
+
 class add_edit_partner_contract(Resource):
     @staticmethod
     def post():
@@ -9745,7 +9803,14 @@ class add_edit_partner_contract(Resource):
             
             return Master.add_edit_partner_contract(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId)
 api.add_resource(add_edit_partner_contract,'/add_edit_partner_contract')
-
+class GetSingleTrainerProfile(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            trainer_profile_id=request.args.get('trainer_profile_id',0,type=int)
+            response=Master.GetSingleTrainerProfile(trainer_profile_id)
+            return response
+api.add_resource(GetSingleTrainerProfile,'/GetSingleTrainerProfile')
 class GetPartnerContractMilestones(Resource):
     @staticmethod
     def get():
