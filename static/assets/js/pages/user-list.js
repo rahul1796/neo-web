@@ -470,6 +470,10 @@ function EditUserDetail(UserId)
                 LoadNEORoleddl(data.UserDetail.Neo_Role_Id);
                 $('#ddlJobsRole').val(data.UserDetail.Jobs_Role_Id);
                 $('#ddlCRMRole').val(data.UserDetail.Crm_Role_Id);
+                if(data.UserDetail.Is_Active)
+                    $('#isactive').prop('checked',true);
+                else
+                    $('#isactive').prop('checked',false);  
             },
             error:function(err)
             {
@@ -483,6 +487,7 @@ function EditUserDetail(UserId)
 }
 function UpdateRole()
 {
+
     var URL=$('#hdn_web_url').val()+ "/tag_user_roles";
         $.ajax({
             type:"POST",
@@ -493,6 +498,7 @@ function UpdateRole()
                 "neo_role":($('#ddlNeoRole').val()==null? '20':$('#ddlNeoRole').val().toString()),
                 "jobs_role":($('#ddlJobsRole').val()==null? '20':$('#ddlJobsRole').val().toString()),
                 "crm_role":($('#ddlCRMRole').val()==null? '20':$('#ddlCRMRole').val().toString()),
+                "isactive" : $('#isactive').prop('checked')
             },
             success:function(data){
                 if(data.PopupMessage.message =="Success")

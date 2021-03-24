@@ -1228,8 +1228,9 @@ class tag_user_roles(Resource):
         user_id=request.form['user_id']
         neo_role=request.form['neo_role']
         jobs_role=request.form['jobs_role']
-        crm_role=request.form['crm_role']        
-        return UsersM.tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role)
+        crm_role=request.form['crm_role']  
+        isactive=request.form['isactive']  
+        return UsersM.tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role,isactive)
 class cancel_planned_batch(Resource):
     @staticmethod
     def post():

@@ -952,10 +952,10 @@ class Database:
         columns = [column[0].title() for column in cur.description]
         #print(columns)
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],columns[8]+"":row[8]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],columns[8]+"":row[8],columns[9]+"":row[9]}
         cur.close()
         con.close()
-        print(h)
+        #print(h)
         return h
     def batch_list(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id):
         content = {}
@@ -1458,11 +1458,11 @@ class Database:
         msg={"Status":True,"message":"Image Uploaded"}
         return msg
     
-    def tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role):
+    def tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role,isactive):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[users].[sp_tag_user_roles] ?, ?, ?,?,?'
-        values = (login_user_id,user_id,neo_role,jobs_role,crm_role)
+        sql = 'exec	[users].[sp_tag_user_roles] ?, ?, ?,?,?, ?'
+        values = (login_user_id,user_id,neo_role,jobs_role,crm_role,isactive)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[0]
@@ -8812,7 +8812,7 @@ SELECT					cb.name as candidate_name,
                 Status=False
             return {"Status":Status,'Message':msg}
         except Exception as e:
-            return {"Status":False,'message': "error: "+str(e)}
+            return {"Status":False,'Message': "error: "+str(e)}
     
     def add_center_attachment_session(UserId, UserRoleId, CenterId, FromDate, ToDate, Agreement_Type, Commercial_Agreement_Type, OtherRemark, value):
         con = pyodbc.connect(conn_str)
