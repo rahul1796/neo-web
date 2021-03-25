@@ -61,25 +61,24 @@ class DownloadAssessmentResult(Resource):
             try:
                 AssessmentId=request.args.get('AssessmentId',0,type=int)
                 Batch_Code=request.args.get('Batch_Code','',type=str)
-                report_name = config.AssessmentCandidateResult+'_'+Batch_Code.replace('/','_')+'_'+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"   
-
-                #print(AssessmentId)
-                r=re.compile(config.AssessmentCandidateResult + ".*")
-                lst=os.listdir(DownloadAssessmentResult.DownloadPath)
-                #print(DownloadAssessmentResult.DownloadPath)
+                DownloadPath=config.neo_report_file_path+'report file/'
+                report_name = 'Assessment_Candidate_Result_'+Batch_Code.replace('/','_')+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
+                r=re.compile('Assessment_Candidate_Result_.*')
+                lst=os.listdir(DownloadPath)
                 newlist = list(filter(r.match, lst))
                 for i in newlist:
-                    os.remove( DownloadAssessmentResult.DownloadPath + i)
-                path = '{}{}'.format(DownloadAssessmentResult.DownloadPath,report_name)
+                    os.remove( DownloadPath + i)
+                path = '{}{}'.format(DownloadPath,report_name)
+                
                 response=Database.GetAssessmentCandidateResults(AssessmentId)
                 res=DownloadAssessmentResult.CreateExcelForDump(response,path,'Result')
-                ImagePath=config.DownloadcandidateResultPathWeb
-                os.chmod(ImagePath+report_name, 0o777)
+                #ImagePath=config.DownloadcandidateResultPathWeb
+                os.chmod(DownloadPath+report_name, 0o777)
             
-                return {"status":True, 'FileName':report_name,'FilePath':ImagePath}
+                return {"success":True,"status":True,'FileName':report_name,'FilePath':config.neo_report_file_path_web}
             except Exception as e:
-                return {"status":False,"exception":"Error : " + str(e),"File":"HI"}
-    
+                return {"success":False,"status":False,"exception":"Error : " + str(e),"File":"HI"}
+             
     
     def CreateExcelForDump(Response,file_path,sheet_name):
         try:
