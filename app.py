@@ -1204,16 +1204,17 @@ class tag_sponser_candidate(Resource):
 class untag_users_from_sub_project(Resource):
     @staticmethod
     def post():
-        user_ids=request.form['user_ids']
+        map_subproject_user_ids=request.form['user_ids']
         sub_project_id=request.form['sub_project_id']
-        return Master.untag_users_from_sub_project(user_ids,sub_project_id)
+        return Master.untag_users_from_sub_project(map_subproject_user_ids,sub_project_id)
 class tag_users_from_sub_project(Resource):
     @staticmethod
     def post():
         user_id=request.form['user_id']
+        user_role_id=request.form['user_role_id']
         sub_project_id=request.form['sub_project_id']
         tagged_by= session['user_id']
-        return Master.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)
+        return Master.tag_users_from_sub_project(user_id,user_role_id,sub_project_id,tagged_by)
 class assign_batch_candidates(Resource):
     @staticmethod
     def post():

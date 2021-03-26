@@ -1292,11 +1292,11 @@ class Database:
             msg={"message":"Error in tagging"}
         return msg
     
-    def untag_users_from_sub_project(user_ids,sub_project_id):
+    def untag_users_from_sub_project(map_subproject_user_ids,sub_project_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec	[masters].[untag_users_from_sub_project] ?, ?'
-        values = (user_ids,sub_project_id)
+        values = (map_subproject_user_ids,sub_project_id)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -1308,11 +1308,11 @@ class Database:
         else:
             msg={"message":"Error in untagging"}
         return msg
-    def tag_users_from_sub_project(user_id,sub_project_id,tagged_by):
+    def tag_users_from_sub_project(user_id,user_role_id,sub_project_id,tagged_by):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[tag_users_from_sub_project] ?, ?, ?'
-        values = (user_id,sub_project_id,tagged_by)
+        sql = 'exec	[masters].[tag_users_from_sub_project] ?,?, ?, ?'
+        values = (user_id,user_role_id,sub_project_id,tagged_by)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
