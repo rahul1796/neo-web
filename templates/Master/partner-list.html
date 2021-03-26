@@ -258,6 +258,7 @@
         var doc;
         var fileExtentionDOC = ['doc','docx']
         var fileExtentionPDF = ['pdf']
+        var fileExtentionZip = ['zip']
         $.ajax({
             type:"GET",
             url:URL,
@@ -298,6 +299,8 @@
                                     varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path + data.PartnerContract[i].Mou.replaceAll(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ 'static/assets/images/pdf-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
                                 else if (fileExtentionDOC.includes(doc.split('.').pop().toLowerCase()))
                                     varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path + data.PartnerContract[i].Mou.replaceAll(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ 'static/assets/images/document-download-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                                else if (fileExtentionZip.includes(doc.split('.').pop().toLowerCase()))
+                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path + data.PartnerContract[i].Mou.replaceAll(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ 'static/assets/images/winzip-data-compression.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
                                 else
                                     varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path + data.PartnerContract[i].Mou.replaceAll(" ", "%20") + ' target="_blank" title="Open image in new tab"><img src='+ data.S3_Path + data.PartnerContract[i].Mou.replaceAll(" ", "%20") +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
                                 //varHtml+='  <td style="text-align:center;">'+ data.PartnerContract[i].Mou +'</td>';   
@@ -840,9 +843,11 @@ function AddMilestone()
 function add_popup_message(){
     $('#imgSpinner3').show();
     //console.log($('#Contract_Name').val()+$('#ContractCode').val()+$('#StartDate').val()+$('#EndDate').val()+$('#MOUDocument').val()+$('#ddlBillingMilestones').val());
-    var validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'application/pdf'];  // , 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    var validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'application/pdf', 'application/x-zip-compressed'];  // , 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    
     var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_'
     var filename = ''
+    
     //hdn_home_user_id_modal2 hdn_home_user_role_id_modal2 hdn_upl_session_id myFile
     if($('#hdn_modal_partner_contract_id').val()=='0'){
         var file = document.getElementById('MOUDocument').files[0]
