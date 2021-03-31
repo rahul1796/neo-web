@@ -822,7 +822,7 @@ function UntagUsers()
                 type:"POST",
                 url:URL,
                 data:{
-                    "user_ids": users,
+                    "user_ids": users, //map_user_sub_project_ids
                     "sub_project_id": $('#hdn_sub_project_id').val()
                 },
                 success:function(data){
@@ -859,6 +859,7 @@ function TagUsers()
                 url:URL,
                 data:{
                     "user_id": $('#ddlUsers').val(),
+                    "user_role_id":  $('#ddlUserRole').val(),
                     "sub_project_id": $('#hdn_sub_project_id').val()
                 },
                 success:function(data){
@@ -966,7 +967,7 @@ function GetUserListForSubProject(SubProjectId)
                             td_open= '  <td style="text-align:center;">' ;
                             td_close=   '</td>';       
                             varHtml+='<tr>';
-                            varHtml += '<td style="text-align:center;"><input id="addedchk_'+data.Users[i].Userid+'" name="checkcase" type="checkbox" value="'+data.Users[i].Userid+'" ></td>';
+                            varHtml += '<td style="text-align:center;"><input id="addedchk_'+data.Users[i].Map_User_Subproject_Id+'" name="checkcase" type="checkbox" value="'+data.Users[i].Map_User_Subproject_Id+'" ></td>';
                             varHtml+='  <td style="text-align:center;">'+ data.Users[i].Username +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.Users[i].Email +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.Users[i].Role +'</td>';

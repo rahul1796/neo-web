@@ -263,11 +263,11 @@ class Master:
     def GetPartners(PartnerTypeId):
         return {'Partners':Database.GetPartners(PartnerTypeId)}
 
-    def untag_users_from_sub_project(user_ids,sub_project_id):
-        popupMessage = {"PopupMessage": Database.untag_users_from_sub_project(user_ids,sub_project_id)}
+    def untag_users_from_sub_project(map_subproject_user_ids,sub_project_id):
+        popupMessage = {"PopupMessage": Database.untag_users_from_sub_project(map_subproject_user_ids,sub_project_id)}
         return popupMessage
-    def tag_users_from_sub_project(user_id,sub_project_id,tagged_by):
-        popupMessage = {"PopupMessage": Database.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)}
+    def tag_users_from_sub_project(user_id,user_role_id,sub_project_id,tagged_by):
+        popupMessage = {"PopupMessage": Database.tag_users_from_sub_project(user_id,user_role_id,sub_project_id,tagged_by)}
         return popupMessage
     def assign_batch_candidates(candidates,batch_id,tagged_by):
         popupMessage = {"PopupMessage": Database.assign_batch_candidates(candidates,batch_id,tagged_by)}
