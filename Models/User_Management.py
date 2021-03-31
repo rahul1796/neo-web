@@ -13,8 +13,8 @@ class UsersM:
     def add_user(user_role_id,first_name,last_name,email,mobile,created_id,is_active,user_id,Id,is_reporting_manager):
         popupMessage = {"PopupMessage": Database.add_user_details(user_role_id,first_name,last_name,email,mobile,created_id,is_active,user_id,Id,is_reporting_manager)}
         return popupMessage
-    def tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role):
-        popupMessage = {"PopupMessage": Database.tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role)}
+    def tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role,isactive):
+        popupMessage = {"PopupMessage": Database.tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role,isactive)}
         return popupMessage
     def AllUserRole():
         userrole_list={"UserRoles":Database.GetUserRole()}
