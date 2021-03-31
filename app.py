@@ -9779,5 +9779,37 @@ class GetPartnerContractMilestones(Resource):
             return response
 api.add_resource(GetPartnerContractMilestones,'/GetPartnerContractMilestones')
 
+@app.route("/revenue_report_page")
+def revenue_report_page():
+    if g.user:
+        return render_template("Reports/Revenue Report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/revenue_report")
+def revenue_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="revenue_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
+class DownloadRevenueReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            month = request.form["month"]
+            role_id = request.form["role_id"]
+            customer_ids = request.form["customer_ids"]
+            contract_ids = request.form["contract_ids"]
+            user_id =  session['user_id']
+            user_role_id =  session['user_role_id']
+            stage_ids =  request.form['stage_ids']
+            status_id =  request.form['status_id']
+            resp = Report.DownloadRevenueReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids,status_id)
+            return resp
+api.add_resource(DownloadRevenueReport,'/DownloadRevenueReport')
+
+
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
