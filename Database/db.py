@@ -958,10 +958,10 @@ class Database:
         columns = [column[0].title() for column in cur.description]
         #print(columns)
         for row in cur:
-            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],columns[8]+"":row[8]}
+            h = {""+columns[0]+"":row[0],""+columns[1]+"":row[1],""+columns[2]+"":row[2],""+columns[3]+"":row[3],""+columns[4]+"":row[4],""+columns[5]+"":row[5],""+columns[6]+"":row[6],""+columns[7]+"":row[7],columns[8]+"":row[8],columns[9]+"":row[9]}
         cur.close()
         con.close()
-        print(h)
+        #print(h)
         return h
     def batch_list(batch_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,user_id,user_role_id):
         content = {}
@@ -1292,11 +1292,11 @@ class Database:
             msg={"message":"Error in tagging"}
         return msg
     
-    def untag_users_from_sub_project(user_ids,sub_project_id):
+    def untag_users_from_sub_project(map_subproject_user_ids,sub_project_id):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
         sql = 'exec	[masters].[untag_users_from_sub_project] ?, ?'
-        values = (user_ids,sub_project_id)
+        values = (map_subproject_user_ids,sub_project_id)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -1308,11 +1308,11 @@ class Database:
         else:
             msg={"message":"Error in untagging"}
         return msg
-    def tag_users_from_sub_project(user_id,sub_project_id,tagged_by):
+    def tag_users_from_sub_project(user_id,user_role_id,sub_project_id,tagged_by):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[masters].[tag_users_from_sub_project] ?, ?, ?'
-        values = (user_id,sub_project_id,tagged_by)
+        sql = 'exec	[masters].[tag_users_from_sub_project] ?,?, ?, ?'
+        values = (user_id,user_role_id,sub_project_id,tagged_by)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -1542,11 +1542,11 @@ class Database:
         msg={"Status":True,"message":"Image Uploaded"}
         return msg
     
-    def tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role):
+    def tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role,isactive):
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec	[users].[sp_tag_user_roles] ?, ?, ?,?,?'
-        values = (login_user_id,user_id,neo_role,jobs_role,crm_role)
+        sql = 'exec	[users].[sp_tag_user_roles] ?, ?, ?,?,?, ?'
+        values = (login_user_id,user_id,neo_role,jobs_role,crm_role,isactive)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[0]
@@ -7181,7 +7181,8 @@ SELECT					cb.name as candidate_name,
             
             if pop >0 :
                 assigned_by_email_id=''
-                assigned_to_email_id=''
+                assigned_to_email_
+                id=''
                 assigned_to_name=''
                 Status=True
                 sql = 'select top(1) first_name, email from users.tbl_user_details where user_id='+ str(assigned_user_id) +' and is_active=1'
@@ -7832,23 +7833,23 @@ SELECT					cb.name as candidate_name,
         sql1=''
         sql2=''
         if int(role_id)==11:
-            sql = 'exec [reports].[sp_get_ops_productivity_report_data_coo] ?, ?, ?,?,?,?,?'
-            sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_sub_project] ?, ?, ?,?,?,?,?'
-            sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_course] ?, ?, ?,?,?,?,?'
-        if int(role_id)==14:
-            sql = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager] ?, ?, ?,?,?,?,?'
-            sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_sub_project] ?, ?, ?,?,?,?,?'
-            sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_course] ?, ?, ?,?,?,?,?'
-        if int(role_id)==5:
-            sql = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager] ?, ?, ?,?,?,?,?'
-            sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_sub_project] ?, ?, ?,?,?,?,?'
-            sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_course] ?, ?, ?,?,?,?,?'
+            sql = 'exec [reports].[sp_get_revenue_report_data_coo] ?, ?, ?,?,?,?,?'
+        #     sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_sub_project] ?, ?, ?,?,?,?,?'
+        #     sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_course] ?, ?, ?,?,?,?,?'
+        # # if int(role_id)==14:
+        #     sql = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager] ?, ?, ?,?,?,?,?'
+        #     sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_sub_project] ?, ?, ?,?,?,?,?'
+        #     sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_course] ?, ?, ?,?,?,?,?'
+        # if int(role_id)==5:
+        #     sql = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager] ?, ?, ?,?,?,?,?'
+        #     sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_sub_project] ?, ?, ?,?,?,?,?'
+        #     sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_course] ?, ?, ?,?,?,?,?'
         values = (customer_ids, contract_ids, month,user_id,user_role_id,stage_ids,status_id)
         curs.execute(sql,(values))
         sheet1_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
         sheet1 = list(map(lambda x:list(x), data))
-        
+        '''
         curs.execute(sql1,(values))
         sheet2_columns = [column[0].title() for column in curs.description]        
         data = curs.fetchall()
@@ -7858,10 +7859,11 @@ SELECT					cb.name as candidate_name,
         # sheet3_columns = [column[0].title() for column in curs.description]        
         # data = curs.fetchall()
         # sheet3 = list(map(lambda x:list(x), data))
-        return {'sheet1':sheet1,'sheet2':sheet2,'sheet1_columns':sheet1_columns,'sheet2_columns':sheet2_columns} #,'sheet3_columns':sheet3_columns  'sheet3':sheet3,
-        cur2.close()
+        '''
+        curs.close()
         con.close()
-
+        return {'sheet1':sheet1,'sheet1_columns':sheet1_columns} #,'sheet3_columns':sheet3_columns  'sheet3':sheet3, 'sheet2':sheet2, 'sheet2_columns':sheet2_columns
+        
     def DownloadEmployeeWiseReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids, status_id):
         con = pyodbc.connect(conn_str)
         curs = con.cursor()
@@ -9010,7 +9012,7 @@ SELECT					cb.name as candidate_name,
                 Status=False
             return {"Status":Status,'Message':msg}
         except Exception as e:
-            return {"Status":False,'message': "error: "+str(e)}
+            return {"Status":False,'Message': "error: "+str(e)}
     
     def add_center_attachment_session(UserId, UserRoleId, CenterId, FromDate, ToDate, Agreement_Type, Commercial_Agreement_Type, OtherRemark, value):
         con = pyodbc.connect(conn_str)

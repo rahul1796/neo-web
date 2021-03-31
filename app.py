@@ -1204,16 +1204,17 @@ class tag_sponser_candidate(Resource):
 class untag_users_from_sub_project(Resource):
     @staticmethod
     def post():
-        user_ids=request.form['user_ids']
+        map_subproject_user_ids=request.form['user_ids']
         sub_project_id=request.form['sub_project_id']
-        return Master.untag_users_from_sub_project(user_ids,sub_project_id)
+        return Master.untag_users_from_sub_project(map_subproject_user_ids,sub_project_id)
 class tag_users_from_sub_project(Resource):
     @staticmethod
     def post():
         user_id=request.form['user_id']
+        user_role_id=request.form['user_role_id']
         sub_project_id=request.form['sub_project_id']
         tagged_by= session['user_id']
-        return Master.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)
+        return Master.tag_users_from_sub_project(user_id,user_role_id,sub_project_id,tagged_by)
 class assign_batch_candidates(Resource):
     @staticmethod
     def post():
@@ -1228,8 +1229,9 @@ class tag_user_roles(Resource):
         user_id=request.form['user_id']
         neo_role=request.form['neo_role']
         jobs_role=request.form['jobs_role']
-        crm_role=request.form['crm_role']        
-        return UsersM.tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role)
+        crm_role=request.form['crm_role']  
+        isactive=request.form['isactive']  
+        return UsersM.tag_user_roles(login_user_id,user_id,neo_role,jobs_role,crm_role,isactive)
 class cancel_planned_batch(Resource):
     @staticmethod
     def post():
@@ -9819,6 +9821,38 @@ class GetPartnerContractMilestones(Resource):
             response=Master.GetPartnerContractMilestones(Partner_Contract_Id)
             return response
 api.add_resource(GetPartnerContractMilestones,'/GetPartnerContractMilestones')
+
+@app.route("/revenue_report_page")
+def revenue_report_page():
+    if g.user:
+        return render_template("Reports/Revenue Report.html")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+@app.route("/revenue_report")
+def revenue_report():
+    if g.user:
+        return render_template("home.html",values=g.User_detail_with_ids,html="revenue_report_page")
+    else:
+        return render_template("login.html",error="Session Time Out!!")
+
+
+class DownloadRevenueReport(Resource):
+    @staticmethod
+    def post():
+        if request.method=='POST':
+            month = request.form["month"]
+            role_id = request.form["role_id"]
+            customer_ids = request.form["customer_ids"]
+            contract_ids = request.form["contract_ids"]
+            user_id =  session['user_id']
+            user_role_id =  session['user_role_id']
+            stage_ids =  request.form['stage_ids']
+            status_id =  request.form['status_id']
+            resp = Report.DownloadRevenueReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids,status_id)
+            return resp
+api.add_resource(DownloadRevenueReport,'/DownloadRevenueReport')
+
 
 if __name__ == '__main__':
     app.run(host=config.app_host, port=int(config.app_port), debug=True)
