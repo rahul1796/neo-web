@@ -2646,7 +2646,7 @@ class Report:
 
     def DownloadRevenueReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids,status_id):
         try:
-            data=Database.DownloadOpsProductivityReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids,status_id)
+            data=Database.DownloadRevenueReport(customer_ids,contract_ids,month,role_id,user_id,user_role_id,stage_ids,status_id)
             DownloadPath=config.neo_report_file_path+'report file/'
             report_name = config.RevenueReportFileName+datetime.now().strftime('%Y_%m_%d_%H_%M_%S')+".xlsx"  
             r=re.compile(config.RevenueReportFileName + ".*")
