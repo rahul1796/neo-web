@@ -7835,6 +7835,22 @@ class AddeEdittUserTarget(Resource):
 
 api.add_resource(AddeEdittUserTarget,'/AddeEdittUserTarget')
 
+class AddeEdittUserAllocation(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            try:
+                allocation=request.form['allocation']
+                user_id=request.form['user_id']
+                mapping_id=request.form['mapping_id']
+                out = UsersM.AddeEdittUserAllocation(mapping_id,allocation,user_id)
+            except Exception as e:
+                out = {"PopupMessage":{"message":"Error " + str(e), "status":0}}
+            finally:
+                return out
+
+api.add_resource(AddeEdittUserAllocation,'/AddeEdittUserAllocation')
+
 class upload_batch_target_plan(Resource):
     @staticmethod
     def post():
