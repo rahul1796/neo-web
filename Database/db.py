@@ -1297,6 +1297,7 @@ class Database:
         cur = con.cursor()
         sql = 'exec	[masters].[untag_users_from_sub_project] ?, ?'
         values = (map_subproject_user_ids,sub_project_id)
+        print(values)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -7764,6 +7765,24 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
+    def AddeEdittUserAllocation(mapping_id,allocation,user_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[users].[sp_add_edit_user_sub_project_allocation] ?, ?, ?'
+        values = (mapping_id,allocation,user_id)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==2:
+            msg={"message":"Not More than 100 Percent can be allocated!", "status":2}
+        elif pop ==1:
+            msg={"message":"Updated", "status":1}
+        else:
+            msg={"message":"Error in updating allocation!", "status":0}
+        return msg
     
     def add_edit_user_targer(created_by, From_Date, To_Date, product, target, is_active, user_id, user_target_id):
         con = pyodbc.connect(conn_str)
@@ -8272,7 +8291,7 @@ SELECT					cb.name as candidate_name,
             # print(str(df.to_json(orient='records')))
             con = pyodbc.connect(conn_str)
             cur = con.cursor()            
-            sql = 'exec	[masters].[sp_sync_weekly_user_sp_allocation] '
+            sql = 'exec	[masters].[sp_sync_weekly_user_sp_allocation_new] '
             cur.execute(sql)
             for row in cur:
                 pop=row[0]

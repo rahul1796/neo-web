@@ -189,6 +189,7 @@
                                                     <th id ="col_to_hide" style="display:none;">Actions</th>
                                                     <th>User Name</th>
                                                     <th>Email</th>
+                                                    <th>Sub Project</th>
                                                     <th>Employee Code</th>
                                                     <th>Entity</th>
                                                     <th>Department</th>
@@ -197,7 +198,7 @@
                                                     <th>JOBS Role</th>
                                                     <th>CRM Role</th>
                                                     <th>Region</th>
-                                                    <th>Project</th>
+                                                    
                                                     <th>Reporting Manager</th>
                                                     <th>Employment Status</th>
                                                     <th>Center(s)</th>
@@ -241,9 +242,14 @@
                             <thead>                        
                                 <tr style="background-color: #f5f6f8;">
                                     <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                    
                                     <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Name</th>
+                                    
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">User Role </th>
                                     <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Code</th>
                                     <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Sub Project Name</th>
+                                    <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Allocation(Percentage)</th>
+                                   
                                     <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Code</th>
                                     <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Project Name</th>
                                     <th style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Business Unit</th>
@@ -519,7 +525,71 @@
         </div>
     </div>
 </div><!--/.modal-->
+<div id="mdl_add_edit_allocation" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content ">
+            <form action="javascript:UpdateUserAllocation();" method="POST" >
+                <div class="modal-header">
+                    <h4 class="modal-title" ><span id="header">Allocation Details</span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
 
+                <div class="modal-body">
+                    <div class="col-12">
+                        <input type="hidden" id="hdn_user_id_allocation" name="hdn_user_id_allocation" value="0">
+                        <input type="hidden" id="hdn_user_sp_id_allocation" name="hdn_user_sp_id_allocation" value="0">
+                       
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="txtSubProjectCode">Sub Project Code :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="text" class="form-control" name="txtSubProjectCode" id="txtSubProjectCode" required placeholder="Sub Project Code" Disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="txtSubProjectName">Sub Project Name :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="text" class="form-control" name="txtSubProjectName" id="txtSubProjectName" required placeholder="Sub Project Name" Disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="TxtEmployeeName">Employee Name :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="text" class="form-control" name="TxtEmployeeName" id="TxtEmployeeName" required placeholder="Employee Name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="txtAllocation">Allocation(Percentage) :</label>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="number" class="form-control" name="txtAllocation" id="txtAllocation" required placeholder="Allocation">
+                                </div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary waves-effect" > Save</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div><!--/.modal-->
 
 <div id="mdl_upload_user_plan" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg">

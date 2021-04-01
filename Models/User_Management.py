@@ -35,3 +35,6 @@ class UsersM:
     def add_edit_user_targer(created_by, From_Date, To_Date, product, target, is_active, user_id, user_target_id):
         popupMessage = {"PopupMessage": Database.add_edit_user_targer(created_by, From_Date, To_Date, product, target, is_active, user_id, user_target_id)}
         return popupMessage
+    def AddeEdittUserAllocation(mapping_id,allocation,user_id):
+        popupMessage = {"PopupMessage": Database.AddeEdittUserAllocation(mapping_id,allocation,user_id)}
+        return popupMessage
