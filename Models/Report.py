@@ -2656,12 +2656,12 @@ class Report:
             res={'success':False, 'msg':'invalid user role'}
             if int(role_id)==11:
                 res=Report.CreateExcelForRevenueCOO(data,role_id,path)
-            '''
+            
             if int(role_id)==14:
                 res=Report.CreateExcelForRevenueTM(data,role_id,path)
             if int(role_id)==5:
                 res=Report.CreateExcelForRevenueCM(data,role_id,path)
-            '''
+            
             if res['success']:
                 return {"success":True,"msg":"Report Created.",'FileName':report_name,'FilePath':config.neo_report_file_path_web}
             else:
@@ -2693,7 +2693,6 @@ class Report:
             default_column = ['COO','Sub Project Name','Sub Project Code']
             first_row = ['Enrolment', 'New Batch Start','Training Nos', 'Certification','Placement','Revenue']
             #second_row = ['Target', 'Actual','Target', 'Actual','Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
-
             CF_second_row = ['C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month','Actual','C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month','Target', 'Actual']
             third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%', 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
                          'W-1', 'W-2','W-3','W-4','Total',
@@ -2750,34 +2749,36 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Userwise') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Revenue Report') 
 
-            df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Sub Project') 
+            # df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
+            # df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Sub Project') 
 
             # df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
             # df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Course') 
 
-            worksheet = writer.sheets['Userwise']
-            default_column = ['COO','TM']
-            first_row = ['Enrolment', 'New Batch Start','Training Nos', 'Certification','Placement']
-            second_row = ['Target', 'Actual','Target', 'Actual','Actual','Target', 'Actual','Target', 'Actual']
-            CF_second_row = ['C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month','Actual','C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month']
+            worksheet = writer.sheets['Revenue Report']
+            default_column = ['COO','TM','Sub Project Name','Sub Project Code']
+            first_row = ['Enrolment', 'New Batch Start','Training Nos', 'Certification','Placement','Revenue']
+            CF_second_row = ['C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month','Actual','C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month','Target', 'Actual']
             third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%', 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
                          'W-1', 'W-2','W-3','W-4','Total',
-                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',]
-            
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+  
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=2
+            col=4
             for col_num, value in enumerate(first_row):
                 if col_num==2:
                     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
-                    col=col+5                    
+                    col=col+5  
+                elif col_num==5:
+                    worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+                    col=col+11                  
                 else:
                     worksheet.merge_range(0, col, 0, 12+col, value, header_format)
                     col=col+13
-            col=2
+            col=4
             for col_num, value in enumerate(CF_second_row):
                 if col_num==8:
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -2793,45 +2794,11 @@ class Report:
                     col=col+1
             cf_gap=0
             for col_num, value in enumerate(third_row):
-                if col_num in (0,22,27):
+                if col_num in (0,22,27,49):
                     cf_gap +=1
                 if col_num in (11,38,):
                     cf_gap +=2
-                worksheet.write(2, 2+cf_gap+col_num, value, header_format)
-
-            worksheet = writer.sheets['User-Sub Project']
-            default_column = ['COO','TM','Sub Project']
-            for col_num, value in enumerate(default_column):
-                worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=3
-            for col_num, value in enumerate(first_row):
-                if col_num==2:
-                    worksheet.merge_range(0, col, 0, 4+col, value, header_format)
-                    col=col+5                    
-                else:
-                    worksheet.merge_range(0, col, 0, 12+col, value, header_format)
-                    col=col+13
-            col=3
-            for col_num, value in enumerate(CF_second_row):
-                if col_num==8:
-                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
-                    col=col+5
-                elif value=='Target':
-                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
-                    col=col+5
-                elif value=='Actual':
-                    worksheet.merge_range(1, col, 1, 5+col, value, header_format)
-                    col=col+6
-                elif (value=='C/F From Last Month') or (value=='Gap_Selected Month'):
-                    worksheet.merge_range(1, col, 2, col, value, header_format)
-                    col=col+1
-            cf_gap=0
-            for col_num, value in enumerate(third_row):
-                if col_num in (0,22,27):
-                    cf_gap +=1
-                if col_num in (11,38,):
-                    cf_gap +=2
-                worksheet.write(2, 3+cf_gap+col_num, value, header_format)
+                worksheet.write(2, 4+cf_gap+col_num, value, header_format)
             writer.save()
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
@@ -2849,36 +2816,38 @@ class Report:
                 'fg_color': '#D7E4BC',
                 'border': 1})
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Userwise') 
+            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='Revenue Report') 
 
-            df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
-            df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Sub Project') 
+            # df = pd.DataFrame(data['sheet2'], columns=data['sheet2_columns'])
+            # df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Sub Project') 
 
             # df = pd.DataFrame(data['sheet3'], columns=data['sheet3_columns'])
             # df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Course') 
 
-            worksheet = writer.sheets['Userwise']
-            default_column = ['COO','TM','CM/PC']
-            first_row = ['Enrolment', 'New Batch Start','Training Nos', 'Certification','Placement']
-
-            second_row = ['Target', 'Actual','Target', 'Actual','Actual','Target', 'Actual','Target', 'Actual']
-            CF_second_row = ['C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month','Actual','C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month']
+            worksheet = writer.sheets['Revenue Report']
+            default_column = ['COO','TM','CM/PC','Sub Project Name','Sub Project Code']
+            first_row = ['Enrolment', 'New Batch Start','Training Nos', 'Certification','Placement','Revenue']
+            # second_row = ['Target', 'Actual','Target', 'Actual','Actual','Target', 'Actual','Target', 'Actual']
+            CF_second_row = ['C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month','Actual','C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month','Target', 'Actual']
             third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%', 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
                          'W-1', 'W-2','W-3','W-4','Total',
-                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
+                         'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%','W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%']
             
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=3
+            col=5
             for col_num, value in enumerate(first_row):
                 if col_num==2:
                     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
-                    col=col+5                    
+                    col=col+5  
+                elif col_num==5:
+                    worksheet.merge_range(0, col, 0, 10+col, value, header_format)
+                    col=col+11                  
                 else:
                     worksheet.merge_range(0, col, 0, 12+col, value, header_format)
                     col=col+13
             
-            col=3
+            col=5
             for col_num, value in enumerate(CF_second_row):
                 if col_num==8:
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -2894,46 +2863,11 @@ class Report:
                     col=col+1
             cf_gap=0
             for col_num, value in enumerate(third_row):
-                if col_num in (0,22,27):
-                    cf_gap +=1
-                if col_num in (11,38,):
-                    cf_gap +=2
-                worksheet.write(2, 3+cf_gap+col_num, value, header_format)
-
-            worksheet = writer.sheets['User-Sub Project']
-            default_column = ['COO','TM','CM/PC','Sub Project']
-            for col_num, value in enumerate(default_column):
-                worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=4
-            for col_num, value in enumerate(first_row):
-                if col_num==2:
-                    worksheet.merge_range(0, col, 0, 4+col, value, header_format)
-                    col=col+5                    
-                else:
-                    worksheet.merge_range(0, col, 0, 12+col, value, header_format)
-                    col=col+13
-            
-            col=4
-            for col_num, value in enumerate(CF_second_row):
-                if col_num==8:
-                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
-                    col=col+5
-                elif value=='Target':
-                    worksheet.merge_range(1, col, 1, 4+col, value, header_format)
-                    col=col+5
-                elif value=='Actual':
-                    worksheet.merge_range(1, col, 1, 5+col, value, header_format)
-                    col=col+6
-                elif (value=='C/F From Last Month') or (value=='Gap_Selected Month'):
-                    worksheet.merge_range(1, col, 2, col, value, header_format)
-                    col=col+1
-            cf_gap=0
-            for col_num, value in enumerate(third_row):
-                if col_num in (0,22,27):
+                if col_num in (0,22,27,49):
                     cf_gap += 1
                 if col_num in (11,38,):
                     cf_gap += 2
-                worksheet.write(2, 4+cf_gap+col_num, value, header_format)        
+                worksheet.write(2, 5+cf_gap+col_num, value, header_format)        
             writer.save()
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
