@@ -9308,12 +9308,12 @@ SELECT					cb.name as candidate_name,
             sql = 'exec [reports].[sp_get_revenue_report_data_coo] ?, ?, ?,?,?,?,?'
         #     sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_sub_project] ?, ?, ?,?,?,?,?'
         #     sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_course] ?, ?, ?,?,?,?,?'
-        # # if int(role_id)==14:
-        #     sql = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager] ?, ?, ?,?,?,?,?'
+        if int(role_id)==14:
+            sql = 'exec [reports].[sp_get_revenue_report_data_territory_manager_sub_project] ?, ?, ?,?,?,?,?'
         #     sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_sub_project] ?, ?, ?,?,?,?,?'
         #     sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_course] ?, ?, ?,?,?,?,?'
-        # if int(role_id)==5:
-        #     sql = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager] ?, ?, ?,?,?,?,?'
+        if int(role_id)==5:
+            sql = 'exec [reports].[sp_get_revenue_report_data_center_manager_sub_project] ?, ?, ?,?,?,?,?'
         #     sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_sub_project] ?, ?, ?,?,?,?,?'
         #     sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_course] ?, ?, ?,?,?,?,?'
         values = (customer_ids, contract_ids, month,user_id,user_role_id,stage_ids,status_id)
