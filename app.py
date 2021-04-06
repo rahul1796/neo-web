@@ -1206,16 +1206,17 @@ class tag_sponser_candidate(Resource):
 class untag_users_from_sub_project(Resource):
     @staticmethod
     def post():
-        user_ids=request.form['user_ids']
+        map_subproject_user_ids=request.form['user_ids']
         sub_project_id=request.form['sub_project_id']
-        return Master.untag_users_from_sub_project(user_ids,sub_project_id)
+        return Master.untag_users_from_sub_project(map_subproject_user_ids,sub_project_id)
 class tag_users_from_sub_project(Resource):
     @staticmethod
     def post():
         user_id=request.form['user_id']
+        user_role_id=request.form['user_role_id']
         sub_project_id=request.form['sub_project_id']
         tagged_by= session['user_id']
-        return Master.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)
+        return Master.tag_users_from_sub_project(user_id,user_role_id,sub_project_id,tagged_by)
 class assign_batch_candidates(Resource):
     @staticmethod
     def post():
@@ -1501,10 +1502,14 @@ class user_sub_project_list_download(Resource):
             user_role_id=request.form['user_role_id']
             employee_status=request.form['user_status']
             sub_project_status=request.form['sub_project_status']
+            month=request.form['month']
+            year=request.form['year']
             status_id=request.form['status_id']
 
             file_name='user_sub_project_report.xlsx'
-            resp = user_subproject_download.create_report(sub_project,project,region,customer,user_id,user_role_id,employee_status,sub_project_status,file_name, status_id)
+
+                       
+            resp = user_subproject_download.create_report(sub_project,project,region,customer,user_id,user_role_id,employee_status,sub_project_status,month,year,status_id,file_name)
             return resp       
 
 api.add_resource(candidate_list, '/candidate_list')
@@ -6010,7 +6015,7 @@ class upload_bulk_upload(Resource):
                 #print(df.columns.to_list())
                 if ProjectType==1:
                     #print(df['Candidate Photo*'])
-                    img_column ='Candidate Photo*,Aadhar Image,Document copy,Educational Marksheet*,Income Certificate'
+                    img_column ='Candidate Photo*,Aadhar Image,Document copy,Income Certificate,Educational Marksheet*'
                     schema = Schema([
                         #nan check column non mandate
                         Column('Candidate_id',null_validation),
@@ -6032,6 +6037,9 @@ class upload_bulk_upload(Resource):
                         Column('BOCW Registration Id',null_validation),
                         Column('Whatsapp Number',mob_validation + null_validation),
                         Column('Aadhar Image',null_validation),
+                        Column('Educational Marksheet*', null_validation),
+                        
+                        
                         #str+null check
                         Column('Candidate Photo*', null_validation),
                         Column('Fresher/Experienced?*',str_validation + null_validation),
@@ -6081,7 +6089,6 @@ class upload_bulk_upload(Resource):
                         Column('Registered by*',email_validation+str_validation),
                         #DELL
                         Column('Aspirational District*',str_validation + null_validation),
-                        Column('Educational Marksheet*', null_validation),
                         Column('Income Certificate', null_validation)
                         ])
                 else:
@@ -6118,7 +6125,7 @@ class upload_bulk_upload(Resource):
                             Column('Result',pass_fail_validation + null_validation)
                             ])
 
-                    img_column ='Aadhar Image,Document copy'
+                    img_column ='Aadhar Image,Document copy,Educational Marksheet'
                     schema = Schema([
                         #nan check column non mandate
                         Column('Candidate_id',null_validation),
@@ -6141,6 +6148,8 @@ class upload_bulk_upload(Resource):
                         Column('BOCW Registration Id',null_validation),
                         Column('Whatsapp Number',mob_validation + null_validation),
                         Column('Aadhar Image',null_validation),
+                        Column('Educational Marksheet', null_validation),
+                        
                         #str+null check
                         Column('Fresher/Experienced?*',str_validation + null_validation),
                         Column('Salutation*',str_validation + null_validation),
@@ -6677,7 +6686,7 @@ class DownloadRegTemplate(Resource):
                     'Permanent_Taluk_Block', 'Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country', 'Aadhar_No', 'Identifier_Type', 
                     'Identity_Number', 'Document_Copy_Image_Name', 'Employment_Type', 'Preferred_Job_Role', 'Years_Of_Experience', 'Relevant_Years_Of_Experience', 
                     'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc', 
-                    'Aadhar_Image_Name','Registered_By', 'Whatsapp_Number']
+                    'Aadhar_Image_Name','Registered_By', 'Whatsapp_Number','Educational Marksheet']
 
                     Column = ['Candidate_id', 'Fresher/Experienced?*', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 
                     'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 'Gender*', 'Marital Status*', 'Caste*', 'Disability Status*', 'Religion*', 
@@ -6687,7 +6696,7 @@ class DownloadRegTemplate(Resource):
                     'Permanent Taluk/Block', 'Permanent District*', 'Permanent State*', 'Permanent Pincode*', 'Permanent Country*', 'Aadhar No', 'Identifier Type', 
                     'Identity number', 'Document copy', 'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 
                     'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 'Expected CTC*',
-                    'Aadhar Image','Registered by*','Whatsapp Number']
+                    'Aadhar Image','Registered by*','Whatsapp Number','Educational Marksheet']
                 
                     if Project_Type==1:
                         col = ['Candidate_Id', 'Isfresher', 'Candidate_Photo', 'Salutation', 'First_Name', 'Middle_Name', 'Last_Name', 'Date_Of_Birth', 
@@ -6698,8 +6707,8 @@ class DownloadRegTemplate(Resource):
                         'Permanent_Taluk_Block', 'Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country', 'Aadhar_No', 'Identifier_Type', 
                         'Identity_Number', 'Document_Copy_Image_Name', 'Employment_Type', 'Preferred_Job_Role', 'Years_Of_Experience', 'Relevant_Years_Of_Experience', 
                         'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc', 
-                        'Aadhar_Image_Name','Registered_By', 'Whatsapp_Number']
-                        col += ['Aspirational District', 'Educational Marksheet', 'Income Certificate']
+                        'Aadhar_Image_Name','Registered_By', 'Whatsapp_Number','Educational Marksheet']
+                        col += ['Aspirational District',  'Income Certificate']
 
                         Column = ['Candidate_id', 'Fresher/Experienced?*', 'Candidate Photo*', 'Salutation*', 'First Name*', 'Middle Name', 'Last Name', 'Date of Birth*', 
                         'Age*', 'Primary contact  No*', 'Secondary Contact  No', 'Email id*', 'Gender*', 'Marital Status*', 'Caste*', 'Disability Status*', 'Religion*', 
@@ -6709,8 +6718,8 @@ class DownloadRegTemplate(Resource):
                         'Permanent Taluk/Block', 'Permanent District*', 'Permanent State*', 'Permanent Pincode*', 'Permanent Country*', 'Aadhar No', 'Identifier Type', 
                         'Identity number', 'Document copy', 'Employment Type*', 'Preferred Job Role*', 'Years Of Experience*', 'Relevant Years of Experience*', 
                         'Current/Last CTC*', 'Preferred Location*', 'Willing to travel?*', 'Willing to work in shifts?*', 'BOCW Registration Id', 'Expected CTC*',
-                        'Aadhar Image','Registered by*','Whatsapp Number']
-                        Column += ['Aspirational District*', 'Educational Marksheet*', 'Income Certificate']
+                        'Aadhar Image','Registered by*','Whatsapp Number','Educational Marksheet*']
+                        Column += ['Aspirational District*', 'Income Certificate']
 
                         filename = 'CandidateBulkUpload_Registration_DELL_'
                     elif Project_Type==2:
@@ -7827,6 +7836,22 @@ class AddeEdittUserTarget(Resource):
                 return out
 
 api.add_resource(AddeEdittUserTarget,'/AddeEdittUserTarget')
+
+class AddeEdittUserAllocation(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            try:
+                allocation=request.form['allocation']
+                user_id=request.form['user_id']
+                mapping_id=request.form['mapping_id']
+                out = UsersM.AddeEdittUserAllocation(mapping_id,allocation,user_id)
+            except Exception as e:
+                out = {"PopupMessage":{"message":"Error " + str(e), "status":0}}
+            finally:
+                return out
+
+api.add_resource(AddeEdittUserAllocation,'/AddeEdittUserAllocation')
 
 class upload_batch_target_plan(Resource):
     @staticmethod
@@ -9752,6 +9777,33 @@ class GetPartnerContract(Resource):
             return response
 api.add_resource(GetPartnerContract,'/GetPartnerContract')
 
+class GetTrainerProfile(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            trainer_id=request.args.get('trainer_id',0,type=int)
+            response=Master.GetTrainerProfile(trainer_id)
+            return response
+api.add_resource(GetTrainerProfile,'/GetTrainerProfile')
+class add_edit_trainer_profile(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            #Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId
+
+            certificate_name=request.form['certificate_name']
+            sector_id=request.form['sector_id']
+            start_date=request.form['start_date']
+            end_date=request.form['end_date']
+            filename=request.form['filename']
+            trainer_id=request.form['trainer_id']
+            is_active=request.form['is_active']
+            trainer_profile_id=request.form['trainer_profile_id']
+            user_id=g.user_id
+            
+            return Master.add_edit_trainer_profile(certificate_name, sector_id, start_date, end_date, filename, trainer_id, is_active, user_id, trainer_profile_id)
+api.add_resource(add_edit_trainer_profile,'/add_edit_trainer_profile')
+
 class add_edit_partner_contract(Resource):
     @staticmethod
     def post():
@@ -9771,7 +9823,14 @@ class add_edit_partner_contract(Resource):
             
             return Master.add_edit_partner_contract(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId)
 api.add_resource(add_edit_partner_contract,'/add_edit_partner_contract')
-
+class GetSingleTrainerProfile(Resource):
+    @staticmethod
+    def get():
+        if request.method=='GET':
+            trainer_profile_id=request.args.get('trainer_profile_id',0,type=int)
+            response=Master.GetSingleTrainerProfile(trainer_profile_id)
+            return response
+api.add_resource(GetSingleTrainerProfile,'/GetSingleTrainerProfile')
 class GetPartnerContractMilestones(Resource):
     @staticmethod
     def get():

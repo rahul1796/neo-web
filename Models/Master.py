@@ -1,4 +1,5 @@
 from Database import Database
+from Database import config
 from flask_restful import Resource
 import pandas as pd
 from flask import request,make_response
@@ -262,11 +263,11 @@ class Master:
     def GetPartners(PartnerTypeId):
         return {'Partners':Database.GetPartners(PartnerTypeId)}
 
-    def untag_users_from_sub_project(user_ids,sub_project_id):
-        popupMessage = {"PopupMessage": Database.untag_users_from_sub_project(user_ids,sub_project_id)}
+    def untag_users_from_sub_project(map_subproject_user_ids,sub_project_id):
+        popupMessage = {"PopupMessage": Database.untag_users_from_sub_project(map_subproject_user_ids,sub_project_id)}
         return popupMessage
-    def tag_users_from_sub_project(user_id,sub_project_id,tagged_by):
-        popupMessage = {"PopupMessage": Database.tag_users_from_sub_project(user_id,sub_project_id,tagged_by)}
+    def tag_users_from_sub_project(user_id,user_role_id,sub_project_id,tagged_by):
+        popupMessage = {"PopupMessage": Database.tag_users_from_sub_project(user_id,user_role_id,sub_project_id,tagged_by)}
         return popupMessage
     def assign_batch_candidates(candidates,batch_id,tagged_by):
         popupMessage = {"PopupMessage": Database.assign_batch_candidates(candidates,batch_id,tagged_by)}
@@ -330,12 +331,19 @@ class Master:
     def upload_center_attachment(user_id,user_role_id,filename,session_id):
         Candidate =Database.upload_center_attachment(user_id,user_role_id,filename,session_id)
         return Candidate
-
+    def GetTrainerProfile(trainer_id):
+        return {"TrainerProfile":Database.GetTrainerProfile(trainer_id), "S3_Path":"https://labournet.s3.ap-south-1.amazonaws.com/"+config.aws_location+"bulk_upload/trainer_certification/"}
+    
     def GetPartnerContract(partner_id):
         return {"PartnerContract":Database.GetPartnerContract(partner_id), "S3_Path":"https://labournet.s3.ap-south-1.amazonaws.com/neo_skills/qa/bulk_upload/Partner%20MOU/"}
+    def GetSingleTrainerProfile(trainer_profile_id):
+        return {"TrainerProfile":Database.GetSingleTrainerProfile(trainer_profile_id),  "S3_Path":"https://labournet.s3.ap-south-1.amazonaws.com/"+config.aws_location+"bulk_upload/trainer_certification/"}
+    
     def GetPartnerContractMilestones(Partner_Contract_Id):
         return {"PartnerContract":Database.GetPartnerContractMilestones(Partner_Contract_Id), "S3_Path":"https://labournet.s3.ap-south-1.amazonaws.com/neo_skills/qa/bulk_upload/Partner%20MOU/"}
-
+    def add_edit_trainer_profile(certificate_name, sector_id, start_date, end_date, filename, trainer_id, is_active, user_id, trainer_profile_id):
+        popupMessage = {"PopupMessage": Database.add_edit_trainer_profile(certificate_name, sector_id, start_date, end_date, filename, trainer_id, is_active, user_id, trainer_profile_id)}
+        return popupMessage
     def add_edit_partner_contract(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId):
         popupMessage = {"PopupMessage": Database.add_edit_partner_contract(Contract_Name, ContractCode, StartDate, EndDate, filename, PartnerId, JSON, is_active, user_id, PartnerContractId)}
         return popupMessage
