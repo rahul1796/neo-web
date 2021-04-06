@@ -4969,7 +4969,7 @@ SELECT					cb.name as candidate_name,
         response=[]
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        if region_id ==5 or region_id==6:
+        if region_id ==5 or region_id==6 or region_id==7:
             sql = 'select state_id, state_name from masters.tbl_states where is_active=1'
         else:
             sql = 'select state_id, state_name from masters.tbl_states where is_active=1 and region_id ='+str(region_id)
