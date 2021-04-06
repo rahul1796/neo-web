@@ -35,6 +35,10 @@
             $("#tbl_users").dataTable().fnDestroy();
             $('.dropdown-search-filter').select2();
 
+            $('#ddlActStatus').empty();
+            $('#ddlActStatus').append(new Option('All','-1'));
+            $('#ddlActStatus').append(new Option('Active','1'));
+            $('#ddlActStatus').append(new Option('Inactive','0'));  
             //LoadRM_Role_ddl();
             LoadRegionddl();
             LoadR_Manager_ddl();
@@ -138,6 +142,12 @@
                                             <option selected="" value="">All</option>
                                         </select>
                                     </div>
+                                    <div class="col-lg-3">
+                                        <label for="ddlActStatus" class="mr-2">Active Status</label>
+                                        <select class="form-control dropdown-search-filter" id="ddlActStatus"> <!--  onchange="LoadCustomers();" -->>
+                                            <option selected="-1" value="-1">All</option>
+                                        </select>
+                                    </div>
                                     <div class="col-lg-1" >
                                         <button style="margin-top: 30px" type="button" class="btn btn-success waves-effect waves-light submit" 
                                         onclick="LoadTable('-1')">Search</button>
@@ -145,10 +155,8 @@
                                     </div>
                                     <div class="col-lg-2" >                                        
                                         <button style="float: left;margin-top: 30px" type="button" id="btn_download" class="btn btn-primary waves-effect waves-light submit" 
-                                        onclick="DownloadTableBasedOnSearch()">Download</button></div>
-                                         
-                               
-                                   
+                                        onclick="DownloadTableBasedOnSearch()">Download</button>
+                                    </div>
                                     
                                     <div class="col-lg-3" >                                        
                                         <button style="float: left; margin-top: 30px; display: none;"  id="btn_upload" onclick="UploadUserMdl()" type="button" class="btn btn-info waves-effect waves-light">Add/Modify Employees</a>

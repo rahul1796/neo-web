@@ -369,6 +369,7 @@ function LoadTable(FilterRoleId)
                 d.project_ids=$('#ddl_Project').val().toString();
                 d.R_mangager_ids = $('#ddl_R_Manager').val().toString();
                 d.status_ids=$('#ddl_status').val().toString();
+                d.Act_status_id=$('#ddlActStatus').val();
                 d.filter_role_id=filter_role_id;
                 d.user_region_id = $('#hdn_user_region_id').val();
                 d.user_role_id = $('#hdn_home_user_role_id').val();

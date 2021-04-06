@@ -772,9 +772,11 @@ class user_list(Resource):
             user_region_id=request.form['user_region_id']
             user_role_id=request.form['user_role_id']
             status_ids=request.form['status_ids']
+            Act_status_id=request.form['Act_status_id']
+            
             project_ids=request.form['project_ids']
             #print(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,dept_ids,role_ids,entity_ids,region_ids,RM_Role_ids,R_mangager_ids,filter_role_id,user_region_id,user_role_id,status_ids,project_ids)
-            return UsersM.user_list(user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids)
+            return UsersM.user_list(user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids,Act_status_id)
             
 
 class add_user_details(Resource):
