@@ -12,7 +12,9 @@
         <link href="static/assets/css/app.min.css" rel="stylesheet" type="text/css" />
         
 		<script type="text/javascript">
-        $(document).ready(function(){    
+        $(document).ready(function(){  
+            $(".date-picker").flatpickr();
+         
             role_id=parseInt($('#hdn_home_user_role_id').val());
             if(role_id == 1 || role_id ==15)
                 $('#btn_create').show();
@@ -158,17 +160,22 @@ function LoadSectorddl(){
             if(data.Sectors != null)
             {
                 $('#ddlSector').empty();
+                $('#ddlSector2').empty();
                 var count=data.Sectors.length;
                 if( count> 0)
                 {
                     //$('#ddl_Project').append(new Option('ALL','-1'));
-                    for(var i=0;i<count;i++)
+                    for(var i=0;i<count;i++){
                         $('#ddlSector').append(new Option(data.Sectors[i].Sector_Name,data.Sectors[i].Sector_Id));
-                    //$('#ddlentity').val('-1');
+                        $('#ddlSector2').append(new Option(data.Sectors[i].Sector_Name,data.Sectors[i].Sector_Id));
+                   
+                    }
+                         //$('#ddlentity').val('-1');
                 }
                 else
                 {
                     $('#ddlSector').append(new Option('ALL','-1'));
+                    $('#ddlSector2').append(new Option('ALL','-1'));
                 }
             }
         },
@@ -432,6 +439,16 @@ function LoadClusterddl(){
                     return varButtons;
                 }
             },
+            { 
+                "data": 
+                function (row, type, val, meta) {
+                    var varButtons = ""; 
+                    varButtons += '<a onclick="GetCertificateDetails(\'' + row.User_Id + '\',\'' + row.User_Name + '\')"  style="color:blue;cursor:pointer" >' + row.Certificate_Count + '</a>';
+                    
+                                       
+                    return varButtons;
+                }
+            },
             { "data": "Sector_Name" },
             { "data": "Employment_Status_Name" },
 
@@ -454,7 +471,300 @@ function LoadClusterddl(){
 
     });
 }
-	
+function EditTrainerProfile(trainer_profile_id){
+    $('#isactive2').prop('checked',true);
+
+    $('#hdn_modal_trainerid3').val($('#hdn_modal_trainer_id').val());
+
+    var URL=$('#hdn_web_url').val()+ "/GetSingleTrainerProfile"
+            $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            data:
+            {   
+                "trainer_profile_id":trainer_profile_id
+            },
+            success: function (data){
+                $('#hdn_modal_trainer_profile_id').val(data.TrainerProfile[0].Trainer_Profile_Id);
+                $('#Certificate_Name').val(data.TrainerProfile[0].Certificate_Name);
+                $('#Trainer_Name').val($('#hdn_modal_trainer_name').val());
+                $('#ddlSector2').val(data.TrainerProfile[0].Sector_Name.toString());
+                $('#StartDate').val(data.TrainerProfile[0].Start_Date);
+                $('#EndDate').val(data.TrainerProfile[0].End_Date);
+                //$('#CertificateDocument').val(data.TrainerProfile[0].Certificate_Copy);
+           },
+            error:function(err)
+            {
+                alert('Error while fetching milestone data');
+                return false;
+            }
+        });
+    $('#mdl_Trainer_Profile').modal('hide');
+    $('#mdl_add_edit_trainer_profile').modal('show'); 
+    return false;
+}
+
+function GetCertificateDetails(TrainerId,TrainerName)
+    {
+        $('#hdn_modal_trainer_id').val(TrainerId);
+        $('#hdn_modal_trainer_name').val(TrainerName);
+        $('#headerTrainerProfile').text(TrainerName);
+        var URL=$('#hdn_web_url').val()+ "/GetTrainerProfile?trainer_id="+TrainerId;
+        var doc;
+        var fileExtentionDOC = ['doc','docx']
+        var fileExtentionPDF = ['pdf','doc','docx','jpg','jpeg','png']
+        
+        $.ajax({
+            type:"GET",
+            url:URL,
+            async:false,
+            overflow:true,        
+            beforeSend:function(x){ if(x && x.overrideMimeType) { x.overrideMimeType("application/json;charset=UTF-8"); } },
+            datatype:"json",
+            success: function (data){
+                varHtml='';
+                $("#tbl_trainer_profile").dataTable().fnDestroy();
+                $("#tbl_trainer_profile tbody").empty();
+                if(!jQuery.isEmptyObject(data))
+                {   if (data.TrainerProfile != null){
+                        count=data.TrainerProfile.length;
+                        if (count>0)
+                        {   varHtml='';
+                            //console.log(count);
+                            for(var i=0;i<count;i++)
+                            {
+                                td_open= '  <td style="text-align:center;">' ;
+                                td_close=   '</td>';       
+                                varHtml+='<tr>';
+                                varHtml+='  <td style="text-align:center;">'+ data.TrainerProfile[i].S_No +'</td>';
+                                //console.log(''+JSON.stringify(data.PartnerContract[i].Mile).replaceAll("\"")+'\\"')
+                                if(1==1) // $('#hdn_home_user_role_id').val()!='50'  
+                                    varHtml+='  <td style="text-align:center;">'+'<a onclick="EditTrainerProfile(\'' + data.TrainerProfile[i].Trainer_Profile_Id + '\')" class="btn" style="cursor:pointer" ><i title="Edit Trainer Profile" class="fas fa-edit" ></i></a>'+'</td>';
+                                else
+                                    varHtml+='  <td style="text-align:center;">'+ ''+'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.TrainerProfile[i].Sector_Name +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.TrainerProfile[i].Certificate_Name +'</td>';                    
+                                varHtml+='  <td style="text-align:center;">'+ data.TrainerProfile[i].Start_Date +'</td>';
+                                varHtml+='  <td style="text-align:center;">'+ data.TrainerProfile[i].End_Date +'</td>';   
+                                doc = data.TrainerProfile[i].Certificate_Copy
+                                //doc.split('.')[doc.split('.').length-1] doc.split('.').pop()
+                                if (doc=='NA' || doc=='')
+                                    varHtml+='  <td style="text-align:center;">NA</td>';
+                                else if (fileExtentionPDF.includes(doc.split('.').pop().toLowerCase())) 
+                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.S3_Path +data.TrainerProfile[i].Certificate_Copy.replaceAll(" ", "%20") + ' target="_blank" title="Open in new tab"><img src='+ 'static/assets/images/document-download-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                                else if (fileExtentionDOC.includes(doc.split('.').pop().toLowerCase()))
+                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.TrainerProfile[i].Certificate_Copy.replaceAll(" ", "%20") + ' target="_blank" title="Open in new tab"><img src='+ 'static/assets/images/document-download-icon.png' +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                                else
+                                    varHtml+='  <td style="text-align:center;">'+ '<a href=' + data.TrainerProfile[i].Certificate_Copy.replaceAll(" ", "%20") + ' target="_blank" title="Open in new tab"><img src='+ data.S3_Path + data.TrainerProfile[i].Certificate_Copy.replaceAll(" ", "%20") +' style="height:20px;width:30px;border:0px solid lightgray;"/></a>'+'</td>';
+                                //varHtml+='  <td style="text-align:center;">'+ data.PartnerContract[i].Mou +'</td>';   
+                                varHtml+='</tr>';                            
+                            }
+                            $("#tbl_trainer_profile tbody").append(varHtml);
+                                $("#tbl_trainer_profile").DataTable({
+                                drawCallback: function(){
+                                    $('#tbl_trainer_profile_paginate ul.pagination').addClass("pagination-rounded");
+                                }
+                            });
+                                $('#mdl_Trainer_Profile').modal('show');
+                                varHtml='';
+                        }
+                        else
+                        {
+                            //varHtml='<tr><td colspan="4" style="text-align:center;">No records found</td></tr>'                            
+                            //$("#tbl_users tbody").append(varHtml);
+                            $("#tbl_trainer_profile").DataTable();
+                            $('#mdl_Trainer_Profile').modal('show');
+                        }
+                    }
+                }
+                else
+                {
+                    //varHtml='<tr><td colspan="4" style="text-align:center;">No records found</td></tr>'
+                    //$("#tbl_users tbody").append(varHtml);
+                    $("#tbl_trainer_profile").DataTable();
+                    $('#mdl_Trainer_Profile').modal('show');
+                }   
+            },
+            error:function(err)
+            {
+                alert('Error! Please try again');
+                return false;
+            }
+        });
+        return false;
+    }
+    function AddTrainerProfileModal(){
+    $('#isactive2').prop('checked',true);
+    
+    $('#hdn_modal_trainer_profile_id').val('0');
+    $('#Certificate_Name').val('');
+    $('#Trainer_Name').val($('#hdn_modal_trainer_name').val());
+    $('#StartDate').val('');
+    $('#EndDate').val('');
+    $('#hdn_modal_trainerid3').val($('#hdn_modal_trainer_id').val());
+    $('#mdl_Trainer_Profile').modal('hide');
+    $('#mdl_add_edit_trainer_profile').modal('show');
+}
+function UploadFileData(file, param)
+{   
+    if (param==''){
+        var file_path=$('#hdn_AWS_S3_path').val()+"bulk_upload/partner_planner/" + $('#hdn_home_user_id').val() + '_' + Date.now() + '_' + file.name;
+    }
+    else{
+        var file_path=$('#hdn_AWS_S3_path').val()+"bulk_upload/trainer_certification/" + param;
+    }
+    
+    var api_url=$('#hdn_COL_url').val() + "s3_signature?file_name="+file_path+"&file_type="+file.type;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET",api_url, false );
+    xhr.send();
+
+    if(xhr.status === 200 || xhr.status === 204){
+        var response = JSON.parse(xhr.responseText);
+        uploadFileToS3(file, response.data, response.url);
+    }
+    else{
+        alert("Could not connect to file server.");
+    }
+}
+
+function uploadFileToS3(file, s3Data, url){
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", s3Data.url, false);
+
+    var postData = new FormData();
+    for(key in s3Data.fields){
+        postData.append(key, s3Data.fields[key]);
+    }
+    postData.append('file', file);
+
+    xhr.send(postData);
+    //console.log(xhr.response);
+    if(xhr.status === 200 || xhr.status === 204){
+        var response = xhr;
+    }
+    else{
+        alert("Could not upload file to s3.");
+    }
+}
+
+function add_popup_message(){
+    $('#imgSpinner3').show();
+    //console.log($('#Contract_Name').val()+$('#ContractCode').val()+$('#StartDate').val()+$('#EndDate').val()+$('#MOUDocument').val()+$('#ddlBillingMilestones').val());
+    var validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'application/pdf'];  // , 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    var filename_prefix = $('#hdn_home_user_id').val() + '_' + Date.now() + '_';
+    var filename = '';
+    if(1==1){
+        var file = document.getElementById('CertificateDocument').files[0];
+        filename = filename_prefix + file.name;
+        if (!validImageTypes.includes(file['type'])){
+            alert('allowed format are : '+validImageTypes.toString());
+            $('#imgSpinner3').hide();
+            return false;
+        }
+        else if(file.size > 5*1024*1024){
+            alert('Image size is not valid');
+            $('#imgSpinner3').hide();
+            return false;
+        }
+    }
+    if ($('#StartDate').val() >= $('#EndDate').val()){
+        alert('End date must greater than start date');
+        $('#imgSpinner3').hide();
+        //console.log($('#StartDate').val(),$('#EndDate').val())
+    }
+    else if (($('#StartDate').val() =='')||($('#EndDate').val() =='')||($('#Certificate_Name').val() =='')){
+        alert('Please fill all required details!');
+        $('#imgSpinner3').hide();
+        //console.log($('#StartDate').val(),$('#EndDate').val())
+    }
+    else{
+        
+        var form_data = new FormData(); //$('#formUpload')[0]
+        //Contract_Name, ContractCode, StartDate, EndDate, filename, BillingMilestones
+        form_data.append('certificate_name',$('#Certificate_Name').val());
+        form_data.append('sector_id',$('#ddlSector2').val());
+        form_data.append('start_date',$('#StartDate').val());
+        form_data.append('end_date',$('#EndDate').val());
+        form_data.append('filename',filename);
+        form_data.append('trainer_id',$('#hdn_modal_trainer_id').val());
+        form_data.append('is_active',$('#isactive2').prop('checked'));
+        form_data.append('trainer_profile_id',$('#hdn_modal_trainer_profile_id').val());
+        
+        $.ajax({
+            type: 'POST',
+            url: $('#hdn_web_url').val()+ "/add_edit_trainer_profile",
+            enctype: 'multipart/form-data',
+            data: form_data,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function(data) 
+            {   //PopupMessage, message, Status
+                //console.log(data)
+                if(1==1){
+                    var status;
+                    file = document.getElementById('CertificateDocument').files[0]
+                    //file = document.getElementById('myFile').files[0]
+                    UploadFileData(file,filename);
+                    status = true;
+                }
+                
+                $('#imgSpinner3').hide();
+                var message="",title="",icon="";
+                if(data.PopupMessage.Status){
+                    message=data.PopupMessage.message;
+                    title="Success";
+                    icon="success";
+                }
+                else{
+                    if (data.PopupMessage.message=="Validation_Error"){
+                        message=data.error;
+                        title="Error";
+                        icon="error";
+                    }
+                    else {
+                        message=data.PopupMessage.message;
+                        title="Error";
+                        icon="error";
+                    }
+                }
+                var span = document.createElement("span");
+                span.innerHTML = message;
+                swal({   
+                            title:title,
+                            content: span,
+                            icon:icon,
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                $('#mdl_add_edit_trainer_profile').modal('hide');
+                                GetCertificateDetails( $('#hdn_modal_trainer_id').val(), $('#hdn_modal_trainer_name').val());
+                                //Create_add_Remove_attachment_Html($('#hdn_upl_session_id').val());
+                            });
+            },
+            error:function(err)
+            {
+                console.log(err)
+                swal({   
+                    title:"Error",
+                    text:'Error! Please try again',
+                    icon:"error",
+                    confirmButtonClass:"btn btn-confirm mt-2"
+                    }).then(function(){
+                        window.location.href = '/trainer';
+                        //Create_add_Remove_attachment_Html($('#hdn_upl_session_id').val());
+                });
+            }
+        });
+    }
+}
+function Back()
+{
+    window.location.href = '/trainer';
+}
     function LoadTableBasedOnSearch(){
 		LoadTable('', $('#ddlStatus').val());
 		/*$('#ddlCenter').val().toString()
@@ -709,6 +1019,7 @@ function LoadClusterddl(){
                                                     <th>Business Unit</th>
                                                     <th>Region</th>
                                                     <th>Project</th>
+                                                    <th>Certificates</th>
                                                     <th>Sector</th>
                                                     <th>Employee Status</th>                                                    
 													<!-- <th>Status</th> -->
@@ -765,7 +1076,170 @@ function LoadClusterddl(){
                 </div>
             </div>
         </div><!--/.modal-->  
-
+        <div id="mdl_Trainer_Profile" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h4 class="modal-title" ><span id="headerTrainerProfile"></span></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="Back()">×</button>
+                    </div>                    
+                    <div class="modal-body">
+                        <input type="hidden" id="hdn_modal_trainer_id" name="hdn_modal_trainer_id" value="0">
+                        <input type="hidden" id="hdn_modal_trainer_name" name="hdn_modal_trainer_name" value="0">
+        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button style="float: right;" type="button" id="btn_add" onclick="AddTrainerProfileModal()" class="btn btn-primary">Add Trainer Certificate</a>
+                            </div>
+                        </div>
+                    </br>
+                        <div >
+                            <table id="tbl_trainer_profile" class="table table-bordered dt-responsive nowrap" style="border-color: lightgray;width:100% !important;font-size: 12px;">
+                                <thead>
+                                    <tr style="background-color: #f5f6f8;">
+                                        <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">S.No</th>
+                                        <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Action</th>
+                                        <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Trade Qualification</th>
+                                        <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Certification</th>
+                                        <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Valid From </th>
+                                        <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Valid To</th>
+                                        <th  style="border-bottom-color: lightgray;vertical-align:middle;text-align:center;">Document</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+        
+                                </tbody>
+                            </table>
+                        </div>	
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal" onclick="Back()"> Close</button>
+                    </div>
+                </div>
+            </div>
+        </div><!--/.modal-->
+        
+        <div id="mdl_add_edit_trainer_profile" class="modal fade" style="overflow:auto;" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content ">
+                    <form action="javascript:add_popup_message();" method="POST" >
+                    <input type="hidden" id="hdn_modal_trainer_profile_id" name="hdn_modal_trainer_profile_id" value="0">
+                    <input type="hidden" id="hdn_modal_traineridt3" name="hdn_modal_traineridt3" value="0">
+                    <div class="modal-header">
+                        <h4 class="modal-title" ><span id="header">Trainer Profile Details</span></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body" id="ModalTrainerProfileInfo">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card-box">
+                                    <br/>
+                                    <div class="alert alert-warning d-none fade show">
+                                        <h4>Oh snap!</h4>
+                                        <p class="mb-0">This form seems to be invalid :(</p>
+                                    </div>
+                                    <div class="alert alert-info d-none fade show">
+                                        <h4>Yay!</h4>
+                                        <p class="mb-0">Everything seems to be ok :)</p>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="Trainer_Name">Trainer Name * :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <input type="text" class="form-control" name="Trainer_Name" id="Trainer_Name" required placeholder="Trainer Name" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="ddlSector2">Trade Qualification :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <select class="form-control" id="ddlSector2" >
+                                                    <!--option selected="" value="0">All</option-->
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="Certificate_Name">Certificate Name * :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <input type="text" class="form-control" name="Certificate_Name" id="Certificate_Name" required placeholder="Certificate Name">
+                                            </div>
+                                        </div>
+                                    </div>
+                                   
+                                    <div class="form-group row ">
+                                            <div class="col-lg-6">
+                                                    <label for="StartDate"> Valid From* :</label>
+                                                </div>
+                                                <div class="col-lg-6">
+                                            <input type="text" id="StartDate" name="StartDate" class="form-control date-picker" ClientIdMode="static" placeholder="Start Date" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row ">
+                                            <div class="col-lg-6">
+                                                    <label for="EndDate"> Valid To* :</label>
+                                                </div>
+                                                <div class="col-lg-6">
+                                            <input type="text" id="EndDate" name="EndDate" class="form-control date-picker" ClientIdMode="static" placeholder="EndDate" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label for="CertificateDocument">Certificate Document * :</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <input type="file" class="form-control" name="CertificateDocument" id="CertificateDocument" required placeholder="Certificate Document">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label>Is Active *:</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="checkbox checkbox-pink mb-0">
+                                                    <input type="checkbox" name="isactive2" id="isactive2" ClientIdMode="static" 
+                                                                    value="1" data-parsley-mincheck="1" >
+                                                    <label for="isactive2"> Is active </label>
+                                                </div>
+                                            </div>   
+                                        </div>                                     
+                                    </div>
+                                    <!-- <div class="form-group mb-0">
+                                        <button class="btn btn-primary" type="submit">Save</button>
+                                    </div> -->
+                                </div> <!-- end card-box-->
+                            </div> <!-- end col-->
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <div id="imgSpinner3" style="display: none;"> <!--style="margin-top: 9px;margin-bottom: -23px;"-->
+                            <img src="static/assets/images/spinner1_old.gif" style="height:30px;display:inline-block;"/>
+                            <label id="imgSpinner3_label" style="display:inline-block;">Please wait while uploading...</label>
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-primary waves-effect" > Save</button>
+                            <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal"> Close</button>
+                        </div>
+                    </div>
+                    </form>
+                    <form id='form2' method="POST" action="/assign_project_add_edit_to_home">
+                        <input type="hidden" id="hdn_project_id" name="hdn_project_id" value="0">
+                    </form>
+                </div>
+            </div>
+        </div><!--/.modal-->
         <!-- third party js -->
         <script src="static/assets/libs/datatables/jquery.dataTables.min.js"></script>
         <script src="static/assets/libs/datatables/dataTables.bootstrap4.js"></script>

@@ -1503,6 +1503,8 @@ class Report:
         except Exception as e:
             print(str(e))
             return({'msg':'Error creating excel -'+str(e), 'success':False, 'Error':str(e)})
+    
+
     def download_courses_list(user_id, user_role_id, course_id, sectors, qps, status):
         try:
             data=Database.download_courses_list(user_id, user_role_id, course_id, sectors, qps, status)
@@ -1606,7 +1608,7 @@ class Report:
             df = pd.DataFrame(data['sheet1'], columns=data['sheet1_columns'])
             df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Employees')            
             
-            first_row = ['S No','Name','Email','Employee Code','Entity','Department','Region','Reporting Manager','Employment Status','NEO Role','Jobs Role','CRM Role','Mobile Number','HR Role','created by','created on','last modified by','last modified on']
+            first_row = ['S No','Name','Email','Employee Code','Entity','Department','Region','Reporting Manager','Employment Status','NEO Role','Jobs Role','CRM Role','Mobile Number','HR Role','Active Status','created by','created on','last modified by','last modified on']
             worksheet = writer.sheets['Employees']
             for col_num, value in enumerate(first_row):
                 worksheet.write(0, 0+col_num, value, header_format)           
@@ -2144,11 +2146,11 @@ class Report:
                        'Are You Willing To Follow  Environment, Health And Safety Norms In Your Business?', 'Have You Ever Been Subjected To Any Legal Enquiry For Non Ethical Work/Business?', 'Address As Per Aadhar Card (Incl Pin Code)', 'Number Of Members Earning In The Family', 'Rented Or Own House?', 'Size Of The House', 'Ration Card (Apl Or Bpl)', 'Tv', 'Refrigerator', 'Washing Machine', 'Ac /Cooler', 'Car',  'Medical Insurance', 'Life Insurance', 'Others', 'Educational Qualification', 'Age Proof', 'Signed Mou', 'Mou Signed Date', 'Kit Given Date', 'Head Of The Household', 'Farm Land', 'If Yes, Acres Of Land','Sponsor']
             for i in range(len(default_column_she)):
                 worksheet3.write(0,i ,default_column_she[i], header_format)
-            df_reg=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Present_Address_Line1','Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block','Present_District', 'Present_State', 'Present_Pincode', 'Present_Country', 'Permanaet_Address_Line1','Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 'Permanent_Taluk_Block','Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country','Aadhar_No', 'Identifier_Type', 'Identity_Number','Employment_Type', 'Preferred_Job_Role', 'Relevant_Years_Of_Experience', 'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc','Project_Type','Candidate_Image','Aadhar_Image_Front','Aadhar_Image_Back','Identifier_Image','Registered_On','Registered_By']]
+            df_reg=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Present_Address_Line1','Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block','Present_District', 'Present_State', 'Present_Pincode', 'Present_Country', 'Permanaet_Address_Line1','Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 'Permanent_Taluk_Block','Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country','Aadhar_No', 'Identifier_Type', 'Identity_Number','Employment_Type', 'Preferred_Job_Role', 'Relevant_Years_Of_Experience', 'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc','Project_Type','Candidate_Image','Aadhar_Image_Front','Aadhar_Image_Back','Identifier_Image','Educational Marksheet','Registered_On','Registered_By']]
             df_reg.drop_duplicates(keep='first',inplace=True) 
             df_reg.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Registration') 
             worksheet2 = writer.sheets['Registration']
-            default_column_reg = ['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Present_Address_Line1','Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block','Present_District', 'Present_State', 'Present_Pincode', 'Present_Country', 'Permanent_Address_Line1','Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 'Permanent_Taluk_Block','Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country','Aadhar_No', 'Identifier_Type', 'Identity_Number','Employment_Type', 'Preferred_Job_Role', 'Relevant_Years_Of_Experience', 'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc','Project_Type','Candidate_Image','Aadhar_First_Side','Aadhar_Second_Side','Identifier_Image','Registered_On','Registered_By']
+            default_column_reg = ['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Email_Id','Present_Address_Line1','Present_Address_Line2', 'Present_Village', 'Present_Panchayat', 'Present_Taluk_Block','Present_District', 'Present_State', 'Present_Pincode', 'Present_Country', 'Permanent_Address_Line1','Permanent_Address_Line2', 'Permanent_Village', 'Permanent_Panchayat', 'Permanent_Taluk_Block','Permanent_District', 'Permanent_State', 'Permanent_Pincode', 'Permanent_Country','Aadhar_No', 'Identifier_Type', 'Identity_Number','Employment_Type', 'Preferred_Job_Role', 'Relevant_Years_Of_Experience', 'Current_Last_Ctc', 'Preferred_Location', 'Willing_To_Travel', 'Willing_To_Work_In_Shifts', 'Bocw_Registration_Id', 'Expected_Ctc','Project_Type','Candidate_Image','Aadhar_First_Side','Aadhar_Second_Side','Identifier_Image','Educational Marksheet','Registered_On','Registered_By']
             for i in range(len(default_column_reg)):
                 worksheet2.write(0,i ,default_column_reg[i], header_format)
             
@@ -2160,11 +2162,11 @@ class Report:
             for i in range(len(default_column_enr)):
                 worksheet4.write(0,i ,default_column_enr[i], header_format)
             
-            df_dell=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Aspirational District','Educational Marksheet','Income Certificate']]
+            df_dell=df[['Candidate_Id',  'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Aspirational District','Income Certificate']]
             df_dell.drop_duplicates(keep='first',inplace=True) 
             df_dell.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='Dell') 
             worksheet5 = writer.sheets['Dell']
-            default_column_dell = ['Candidate_Id', 'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Aspirational District','Educational Marksheet','Income Certificate']
+            default_column_dell = ['Candidate_Id', 'First_Name', 'Middle_Name', 'Last_Name','Primary_Contact_No','Aspirational District','Income Certificate']
             for i in range(len(default_column_dell)):
                 worksheet5.write(0,i ,default_column_dell[i], header_format)
                       

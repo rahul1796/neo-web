@@ -408,14 +408,6 @@ function LoadTable(FilterRoleId)
             },
             //{ "data": "User_Name" },
             { "data": "Email" },
-            { "data": "Employee_Code" },            
-            { "data": "Entity_Name" },
-            { "data": "Department_Name" },
-            { "data": "Employee_Role_Name" },
-            { "data": "User_Role_Name" },
-            { "data": "Jobs_Role_Name" },
-            { "data": "Crm_Role_Name" },
-            { "data": "Region" },
             { 
                 "data": 
                 function (row, type, val, meta) {
@@ -429,6 +421,15 @@ function LoadTable(FilterRoleId)
                     return varButtons;
                 }
             },
+           
+            { "data": "Employee_Code" },            
+            { "data": "Entity_Name" },
+            { "data": "Department_Name" },
+            { "data": "Employee_Role_Name" },
+            { "data": "User_Role_Name" },
+            { "data": "Jobs_Role_Name" },
+            { "data": "Crm_Role_Name" },
+            { "data": "Region" },
             { "data": "Reporting_Manager_Name"},
             { "data": "Employment_Status"},
             { "visible":false, "data": "Center_Name" },
@@ -726,8 +727,12 @@ function GetProjectDetails(User_Id,User_Name)
                             varHtml+='<tr>';
                             varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].S_No +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ User_Name +'</td>';
+                            varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].User_Role +'</td>';
+                           
                             varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Sub_Project_Code +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Sub_Project_Name +'</td>';                    
+                            varHtml+='  <td style="text-align:center;">'+'<a onclick="EditAllocationModal(\'' + User_Id.toString() + '\',\'' + data.SubProjects[i].Sub_Project_Code + '\',\'' +  data.SubProjects[i].Sub_Project_Name + '\',\'' + User_Name + '\',\'' + data.SubProjects[i].Allocation + '\',\'' +  data.SubProjects[i].Mapping_Id+ '\')" class="btn" style="cursor:pointer" >'+data.SubProjects[i].Allocation+'</a>'+'</td>';
+                                
                             varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Code +'</td>';
                             varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Project_Name +'</td>';  
                             varHtml+='  <td style="text-align:center;">'+ data.SubProjects[i].Bu +'</td>';  
@@ -853,6 +858,19 @@ function Getusertarget(UserId,UserName)
         $('#mdl_user_target').modal('hide');
         $('#mdl_add_edit_targets').modal('show');
     }
+    function EditAllocationModal(user_id,sub_project_code,sub_project_name,user_name,allocation,mapping_id)
+    {   
+        $('#txtSubProjectCode').val(sub_project_code);
+        $('#txtSubProjectName').val(sub_project_name);
+        $('#TxtEmployeeName').val(user_name);
+        $('#txtAllocation').val(allocation);
+        $('#hdn_user_id_allocation').val(user_id.toString()); 
+        $('#hdn_user_sp_id_allocation').val(mapping_id); 
+        
+        $('#divSubProjectList').modal('hide');
+        $('#mdl_add_edit_allocation').modal('show');
+        
+    }
     
     function EditModal(From_Date, To_Date, Product, Target, User_Id, Is_Active, User_Target_Id)
     {   
@@ -918,6 +936,58 @@ function Getusertarget(UserId,UserName)
                                 window.location.href = '/user';
                                 // $('#mdl_add_edit_Users').modal('hide');
                                 // LoadTable();
+                            }); 
+            },
+            error:function(x){
+                alert('error');
+            }
+        });
+        }
+    }
+    function UpdateUserAllocation()
+    {   //alert($('#hdn_user_sp_id_allocation').val())
+        
+        if (1==0){
+            alert('');
+            return;
+        }
+        else{
+            var URL=$('#hdn_web_url').val()+ "/AddeEdittUserAllocation";
+        $.ajax({
+            type:"POST",
+            url:URL,
+            data:{
+                "mapping_id" : $('#hdn_user_sp_id_allocation').val(),
+                "allocation" : $('#txtAllocation').val(),
+                "user_id":$('#hdn_home_user_id').val()
+               
+            },
+            success:function(data){
+                var message="",title="",icon="";
+                if(data.PopupMessage.status==1){
+                    message=data.PopupMessage.message;
+                    title="Success";
+                    icon="success";
+                }
+                else if(data.PopupMessage.status==2){
+                    message=data.PopupMessage.message;
+                    title="Error";
+                    icon="error";
+                }
+                else{
+                    message=data.PopupMessage.message;
+                    title="Error";
+                    icon="error";
+                }
+                swal({   
+                            title:title,
+                            text:message,
+                            icon:icon,
+                            confirmButtonClass:"btn btn-confirm mt-2"
+                            }).then(function(){
+                                //window.location.href = '/user';
+                                $('#mdl_add_edit_allocation').modal('hide');
+                                GetProjectDetails($('#hdn_upl_user_id').val(),$('#hdn_upl_user_name').val());
                             }); 
             },
             error:function(x){
