@@ -5661,7 +5661,8 @@ class otp_send(Resource):
                     #sms_msg=   'Hi {},\n\nThank you for getting in touch with Labournet.\nYour OTP is {}.\n\nThanks,\nNEO Teams.'.format(cand_name, otp)
                     #sms_msg='Hi {},\n\nYour OTP is {}.\nOR\nClick here to verify {}\n\nThanks,\nNEO Team.'.format(name, otp,short_url)
                     if is_otp==1:
-                        sms_msg='Hi {},\n\nThank you for getting in touch with Labournet.\nYour Registration Number is {}.\n\nThanks,\nNEO Teams.'.format(name, otp)
+                        sms_msg='Hi {},\n\nThank you for getting in touch with Labournet.\nYour OTP for mobile number verification is {}.\n\nThanks,\nNEO Teams.'.format(name, otp)
+                        #sms_msg='Hi {},\n\nThank you for getting in touch with Labournet.\nYour Registration Number is {}.\n\nThanks,\nNEO Teams.'.format(name, otp)
                     elif is_otp==0:
                         sms_msg='Hi {},\n\nClick to verify your mobile number with Labournet.{}.\n\nNEO Team.'.format(name,short_url)
                     #print(sms_msg)

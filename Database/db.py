@@ -6126,7 +6126,7 @@ SELECT					cb.name as candidate_name,
                 mobilization_type = temp_data['mobilization_type']
             if 'assign_batch' in temp_data:
                 json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
-            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"row_id":row_id,"primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
+            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"row_id":temp_data['row_id'],"primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
 
         sql = 'exec	[masters].[sp_validate_upload_mobh_contact_info] ?'
         values = (json.dumps(json_array_cont),)
