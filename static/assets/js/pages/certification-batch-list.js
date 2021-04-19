@@ -242,7 +242,12 @@ function LoadCenter(){
     return false;
 }
 function LoadTable()
-{   
+{ 
+    if ($('#ddlClient').val()=='')
+    {
+        alert("Select atleast one customer to load the data!");
+        return false;
+    }
     $('#divBcthList').show();
     vartable = $("#tbl_batchs").DataTable({
         "serverSide": true,
@@ -583,7 +588,7 @@ function ShowCandidateCertificationMetrics(Batch_Code,Stage)
     }
 function ShowAssessmentPage()
 {
-    LoadTable();
+    //LoadTable();
     $('#headBatch').text("Assessment Batch List");
     $('#divBtns').hide();
     $('#btnAssessmentInfo').hide();
