@@ -8232,7 +8232,7 @@ SELECT					cb.name as candidate_name,
     def GetShikshaLastSyncDate():
         last_sync_date = ''
         con = pyodbc.connect(conn_str)
-        cur2 = con.cursor()        
+        cur2 = con.cursor()
         quer = "Select COALESCE(cast(MAX(last_sync_date) as date),cast('2019-04-01' as date)) as last_sync_date from [masters].[tbl_shiksha_candidate_data];"
         cur2.execute(quer)
         data=cur2.fetchall()
