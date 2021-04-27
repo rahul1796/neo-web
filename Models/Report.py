@@ -265,8 +265,12 @@ class Report:
             
             df=pd.DataFrame(response)
             if len(df.index)>0:
-                df=df[[ 'Practice_Name','Is_Active','Customer_Name','Contract_Stage_Name','Contract_Code','Contract_Name','Project_Code','Project_Name','Sub_Project_Code','Sub_Project_Name','Center_Name','Product_Name','Bu_Name','Region_Name','Batch_Code','Course_Code','Course_Name','Status','Actual_Start_Date','Actual_End_Date','Unit_Rate','E_Ratio','C_Ratio','P_Ratio','Batch_Enrolled','Batch_Dropped','Batch_Certified','Certification_Distribution','Batch_Placement','Placement_Count_Rr','Placement_Is_Per_Of','Ojt_Completed','Filtered_Enrolled','Filtered_Dropped','Filtered_Certified','Filtered_Certification_Distribution','Filtered_Placed','Filtered_Placement_Count_Rr','Filtered_Ojt_Completed','Excess_No','Excess_Revenue','Overall_Revenue','Mon_Revenue']]
-                columns=[ 'Practice','Customer Status','Customer','Contract Stage','Contract Code','Contract Name','Project Code','Project Name','Sub Project Code','Sub Project Name','Center','Product','BU','Region','Batch Code','Course Code','Course Name','Status','Actual Start Date','Actual End Date','Unit Rate','E Ratio','C Ratio','P Ratio','Enrolled','Dropped','Certified','Certificates Distribution','Placed','Placement Count(RR)','Placement Is Percent Of','Ojt Completed','Enrolled(Selected Duration)','Dropped(Selected Duration)','Certified(Selected Duration)','Certificates Distribution(Selected Duration)','Placed(Selected Duration)','Placement Count RR(Selected Duration)','Ojt Completed(Selected Duration)','Excess No','Excess Revenue','Revenue(Without Excess)','Revenue(Selected Duration)']
+                df=df[['Practice_Name','Is_Active','Customer_Name','Contract_Stage_Name','Contract_Code','Contract_Name','Bu_Name','Region_Name','User_Name','Project_Status','Project_Code','Project_Name','Sub_Project_Code','Sub_Project_Name',
+                'Center_Name','Product_Name','Batch_Code','Course_Code','Course_Name','Status','Actual_Start_Date','Actual_End_Date','Unit_Rate','E_Ratio','C_Ratio','P_Ratio','Batch_Enrolled','Batch_Dropped','Batch_Certified','Certification_Distribution','Batch_Placement','Placement_Count_Rr','Placement_Is_Per_Of','Ojt_Completed','Filtered_Enrolled','Filtered_Dropped','Filtered_Certified','Filtered_Certification_Distribution','Filtered_Placed','Filtered_Placement_Count_Rr','Filtered_Ojt_Completed','Excess_No','Excess_Revenue','Overall_Revenue','Mon_Revenue']]
+
+                columns=['Practice','Customer Status','Customer','Contract Stage','Contract Code','Contract Name','BU','Region','COO','Project Status','Project Code','Project Name','Sub Project Code','Sub Project Name',
+                'Center','Product','Batch Code','Course Code','Course Name','Status','Actual Start Date','Actual End Date','Unit Rate','E Ratio','C Ratio','P Ratio','Enrolled','Dropped','Certified','Certificates Distribution','Placed','Placement Count(RR)','Placement Is Percent Of','Ojt Completed','Enrolled(Selected Duration)','Dropped(Selected Duration)','Certified(Selected Duration)','Certificates Distribution(Selected Duration)','Placed(Selected Duration)','Placement Count RR(Selected Duration)','Ojt Completed(Selected Duration)','Excess No','Excess Revenue','Revenue(Without Excess)','Revenue(Selected Duration)']
+
                 temp={"data":df,"columns":columns} 
                 
                 res=Report.CreateExcelFun(temp,path,'Batch Status')
@@ -407,10 +411,11 @@ class Report:
                 worksheet.write(2, 1+cf_gap+col_num, value, header_format)
 
             worksheet = writer.sheets['User-Sub Project']
-            default_column = ['COO','Sub Project']
+            default_column = ['Region','COO','BU','Project status','Project Id','Project Name','Subproject ID','SubProject Name']
+
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=2
+            col=8
             for col_num, value in enumerate(first_row):
                 if col_num==2:
                     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
@@ -418,7 +423,7 @@ class Report:
                 else:
                     worksheet.merge_range(0, col, 0, 12+col, value, header_format)
                     col=col+13
-            col=2
+            col=8
             for col_num, value in enumerate(CF_second_row):
                 if col_num==8:
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -433,12 +438,13 @@ class Report:
                     worksheet.merge_range(1, col, 2, col, value, header_format)
                     col=col+1
             cf_gap=0
+            col=8
             for col_num, value in enumerate(third_row):
                 if col_num in (0,22,27):
                     cf_gap +=1
                 if col_num in (11,38,):
                     cf_gap +=2
-                worksheet.write(2, 2+cf_gap+col_num, value, header_format)
+                worksheet.write(2, col+cf_gap+col_num, value, header_format)
 
             # worksheet = writer.sheets['User-Course']            
             # default_column = ['COO','Course']
@@ -532,10 +538,10 @@ class Report:
                 worksheet.write(2, 2+cf_gap+col_num, value, header_format)
 
             worksheet = writer.sheets['User-Sub Project']
-            default_column = ['COO','TM','Sub Project']
+            default_column = ['Region','COO','TM','BU','Project status','Project Id','Project Name','Subproject ID','SubProject Name']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=3
+            col=9
             for col_num, value in enumerate(first_row):
                 if col_num==2:
                     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
@@ -543,7 +549,7 @@ class Report:
                 else:
                     worksheet.merge_range(0, col, 0, 12+col, value, header_format)
                     col=col+13
-            col=3
+            col=9
             for col_num, value in enumerate(CF_second_row):
                 if col_num==8:
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -558,12 +564,13 @@ class Report:
                     worksheet.merge_range(1, col, 2, col, value, header_format)
                     col=col+1
             cf_gap=0
+            col=9
             for col_num, value in enumerate(third_row):
                 if col_num in (0,22,27):
                     cf_gap +=1
                 if col_num in (11,38,):
                     cf_gap +=2
-                worksheet.write(2, 3+cf_gap+col_num, value, header_format)
+                worksheet.write(2, col+cf_gap+col_num, value, header_format)
 
             # worksheet = writer.sheets['User-Course']            
             # default_column = ['COO','TM','Course']
@@ -660,10 +667,10 @@ class Report:
                 worksheet.write(2, 3+cf_gap+col_num, value, header_format)
 
             worksheet = writer.sheets['User-Sub Project']
-            default_column = ['COO','TM','CM/PC','Sub Project']
+            default_column = ['Region','COO','TM','CM/PC','BU','Project status','Project Id','Project Name','Subproject ID','SubProject Name']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=4
+            col=10
             for col_num, value in enumerate(first_row):
                 if col_num==2:
                     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
@@ -672,7 +679,7 @@ class Report:
                     worksheet.merge_range(0, col, 0, 12+col, value, header_format)
                     col=col+13
             
-            col=4
+            col=10
             for col_num, value in enumerate(CF_second_row):
                 if col_num==8:
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -687,12 +694,13 @@ class Report:
                     worksheet.merge_range(1, col, 2, col, value, header_format)
                     col=col+1
             cf_gap=0
+            col=10
             for col_num, value in enumerate(third_row):
                 if col_num in (0,22,27):
                     cf_gap += 1
                 if col_num in (11,38,):
                     cf_gap += 2
-                worksheet.write(2, 4+cf_gap+col_num, value, header_format)
+                worksheet.write(2, col+cf_gap+col_num, value, header_format)
     
             # worksheet = writer.sheets['User-Course']            
             # default_column = ['COO','TM','CM/PC','Course']
@@ -808,10 +816,11 @@ class Report:
             
             # first_row_sp,second_row_sp,third_row_sp
             worksheet = writer.sheets['User-Sub Project']
-            default_column = ['COO','Sub Project']
+            default_column = ['Region', 'COO', 'BU','Project status', 'Project id', 'Project name', 'Subproject ID', 'SubProject Name']
+
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=2
+            col=8
             for col_num, value in enumerate(first_row_sp):
                 # if col_num==3:
                 #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
@@ -819,7 +828,7 @@ class Report:
                 # else:
                 worksheet.merge_range(0, col, 0, 10+col, value, header_format)
                 col=col+11
-            col=2
+            col=8
             for col_num, value in enumerate(second_row_sp):
                 # if col_num==6:
                 #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -830,8 +839,9 @@ class Report:
                 elif value=='Actual':
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6                
+            col=8
             for col_num, value in enumerate(third_row_sp):
-                worksheet.write(2, 2+col_num, value, header_format)
+                worksheet.write(2, col+col_num, value, header_format)
 
             # worksheet = writer.sheets['User-Course']            
             # default_column = ['COO','Course']
@@ -921,10 +931,11 @@ class Report:
 
             worksheet = writer.sheets['User-Sub Project']
             # first_row_sp,second_row_sp,third_row_sp
-            default_column = ['COO','TM','Sub Project']
+            default_column = ['Region', 'COO','TM', 'BU','Project status', 'Project id', 'Project name', 'Subproject ID', 'SubProject Name']
+
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=3
+            col=9
             for col_num, value in enumerate(first_row_sp):
                 # if col_num==3:
                 #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
@@ -932,7 +943,7 @@ class Report:
                 # else:
                 worksheet.merge_range(0, col, 0, 10+col, value, header_format)
                 col=col+11
-            col=3
+            col=9
             for col_num, value in enumerate(second_row_sp):
                 # if col_num==6:
                 #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -944,7 +955,7 @@ class Report:
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6                
             for col_num, value in enumerate(third_row_sp):
-                worksheet.write(2, 3+col_num, value, header_format)
+                worksheet.write(2, 9+col_num, value, header_format)
 
             # worksheet = writer.sheets['User-Course']            
             # default_column = ['COO','TM','Course']
@@ -1033,10 +1044,10 @@ class Report:
                 worksheet.write(2, 3+col_num, value, header_format)
             # first_row_sp,second_row_sp,third_row_sp
             worksheet = writer.sheets['User-Sub Project']
-            default_column = ['COO','TM','CM/PC','Sub Project']
+            default_column = ['Region', 'COO','TM', 'CM/PC', 'BU','Project status', 'Project id', 'Project name', 'Subproject ID', 'SubProject Name']
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=4
+            col=10
             for col_num, value in enumerate(first_row_sp):
                 # if col_num==3:
                 #     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
@@ -1044,7 +1055,7 @@ class Report:
                 # else:
                 worksheet.merge_range(0, col, 0, 10+col, value, header_format)
                 col=col+11
-            col=4
+            col=10
             for col_num, value in enumerate(second_row_sp):
                 # if col_num==6:
                 #     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -1056,7 +1067,7 @@ class Report:
                     worksheet.merge_range(1, col, 1, 5+col, value, header_format)
                     col=col+6                
             for col_num, value in enumerate(third_row_sp):
-                worksheet.write(2, 4+col_num, value, header_format)
+                worksheet.write(2, 10+col_num, value, header_format)
 
             # worksheet = writer.sheets['User-Course']            
             # default_column = ['COO','TM','CM/PC','Course']
@@ -2692,7 +2703,7 @@ class Report:
             # df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Course') 
 
             worksheet = writer.sheets['Revenue Report']
-            default_column = ['COO','Sub Project Name','Sub Project Code']
+            default_column = ['Region','COO','BU','Project status','Project Name','Project Id','SubProject Name','Subproject ID']
             first_row = ['Enrolment', 'New Batch Start','Training Nos', 'Certification','Placement','Revenue']
             #second_row = ['Target', 'Actual','Target', 'Actual','Actual','Target', 'Actual','Target', 'Actual','Target', 'Actual']
             CF_second_row = ['C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month','Actual','C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month','Target', 'Actual']
@@ -2702,7 +2713,7 @@ class Report:
             
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=3
+            col=8
             for col_num, value in enumerate(first_row):
                 if col_num==2:
                     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
@@ -2713,7 +2724,7 @@ class Report:
                 else:
                     worksheet.merge_range(0, col, 0, 12+col, value, header_format)
                     col=col+13
-            col=3
+            col=8
             for col_num, value in enumerate(CF_second_row):
                 if col_num==8:
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -2728,12 +2739,13 @@ class Report:
                     worksheet.merge_range(1, col, 2, col, value, header_format)
                     col=col+1
             cf_gap=0
+            col=8
             for col_num, value in enumerate(third_row):
                 if col_num in (0,22,27,49):
                     cf_gap +=1
                 if col_num in (11,38,):
                     cf_gap +=2
-                worksheet.write(2, 3+cf_gap+col_num, value, header_format)
+                worksheet.write(2, col+cf_gap+col_num, value, header_format)
             writer.save()
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
@@ -2760,7 +2772,7 @@ class Report:
             # df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Course') 
 
             worksheet = writer.sheets['Revenue Report']
-            default_column = ['COO','TM','Sub Project Name','Sub Project Code']
+            default_column = ['Region','COO','TM','BU','Project status','Project Name','Project Id','SubProject Name','Subproject ID']
             first_row = ['Enrolment', 'New Batch Start','Training Nos', 'Certification','Placement','Revenue']
             CF_second_row = ['C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month','Actual','C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month','Target', 'Actual']
             third_row = ['W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%', 'W-1', 'W-2','W-3','W-4','Total','W-1', 'W-2','W-3','W-4','Total','%',
@@ -2769,7 +2781,7 @@ class Report:
   
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=4
+            col=9
             for col_num, value in enumerate(first_row):
                 if col_num==2:
                     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
@@ -2780,7 +2792,7 @@ class Report:
                 else:
                     worksheet.merge_range(0, col, 0, 12+col, value, header_format)
                     col=col+13
-            col=4
+            col=9
             for col_num, value in enumerate(CF_second_row):
                 if col_num==8:
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -2795,12 +2807,13 @@ class Report:
                     worksheet.merge_range(1, col, 2, col, value, header_format)
                     col=col+1
             cf_gap=0
+            col=9
             for col_num, value in enumerate(third_row):
                 if col_num in (0,22,27,49):
                     cf_gap +=1
                 if col_num in (11,38,):
                     cf_gap +=2
-                worksheet.write(2, 4+cf_gap+col_num, value, header_format)
+                worksheet.write(2, col+cf_gap+col_num, value, header_format)
             writer.save()
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
@@ -2827,7 +2840,7 @@ class Report:
             # df.to_excel(writer, index=None, header=None ,startrow=3 ,sheet_name='User-Course') 
 
             worksheet = writer.sheets['Revenue Report']
-            default_column = ['COO','TM','CM/PC','Sub Project Name','Sub Project Code']
+            default_column = ['Region','COO','TM','CM/PC','BU','Project status','Project Name','Project Id','SubProject Name','Subproject ID']
             first_row = ['Enrolment', 'New Batch Start','Training Nos', 'Certification','Placement','Revenue']
             # second_row = ['Target', 'Actual','Target', 'Actual','Actual','Target', 'Actual','Target', 'Actual']
             CF_second_row = ['C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month','Actual','C/F From Last Month','Target', 'Actual','Gap_Selected Month','C/F From Last Month','Target', 'Actual','Gap_Selected Month','Target', 'Actual']
@@ -2837,7 +2850,7 @@ class Report:
             
             for col_num, value in enumerate(default_column):
                 worksheet.merge_range(0, col_num, 2, col_num, value, header_format)
-            col=5
+            col=10
             for col_num, value in enumerate(first_row):
                 if col_num==2:
                     worksheet.merge_range(0, col, 0, 4+col, value, header_format)
@@ -2849,7 +2862,7 @@ class Report:
                     worksheet.merge_range(0, col, 0, 12+col, value, header_format)
                     col=col+13
             
-            col=5
+            col=10
             for col_num, value in enumerate(CF_second_row):
                 if col_num==8:
                     worksheet.merge_range(1, col, 1, 4+col, value, header_format)
@@ -2864,12 +2877,13 @@ class Report:
                     worksheet.merge_range(1, col, 2, col, value, header_format)
                     col=col+1
             cf_gap=0
+            col=10
             for col_num, value in enumerate(third_row):
                 if col_num in (0,22,27,49):
                     cf_gap += 1
                 if col_num in (11,38,):
                     cf_gap += 2
-                worksheet.write(2, 5+cf_gap+col_num, value, header_format)        
+                worksheet.write(2, col+cf_gap+col_num, value, header_format)
             writer.save()
             return({'msg':'created excel', 'success':True, 'filename':path})
         except Exception as e:
