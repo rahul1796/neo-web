@@ -772,9 +772,11 @@ class user_list(Resource):
             user_region_id=request.form['user_region_id']
             user_role_id=request.form['user_role_id']
             status_ids=request.form['status_ids']
+            Act_status_id=request.form['Act_status_id']
+            
             project_ids=request.form['project_ids']
             #print(user_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw,dept_ids,role_ids,entity_ids,region_ids,RM_Role_ids,R_mangager_ids,filter_role_id,user_region_id,user_role_id,status_ids,project_ids)
-            return UsersM.user_list(user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids)
+            return UsersM.user_list(user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids,Act_status_id)
             
 
 class add_user_details(Resource):
@@ -1505,10 +1507,9 @@ class user_sub_project_list_download(Resource):
             status_id=request.form['status_id']
 
             file_name='user_sub_project_report.xlsx'
-
-                       
+            
             resp = user_subproject_download.create_report(sub_project,project,region,customer,user_id,user_role_id,employee_status,sub_project_status,month,year,status_id,file_name)
-            return resp       
+            return resp
 
 api.add_resource(candidate_list, '/candidate_list')
 api.add_resource(user_sub_project_list, '/user_sub_project_list')
@@ -5659,7 +5660,8 @@ class otp_send(Resource):
                     #sms_msg=   'Hi {},\n\nThank you for getting in touch with Labournet.\nYour OTP is {}.\n\nThanks,\nNEO Teams.'.format(cand_name, otp)
                     #sms_msg='Hi {},\n\nYour OTP is {}.\nOR\nClick here to verify {}\n\nThanks,\nNEO Team.'.format(name, otp,short_url)
                     if is_otp==1:
-                        sms_msg='Hi {},\n\nThank you for getting in touch with Labournet.\nYour Registration Number is {}.\n\nThanks,\nNEO Teams.'.format(name, otp)
+                        sms_msg='Hi {},\n\nThank you for getting in touch with Labournet.\nYour OTP for mobile number verification is {}.\n\nThanks,\nNEO Teams.'.format(name, otp)
+                        #sms_msg='Hi {},\n\nThank you for getting in touch with Labournet.\nYour Registration Number is {}.\n\nThanks,\nNEO Teams.'.format(name, otp)
                     elif is_otp==0:
                         sms_msg='Hi {},\n\nClick to verify your mobile number with Labournet.{}.\n\nNEO Team.'.format(name,short_url)
                     #print(sms_msg)
@@ -7834,6 +7836,22 @@ class AddeEdittUserTarget(Resource):
                 return out
 
 api.add_resource(AddeEdittUserTarget,'/AddeEdittUserTarget')
+
+class AddeEdittUserAllocation(Resource):
+    @staticmethod
+    def post():
+        if request.method == 'POST':
+            try:
+                allocation=request.form['allocation']
+                user_id=request.form['user_id']
+                mapping_id=request.form['mapping_id']
+                out = UsersM.AddeEdittUserAllocation(mapping_id,allocation,user_id)
+            except Exception as e:
+                out = {"PopupMessage":{"message":"Error " + str(e), "status":0}}
+            finally:
+                return out
+
+api.add_resource(AddeEdittUserAllocation,'/AddeEdittUserAllocation')
 
 class upload_batch_target_plan(Resource):
     @staticmethod

@@ -42,11 +42,16 @@ def create_report(sub_project,project,region,customer,user_id,user_role_id,emplo
         data = curs.fetchall()
         data = list(map(lambda x:list(x), data))
         df = pd.DataFrame(data, columns=columns)
-        df= df[['Employee_Code', 'Employee_Name','Employee_Email','Sub_Project_Code', 'Sub_Project_Name', 'Employee_Neo_Role', 'Employement_Type','Region','Employee_Status']]
-        
+
+        df= df[['Employee_Code', 'Employee_Name','Employee_Email', 'Employee_Neo_Role', 'Employement_Type','Employee_Status', 
+        'Sub_Project_Name', 'Sub_Project_Code', 'Project_Name', 'Project_Code', 'Project_Stage', 'Bu_Name', 'Coo', 'Region']]
+
         df.to_excel(writer, index=None, header=None ,startrow=1 ,sheet_name='User-SubProject') 
         worksheet = writer.sheets['User-SubProject']
-        Column = ['Employee_Code', 'Employee_Name','Employee_Email','Sub_Project_Code', 'Sub_Project_Name', 'Employee_Neo_Role', 'Employement_Type','Region','Employee_Status']
+        
+        Column = ['Employee Code', 'Employee Name','Employee Email', 'Employee Neo Role', 'Employement Type','Employee Status',
+        'Sub Project Name', 'Sub Project Code', 'Project Name', 'Project Code', 'Project Status', 'Bu Name', 'COO', 'Region']
+        
         for col_num, value in enumerate(Column):
             worksheet.write(0, col_num, value, header_format)
 

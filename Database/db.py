@@ -859,13 +859,14 @@ class Database:
         cur.close()
         con.close()
         return h    
-    def user_list(user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids):
+    def user_list(user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction,draw, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids,Act_status_id):
         content = {}
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        sql = 'exec [users].[sp_get_users_list] ?, ?, ?, ?, ?, ?,? ,? ,? ,? ,? ,?, ?, ?, ?, ?, ?'
-        values = (user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids)
+        sql = 'exec [users].[sp_get_users_list] ?, ?, ?, ?, ?, ?,? ,? ,? ,? ,? ,?, ?, ?, ?, ?, ?, ?'
+        values = (user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids,Act_status_id)
+        #print(values)
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -1297,6 +1298,7 @@ class Database:
         cur = con.cursor()
         sql = 'exec	[masters].[untag_users_from_sub_project] ?, ?'
         values = (map_subproject_user_ids,sub_project_id)
+        print(values)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -4968,7 +4970,7 @@ SELECT					cb.name as candidate_name,
         response=[]
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
-        if region_id ==5 or region_id==6:
+        if region_id ==5 or region_id==6 or region_id==7:
             sql = 'select state_id, state_name from masters.tbl_states where is_active=1'
         else:
             sql = 'select state_id, state_name from masters.tbl_states where is_active=1 and region_id ='+str(region_id)
@@ -6124,7 +6126,7 @@ SELECT					cb.name as candidate_name,
                 mobilization_type = temp_data['mobilization_type']
             if 'assign_batch' in temp_data:
                 json_array.append({"Candidate_id":temp_data['cand_id'],"batch_id":temp_data['assign_batch']})
-            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"row_id":row_id,"primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
+            json_array_cont.append({"Candidate_id":temp_data['cand_id'],"row_id":temp_data['row_id'],"primaryMob":temp_data['primaryMob'],"candEmail":temp_data['candEmail'], "firstname":temp_data['firstname']})
 
         sql = 'exec	[masters].[sp_validate_upload_mobh_contact_info] ?'
         values = (json.dumps(json_array_cont),)
@@ -7765,6 +7767,24 @@ SELECT					cb.name as candidate_name,
         cur2.close()
         con.close()
         return response
+    def AddeEdittUserAllocation(mapping_id,allocation,user_id):
+        con = pyodbc.connect(conn_str)
+        cur = con.cursor()
+        sql = 'exec	[users].[sp_add_edit_user_sub_project_allocation] ?, ?, ?'
+        values = (mapping_id,allocation,user_id)
+        cur.execute(sql,(values))
+        for row in cur:
+            pop=row[1]
+        cur.commit()
+        cur.close()
+        con.close()
+        if pop ==2:
+            msg={"message":"Not More than 100 Percent can be allocated!", "status":2}
+        elif pop ==1:
+            msg={"message":"Updated", "status":1}
+        else:
+            msg={"message":"Error in updating allocation!", "status":0}
+        return msg
     
     def add_edit_user_targer(created_by, From_Date, To_Date, product, target, is_active, user_id, user_target_id):
         con = pyodbc.connect(conn_str)
@@ -8212,7 +8232,7 @@ SELECT					cb.name as candidate_name,
     def GetShikshaLastSyncDate():
         last_sync_date = ''
         con = pyodbc.connect(conn_str)
-        cur2 = con.cursor()        
+        cur2 = con.cursor()
         quer = "Select COALESCE(cast(MAX(last_sync_date) as date),cast('2019-04-01' as date)) as last_sync_date from [masters].[tbl_shiksha_candidate_data];"
         cur2.execute(quer)
         data=cur2.fetchall()
@@ -8274,7 +8294,7 @@ SELECT					cb.name as candidate_name,
             # print(str(df.to_json(orient='records')))
             con = pyodbc.connect(conn_str)
             cur = con.cursor()            
-            sql = 'exec	[masters].[sp_sync_weekly_user_sp_allocation] '
+            sql = 'exec	[masters].[sp_sync_weekly_user_sp_allocation_new] '
             cur.execute(sql)
             for row in cur:
                 pop=row[0]
@@ -9289,12 +9309,12 @@ SELECT					cb.name as candidate_name,
             sql = 'exec [reports].[sp_get_revenue_report_data_coo] ?, ?, ?,?,?,?,?'
         #     sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_sub_project] ?, ?, ?,?,?,?,?'
         #     sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_coo_course] ?, ?, ?,?,?,?,?'
-        # # if int(role_id)==14:
-        #     sql = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager] ?, ?, ?,?,?,?,?'
+        if int(role_id)==14:
+            sql = 'exec [reports].[sp_get_revenue_report_data_territory_manager_sub_project] ?, ?, ?,?,?,?,?'
         #     sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_sub_project] ?, ?, ?,?,?,?,?'
         #     sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_territory_manager_course] ?, ?, ?,?,?,?,?'
-        # if int(role_id)==5:
-        #     sql = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager] ?, ?, ?,?,?,?,?'
+        if int(role_id)==5:
+            sql = 'exec [reports].[sp_get_revenue_report_data_center_manager_sub_project] ?, ?, ?,?,?,?,?'
         #     sql1 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_sub_project] ?, ?, ?,?,?,?,?'
         #     sql2 = 'exec [reports].[sp_get_ops_productivity_report_data_center_manager_course] ?, ?, ?,?,?,?,?'
         values = (customer_ids, contract_ids, month,user_id,user_role_id,stage_ids,status_id)
