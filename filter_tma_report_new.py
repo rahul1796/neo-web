@@ -99,7 +99,10 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
 
             #df['SESSION GROUP IMAGE'] = df.loc[:,'SESSION GROUP IMAGE'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + attendance_url + x + '","View Image")')
             df['SESSION GROUP IMAGE'] = df.loc[:,'SESSION GROUP IMAGE'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + base_url + '/GetDocumentForExcel?image_name=' + x +'&image_path=attendance_images' + '","View Image")')
+<<<<<<< HEAD
             
+=======
+>>>>>>> 3b579b53a6d0b131e0052982bd03551f27f75809
             df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Session-Group-Images')
 
             worksheet = writer.sheets['Session-Group-Images']
