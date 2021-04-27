@@ -94,10 +94,11 @@ def create_report(start_date, end_date, customername, sub_project, coursename, n
             df = pd.DataFrame(data)
             df.columns = groupimage_default_column
 
-            attendance_image = '/data/TMA/attendance_images/'
-            attendance_url = base_url + attendance_image
+            #attendance_image = '/data/TMA/attendance_images/'
+            #attendance_url = base_url + attendance_image
 
-            df['SESSION GROUP IMAGE'] = df.loc[:,'SESSION GROUP IMAGE'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + attendance_url + x + '","View Image")')
+            #df['SESSION GROUP IMAGE'] = df.loc[:,'SESSION GROUP IMAGE'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + attendance_url + x + '","View Image")')
+            df['SESSION GROUP IMAGE'] = df.loc[:,'SESSION GROUP IMAGE'].map(lambda x: x if ((x=='NR') or (x=='NA')) else '=HYPERLINK("' + base_url + '/GetDocumentForExcel?image_name=' + x +'&image_path=attendance_images' + '","View Image")')
             
             df.to_excel(writer, index=None, header=None, startrow=1 ,sheet_name='Session-Group-Images')
 
