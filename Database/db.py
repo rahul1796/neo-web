@@ -864,9 +864,14 @@ class Database:
         d = []
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
+
         sql = 'exec [users].[sp_get_users_list] ?, ?, ?, ?, ?, ?,? ,? ,? ,? ,? ,?, ?, ?, ?, ?, ?, ?'
         values = (user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids,Act_status_id)
         #print(values)
+
+        #sql = 'exec [users].[sp_get_users_list] ?, ?, ?, ?, ?, ?,? ,? ,? ,? ,? ,?, ?, ?, ?, ?, ?'
+        #values = (user_id,filter_role_id,user_region_id,user_role_id,start_index,page_length,search_value,order_by_column_position,order_by_column_direction, dept_ids, role_ids, entity_ids, region_ids, RM_Role_ids, R_mangager_ids,status_ids,project_ids)
+
         cur.execute(sql,(values))
         columns = [column[0].title() for column in cur.description]
         record="0"
@@ -1298,7 +1303,6 @@ class Database:
         cur = con.cursor()
         sql = 'exec	[masters].[untag_users_from_sub_project] ?, ?'
         values = (map_subproject_user_ids,sub_project_id)
-        print(values)
         cur.execute(sql,(values))
         for row in cur:
             pop=row[1]
@@ -4970,6 +4974,7 @@ SELECT					cb.name as candidate_name,
         response=[]
         con = pyodbc.connect(conn_str)
         cur = con.cursor()
+
         if region_id ==5 or region_id==6 or region_id==7:
             sql = 'select state_id, state_name from masters.tbl_states where is_active=1'
         else:
