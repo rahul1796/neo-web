@@ -1507,10 +1507,9 @@ class user_sub_project_list_download(Resource):
             status_id=request.form['status_id']
 
             file_name='user_sub_project_report.xlsx'
-
-                       
+            
             resp = user_subproject_download.create_report(sub_project,project,region,customer,user_id,user_role_id,employee_status,sub_project_status,month,year,status_id,file_name)
-            return resp       
+            return resp
 
 api.add_resource(candidate_list, '/candidate_list')
 api.add_resource(user_sub_project_list, '/user_sub_project_list')
